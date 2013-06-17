@@ -15,6 +15,7 @@ from datetime import datetime
 from traceback import format_tb
 import urlparse
 from webob import Request
+import tempita
 
 from utilities import *
 
@@ -32,7 +33,7 @@ DEBUG = False
 
 ENCODING = 'utf-8'
 CONFIGURATION_PATH = './coldsweat.ini'
-TEMPLATE_PATH = ['./coldsweat/templates'] #  Support for multiple template dirs
+
 
 ##@@TODO Load up config file 
 #config = load_config(CONFIGURATION_PATH)
@@ -46,6 +47,9 @@ HTTP_SEE_OTHER = '303 See Other'
 HTTP_INTERNAL_SERVER_ERROR = '500 Internal Server Error'
 HTTP_FORBIDDEN = '403 Forbidden'
 HTTP_UNAUTHORIZED = '401 Unauthorized'
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
  
  
 # ------------------------------------------------------
@@ -70,9 +74,6 @@ def dispatch_request(environ, start_response):
 
     template_symbols = {
         'base_uri': get_base_uri(environ), 
-        'meta': meta,
-        'header': header,
-        'footer': footer,
         'encoding': ENCODING,
         'version_string': VERSION_STRING
     }
@@ -157,9 +158,6 @@ def redirect_to(uri, headers=None):
     return HTTP_SEE_OTHER, output_headers, u''
  
 
-
-
-        
 def sanitize(value, escape=True, truncate=30):     
     if truncate:
         value = value[:truncate]
@@ -173,45 +171,37 @@ def sanitize(value, escape=True, truncate=30):
 
 def fill_template_namespace(**kwargs):            
     d = kwargs.copy()
-    def _(source, **kwargs):
-        t = string.Template(source)    
+    def _(t, **kwargs):
         d.update(kwargs)        
-        return t.safe_substitute(d)
+        return t.substitute(d)
     return _
 
+
+def get_template(filename, from_template):
+    """
+    Load an inherited template
+    """
+    return tempita.Template.from_filename(os.path.join(BASE_DIR, 'templates', filename))
+        
 def fill_template(source, **kwargs):    
-    t = string.Template(source)    
-    return t.safe_substitute(kwargs)
+    t = tempita.Template(source, get_template=get_template)    
+    return t.substitute(kwargs)
 
-def load_disk_template(filename):            
-    for template_dir in TEMPLATE_PATH:
-        try:
-            with codecs.open(os.path.join(template_dir, filename), encoding=ENCODING) as f:
-                return f.read()
-        except IOError:
-            pass # Try another dir
-    raise IOError('Could not find template "%s" in the following directories: %s' % (filename, ', '.join(TEMPLATE_PATH)))
 
-# Load and fill once
-meta = load_disk_template('_meta.html')
-header = fill_template(load_disk_template('_header.html'))
-footer = fill_template(load_disk_template('_footer.html'))  
+def load_template(filename):            
+    return tempita.Template.from_filename(os.path.join(BASE_DIR, 'templates', filename), get_template=get_template)
+
 
 def make_page(filename, filler, symbols):
-    
+
     d = {
-         # CSS class
-         'page_class': symbols.get('name', '').lower(),
-         # Fallback to SITE_NAME if page_title is not given
-         'page_title': symbols.get('page_title', '')        
+         'page_title': symbols.get('page_title', 'Coldsweat')        
     }
                            
     d.update(symbols)            
-    # Assemble page _partials
-    body = filler(load_disk_template(filename), **d) 
+    body = filler(load_template(filename), **d) 
 
-    # Resolve remaning global symbols
-    return filler(body) 
+    return body
 
 
 # ------------------------------------------------------
@@ -272,5 +262,5 @@ dispatch_request = ExceptionMiddleware(dispatch_request)
 import fever
 
 # Web views
-#import views
+import views
 

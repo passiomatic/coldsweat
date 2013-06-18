@@ -18,13 +18,12 @@ from requests.exceptions import RequestException
 
 from sqlite3 import IntegrityError
 
-
 from models import *
 from utilities import *
 from app import VERSION_STRING
 
-import logging
-log = logging.getLogger()
+from coldsweat import log, config
+
 
 USER_AGENT = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING
  

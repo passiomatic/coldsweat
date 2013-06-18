@@ -18,9 +18,7 @@ from webob import Request
 import tempita
 
 from utilities import *
-
-import logging
-log = logging.getLogger()
+from coldsweat import log, config
 
 
 __author__ = 'Andrea Peltrin and Rui Carmo'
@@ -73,7 +71,7 @@ def dispatch_request(environ, start_response):
     output_headers = Headers([('Content-Type', 'text/html; charset=%s' % ENCODING)])
 
     template_symbols = {
-        'base_uri': get_base_uri(environ), 
+        'base_uri': get_base_uri(environ), #@@FIXME: Use reuqest.application_url instead
         'encoding': ENCODING,
         'version_string': VERSION_STRING
     }

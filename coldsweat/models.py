@@ -7,15 +7,17 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
+from os import path
 from datetime import datetime
 from calendar import timegm
 from peewee import *
 
 from utilities import *
 import favicon
+from coldsweat import config, installation_dir
 
-#db = SqliteDatabase(config.get('database_path'), threadlocals=True)
-db = SqliteDatabase('./data/coldsweat.db', threadlocals=True) 
+
+coldsweat_db = SqliteDatabase(None, threadlocals=True) 
 
 class CustomModel(Model):
     """
@@ -23,7 +25,7 @@ class CustomModel(Model):
     """
 
     class Meta:
-        database = db
+        database = coldsweat_db
 
 
 class User(CustomModel):
@@ -34,7 +36,7 @@ class User(CustomModel):
     DEFAULT_CREDENTIALS = 'default', 'default'
 
     username            = CharField(unique=True)
-    password            = CharField()
+    password            = CharField() #@@TODO: hashed & salted
     
     email               = CharField(null=True)
     api_key             = CharField(unique=True)
@@ -181,10 +183,26 @@ class Subscription(CustomModel):
     class Meta:
         db_table = 'subscriptions'
 
-def setup(skip_if_existing=False):
+
+def connect():
     """
-    Create tables for all models and setup bootstrap data
+    Shortcut to init and connect to database
     """
+
+    database_path = path.join(installation_dir, config.get('database', 'database_path'))
+
+    coldsweat_db.init(database_path)    
+    coldsweat_db.connect()
+
+
+def setup(database_path, skip_if_existing=False):
+    """
+    Create database and tables for all models and setup bootstrap data
+    """
+
+    coldsweat_db.init(database_path)
+    coldsweat_db.connect()
+    
     models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription
 
     for model in models:
@@ -193,9 +211,7 @@ def setup(skip_if_existing=False):
     username, password = User.DEFAULT_CREDENTIALS
 
     # Create the bare minimum to boostrap system
-    with db.transaction():
+    with coldsweat_db.transaction():
         User.create(username=username, password=password, api_key=make_md5_hash('%s:%s' % (username, password)))
         Group.create(title='All entries')        
         Icon.create(data=favicon.DEFAULT_FAVICON) 
-
-

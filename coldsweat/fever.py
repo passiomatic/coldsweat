@@ -160,7 +160,9 @@ COMMANDS = [
 @view(r'^/fever/$', 'POST')
 def endpoint(request, _):
 
-    log.debug('client request -> %s' % request.params)
+    connect()
+
+    log.debug('client from %s requested: %s' % (request.remote_addr, request.params))
 
     result = Struct({'api_version':2, 'auth':0})    
     

@@ -174,7 +174,7 @@ def endpoint(request, _):
     if 'api_key' in request.POST:
         api_key = request.POST['api_key']        
         try:
-            user = User.get(User.api_key == api_key)
+            user = User.get((User.api_key == api_key) & (User.is_enabled == True))
         except User.DoesNotExist:
             return HTTP_UNAUTHORIZED, headers, serialize(result) 
     else:

@@ -8,7 +8,9 @@ License: MIT (see LICENSE.md for details)
 """
 
 from hashlib import md5, sha1
-import time, timeformat, cgi
+from calendar import timegm
+from datetime import datetime
+import cgi
 
 
 DEFAULT_ENCODING = 'utf-8'
@@ -30,40 +32,47 @@ def make_sha1_hash(s):
     return sha1(encode(s)).hexdigest()
 
 # --------------------
-# Format date/times
+# Date/time functions
 # --------------------
 
-def format_datetime(seconds, short=True):    
-    return timeformat.format(short and '%b[SHORT] %d, %Y' or '%b[SHORT] %d, %Y at %H:%M', 
-        time.gmtime(seconds), utctime=True)
 
-def format_iso_datetime(seconds):        
-    return timeformat.format(u'%Y-%m-%dT%H:%M:%S%z', 
-        time.gmtime(seconds), utctime=True)
+# def format_iso_datetime(seconds):        
+#     return timeformat.format(u'%Y-%m-%dT%H:%M:%S%z', 
+#         time.gmtime(seconds), utctime=True)
 
-# def format_log_datetime(datetime):
-#     return timeformat.format(u'%d/%b[SHORT]/%Y:%H:%M:%S %T', 
-#         datetime.timetuple(), utctime=True)
+# def format_http_datetime(value):        
+#     return timeformat.format(u'%a[SHORT], %d %b[SHORT] %Y %H:%M:%S %z', 
+#         value.utctimetuple(), utctime=True)
 
-def format_http_datetime(datetime):        
-    return timeformat.format(u'%a[SHORT], %d %b[SHORT] %Y %H:%M:%S %Z', 
-        datetime.utctimetuple(), utctime=True)
+def format_http_datetime(value):
+    """
+    Format datetime to comply with RFC 1123 
+    (ex.: Fri, 12 Feb 2010 16:23:03 GMT). 
+    Assume GMT values
+    """
+    #@@FIXME: what if locale isn't en?
+    return value.strftime(u'%a, %d %b %Y %H:%M:%S GMT')
 
-# --------------------
-# Escape functions
-# --------------------
-
-def escape_html(s):
-    return cgi.escape(s, quote=True)
-
-# def escape_url(value):
-#     return urllib.quote(value)
-
-
+def datetime_as_epoch(value):
+    return int(timegm(value.utctimetuple()))
+    
+def epoch_as_datetime(value):
+    return datetime.utcfromtimestamp(timegm(value))
+    
 # --------------------
 # Misc
 # --------------------
 
+def get_excerpt(value, truncate=200):     
+    """
+    Escape and truncate an HTML string
+    """
+    if truncate:
+        value = value[:truncate]
+    
+    return cgi.escape(value, quote=True)
+    
+    
 class Struct(dict):
     """
     An object that recursively builds itself from a dict 
@@ -92,16 +101,12 @@ class Struct(dict):
         self.__setitem__(attr, value)            
 
     
-    
-    
 def run_tests():
     
-    t = time.time()
+    t = datetime.utcnow()
     
-    print format_datetime(t)
-    print format_iso_datetime(t)
     print format_http_datetime(t)
-    print escape_html('Some <script src="http://example.com/evil.js"></script> code.')
+    print get_excerpt('Some <script src="http://example.com/evil.js"></script> code.')
     
 if __name__ == '__main__':
     run_tests()

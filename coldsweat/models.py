@@ -11,7 +11,7 @@ from datetime import datetime
 from calendar import timegm
 from peewee import *
 
-from utilities import make_md5_hash
+from utilities import *
 import favicon
 
 #db = SqliteDatabase(config.get('database_path'), threadlocals=True)
@@ -104,7 +104,7 @@ class Feed(CustomModel):
     @property
     def last_updated_on_as_epoch(self):
         if self.last_updated_on: # Never updated?
-            return int(timegm(self.last_updated_on.utctimetuple()))
+            return datetime_as_epoch(self.last_updated_on)
         return 0 
 
 
@@ -138,8 +138,12 @@ class Entry(CustomModel):
 
     @property
     def last_updated_on_as_epoch(self):
-        return int(timegm(self.last_updated_on.utctimetuple()))
-        
+        return datetime_as_epoch(self.last_updated_on)
+
+    @property
+    def excerpt(self):
+        return get_excerpt(self.content)
+                
 class Saved(CustomModel):
     """
     Many-to-many relationship between Users and entries

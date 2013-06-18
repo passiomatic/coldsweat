@@ -36,7 +36,7 @@ def get_feed_updated(feed, default):
     for header in ['updated_parsed', 'published_parsed']:
         value = feed.get(header, None)
         if value:
-            return datetime.utcfromtimestamp(timegm(value))
+            return epoch_as_datetime(value)
     return default
 
 def get_entry_timestamp(entry, default):
@@ -46,7 +46,7 @@ def get_entry_timestamp(entry, default):
     for header in ['updated_parsed', 'published_parsed', 'created_parsed']:
         value = entry.get(header, None)
         if value:
-            return datetime.utcfromtimestamp(timegm(value))
+            return epoch_as_datetime(value)
     return default
         
 def get_entry_title(entry):
@@ -156,13 +156,13 @@ def fetch_feed(feed):
     if feed.last_checked_on:
         #@@FIXME Load up settings settings.fetcher.min_interval
         if (now - feed.last_checked_on).seconds < 60*30:
-            log.info("last_checked_on for %s is below min_interval, skipped" % netloc)
+            log.debug("last_checked_on for %s is below min_interval, skipped" % netloc)
             return
 
     if feed.last_updated_on:
         #@@FIXME Load up settings settings.fetcher.min_interval
         if (now - feed.last_updated_on).seconds < 60*30:
-            log.info("last_updated_on for %s is below min_interval, skipped" % netloc)
+            log.debug("last_updated_on for %s is below min_interval, skipped" % netloc)
             return
        
     # Conditional GET headers
@@ -180,7 +180,7 @@ def fetch_feed(feed):
         return
 
     if response.status_code == 304: # Not modified
-        log.info("%s hasn't been modified, skipped" % netloc)
+        log.debug("%s hasn't been modified, skipped" % netloc)
         post_fetch(response.status_code)
         return
     elif response.status_code == 410: # Gone

@@ -158,13 +158,6 @@ def redirect_to(uri, headers=None):
     return HTTP_SEE_OTHER, output_headers, u''
  
 
-def sanitize(value, escape=True, truncate=30):     
-    if truncate:
-        value = value[:truncate]
-    
-    return escape_html(value) if escape else value
-
-   
 # ------------------------------------------------------
 # Templates
 # ------------------------------------------------------

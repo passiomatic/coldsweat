@@ -45,6 +45,7 @@ HTTP_SEE_OTHER = '303 See Other'
 HTTP_INTERNAL_SERVER_ERROR = '500 Internal Server Error'
 HTTP_FORBIDDEN = '403 Forbidden'
 HTTP_UNAUTHORIZED = '401 Unauthorized'
+HTTP_BAD_REQUEST = '400 Bad Request'
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

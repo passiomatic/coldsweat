@@ -16,8 +16,8 @@ from utilities import *
 import favicon
 from coldsweat import config, installation_dir
 
-
-coldsweat_db = SqliteDatabase(None, threadlocals=True) 
+# Defer database init, see connect() below
+coldsweat_db = SqliteDatabase(None) #, threadlocals=True) 
 
 class CustomModel(Model):
     """
@@ -184,24 +184,26 @@ class Subscription(CustomModel):
         db_table = 'subscriptions'
 
 
-def connect():
+def connect(database_path=None):
     """
     Shortcut to init and connect to database
     """
-
-    database_path = path.join(installation_dir, config.get('database', 'database_path'))
+    
+    if not database_path:
+        database_path = path.join(installation_dir, config.get('database', 'database_path'))
 
     coldsweat_db.init(database_path)    
     coldsweat_db.connect()
+    
+    # See http://www.sqlite.org/wal.html
+    coldsweat_db.execute_sql('PRAGMA journal_mode=WAL')
 
-
-def setup(database_path, skip_if_existing=False):
+def setup(database_path=None, skip_if_existing=False):
     """
     Create database and tables for all models and setup bootstrap data
     """
 
-    coldsweat_db.init(database_path)
-    coldsweat_db.connect()
+    connect(database_path)
     
     models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription
 
@@ -215,3 +217,4 @@ def setup(database_path, skip_if_existing=False):
         User.create(username=username, password=password, api_key=make_md5_hash('%s:%s' % (username, password)))
         Group.create(title='All entries')        
         Icon.create(data=favicon.DEFAULT_FAVICON) 
+

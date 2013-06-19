@@ -8,16 +8,15 @@ License: MIT (see LICENSE.md for details)
 """
 import os, sys, cgi, time, re
 from collections import defaultdict
+from datetime import datetime
 from calendar import timegm
 
 from utilities import *    
 from app import *
 from models import *
 
-from sqlite3 import IntegrityError
+from sqlite3 import IntegrityError 
 
-import logging
-log = logging.getLogger()
 
 RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 60*60 # 1 hour
@@ -97,55 +96,80 @@ def unread_recently_command(request, user, result):
 def mark_command(request, user, result):
 
     try:
-        mark = request.POST['mark']
-        entry_status = request.POST['as']
-        entry_id = request.POST['id']
+        mark, status, object_id = request.POST['mark'], request.POST['as'], request.POST['id']
     except KeyError:
         return              
 
-    if not RE_DIGITS.match(entry_id):
+    try:        
+        object_id = int(object_id)        
+    except ValueError:
         return
-        
-    entry_id = int(entry_id)        
         
     if mark == 'item':
 
         try:
             # Sanity check
-            entry = Entry.get(Entry.id == entry_id)  
+            entry = Entry.get(Entry.id == object_id)  
         except Entry.DoesNotExist:
-            log.warn('could not find requested entry %d, ignored' % entry_id)
+            log.warn('could not find requested entry %d, ignored' % object_id)
             return
 
-        if entry_status == 'read':
+        if status == 'read':
             try:
                 Read.create(user=user, entry=entry)
             except IntegrityError:
-                log.warn('entry %d already marked as read, ignored' % entry_id)
+                log.warn('entry %d already marked as read, ignored' % object_id)
                 return
         #Note: strangely enough 'unread' is not mentioned in 
-        #  the Fever API, but Reeder app ask for it
-        elif entry_status == 'unread':
+        #  the Fever API, but Reeder app asks for it
+        elif status == 'unread':
             count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
             if not count:
-                log.debug('entry %d never marked as read, ignored' % entry_id)
+                log.debug('entry %d never marked as read, ignored' % object_id)
                 return
-        elif entry_status == 'saved':
+        elif status == 'saved':
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
-                log.warn('entry %d already marked as saved, ignored' % entry_id)
+                log.warn('entry %d already marked as saved, ignored' % object_id)
                 return
-        elif entry_status == 'unsaved':
+        elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
             if not count:
-                log.debug('entry %d never marked as saved, ignored' % entry_id)
+                log.debug('entry %d never marked as saved, ignored' % object_id)
                 return
                   
-        log.debug('marked entry %d as %s' % (entry_id, entry_status))
+        log.debug('marked entry %d as %s' % (object_id, status))
 
 
-    #@@TODO: mark:feed, mark:group
+    if mark == 'feed':
+
+        try:
+            # Sanity check
+            feed = Feed.get(Feed.id == object_id)  
+        except Feed.DoesNotExist:
+            log.warn('could not find requested feed %d, ignored' % object_id)
+            return
+
+        if status == 'read':
+            # Unix timestamp of the the local client’s last items API request
+            try:
+                before = datetime.utcfromtimestamp(int(request.POST['before']))
+            except KeyError, ValueError:
+                return              
+            
+            with coldsweat_db.transaction():
+                for entry in feed.entries.where(Entry.last_updated_on < before):
+                    try:
+                        Read.create(user=user, entry=entry)
+                    except IntegrityError:
+                        continue
+            
+            log.debug('marked feed %d as %s' % (object_id, status))
+                
+            
+
+    #@@TODO: mark:group
 
 
 def links_command(request, user, result):

@@ -16,8 +16,6 @@ import urlparse
 import requests
 from requests.exceptions import RequestException
 
-from sqlite3 import IntegrityError
-
 from models import *
 from utilities import *
 from app import VERSION_STRING

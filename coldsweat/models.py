@@ -17,7 +17,18 @@ import favicon
 from coldsweat import config, installation_dir
 
 # Defer database init, see connect() below
-coldsweat_db = SqliteDatabase(None) #, threadlocals=True) 
+engine = config.get('database', 'engine', 'sqlite')
+if engine == 'sqlite':
+    from sqlite3 import IntegrityError
+    coldsweat_db = SqliteDatabase(None) 
+elif engine == 'mysql':
+    from MySQLdb import IntegrityError
+    coldsweat_db = MySQLDatabase(None)
+else:
+    raise ValueError('Unknown database engine %s. Should be sqlite or mysql' % engine)
+
+
+
 
 class CustomModel(Model):
     """
@@ -184,26 +195,39 @@ class Subscription(CustomModel):
         db_table = 'subscriptions'
 
 
-def connect(database_path=None):
+def connect():
     """
     Shortcut to init and connect to database
     """
     
-    if not database_path:
-        database_path = path.join(installation_dir, config.get('database', 'database_path'))
+    if engine == 'sqlite':
+        filename = path.join(installation_dir, config.get('database', 'filename'))
+        
+        coldsweat_db.init(filename)    
+        
+        # See http://www.sqlite.org/wal.html
+        #coldsweat_db.execute_sql('PRAGMA journal_mode=WAL')
+        
+    elif engine == 'mysql':            
+        database = config.get('database', 'database', 'coldsweat')
 
-    coldsweat_db.init(database_path)    
-    coldsweat_db.connect()
+        kwargs = dict(
+            host    = config.get('database', 'hostname', 'localhost'),
+            user    = config.get('database', 'username', 'root'),
+            passwd  = config.get('database', 'password', 'secret')        
+        )
+
+        coldsweat_db.init(database, **kwargs)
     
-    # See http://www.sqlite.org/wal.html
-    coldsweat_db.execute_sql('PRAGMA journal_mode=WAL')
+    coldsweat_db.connect()
 
-def setup(database_path=None, skip_if_existing=False):
+
+def setup(skip_if_existing=False):
     """
     Create database and tables for all models and setup bootstrap data
     """
 
-    connect(database_path)
+    connect()
     
     models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription
 

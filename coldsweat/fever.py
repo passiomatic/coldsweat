@@ -15,7 +15,7 @@ from utilities import *
 from app import *
 from models import *
 
-from sqlite3 import IntegrityError 
+#from sqlite3 import IntegrityError 
 
 
 RE_DIGITS = re.compile('[0-9]+')

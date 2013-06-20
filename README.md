@@ -1,6 +1,6 @@
 # Coldsweat
 
-Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and a simple feed store based on SQLite.
+Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and a simple feed store based on SQLite and MySQL.
 
 Coldsweat started as a fork of Bottle Fever by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds. 
 
@@ -13,13 +13,14 @@ Since Coldsweat is intended for personal use — but you can have multiple user
 * Compatible with Reeder apps on iOS and Mac OS X
 * Grouping of similar items
 * Minimal web interface to add/import feeds
+* Multiprocessing for parallel feed fetching
 
 ## Technical underpinnings
 
-* SQLite database (trivial to replace if you want to scale up, since it uses the Peewee ORM)
+* SQLite and MySQL databases (trivial to add Postgres if you want, since it uses the Peewee ORM)
 * WSGI compatible, currently tested under FastCGI environments
-* Multiprocessing for parallel feed fetching
 * Uses Mark Pilgrim's [`feedparser`][fp]
+
 
 ## Setup
 
@@ -34,6 +35,7 @@ Coldsweat uses various third-party packages:
 * Requests
 * WebOb
 * Tempita, HTML templating
+* Flup, for FastCGI support
 
 If you don't have the `pip` utility first install it with:
 

@@ -1,5 +1,6 @@
-feedparser==5.1.3
-peewee==2.1.2
-requests==1.2.3
+Feedparser==5.1.3
+Peewee==2.1.2
+Requests==1.2.3
 WebOb==1.2.3
 Tempita==0.5.1
+Flup>1.0.2

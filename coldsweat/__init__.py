@@ -4,15 +4,13 @@ import logging
 
 # Figure out installation directory. This has 
 #  to work for the fetcher script too
-#print os.path.dirname(os.path.abspath(__file__))
 installation_dir, _ = path.split(path.dirname(path.abspath(__file__)))
 
 def load_config(filename):
     
     config = SafeConfigParser({
-        'database_path': path.join(installation_dir, 'data/coldsweat.db'), 
-        'min_interval': 1800,
-        'error_threshold': 100,
+        'engine': 'sqlite', 
+        'filename': 'data/coldsweat.db', 
     })
     
     config.read(filename)    
@@ -32,4 +30,3 @@ logging.basicConfig(
 logging.getLogger("peewee").setLevel(logging.INFO)
 
 log = logging.getLogger()
-

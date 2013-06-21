@@ -184,7 +184,7 @@ COMMANDS = [
     ('unread_item_ids'               , unread_items_command),
     ('saved_item_ids'                , saved_items_command),
     ('mark'                          , mark_command),
-    ('unread_recently_read_command'  , unread_recently_command),
+    ('unread_recently_read'          , unread_recently_command),
     ('favicons'                      , favicons_command), 
     ('links'                         , links_command),
 ]

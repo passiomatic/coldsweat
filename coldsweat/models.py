@@ -201,7 +201,7 @@ def connect():
     """
     
     if engine == 'sqlite':
-        filename = path.join(installation_dir, config.get('database', 'filename'))
+        filename = config.get('database', 'filename')
         
         coldsweat_db.init(filename)    
         
@@ -209,12 +209,12 @@ def connect():
         #coldsweat_db.execute_sql('PRAGMA journal_mode=WAL')
         
     elif engine == 'mysql':            
-        database = config.get('database', 'database', 'coldsweat')
+        database = config.get('database', 'database')
 
         kwargs = dict(
-            host    = config.get('database', 'hostname', 'localhost'),
-            user    = config.get('database', 'username', 'root'),
-            passwd  = config.get('database', 'password', 'secret')        
+            host    = config.get('database', 'hostname'),
+            user    = config.get('database', 'username'),
+            passwd  = config.get('database', 'password')        
         )
 
         coldsweat_db.init(database, **kwargs)

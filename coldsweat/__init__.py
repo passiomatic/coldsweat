@@ -18,15 +18,17 @@ def load_config(filename):
     return config
 
 # Set up configuration settings
-config = load_config(path.join(installation_dir, 'coldsweat.ini'))
+config = load_config(path.join(installation_dir, 'etc/config'))
 
 logging.basicConfig(
-    level=logging.DEBUG, 
-    filename=path.join(installation_dir, 'coldsweat.log'),
-    format='%(asctime)s %(levelname)s: %(message)s',    
-    datefmt='%Y-%m-%d %H:%M:%S')
+    filename    = config.get('log', 'filename', 'coldsweat.log'),
+    level       = getattr(logging, config.get('log', 'level', 'DEBUG')),
+    format      = config.get('log', 'format', '%(asctime)s %(levelname)s: %(message)s'),
+    datefmt     = config.get('log', 'datefmt', '%Y-%m-%d %H:%M:%S'),
+)
                     
 # Quiet Peewee, quiet                    
 logging.getLogger("peewee").setLevel(logging.INFO)
 
+# Shared logger instance
 log = logging.getLogger()

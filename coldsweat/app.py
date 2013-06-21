@@ -30,11 +30,6 @@ VERSION_STRING = '%d.%d.%d%s' % __version__
 DEBUG = False
 
 ENCODING = 'utf-8'
-CONFIGURATION_PATH = './coldsweat.ini'
-
-
-##@@TODO Load up config file 
-#config = load_config(CONFIGURATION_PATH)
 
 #@@FIXME Use httplib.responses http://docs.python.org/2/library/httplib.html
 

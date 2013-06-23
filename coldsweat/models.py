@@ -29,7 +29,6 @@ else:
 
 
 
-
 class CustomModel(Model):
     """
     Binds the database to all our models
@@ -73,10 +72,14 @@ class Group(CustomModel):
     """
     Feed group/folder
     """
+    
+    DEFAULT_GROUP = 'All entries'
+    
     title               = CharField(null=True)
     
-    class Meta:
+    class Meta:  
         db_table = 'groups'    
+
 
 class Feed(CustomModel):
     """
@@ -88,7 +91,7 @@ class Feed(CustomModel):
     
     # A URL to a small icon representing the feed
     icon                = ForeignKeyField(Icon, default=1)
-    title               = CharField(default='Untitled')    
+    title               = CharField(null=True, default='Untitled')    
     
     # The URL of the HTML page associated with the feed
     alternate_link      = CharField(null=True)            
@@ -169,6 +172,7 @@ class Saved(CustomModel):
         indexes = (
             (('user', 'entry'), True),
         )
+        #db_table = 'saved'        
 
 class Read(CustomModel):
     """
@@ -182,6 +186,7 @@ class Read(CustomModel):
         indexes = (
             (('user', 'entry'), True),
         )
+        #db_table = 'read'
 
 class Subscription(CustomModel):
     """
@@ -192,6 +197,9 @@ class Subscription(CustomModel):
     feed           = ForeignKeyField(Feed)
 
     class Meta:
+        indexes = (
+            (('user', 'group', 'feed'), True),
+        )    
         db_table = 'subscriptions'
 
 
@@ -239,6 +247,6 @@ def setup(skip_if_existing=False):
     # Create the bare minimum to boostrap system
     with coldsweat_db.transaction():
         User.create(username=username, password=password, api_key=make_md5_hash('%s:%s' % (username, password)))
-        Group.create(title='All entries')        
+        Group.create(title=Group.DEFAULT_GROUP)        
         Icon.create(data=favicon.DEFAULT_FAVICON) 
 

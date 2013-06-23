@@ -1,0 +1,17 @@
+/* 
+
+Built on Rock Hammer by Stuff and Nonsense
+URL: http://stuffandnonsense.co.uk/projects/rock-hammer/ 
+
+*/
+
+$media-queries-supported : true;
+
+// Import all SASS imports
+@import 'imports';
+
+
+.container {
+    max-width: $maxwidth;
+    margin: 0 auto;
+}

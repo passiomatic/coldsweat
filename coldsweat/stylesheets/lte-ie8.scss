@@ -1,0 +1,15 @@
+/* 
+
+Built on Rock Hammer by Stuff and Nonsense
+URL: http://stuffandnonsense.co.uk/projects/rock-hammer/ 
+
+*/
+
+$media-queries-supported : false;
+
+// Import all SASS imports
+@import 'imports';
+
+// IE override styles can be defined here (use classes applied to 
+// the HTML element as per the conditional comments to surround 
+// your selectors and target specific IE versions, such as ".lte-ie8")

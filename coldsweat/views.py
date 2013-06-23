@@ -7,9 +7,11 @@ Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
-
-from utilities import *    
 from app import *
+from models import *
+import fetcher
+
+#from coldsweat import log
 
 # -------------------
 # Index page
@@ -17,7 +19,8 @@ from app import *
 
 @view()
 def index(request, filler):     
-    return HTTP_OK, [], make_page('index.html', filler, locals())
+    message = u''
 
+    return HTTP_OK, [], make_page('index.html', filler, locals())
 
 

@@ -98,7 +98,7 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
 
     try:
         previous_feed = Feed.get(Feed.self_link == self_link)
-        log.info('feed %s has been already imported' % self_link)
+        log.debug('feed %s has been already imported' % self_link)
         return previous_feed
     except Feed.DoesNotExist:
         pass

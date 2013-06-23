@@ -1,0 +1,102 @@
+// Rock Hammer by Stuff and Nonsense
+// Version: <!-- $version -->
+// URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
+// Version: <!-- $license -->
+// Adapted from: https://github.com/twitter/bootstrap/blob/master/less/modals.less
+
+.modal-backdrop {
+position : fixed;
+top : 0;
+right : 0;
+bottom : 0;
+left : 0;
+z-index : 1040;
+background-color : $black; }
+
+.modal-backdrop.fade {
+opacity : 0; }
+
+.modal-backdrop,
+.modal-backdrop.fade.in {
+opacity : .8; }
+
+.modal {
+position : fixed;
+top : 10%;
+left : 50%;
+z-index : 1050;
+width : 560px;
+margin-left : -280px;
+background-color : $bodycolor;
+border : $borderwidth $borderstyle $bordercolor;
+border-radius : $borderradius;
+outline : none;
+@include background-clip(padding-box); }
+
+.modal.fade {
+top : -25%;
+-webkit-transition : opacity $transitionduration linear, top $transitionduration ease-out;
+-moz-transition : opacity $transitionduration linear, top $transitionduration ease-out;
+-o-transition : opacity $transitionduration linear, top $transitionduration ease-out;
+transition : opacity $transitionduration linear, top $transitionduration ease-out; }
+
+.modal.fade.in {
+top : 10%; }
+
+.modal-header {
+padding : $baselineheight / 2 $gutterwidth;
+border-bottom : $borderwidth $borderstyle $bordercolor; }
+
+.modal-header .close {
+float : right;
+margin-top : 2px;
+background-color : $buttonbackgroundcolor;
+// @include buttongrad;
+border : $buttonborderwidth $buttonborderstyle $buttonbordercolor;
+border-bottom-color : $buttonbottombordercolor;
+border-radius : $buttonborderradius;
+cursor : pointer;
+color : $buttoncolor; }
+
+.modal-header h3 {
+margin : 0;
+line-height : 30px; }
+
+.modal-body {
+position : relative;
+max-height : 400px;
+padding : $baselineheight $gutterwidth;
+overflow-y : auto; }
+
+.modal-form {
+margin-bottom : 0; }
+
+.modal-footer {
+padding : $baselineheight / 2 $gutterwidth;
+margin-bottom : 0;
+text-align : right;
+border-top : $borderwidth $borderstyle $bordercolor;
+border-radius : 0 0 inherit inherit;
+*zoom : 1; }
+
+.modal-footer:before,
+.modal-footer:after {
+display : table;
+line-height : 0;
+content : ""; }
+
+.modal-footer:after {
+clear : both; }
+
+.modal-footer .btn + .btn {
+margin-bottom : 0;
+margin-left : 5px; }
+
+.modal-footer .btn-group .btn + .btn {
+margin-left : -1px; }
+
+.modal-footer .btn-block + .btn-block {
+margin-left : 0; }
+
+.modal.hide {
+display : none; }

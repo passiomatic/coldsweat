@@ -1,50 +1,134 @@
-<!DOCTYPE HTML>
-<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+
+<!-- 
+Coldsweat by Andrea Peltrin
+Version: {{version_string}}
+URL: http://lab.passiomatic.com/coldsweat/
+-->
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+
 <head>
-    <meta charset="UTF-8">
-    <title>{{page_title}}</title>
-    <meta name="description" content="">    
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width">
-    
-    <!-- Google web fonts -->
-    <!-- <link href='http://fonts.googleapis.com/css?family=Ubuntu:700italic,700,400italic,400' rel='stylesheet' type='text/css'> -->
-    
-    <!-- <link rel="stylesheet" href="{{base_uri}}/coldsweat/stylesheets/all.css" type="text/css"> -->
-    
-    <!--[if lt IE 9]>
-        <script src="{{base_uri}}/coldsweat/javascripts/html5.js"></script>
-    <![endif]-->
+<title>{{page_title}}</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="cleartype" content="on">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<meta name="description" content="">
+<meta name="author" content="Andrea Peltrin">
+
+<!-- For all browsers -->
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:700italic,700,400italic,400' rel='stylesheet' type='text/css'>
+<link rel='stylesheet' href='coldsweat/stylesheets/all.css'>
+
+<!--[if (lt IE 9) & (!IEMobile)]>
+<script src='coldsweat/javascripts/vendor/selectivizr-min.js'></script>
+<link rel='stylesheet' href='coldsweat/stylesheets/lte-ie8.css'>
+<![endif]-->
+
+<!-- JavaScript -->
+<script src='coldsweat/javascripts/vendor/head.load.min.js'></script>
+
+<link rel="shortcut icon" href="coldsweat/images/favicon.ico">
+<!-- <link rel="shortcut icon" href="coldsweat/images/favicon.png"> -->
+<!-- <link rel="apple-touch-icon-precomposed" href="coldsweat/images/l/apple-touch-icon-precomposed.png"> -->
+<!-- <link rel="apple-touch-icon-precomposed" sizes="72x72" href="coldsweat/images/m/apple-touch-icon-72x72-precomposed.png"> -->
+<!-- <link rel="apple-touch-icon-precomposed" sizes="114x114" href="coldsweat/images/h/apple-touch-icon-114x114-precomposed.png"> -->
+<!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="coldsweat/images/h/apple-touch-icon-144x144-precomposed.png"> -->
+<!--iOS -->
+<!-- <meta name="apple-mobile-web-app-title" content="Coldsweat"> -->
+<!-- <meta name="viewport" content="initial-scale=1.0"> (Use if apple-mobile-web-app-capable below is set to yes) -->
+<!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
+<!-- <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
+<!-- Windows 8 / RT -->
+<!-- <meta name="msapplication-TileImage" content="images/h/apple-touch-icon-144x144-precomposed.png"> -->
+<!-- <meta name="msapplication-TileColor" content="#000"> -->
 </head>
+
+
 <body>
 
-<div class="wrap">
-<header>
-    <div class="header-inner">
-        <nav>
-             
-        </nav>        
-    </div>        
-</header>
-<div class="main">
+<div class="container">
 
-{{self.content}}
-    
-<footer class="dim"> 
-    <div class="footer-inner">
-        <nav class="hidden"><ul></ul></nav>
-        <p>
-            Coldsweat was created by Andrea Peltrin.
-        </p>        
-    </div>
-</footer>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<!-- <script>window.jQuery || document.write('<script src="$base_uri/coldsweat/javascripts/jquery.min.js"><\/script>')</script> -->
-<script src="{{base_uri}}/coldsweat/javascripts/plugins.js"></script>
+<!--
+    <a href="#navigation-toggle" class="navigation-toggle">Menu</a>
+    <nav id="navigation-toggle" role="navigation">
+    <ul>
+    <li><a href="#panel-typography">Typography</a></li>
+    <li><a href="#panel-colour">Colour</a></li>
+    <li><a href="#panel-images">Images</a></li>
+    <li><a href="#panel-navigation">Navigation</a></li>
+    <li><a href="#panel-modules">Modules</a></li>
+    <li><a href="#panel-forms">Forms</a></li>
+    <li><a href="#panel-tables">Tables</a></li>
+    <li><a href="#panel-widgets">Widgets</a></li>
+    </ul>
+    </nav>   
+-->  
 
-<!-- /wrap -->
+<div class="content">
+    {{self.content}}
 </div>
 
- 
+<!-- Final ============================== -->
+
+<footer role="contentinfo" class="">
+    <small>This is Coldsweat {{version_string}}.</small>
+</footer>
+</div><!-- container -->
+
+<!-- Load libraries -->
+<script>
+head.js(
+// Place scripts to be loaded here, in the order the need to be executed
+// Typically libraries are needed first, such as jQuery (as the plugins 
+// depend on jQuery to execute). The below configuration is what Rock 
+// Hammer uses, but customise this for your own needs.
+// Notice the use of @path here. This is because we need the file names, 
+// not the script tags being generated. Ensure all filenames you wish
+// head.js to load are surrounded with quotes. Also, this is a list, so
+// ensure that all but the last item are followed by a comma.
+
+// Libraries
+"coldsweat/javascripts/vendor/modernizr-min.js",
+"coldsweat/javascripts/vendor/jquery-min.js",
+
+// Plugins
+"coldsweat/javascripts/plugins.js",
+
+// Load bootstrap-transition first so that nice glides/fades 
+// etc for the other bootstrap plugins work
+"coldsweat/javascripts/vendor/bootstrap/bootstrap-transition.js",
+"coldsweat/javascripts/vendor/bootstrap/bootstrap-carousel.js",
+"coldsweat/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
+
+// Popover has a dependency on tooltip, so make sure and include 
+// bootstrap-tooltip regardless in order for popovers to work
+"coldsweat/javascripts/vendor/bootstrap/bootstrap-popover.js",
+"coldsweat/javascripts/vendor/bootstrap/bootstrap-modal.js",
+"coldsweat/javascripts/vendor/bootstrap/bootstrap-collapse.js",
+
+// Functionality only used by Rock Hammer
+//"coldsweat/javascripts/navigation-manager.js",
+
+// Remove any navigation patterns below that arent used
+//"coldsweat/javascripts/nav-patterns/nav-toggle.js",
+//"coldsweat/javascripts/nav-patterns/left-nav-flyout.js",
+//"coldsweat/javascripts/nav-patterns/responsive-nav.min.js"
+);
+
+// Google Analytics code
+// Set your account ID appropriately by replacing UA-XXXXX-X
+/*
+var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+s.parentNode.insertBefore(g,s)}(document,'script'));
+*/
+</script>
 </body>
 </html>
 

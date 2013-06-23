@@ -29,7 +29,9 @@ nosetests.xml
 # Translations
 *.mo
 
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
+# SASS
+.sass-cache
+
+# Max OS X
+.DS_Store
+

@@ -1,0 +1,46 @@
+
+// Rock Hammer by Stuff and Nonsense
+// Version: <!-- $version -->
+// URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
+// Version: <!-- $license -->
+// Adapted from: http://codepen.io/bradfrost/pen/mlyvu
+
+.navigation-footer-anchor-toggle {
+float : right;
+display : block;
+padding : 1em; 
+
+@include media-query-bp($bp4) {
+display : none; }
+}
+
+.navigation-footer-anchor {
+list-style-type : none;
+@include zero;
+border-top : $borderwidth $borderstyle $bordercolor; 
+
+@include media-query-bp($bp4) {
+position : absolute;
+top : 0;
+left : 0;
+border-width : 0;
+@include zero; }
+}
+
+.navigation-footer-anchor li {
+@include media-query-bp($bp4) {
+display : inline-block;
+margin-right : $gutterwidth; }
+}
+
+.navigation-footer-anchor li a {
+display : block;
+min-height : 44px;
+line-height : 44px;
+border-bottom : $borderwidth $borderstyle $bordercolor;
+}
+
+.f-nav li a {
+@include media-query-bp($bp4) {
+border-width : 0; }
+}

@@ -1,0 +1,131 @@
+// Rock Hammer by Stuff and Nonsense
+// Version: <!-- $version -->
+// URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
+// Version: <!-- $license -->
+// Adapted from: https://github.com/twitter/bootstrap/blob/master/less/popovers.less
+
+.popover {
+position : absolute;
+top : 0;
+left : 0;
+z-index : 1000;
+display : none;
+max-width : 276px;
+text-align : left;
+background-color : $popoverbackgroundcolor;
+@include background-clip(padding-box);
+border : $popoverborderwidth $popoverborderstyle $popoverbordercolor;
+border-radius : $popoverborderradius;
+white-space : normal;
+
+&.top { 
+margin-top: -10px; }
+
+&.right { 
+margin-left: 10px; }
+
+&.bottom { 
+margin-top: 10px; }
+
+&.left { 
+margin-left: -10px; }
+}/*popover*/
+
+.popover-title {
+margin : 0;
+padding : $baselineheight / 2 $gutterwidth / 2;
+@include font-size($basefontsize);
+font-weight : normal;
+background-color : $popovertitlebackground;
+border-bottom : $popoverborderwidth $popoverborderstyle darken($popovertitlebackground, 5%);
+border-radius : inherit inherit 0 0;
+font-family : $popoverfontfamily;
+@include font-size($basefontsize);
+color : $popovercolor;
+
+&:empty {
+display : none; }
+}/*popover-title*/
+
+.popover-content {
+padding : $baselineheight / 2 $gutterwidth / 2;
+font-family : $popoverfontfamily;
+@include font-size($basefontsize / 1.25);
+line-height : $baselineheight / 1.15;
+color : $popovercolor; }
+
+.popover .arrow,
+.popover .arrow:after {
+position : absolute;
+display : block;
+width : 0;
+height : 0;
+border-color : transparent;
+border-style : solid; }
+
+.popover .arrow {
+border-width : $popoverarrowouterwidth; }
+
+.popover .arrow:after {
+border-width : $popoverarrowwidth;
+content : ""; }
+
+.popover {
+
+&.top .arrow {
+left : 50%;
+margin-left : -$popoverarrowouterwidth;
+border-bottom-width : 0;
+border-top-color : $popoverarrowoutercolor;
+bottom : -$popoverarrowouterwidth;
+
+&:after {
+bottom : 1px;
+margin-left : -$popoverarrowwidth;
+border-bottom-width : 0;
+border-top-color : $popoverarrowcolor; }
+}/*top*/
+
+&.right .arrow {
+top : 50%;
+left : -$popoverarrowouterwidth;
+margin-top : -$popoverarrowouterwidth;
+border-left-width : 0;
+border-right-color : $popoverarrowoutercolor;
+
+&:after {
+left : 1px;
+bottom : -$popoverarrowwidth;
+border-left-width : 0;
+border-right-color : $popoverarrowcolor; }
+}/*right*/
+
+&.bottom .arrow {
+left : 50%;
+margin-left : -$popoverarrowouterwidth;
+border-top-width : 0;
+border-bottom-color : $popoverarrowoutercolor;
+top : -$popoverarrowouterwidth;
+
+&:after {
+top : 1px;
+margin-left : -$popoverarrowwidth;
+border-top-width : 0;
+border-bottom-color : $popoverarrowcolor; }
+}/*bottom*/
+
+&.left .arrow {
+top : 50%;
+right : -$popoverarrowouterwidth;
+margin-top : -$popoverarrowouterwidth;
+border-right-width : 0;
+border-left-color : $popoverarrowoutercolor;
+
+&:after {
+right : 1px;
+border-right-width : 0;
+border-left-color : $popoverarrowcolor;
+bottom : -$popoverarrowwidth; }
+}/*left*/
+
+}/*popover*/

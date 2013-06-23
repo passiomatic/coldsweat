@@ -22,29 +22,26 @@ URL: http://lab.passiomatic.com/coldsweat/
 
 <!-- For all browsers -->
 <link href='http://fonts.googleapis.com/css?family=Ubuntu:700italic,700,400italic,400' rel='stylesheet' type='text/css'>
-<link rel='stylesheet' href='coldsweat/stylesheets/all.css'>
+<link rel='stylesheet' href='{{base_url}}coldsweat/stylesheets/all.css'>
 
 <!--[if (lt IE 9) & (!IEMobile)]>
-<script src='coldsweat/javascripts/vendor/selectivizr-min.js'></script>
-<link rel='stylesheet' href='coldsweat/stylesheets/lte-ie8.css'>
+<script src='{{base_url}}coldsweat/javascripts/vendor/selectivizr-min.js'></script>
+<link rel='stylesheet' href='{{base_url}}coldsweat/stylesheets/lte-ie8.css'>
 <![endif]-->
 
 <!-- JavaScript -->
-<script src='coldsweat/javascripts/vendor/head.load.min.js'></script>
+<script src='{{base_url}}coldsweat/javascripts/vendor/head.load.min.js'></script>
 
-<link rel="shortcut icon" href="coldsweat/images/favicon.ico">
-<!-- <link rel="shortcut icon" href="coldsweat/images/favicon.png"> -->
-<!-- <link rel="apple-touch-icon-precomposed" href="coldsweat/images/l/apple-touch-icon-precomposed.png"> -->
-<!-- <link rel="apple-touch-icon-precomposed" sizes="72x72" href="coldsweat/images/m/apple-touch-icon-72x72-precomposed.png"> -->
-<!-- <link rel="apple-touch-icon-precomposed" sizes="114x114" href="coldsweat/images/h/apple-touch-icon-114x114-precomposed.png"> -->
-<!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="coldsweat/images/h/apple-touch-icon-144x144-precomposed.png"> -->
+<link rel="shortcut icon" href="{{base_url}}coldsweat/images/favicon.ico">
+<!-- <link rel="shortcut icon" href="{{base_url}}coldsweat/images/favicon.png"> -->
+<!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{base_url}}coldsweat/images/apple-touch-icon.png"> -->
 <!--iOS -->
 <!-- <meta name="apple-mobile-web-app-title" content="Coldsweat"> -->
 <!-- <meta name="viewport" content="initial-scale=1.0"> (Use if apple-mobile-web-app-capable below is set to yes) -->
 <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
 <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
 <!-- Windows 8 / RT -->
-<!-- <meta name="msapplication-TileImage" content="images/h/apple-touch-icon-144x144-precomposed.png"> -->
+<!-- <meta name="msapplication-TileImage" content="{{base_url}}coldsweat/images/apple-touch-icon.png"> -->
 <!-- <meta name="msapplication-TileColor" content="#000"> -->
 </head>
 
@@ -57,14 +54,7 @@ URL: http://lab.passiomatic.com/coldsweat/
     <a href="#navigation-toggle" class="navigation-toggle">Menu</a>
     <nav id="navigation-toggle" role="navigation">
     <ul>
-    <li><a href="#panel-typography">Typography</a></li>
-    <li><a href="#panel-colour">Colour</a></li>
-    <li><a href="#panel-images">Images</a></li>
-    <li><a href="#panel-navigation">Navigation</a></li>
-    <li><a href="#panel-modules">Modules</a></li>
-    <li><a href="#panel-forms">Forms</a></li>
-    <li><a href="#panel-tables">Tables</a></li>
-    <li><a href="#panel-widgets">Widgets</a></li>
+    <li><a href="#">Lorem Ipsum</a></li>
     </ul>
     </nav>   
 -->  
@@ -93,23 +83,23 @@ head.js(
 // ensure that all but the last item are followed by a comma.
 
 // Libraries
-"coldsweat/javascripts/vendor/modernizr-min.js",
-"coldsweat/javascripts/vendor/jquery-min.js",
+"{{base_url}}coldsweat/javascripts/vendor/modernizr-min.js",
+"{{base_url}}coldsweat/javascripts/vendor/jquery-min.js",
 
 // Plugins
-"coldsweat/javascripts/plugins.js",
+"{{base_url}}coldsweat/javascripts/plugins.js",
 
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
-"coldsweat/javascripts/vendor/bootstrap/bootstrap-transition.js",
-"coldsweat/javascripts/vendor/bootstrap/bootstrap-carousel.js",
-"coldsweat/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
+"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-transition.js",
+//"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-carousel.js",
+"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
 
 // Popover has a dependency on tooltip, so make sure and include 
 // bootstrap-tooltip regardless in order for popovers to work
-"coldsweat/javascripts/vendor/bootstrap/bootstrap-popover.js",
-"coldsweat/javascripts/vendor/bootstrap/bootstrap-modal.js",
-"coldsweat/javascripts/vendor/bootstrap/bootstrap-collapse.js",
+"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-popover.js",
+"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-modal.js",
+"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-collapse.js",
 
 // Functionality only used by Rock Hammer
 //"coldsweat/javascripts/navigation-manager.js",

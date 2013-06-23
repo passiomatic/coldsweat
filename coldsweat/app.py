@@ -57,7 +57,7 @@ def dispatch_request(environ, start_response):
     output_headers = Headers([('Content-Type', 'text/html; charset=%s' % ENCODING)])
 
     template_symbols = {
-        'base_uri': get_base_uri(environ), #@@FIXME: Use reuqest.application_url instead
+        'base_url': get_base_url(request), 
         'encoding': ENCODING,
         'version_string': VERSION_STRING
     }
@@ -69,7 +69,7 @@ def dispatch_request(environ, start_response):
         path_info = request.path_info
     except KeyError:
         path_info = ''
-    
+
     def find_view():
     
         for re, method, handler in URI_MAP:        
@@ -120,9 +120,9 @@ def dispatch_request(environ, start_response):
 # Misc. utilities
 # ------------------------------------------------------
 
-def get_base_uri(environ):
-    _, filename = os.path.split(environ.get('SCRIPT_FILENAME', ''))    
-    return application_uri(environ).replace('/%s' % filename, '')
+def get_base_url(request):
+    _, filename = os.path.split(request.script_name)    
+    return request.application_url.rstrip(filename)
     
 class HTTPError(Exception):
     def __init__(self, status, headers=[], body=u''):

@@ -1,11 +1,6 @@
 # Coldsweat
 
-Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and a simple feed store based on SQLite and MySQL.
-
-Coldsweat started as a fork of Bottle Fever by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds. 
-
-Since Coldsweat is intended for personal use — but you can have multiple users/accounts - I dropped the more speedier `speedparser` module to simplify the code.
-
+Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and a simple feed store based on SQLite or MySQL. Coldsweat started as a fork of [Bottle Fever][b] by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds. 
 
 ## Target features
 
@@ -19,32 +14,15 @@ Since Coldsweat is intended for personal use — but you can have multiple user
 
 * SQLite and MySQL databases (trivial to add Postgres if you want, since it uses the Peewee ORM)
 * WSGI compatible, currently tested under FastCGI environments
-* Uses Mark Pilgrim's [`feedparser`][fp]
+* Uses Mark Pilgrim's [Universal Feed Parser][fp]
 
+## Current status
+
+Coldsweat correctly syncs read and saved items with Reeder for iOS — see issue #3 for more information. Command-line utilities are provided to import existing feeds as an OPML file and store new feed entries in the database. 
 
 ## Setup
 
-@@TODO
-
-### Dependences
-
-Coldsweat uses various third-party packages:
-
-* Feedparser
-* Peewee, object-relational mapper 
-* Requests
-* WebOb
-* Tempita, HTML templating
-* Flup, for FastCGI support
-
-If you don't have the `pip` utility first install it with:
-
-    easy_install pip
-
-Then install all dependences by typing:
-
-    pip install -r requirements.txt
-
+See <https://github.com/passiomatic/coldsweat/wiki/Setup>
 
 ## On the web 
 
@@ -56,9 +34,7 @@ Then install all dependences by typing:
 
 [Available on GitHub][s].
 
-
-
-[p]: https://github.com/coleifer/peewee
 [fp]: https://pypi.python.org/pypi/feedparser/
 [f]: http://www.feedafever.com/
 [s]: https://github.com/passiomatic/coldsweat
+[b]: https://github.com/rcarmo/bottle-fever

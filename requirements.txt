@@ -3,4 +3,5 @@ Peewee==2.1.2
 Requests==1.2.3
 WebOb==1.2.3
 Tempita==0.5.1
-Flup>1.0.2
+#Flup>1.0.2
+#Mysql-python

@@ -17,7 +17,7 @@ import favicon
 from coldsweat import config, installation_dir
 
 # Defer database init, see connect() below
-engine = config.get('database', 'engine', 'sqlite')
+engine = config.get('database', 'engine')
 if engine == 'sqlite':
     from sqlite3 import IntegrityError
     coldsweat_db = SqliteDatabase(None) 

@@ -14,9 +14,7 @@ from calendar import timegm
 from utilities import *    
 from app import *
 from models import *
-
-#from sqlite3 import IntegrityError 
-
+from coldsweat import log
 
 RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 60*60 # 1 hour

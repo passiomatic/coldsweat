@@ -7,24 +7,18 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 '''
 
-import sys, os, re, time, cgi
+import sys, os, re, time, cgi, urlparse
 from calendar import timegm
 from datetime import datetime
 
 import feedparser
-import urlparse
 import requests
 from requests.exceptions import RequestException
 
 from models import *
 from utilities import *
-from app import VERSION_STRING
+from coldsweat import *
 
-from coldsweat import log, config
-
-
-USER_AGENT = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING
- 
 
 def get_feed_updated(feed, default):
     """
@@ -98,7 +92,7 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
 
     try:
         previous_feed = Feed.get(Feed.self_link == self_link)
-        log.debug('feed %s has been already imported' % self_link)
+        log.debug('feed %s has been already added' % self_link)
         return previous_feed
     except Feed.DoesNotExist:
         pass
@@ -114,7 +108,7 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
     if fetch_icon:
         icon = Icon.create(data=favicon.fetch(self_link))
         feed.icon = icon
-        log.info("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
+        log.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
 
     feed.save()
 
@@ -132,8 +126,7 @@ def fetch_feed(feed):
             feed.last_status = status
         if error:
             feed.error_count = feed.error_count + 1        
-        #@@TODO: settings.fetcher.error_threshold        
-        if feed.error_count > 100:
+        if feed.error_count > config.getint('fetcher', 'error_threshold'):
             feed.is_enabled = False
             log.warn("%s has too many errors, disabled" % netloc)
         feed.save()
@@ -147,18 +140,16 @@ def fetch_feed(feed):
     now = datetime.utcnow()
 
     headers = {
-        'User-Agent': USER_AGENT
+        'User-Agent': DEFAULT_USER_AGENT #@@TODO: config.get('fetcher', 'user_agent') if config.has_option('fetcher', 'user_agent') else DEFAULT_USER_AGENT
     }
 
     if feed.last_checked_on:
-        #@@FIXME Load up settings settings.fetcher.min_interval
-        if (now - feed.last_checked_on).seconds < 60*30:
+        if (now - feed.last_checked_on).seconds < config.getint('fetcher', 'min_interval'):
             log.debug("last_checked_on for %s is below min_interval, skipped" % netloc)
             return
 
     if feed.last_updated_on:
-        #@@FIXME Load up settings settings.fetcher.min_interval
-        if (now - feed.last_updated_on).seconds < 60*30:
+        if (now - feed.last_updated_on).seconds < config.getint('fetcher', 'min_interval'):
             log.debug("last_updated_on for %s is below min_interval, skipped" % netloc)
             return
        
@@ -168,8 +159,7 @@ def fetch_feed(feed):
         headers['If-Modified-Since'] = format_http_datetime(feed.last_updated_on)
             
     try:
-        #log.info('-> headers: %r' % headers)
-        response = requests.get(feed.self_link, timeout=10, headers=headers)
+        response = requests.get(feed.self_link, timeout=config.getint('fetcher', 'timeout'), headers=headers)
     except RequestException:
         # Interpret as 'Service Unavailable'
         post_fetch(503, error=True)
@@ -223,15 +213,14 @@ def fetch_feed(feed):
         guid = get_entry_id(entry)
                 
         # Skip ancient feed items        
-        #@@FIXME: settings.fetcher.max_history
-        if (now - timestamp).days > 7:  
-            log.debug("entry %s from %s is over max_history, skipping" % (guid, netloc))
+        if (now - timestamp).days > config.getint('fetcher', 'max_history'):  
+            log.debug("entry %s from %s is over max_history, skipped" % (guid, netloc))
             continue
 
         try:
             # If entry is already in database with same id, then skip it
             Entry.get(guid=guid)
-            log.debug("duplicated entry %s, skipping" % guid)
+            log.debug("duplicated entry %s, skipped" % guid)
             continue
         except Entry.DoesNotExist:
             pass

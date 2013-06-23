@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Coldsweat - A Fever clone
+Coldsweat - Web app machinery
 
 Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
@@ -18,16 +18,8 @@ from webob import Request
 import tempita
 
 from utilities import *
-from coldsweat import log, config
+from coldsweat import log, config, VERSION_STRING, installation_dir
 
-
-__author__ = 'Andrea Peltrin and Rui Carmo'
-__version__ = (0, 6, 0, '')
-__license__ = 'MIT'
-
-VERSION_STRING = '%d.%d.%d%s' % __version__
-
-DEBUG = False
 
 ENCODING = 'utf-8'
 
@@ -42,8 +34,7 @@ HTTP_FORBIDDEN = '403 Forbidden'
 HTTP_UNAUTHORIZED = '401 Unauthorized'
 HTTP_BAD_REQUEST = '400 Bad Request'
 
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#BASE_DIR = os.path.dirname(os.path.abspath(__file__))
  
  
 # ------------------------------------------------------
@@ -168,7 +159,7 @@ def get_template(filename, from_template):
     """
     Load an inherited template
     """
-    return tempita.Template.from_filename(os.path.join(BASE_DIR, 'templates', filename))
+    return tempita.Template.from_filename(os.path.join(installation_dir, 'coldsweat/templates', filename))
         
 def fill_template(source, **kwargs):    
     t = tempita.Template(source, get_template=get_template)    
@@ -176,7 +167,7 @@ def fill_template(source, **kwargs):
 
 
 def load_template(filename):            
-    return tempita.Template.from_filename(os.path.join(BASE_DIR, 'templates', filename), get_template=get_template)
+    return tempita.Template.from_filename(os.path.join(installation_dir, 'coldsweat/templates', filename), get_template=get_template)
 
 
 def make_page(filename, filler, symbols):

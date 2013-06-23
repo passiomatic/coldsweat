@@ -1,4 +1,5 @@
 [database]
+
 ;engine: mysql
 engine: sqlite
 
@@ -12,10 +13,17 @@ database: coldsweat
 filename: data/coldsweat.db
 
 [fetcher]
-min_interval: 1800
-error_threshold: 100
+
+min_interval:       900     ; Seconds
+error_threshold:    100
+max_history:        7       ; Days
+timeout:            15      ; Seconds
+
+; Overrides default Coldsweat user agent string
+;user_agent:
 
 [log]
+
 ; See http://docs.python.org/2/howto/logging.html#when-to-use-logging
 level: DEBUG
 filename: coldsweat.log

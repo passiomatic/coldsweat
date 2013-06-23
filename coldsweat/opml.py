@@ -49,7 +49,7 @@ def add_feeds_from_file(source):
                 try:
                     feed.save()
                 except IntegrityError:
-                    log.info('feed %s already added, ignored' % feed.self_link)
+                    log.info('feed %s has been already added, ignored' % feed.self_link)
                     continue
 
                 feeds.append(feed)

@@ -5,11 +5,11 @@ Favicon retrieval
 Created by: Rui Carmo
 License: MIT (see LICENSE for details)
 """
-import logging, base64, urlparse
+import base64, urlparse
 import requests
 from requests.exceptions import RequestException
 
-log = logging.getLogger()
+from coldsweat import log, config
 
 DEFAULT_FAVICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAxlBMVEUAAABOWZ5BTZhCTZhHUpt7g7d5gbZ5grZ5grZ6grZsda9sdq9tdq9tdrBtd7Bye7JxerJye7JzfLN0fbNdaKdeaadfaahfaqhha6ldZ6dfaahfaqhjbat3gLV6grZ6grd8hLh/h7mAh7mFjLxfaahgaqlha6libKpjbapRXKBSXKBSXaFTXqFUX6KNmcKXo8idqcujrs6uuNWzvdi5wtu+x96/x97EzOHJ0eXQ1ufV2+vb4O/g5fHm6vXr7/fx9Pv8/f////8y4F8aAAAALnRSTlMACR0dI1BRUVJSiIiIiIi8vb29vdbW1tbW4uLi4uzs7Ozs7Ozx8fHx8f39/f39FstVagAAALBJREFUGBllwUFOw0AMQNFve6Yhk6RFAhZsev9rwRap6iKZtp4kRrCE9+APAZGuvGX8q3oEhtgwHUexYVP2wNByei025qdx8LaF0U1noGWTdlq2VSmlhwgjNht6jPNLcpgU5HGUSyIn1UNWkEbKKCiDBz+EIOGedKpwSOP2aBixP4Pd9hZZP653ZZkrvzzqrWIE3mfRld4/Zw9BrCv9e3hcl+pbGMTaQvb1fpnXPfjnG2UzUabhPViuAAAAAElFTkSuQmCC"
 
@@ -28,7 +28,7 @@ def google_fetcher(url):
     endpoint = "http://www.google.com/s2/favicons?domain=%s" % urlparse.urlparse(url).hostname
 
 #     headers = {
-#         'User-Agent': USER_AGENT
+#         'User-Agent': config.get('fetcher', 'user_agent')
 #     }
     try:
         result = requests.get(endpoint)

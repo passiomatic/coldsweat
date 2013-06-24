@@ -48,6 +48,7 @@ def run_tests(endpoint):
         (True, 'mark=item&as=saved&id=1'),  # Dupe
         (True, 'mark=item&as=unsaved&id=1'), 
         (True, 'mark=feed&as=read&id=1&before=%d' % datetime_as_epoch(utcnow)), 
+        (True, 'mark=group&as=read&id=1&before=%d' % datetime_as_epoch(utcnow)), 
     ]
 
     username, password = User.DEFAULT_CREDENTIALS    

@@ -85,11 +85,10 @@ def items_command(request, user, result):
 
 
 
-def unread_recently_command(request, user, result):
+def unread_recently_command(request, user, result):    
+    log.warn('unread_recently_read command is not implemented')
+ 
     
-    
-    pass
-
 
 def mark_command(request, user, result):
 
@@ -165,9 +164,9 @@ def mark_command(request, user, result):
             
             log.debug('marked feed %d as %s' % (object_id, status))
                 
-            
+    if mark == 'group':
+        log.warn('mark=group command is not implemented')           
 
-    #@@TODO: mark:group
 
 
 def links_command(request, user, result):

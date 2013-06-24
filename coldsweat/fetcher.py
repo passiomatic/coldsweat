@@ -54,11 +54,11 @@ def get_entry_id(entry):
         #    return entry.id.values()[0]
         return entry.id
 
+    if 'link' in entry: 
+        return entry.link
     content = get_entry_content(entry)
     if content: 
         return make_sha1_hash(content)
-    if 'link' in entry: 
-        return entry.link
     if 'title' in entry: 
         return make_sha1_hash(entry.title)
 

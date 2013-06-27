@@ -26,7 +26,7 @@ def run_tests(endpoint):
     Use curl command line utility to run tests
     """
 
-    utcnow = datetime.utcnow()
+    epoch = datetime_as_epoch(datetime.utcnow())
 
     # Assume to have some test data already fetched
     queries = [
@@ -49,8 +49,10 @@ def run_tests(endpoint):
         (True, 'mark=item&as=saved&id=1'),  # Dupe
         (True, 'mark=item&as=saved&id=0'),  # Does not exist
         (True, 'mark=item&as=unsaved&id=1'), 
-        (True, 'mark=feed&as=read&id=1&before=%d' % datetime_as_epoch(utcnow)), 
-        (True, 'mark=group&as=read&id=1&before=%d' % datetime_as_epoch(utcnow)), 
+        (True, 'mark=feed&as=read&id=1&before=%d' % epoch), 
+        (True, 'mark=feed&as=read&id=0&before=%d' % epoch), # Does not exist
+        (True, 'mark=group&as=read&id=1&before=%d' % epoch), 
+        (True, 'mark=group&as=read&id=0&before=%d' % epoch), # Does not exist
     ]
 
     username, password = User.DEFAULT_CREDENTIALS    

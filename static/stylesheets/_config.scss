@@ -33,8 +33,8 @@
 
 // Start the ‘atmosphere’ of your design by defining the colours of your pages and text
 
-$bodycolor 						: white;
-$textcolor 						: #444;
+$bodycolor 						: darken(#e6eff5, 15%);  // #e6eff5;
+$textcolor 						: #133142;
 
 
 
@@ -94,14 +94,14 @@ $basefontsize 					: 16;
 $baseheadingfont 				: inherit;
 
 // Choose between normal, bold or set a font-weight number (eg: 700) for your headings
-$baseheadingfontweight 			: bold;
+$baseheadingfontweight 			: 400;
 
 // Your headings may inherit the $textcolor, or you may set a different colour
 $baseheadingfontcolor 			: inherit;
 
 // Often you’ll use an alternative typeface (eg: for buttons, form inputs and tables)
-$altfontfamily 					: $basefontfamily; //"Helvetica Neue", Helvetica, Arial, sans-serif;
-$altlineheight 					: 1.35em;
+$altfontfamily 					: $basefontfamily;
+$altlineheight 					: $baselineheight;
 
 // You can choose a special typeface just for ampersands too
 $ampfontfamily 					: local('Georgia'), local('Garamond'), local('Palatino'), local('Book Antiqua');
@@ -115,12 +115,12 @@ $codefont 						: Consolas, Menlo, Monaco, Courier New, monospace;
 
 
 // Define your design’s palette by choosing three main colours
-$primarycolor 					: rgb(146,154,0);
-$secondarycolor 				: rgb(164,50,21);
+$primarycolor 					: #175b82; // rgb(146,154,0);
+$secondarycolor 				: #9c1c1e; //rgb(164,50,21);
 $tertiarycolor 					: rgb(41,47,54);
 
 // Now set a neutral colour for borders etc.
-$neutralcolor 					: rgb(71,63,63);
+$neutralcolor 					: #474242; //rgb(71,63,63);
 $midneutralcolor 				: darken($neutralcolor,25%);
 $darkneutralcolor 				: darken($neutralcolor,50%);
 $lightneutralcolor 				: lighten($neutralcolor,25%);
@@ -133,14 +133,14 @@ $white 							: rgb(255,255,255);
 
 // Choose a colour for your hyperlinks. Often this will be the $primarycolor 
 $linkcolor 		    			: $primarycolor;
-$linkcolorhover 				: darken($linkcolor, 10);
-$linkcolorvisited   			: darken($linkcolorhover, 10);
-$linkcolorfocus 				: darken($linkcolorvisited, 10);
+$linkcolorhover 				: $secondarycolor; //darken($linkcolor, 10);
+$linkcolorvisited   			: darken($linkcolor, 10);
+$linkcolorfocus 				: darken($linkcolor, 10);
 
 // Now define another set of colours. These will be used to style alerts and buttons
-$alertcolor 					: rgb(218,79,73);
-$errorcolor 					: rgb(176,20,0);
-$infocolor 						: rgb(216,220,162);
+$alertcolor 					: darken(#e6eff5, 15%); //rgb(218,79,73);
+$errorcolor 					: $secondarycolor; //rgb(176,20,0);
+$infocolor 						: darken(#e6eff5, 15%); //rgb(216,220,162);
 $inversecolor 					: rgb(65,65,65);
 $successcolor 					: rgb(188,212,222);
 $warningcolor 					: $errorcolor;
@@ -417,7 +417,7 @@ $heroshadowblur					: 10px;
 
 // =alerts ============
 
-$alertpadding					: 8px 35px 8px 14px;
+$alertpadding					: 8px;
 
 // Alerts have a default flat background colour
 // Add an optional gradient in _bootstrap-alerts.scss
@@ -425,7 +425,7 @@ $alertpadding					: 8px 35px 8px 14px;
 $alertbackgroundcolor 			: $alertcolor;
 
 // Set the alert’s border width
-$alertborderwidth 				: $borderwidth * 2;
+$alertborderwidth 				: 0; // $borderwidth * 2;
 
 // And the alert’s border style
 $alertborderstyle 				: $borderstyle;
@@ -434,7 +434,7 @@ $alertborderstyle 				: $borderstyle;
 $alertbordercolor				: darken($alertbackgroundcolor, 20%);
 
 // Set the alert’s border radius. Default is $borderradius defined above
-$alertborderradius 				: $borderradius;
+$alertborderradius 				: 0; //$borderradius;
 
 // Set the alert’s font-size. 
 // Use only a number. Units (em/px/%) are not required
@@ -484,7 +484,7 @@ $alertcolorwarning				: darken($warningcolor, 20%);
 // Wells have a default flat background colour
 // Add an optional gradient in _bootstrap-wells.scss
 // Configure the gradient colours in _texture.scss
-$wellbackgroundcolor 			: $lightestneutralcolor;
+$wellbackgroundcolor 			: #e6eff5;
 
 // Set wells’ border width
 $wellborderwidth 				: $alertborderwidth;
@@ -583,10 +583,10 @@ $buttonborderwidth				: $borderwidth;
 $buttonborderstyle				: $borderstyle;
 
 // By default border colour is a tint of background colour. Adjust percentage as required
-$buttonbordercolor 				: darken($buttonbackgroundcolor,10%);
+$buttonbordercolor 				: darken($buttonbackgroundcolor,13%);
 
 // Sometimes you may want a darker bottom border to suggest three-dimensions
-$buttonbottombordercolor 		: darken($buttonbordercolor, 5%);
+$buttonbottombordercolor 		: darken($buttonbordercolor, 17%);
 
 // Set the default button’s border radius. Default is $borderradius defined above
 $buttonborderradius				: $borderradius;
@@ -602,7 +602,7 @@ $buttonfontsize 				: $basefontsize;
 // Set the default button’s text colour
 // Colours for :hover and :active  are derived automatically from $buttoncolor
 // Override colours for :hover and :active in _bootstrap-form-buttons.scss
-$buttoncolor 					: $lightneutralcolor;
+$buttoncolor 					: $neutralcolor;
 
 
 
@@ -648,7 +648,7 @@ $buttoncolorwarning				: $white;
 
 // =tables ============
 
-$tablepadding 					: 8px;
+$tablepadding 					: 8px 4px;
 
 // Set table background colour
 $tablebackgroundcolor			: transparent;
@@ -666,7 +666,7 @@ $tableborderwidth				: $borderwidth;
 $tableborderstyle				: $borderstyle;
 
 // Set tables’ border colour
-$tablebordercolor 				: $lighterneutralcolor;
+$tablebordercolor 				: $lightneutralcolor;
 
 // Set tables’ font-family. Default is $altfontfamily defined above
 $tablefontfamily 				: $altfontfamily;

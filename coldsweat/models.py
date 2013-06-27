@@ -14,7 +14,7 @@ from peewee import *
 
 from utilities import *
 import favicon
-from coldsweat import config, installation_dir
+from coldsweat import config, log
 
 # Defer database init, see connect() below
 engine = config.get('database', 'engine')
@@ -62,7 +62,7 @@ class Icon(CustomModel):
     """
     Feed (fav)icons, stored as data URIs
     """
-    data                = CharField() 
+    data                = TextField() 
 
     class Meta:
         db_table = 'icons'
@@ -114,7 +114,7 @@ class Feed(CustomModel):
             (('last_checked_on',), False),
             #(('last_updated_on',), False),
         )
-        order_by = ('-last_updated_on',)
+        #order_by = ('-last_updated_on',)
         db_table = 'feeds'
 
     @property
@@ -149,7 +149,7 @@ class Entry(CustomModel):
             (('guid',), False),
             (('link',), False),
         )
-        order_by = ('-last_updated_on',)
+        #order_by = ('-last_updated_on',)
         db_table = 'entries'
 
     @property
@@ -214,7 +214,7 @@ def connect():
         coldsweat_db.init(filename)    
         
         # See http://www.sqlite.org/wal.html
-        #coldsweat_db.execute_sql('PRAGMA journal_mode=WAL')
+        coldsweat_db.execute_sql('PRAGMA journal_mode=WAL')
         
     elif engine == 'mysql':            
         database = config.get('database', 'database')
@@ -228,6 +228,8 @@ def connect():
         coldsweat_db.init(database, **kwargs)
     
     coldsweat_db.connect()
+
+    log.debug('connected to %s database' % engine)
 
 
 def setup(skip_if_existing=False):
@@ -250,3 +252,4 @@ def setup(skip_if_existing=False):
         Group.create(title=Group.DEFAULT_GROUP)        
         Icon.create(data=favicon.DEFAULT_FAVICON) 
 
+    coldsweat_db.close()

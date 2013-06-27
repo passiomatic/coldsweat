@@ -27,7 +27,8 @@ def get_feed_updated(feed, default):
     for header in ['updated_parsed', 'published_parsed']:
         value = feed.get(header, None)
         if value:
-            return epoch_as_datetime(value)
+            # Fix future dates
+            return min(tuple_as_datetime(value), default)
     return default
 
 def get_entry_timestamp(entry, default):
@@ -37,7 +38,8 @@ def get_entry_timestamp(entry, default):
     for header in ['updated_parsed', 'published_parsed', 'created_parsed']:
         value = entry.get(header, None)
         if value:
-            return epoch_as_datetime(value)
+            # Fix future dates
+            return min(tuple_as_datetime(value), default)
     return default
         
 def get_entry_title(entry):
@@ -136,7 +138,6 @@ def fetch_feed(feed):
 
     (schema, netloc, path, params, query, fragment) = urlparse.urlparse(feed.self_link)
 
-
     now = datetime.utcnow()
 
     headers = {
@@ -166,6 +167,8 @@ def fetch_feed(feed):
         log.error("a network error occured while fetching %s, skipped" % netloc)
         return
 
+    feed.last_checked_on = now
+
     if response.status_code == 304: # Not modified
         log.debug("%s hasn't been modified, skipped" % netloc)
         post_fetch(response.status_code)
@@ -183,7 +186,6 @@ def fetch_feed(feed):
         post_fetch(response.status_code, error=True)
         return
 
-
     try:
         soup = feedparser.parse(response.text) 
     except Exception, exc:
@@ -199,7 +201,6 @@ def fetch_feed(feed):
     if 'title' in soup.feed:
         feed.title = soup.feed.title
 
-    feed.last_checked_on = now
     feed.last_updated_on = get_feed_updated(soup.feed, now)    
     #feed.last_status = response.status_code
     

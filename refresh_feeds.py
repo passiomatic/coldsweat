@@ -4,7 +4,7 @@
 Description: refresh all subscrptions feeds.
 """
 
-from coldsweat.models import Feed, connect
+from coldsweat.models import Feed, connect, coldsweat_db
 from coldsweat import fetcher
 
 if __name__ == '__main__':
@@ -14,4 +14,4 @@ if __name__ == '__main__':
     for feed in Feed.select():
         fetcher.fetch_feed(feed)
 
-                
+    coldsweat_db.close()

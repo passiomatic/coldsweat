@@ -6,7 +6,7 @@ engine: sqlite
 ; mysql
 hostname: localhost
 username: root
-password: secret
+password: 
 database: coldsweat
 
 ; sqlite3

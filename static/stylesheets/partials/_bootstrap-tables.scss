@@ -21,7 +21,7 @@ td {
 padding : $tablepadding;
 vertical-align : top;
 border-top : $tableborderwidth $tableborderstyle $tablebordercolor;
-@include font-size($basefontsize / 1.25);
+/* @include font-size($basefontsize / 1.25); */
 line-height : $baselineheight;
 text-align : left; }
 

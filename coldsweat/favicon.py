@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Favicon retrieval
+Decsription: favicon retrieval
 
-Created by: Rui Carmo
-License: MIT (see LICENSE for details)
+Copyright (c) 2013— Andrea Peltrin
+Portions are copyright (c) 2013 Rui Carmo
+License: MIT (see LICENSE.md for details)
 """
 import base64, urlparse
 import requests

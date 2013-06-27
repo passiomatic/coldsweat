@@ -20,3 +20,12 @@
 @mixin successgrad 		{ @include vertical($successcolor, darken($successcolor, 10%)); }
 @mixin warninggrad 		{ @include vertical($warningcolor, darken($warningcolor, 10%)); }
 @mixin wellgrad 		{ @include vertical($wellbackgroundcolor, darken($wellbackgroundcolor, 10%)); }
+
+
+.btn {
+    @include buttongrad;
+}
+
+.btn-primary {
+    @include primarygrad;
+}

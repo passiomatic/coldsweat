@@ -11,7 +11,7 @@ URL: http://lab.passiomatic.com/coldsweat/
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 
 <head>
-<title>{{page_title}}</title>
+<title>Coldsweat</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="cleartype" content="on">
@@ -21,27 +21,27 @@ URL: http://lab.passiomatic.com/coldsweat/
 <meta name="author" content="Andrea Peltrin">
 
 <!-- For all browsers -->
-<link href='http://fonts.googleapis.com/css?family=Ubuntu:700italic,700,400italic,400' rel='stylesheet' type='text/css'>
-<link rel='stylesheet' href='{{base_url}}coldsweat/stylesheets/all.css'>
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:500italic,500,400italic,400' rel='stylesheet' type='text/css'>
+<link rel='stylesheet' href='{{static_url}}/stylesheets/all.css'>
 
 <!--[if (lt IE 9) & (!IEMobile)]>
-<script src='{{base_url}}coldsweat/javascripts/vendor/selectivizr-min.js'></script>
-<link rel='stylesheet' href='{{base_url}}coldsweat/stylesheets/lte-ie8.css'>
+<script src='{{static_url}}/javascripts/vendor/selectivizr-min.js'></script>
+<link rel='stylesheet' href='{{static_url}}/stylesheets/lte-ie8.css'>
 <![endif]-->
 
 <!-- JavaScript -->
-<script src='{{base_url}}coldsweat/javascripts/vendor/head.load.min.js'></script>
+<script src='{{static_url}}/javascripts/vendor/head.load.min.js'></script>
 
-<link rel="shortcut icon" href="{{base_url}}coldsweat/images/favicon.ico">
-<!-- <link rel="shortcut icon" href="{{base_url}}coldsweat/images/favicon.png"> -->
-<!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{base_url}}coldsweat/images/apple-touch-icon.png"> -->
+<link rel="shortcut icon" href="{{static_url}}/images/favicon.ico">
+<!-- <link rel="shortcut icon" href="{{static_url}}/images/favicon.png"> -->
+<!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{static_url}}/images/apple-touch-icon.png"> -->
 <!--iOS -->
 <!-- <meta name="apple-mobile-web-app-title" content="Coldsweat"> -->
 <!-- <meta name="viewport" content="initial-scale=1.0"> (Use if apple-mobile-web-app-capable below is set to yes) -->
 <!-- <meta name="apple-mobile-web-app-capable" content="yes"> -->
 <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
 <!-- Windows 8 / RT -->
-<!-- <meta name="msapplication-TileImage" content="{{base_url}}coldsweat/images/apple-touch-icon.png"> -->
+<!-- <meta name="msapplication-TileImage" content="coldsweat/images/apple-touch-icon.png"> -->
 <!-- <meta name="msapplication-TileColor" content="#000"> -->
 </head>
 
@@ -60,13 +60,33 @@ URL: http://lab.passiomatic.com/coldsweat/
 -->  
 
 <div class="content">
+    {{alert_message}}
+
     {{self.content}}
 </div>
 
 <!-- Final ============================== -->
 
-<footer role="contentinfo" class="">
-    <small>This is Coldsweat {{version_string}}.</small>
+<footer role="contentinfo">
+
+    <div class="grid-container">
+
+      <div class="grid-60">    
+        <div class="payoff">
+            <div class="branding">
+                <img src="{{static_url}}/images/branding.png" alt="branding" width="70" height="70">
+            </div>
+            Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds
+        </div>        
+      </div>
+    
+      <div class="grid-40">    
+        &copy; 2013&ndash; <a href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a href="https://github.com/passiomatic/coldsweat">Source Code</a>
+        </div>
+
+    <!-- /grid-container -->
+    </div>
+        
 </footer>
 </div><!-- container -->
 
@@ -83,31 +103,31 @@ head.js(
 // ensure that all but the last item are followed by a comma.
 
 // Libraries
-"{{base_url}}coldsweat/javascripts/vendor/modernizr-min.js",
-"{{base_url}}coldsweat/javascripts/vendor/jquery-min.js",
+"{{static_url}}/javascripts/vendor/modernizr-min.js",
+"{{static_url}}/javascripts/vendor/jquery-min.js",
 
 // Plugins
-"{{base_url}}coldsweat/javascripts/plugins.js",
+"{{static_url}}/javascripts/plugins.js",
 
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
-"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-transition.js",
-//"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-carousel.js",
-"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
+//"javascripts/vendor/bootstrap/bootstrap-transition.js",
+//"javascripts/vendor/bootstrap/bootstrap-carousel.js",
+//"javascripts/vendor/bootstrap/bootstrap-tooltip.js",
 
 // Popover has a dependency on tooltip, so make sure and include 
 // bootstrap-tooltip regardless in order for popovers to work
-"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-popover.js",
-"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-modal.js",
-"{{base_url}}coldsweat/javascripts/vendor/bootstrap/bootstrap-collapse.js",
+//"javascripts/vendor/bootstrap/bootstrap-popover.js",
+//"javascripts/vendor/bootstrap/bootstrap-modal.js",
+//"javascripts/vendor/bootstrap/bootstrap-collapse.js",
 
 // Functionality only used by Rock Hammer
-//"coldsweat/javascripts/navigation-manager.js",
+//"javascripts/navigation-manager.js",
 
 // Remove any navigation patterns below that arent used
-//"coldsweat/javascripts/nav-patterns/nav-toggle.js",
-//"coldsweat/javascripts/nav-patterns/left-nav-flyout.js",
-//"coldsweat/javascripts/nav-patterns/responsive-nav.min.js"
+//"javascripts/nav-patterns/nav-toggle.js",
+//"javascripts/nav-patterns/left-nav-flyout.js",
+//"javascripts/nav-patterns/responsive-nav.min.js"
 );
 
 // Google Analytics code

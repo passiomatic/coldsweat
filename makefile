@@ -1,4 +1,4 @@
-CSS_FILES=./coldsweat/stylesheets/all.scss:./coldsweat/stylesheets/all.css
+CSS_FILES=./static/stylesheets/all.scss:./static/stylesheets/all.css
 
 all: cssupdate
 

@@ -15,24 +15,7 @@ AddHandler fastcgi-script .fcgi
 
 DirectoryIndex index.cgi
 # To use FastCGI uncomment this instead
-#DirectoryIndex index.fcgi
-
-# --------------------------------------------------------
-# URL rewriting
-# --------------------------------------------------------
-
-<IfModule mod_rewrite.c>    
-
-    RewriteEngine On  
-
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d    
-
-    # To use FastCGI uncomment this instead
-    #RewriteRule ^(.*)$ index.fcgi/$1 [L]
-    RewriteRule ^(.*)$ index.cgi/$1 [L]                
-
-</IfModule>
+#DirectoryIndex dispatch.fcgi
 
 # --------------------------------------------------------
 # Caching

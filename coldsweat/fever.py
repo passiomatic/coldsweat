@@ -11,6 +11,9 @@ from collections import defaultdict
 from datetime import datetime
 from calendar import timegm
 
+from webob import Response
+from webob.exc import HTTPBadRequest
+
 from utilities import *    
 from app import *
 from models import *
@@ -18,10 +21,6 @@ from coldsweat import log
 
 RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 60*60 # 1 hour
-
-# -------------------
-# Fever API
-# -------------------
 
 
 def groups_command(request, user, result):            
@@ -108,32 +107,32 @@ def mark_command(request, user, result):
             # Sanity check
             entry = Entry.get(Entry.id == object_id)  
         except Entry.DoesNotExist:
-            log.warn('could not find requested entry %d, ignored' % object_id)
+            log.info('could not find requested entry %d, ignored' % object_id)
             return
 
         if status == 'read':
             try:
                 Read.create(user=user, entry=entry)
             except IntegrityError:
-                log.warn('entry %d already marked as read, ignored' % object_id)
+                log.info('entry %d already marked as read, ignored' % object_id)
                 return
         #Note: strangely enough 'unread' is not mentioned in 
         #  the Fever API, but Reeder app asks for it
         elif status == 'unread':
             count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
             if not count:
-                log.debug('entry %d never marked as read, ignored' % object_id)
+                log.info('entry %d never marked as read, ignored' % object_id)
                 return
         elif status == 'saved':
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
-                log.warn('entry %d already marked as saved, ignored' % object_id)
+                log.info('entry %d already marked as saved, ignored' % object_id)
                 return
         elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
             if not count:
-                log.debug('entry %d never marked as saved, ignored' % object_id)
+                log.info('entry %d never marked as saved, ignored' % object_id)
                 return
                   
         log.debug('marked entry %d as %s' % (object_id, status))
@@ -145,7 +144,7 @@ def mark_command(request, user, result):
             # Sanity check
             feed = Feed.get(Feed.id == object_id)  
         except Feed.DoesNotExist:
-            log.warn('could not find requested feed %d, ignored' % object_id)
+            log.info('could not find requested feed %d, ignored' % object_id)
             return
 
         if status == 'read':
@@ -186,44 +185,50 @@ COMMANDS = [
     ('links'                         , links_command),
 ]
 
-@view(r'^/fever/$', 'POST')
-def endpoint(request, _):
+@view(r'^/fever/?$', 'post')
+def endpoint(ctx):
 
-    connect()
-
-    log.debug('client from %s requested: %s' % (request.remote_addr, request.params))
+    log.debug('client from %s requested: %s' % (ctx.request.remote_addr, ctx.request.params))
     
-    if 'api' not in request.GET:
-        return HTTP_BAD_REQUEST, [], '' # Ignore request
+    if 'api' not in ctx.request.GET:
+        raise HTTPBadRequest()
 
     result = Struct({'api_version':2, 'auth':0})   
             
     #@@TODO format = 'xml' if request.GET['api'] == 'xml' else 'json'
 
-    headers = [('Content-Type', 'application/json')] # application/xml
+    connect()
         
-    if 'api_key' in request.POST:
-        api_key = request.POST['api_key']        
+    if 'api_key' in ctx.request.POST:
+        api_key = ctx.request.POST['api_key']        
         try:
             user = User.get((User.api_key == api_key) & (User.is_enabled == True))
         except User.DoesNotExist:
-            return HTTP_UNAUTHORIZED, headers, serialize(result) 
+            return serialize(result)  #@@TODO: HTTPUnauthorized ?
     else:
-        return HTTP_UNAUTHORIZED, headers, serialize(result)   
+        return serialize(result)   #@@TODO: HTTPUnauthorized ?
 
     # Authorized
     result.auth = 1
 
     # Note: client *can* send multiple commands at time
     for command, handler in COMMANDS:
-        if command in request.params:            
-            handler(request, user, result)
+        if command in ctx.request.params:            
+            handler(ctx.request, user, result)
             #break
 
     result.last_refreshed_on_time = get_last_refreshed_on_time()
-       
-    return HTTP_OK, headers, serialize(result)
 
+    coldsweat_db.close()
+               
+    return serialize(result)
+
+
+@view(r'^/fever/?$')
+@template('fever.html')
+def placeholder(ctx):
+    pass
+    
 
 
 def serialize(result, format='json'):
@@ -234,15 +239,16 @@ def serialize(result, format='json'):
 
     def as_json(result):
         import json
-        #json_result = json.dumps(result, sort_keys=True, indent=4, encoding=ENCODING)
         return json.dumps(result, indent=4, encoding=ENCODING)
 
     serializers = {
         'json': as_json,
         'xml': as_xml 
     }
-
-    return serializers.get(format)(result)
+  
+    r = Response(content_type='application/json', charset='utf-8')  #application/xml
+    r.body = serializers.get(format)(result)   
+    return r
 
 
 

@@ -12,14 +12,13 @@ from calendar import timegm
 from datetime import datetime
 import cgi
 
-
 DEFAULT_ENCODING = 'utf-8'
 
-def encode(value, encoding=DEFAULT_ENCODING):
-    return value.encode(encoding, 'replace')
+def encode(value):
+    return value.encode(DEFAULT_ENCODING, 'replace')
 
-def decode(value, encoding=DEFAULT_ENCODING):  
-    return unicode(value, encoding, 'replace')        
+def decode(value):  
+    return unicode(value, DEFAULT_ENCODING, 'replace')        
 
 # --------------------
 # Hash functions
@@ -56,9 +55,9 @@ def format_http_datetime(value):
 def datetime_as_epoch(value):
     return int(timegm(value.utctimetuple()))
     
-def epoch_as_datetime(value):
+def tuple_as_datetime(value):
     return datetime.utcfromtimestamp(timegm(value))
-    
+   
 # --------------------
 # Misc
 # --------------------

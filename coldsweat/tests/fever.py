@@ -36,16 +36,18 @@ def run_tests(endpoint):
         (False, 'saved_item_ids'),
         (False, 'groups&feeds'),            # Mixed
         (False, 'favicons'),
-        (False, 'items?max_id=10'),
-        (False, 'items?since_id=5'),
+        (False, 'items&max_id=10'),
+        (False, 'items&since_id=5'),
         (False, 'items'), 
         (False, 'links'),                   # Unsupported
         (True, 'unread_recently_read=1'),
         (True, 'mark=item&as=read&id=1'), 
         (True, 'mark=item&as=read&id=1'),   # Dupe
+        (True, 'mark=item&as=read&id=0'),   # Does not exist
         (True, 'mark=item&as=unread&id=1'), 
         (True, 'mark=item&as=saved&id=1'), 
         (True, 'mark=item&as=saved&id=1'),  # Dupe
+        (True, 'mark=item&as=saved&id=0'),  # Does not exist
         (True, 'mark=item&as=unsaved&id=1'), 
         (True, 'mark=feed&as=read&id=1&before=%d' % datetime_as_epoch(utcnow)), 
         (True, 'mark=group&as=read&id=1&before=%d' % datetime_as_epoch(utcnow)), 
@@ -54,23 +56,31 @@ def run_tests(endpoint):
     username, password = User.DEFAULT_CREDENTIALS    
     api_key=make_md5_hash('%s:%s' % (username, password))
 
+    # Test auth failure
+    print ('\n= auth\n')
+
+    subprocess.call([
+        "curl", 
+        "-dapi_key=%s" % 'wrong-key',
+        "%s?api&unread_item_ids" % endpoint
+    ])
+
+    # Test API commands            
     for as_form, q in queries:
         print ('\n= %s\n' % q)
 
         if as_form:
             subprocess.call([
                 "curl", 
-                #"-v",
                 "-dapi_key=%s" % api_key,
                 "-d%s" % q,
-                "%s" % endpoint
+                "%s?api" % endpoint
             ])
         else:
             subprocess.call([
                 "curl", 
-                #"-v",
                 "-dapi_key=%s" % api_key,
-                "%s&%s" % (endpoint, q),
+                "%s?api&%s" % (endpoint, q),
             ])
             
 

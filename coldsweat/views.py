@@ -7,14 +7,14 @@ Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
-from app import *
-from models import *
-import fetcher
+from tempita import HTMLTemplate
 from webob.exc import HTTPSeeOther 
 
+from app import *
+from models import *
+from utilities import *
+import fetcher
 from coldsweat import log
-
-from tempita import HTMLTemplate
 
 
 @view()
@@ -26,9 +26,9 @@ def index(ctx):
     #@@TODO: remove read entries from list                                                
     last_entries = Entry.select().join(Feed).join(Icon).order_by(Entry.last_updated_on.desc()).limit(5)
         
-    q = Feed.select(fn.Max(Feed.last_checked_on))
-    if q.exists():
-        last_checked_on = q.scalar()
+    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    if last_checked_on:
+        last_checked_on = format_datetime(last_checked_on)
     else:
         last_checked_on = '–'
         

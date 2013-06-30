@@ -39,9 +39,9 @@ def make_sha1_hash(s):
 #     return timeformat.format(u'%Y-%m-%dT%H:%M:%S%z', 
 #         time.gmtime(seconds), utctime=True)
 
-# def format_http_datetime(value):        
-#     return timeformat.format(u'%a[SHORT], %d %b[SHORT] %Y %H:%M:%S %z', 
-#         value.utctimetuple(), utctime=True)
+def format_datetime(value, smart=True):
+    return value.strftime(u'%a, %d %b %H:%M:%S UTC')
+
 
 def format_http_datetime(value):
     """

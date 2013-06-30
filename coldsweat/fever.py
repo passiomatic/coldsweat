@@ -430,13 +430,8 @@ def get_last_refreshed_on_time():
     """
     Time of the most recently *refreshed* feed
     """
-    #@@TODO
-    #q = Feed.select(fn.Max(Feed.last_checked_on).alias('last_checked_on'))
-    
-    return int(time.time()) # timegm(value.utctimetuple())
+    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    return datetime_as_epoch(last_checked_on)
 
-
-# if __name__ == '__main__':
-#     pass
 
 

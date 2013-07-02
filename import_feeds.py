@@ -8,10 +8,10 @@ from coldsweat import opml
 
 if __name__ == '__main__':
 
-    connect()
-    setup(skip_if_existing=True)
-
     username, password = User.DEFAULT_CREDENTIALS
+
+    connect()
+    setup(username, password)
 
     default_user = User.get(User.username == username)
     default_group = Group.get(Group.title == Group.DEFAULT_GROUP)    
@@ -23,5 +23,6 @@ if __name__ == '__main__':
             Subscription.create(user=default_user, group=default_group, feed=feed)
 
 
-            
+    coldsweat_db.close()
+
                         

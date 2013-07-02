@@ -9,7 +9,6 @@ License: MIT (see LICENSE.md for details)
 
 from os import path
 from datetime import datetime
-from calendar import timegm
 from peewee import *
 
 from utilities import *
@@ -56,6 +55,10 @@ class User(CustomModel):
 
     class Meta:
         db_table = 'users'
+    
+    @staticmethod
+    def make_api_key(username, password):
+        return make_md5_hash('%s:%s' % (username, password))
     
 
 class Icon(CustomModel):
@@ -232,24 +235,25 @@ def connect():
     log.debug('connected to %s database' % engine)
 
 
-def setup(skip_if_existing=False):
+def setup(username, password):
     """
     Create database and tables for all models and setup bootstrap data
     """
 
-    connect()
-    
     models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription
 
     for model in models:
-        model.create_table(skip_if_existing)
-
-    username, password = User.DEFAULT_CREDENTIALS
+        model.create_table(fail_silently=True)
+        
+    try:
+        User.get(User.username == username)
+        return # Already set up, bail out
+    except User.DoesNotExist:
+        pass
 
     # Create the bare minimum to boostrap system
     with coldsweat_db.transaction():
-        User.create(username=username, password=password, api_key=make_md5_hash('%s:%s' % (username, password)))
+        User.create(username=username, password=password, api_key=User.make_api_key(username, password))
         Group.create(title=Group.DEFAULT_GROUP)        
         Icon.create(data=favicon.DEFAULT_FAVICON) 
 
-    coldsweat_db.close()

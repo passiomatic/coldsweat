@@ -138,7 +138,7 @@ def mark_command(request, user, result):
         log.debug('marked entry %d as %s' % (object_id, status))
 
 
-    if mark == 'feed':
+    if mark == 'feed' and status == 'read':
 
         try:
             # Sanity check
@@ -147,51 +147,58 @@ def mark_command(request, user, result):
             log.info('could not find requested feed %d, ignored' % object_id)
             return
 
-        if status == 'read':
-            # Unix timestamp of the the local client’s last items API request
-            try:
-                before = datetime.utcfromtimestamp(int(request.POST['before']))
-            except KeyError, ValueError:
-                return              
-            
-            q = feed.entries.where(Entry.last_updated_on < before)            
-            with coldsweat_db.transaction():
-                for entry in q:
-                    try:
-                        Read.create(user=user, entry=entry)
-                    except IntegrityError:
-                        continue
-            
-            log.debug('marked feed %d as %s' % (object_id, status))
-                
-    if mark == 'group':
+        # Unix timestamp of the the local client’s last items API request
         try:
-            # Note: Coldsweat doesn't know Fever super groups Kindling 0 and Sparks -1
-            group = Group.get(Group.id == object_id)  
-        except Group.DoesNotExist:
-            log.info('could not find requested group %d, ignored' % object_id)
-            return
+            before = datetime.utcfromtimestamp(int(request.POST['before']))
+        except KeyError, ValueError:
+            return              
+        
+        q = feed.entries.where(Entry.last_updated_on < before)            
+        with coldsweat_db.transaction():
+            for entry in q:
+                try:
+                    Read.create(user=user, entry=entry)
+                except IntegrityError:
+                    continue
+        
+        log.debug('marked feed %d as %s' % (object_id, status))
+                
 
-        if status == 'read':
-            # Unix timestamp of the the local client’s last items API request
-            try:
-                before = datetime.utcfromtimestamp(int(request.POST['before']))
-            except KeyError, ValueError:
-                return              
+    if mark == 'group' and status == 'read':
+
+        # Unix timestamp of the the local client’s last items API request
+        try:
+            before = datetime.utcfromtimestamp(int(request.POST['before']))
+        except KeyError, ValueError:
+            return              
+
+        # Mark all as read?
+        if object_id == 0:                                                
+            q = Entry.select().join(Feed).join(Subscription).where(
+                (Subscription.user == user) &
+                (Entry.last_updated_on < before)
+            ).naive()
+        else:
+            try:        
+                group = Group.get(Group.id == object_id)  
+            except Group.DoesNotExist:
+                log.info('could not find requested group %d, ignored' % object_id)
+                return
 
             q = Entry.select().join(Feed).join(Subscription).where(
                 (Subscription.group == group) & 
                 (Subscription.user == user) &
                 (Entry.last_updated_on < before)
-                ).naive()
-            with coldsweat_db.transaction():
-                for entry in q:
-                    try:
-                        Read.create(user=user, entry=entry)
-                    except IntegrityError:
-                        continue
-            
-            log.debug('marked group %d as %s' % (object_id, status))
+            ).naive()
+
+        with coldsweat_db.transaction():
+            for entry in q:
+                try:
+                    Read.create(user=user, entry=entry)
+                except IntegrityError:
+                    continue
+        
+        log.debug('marked group %d as %s' % (object_id, status))
 
 
 def links_command(request, user, result):

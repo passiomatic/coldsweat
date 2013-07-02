@@ -6,7 +6,7 @@ Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 '''
-import sys, os, re, time, cgi
+import sys, os, re
 
 from webob import Request, Response
 from webob.exc import *
@@ -14,14 +14,9 @@ import tempita
 
 from utilities import *
 from coldsweat import log, config, installation_dir, VERSION_STRING
-#from models import connect
-
 
 ENCODING = 'utf-8'
-
-
 TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
- 
 URI_MAP = []
     
 class Context(object):
@@ -149,76 +144,6 @@ def http_not_found(ctx):
     pass    
 
     
-# def dispatch_request(environ, start_response):
-# 
-#     request     = Request(environ) 
-#     response    = Response(charset='utf-8')
-#     
-#     request.base_url = fix_application_url(request)
-# 
-#     output_headers = Headers([('Content-Type', 'text/html; charset=utf-8')])
-# 
-#     template_symbols = {
-#         'base_url': request.base_url, #get_base_url(request), 
-#         #'encoding': ENCODING,
-#         'version_string': VERSION_STRING
-#     }
-#     
-#     # Setup common template symbols
-#     filler = fill_template_namespace(**template_symbols)
-# 
-#     try:
-#         path_info = request.path_info
-#     except KeyError:
-#         path_info = ''
-# 
-#     def find_view():
-#     
-#         for re, method, handler in URI_MAP:        
-#             match = re.match(path_info)
-#             if match and (method == request.method):                    
-#                 return handler, match.groups()
-#     
-#         raise NotFoundError  
-#     
-#     def response(lines):
-#         for line in lines:
-#             #yield encode(line)
-#             yield line
-# 
-#     try:                    
-#         handler, args = find_view()
-#                    
-#         if not args:
-#             args = ()
-# 
-#         status, headers, body = handler(request, filler, *args)
-# 
-#         for name, value in headers:
-#             if name == 'Content-Type':
-#                 output_headers[name] = value # Replace default value
-#             else:
-#                 output_headers.add_header(name, value)
-# 
-#     except NotFoundError, exc:     
-#         status = str(exc)
-#         if exc.body:
-#             message = exc.body
-#         else:
-#             message = u'Resource <i>%s</i> could not be found on this server.' % path_info
-#                     
-#         body = make_page('404.html', filler, {'message': message})
-# 
-#     #output_headers['Content-Length'] = str(len(body))
-# 
-#     #@@NOTE: Looks wrong to me. However, WSGI handlers.py uses StringType 
-#     #  instead of str while asserting for k and v types
-#     start_response(status, [(str(k), str(v)) for k, v in output_headers.items()])    
-#     #start_response(status, str(output_headers))    
-# 
-#     return response([body])
-
-
 # ------------------------------------------------------
 # Misc. utilities
 # ------------------------------------------------------
@@ -270,7 +195,7 @@ class ExceptionMiddleware(object):
             traceback += format_tb(tb)
             traceback.append('%s: %s' % (type.__name__, value))
             # We might have not a stated response by now. Try
-            # to start one with the status code 500 or ignore an
+            # to start one with the status code 500 or ignore any
             # raised exception if the application already started one            
             try:
                 start_response('500 Internal Server Error', [
@@ -287,7 +212,6 @@ class ExceptionMiddleware(object):
         # it *must* be called
         if hasattr(self.app, 'close'):
             self.app.close()
-
 
 # ------------------------------------------------------
 # All set, import views

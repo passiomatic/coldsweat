@@ -74,12 +74,14 @@ def run_tests(endpoint, suites=ALL):
     if 'mark_feed' in suites:
         queries.extend([
             (True, 'mark=feed&as=read&id=1&before=%d' % epoch), 
+            (True, 'mark=feed&as=read&id=1&before=abc'),            # Malformed
             (True, 'mark=feed&as=read&id=0&before=%d' % epoch),     # Does not exist
         ]) 
 
     if 'mark_group' in suites:
         queries.extend([
             (True, 'mark=group&as=read&id=1&before=%d' % epoch), 
+            (True, 'mark=group&as=read&id=1&before=abc'),           # Malformed 
             (True, 'mark=group&as=read&id=-1&before=%d' % epoch),   # Unsupported
         ]) 
 

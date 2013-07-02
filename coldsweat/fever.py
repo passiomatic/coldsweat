@@ -150,7 +150,7 @@ def mark_command(request, user, result):
         # Unix timestamp of the the local client’s last items API request
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
-        except KeyError, ValueError:
+        except (KeyError, ValueError):
             return              
         
         q = feed.entries.where(Entry.last_updated_on < before)            
@@ -169,7 +169,7 @@ def mark_command(request, user, result):
         # Unix timestamp of the the local client’s last items API request
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
-        except KeyError, ValueError:
+        except (KeyError, ValueError):
             return              
 
         # Mark all as read?

@@ -13,6 +13,7 @@ from xml.etree import ElementTree
 #from collections import defaultdict
 
 from models import *
+import favicon
 from coldsweat import log
 
 
@@ -24,7 +25,7 @@ allowed_attribs = {
 }
 
 #@@TODO: add suport to grouped subscriptions
-def add_feeds_from_file(source):
+def add_feeds_from_file(source, fetch_icons=False):
     """
     Add feeds to database reading from a file containing OPML data. 
     """    
@@ -45,7 +46,11 @@ def add_feeds_from_file(source):
                 for k, v in element.attrib.items():
                     if k in allowed_attribs:
                         setattr(feed, allowed_attribs[k], v)
-                                        
+
+                if fetch_icons:
+                    icon = Icon.create(data=favicon.fetch(feed.self_link))
+                    feed.icon = icon
+                
                 try:
                     feed.save()
                 except IntegrityError:

@@ -18,7 +18,7 @@ def make_data_uri(content_type, data):
     """
     Return data as a data:URI scheme
     """
-    return "data:%s;base64,%s" % (content_type, base64.urlsafe_b64encode(data))
+    return "data:%s;base64,%s" % (content_type, base64.standard_b64encode(data))
 
 def google_fetcher(url):
     """
@@ -34,6 +34,9 @@ def google_fetcher(url):
     except RequestException, exc:
         log.warn("could not fetch favicon for %s (%s)" % (url, exc))
         return DEFAULT_FAVICON
+
+    #log.debug("favicon data length %d" % len(result.content))
+
 
     return make_data_uri(result.headers['Content-Type'], result.content)
 

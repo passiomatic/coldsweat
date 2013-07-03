@@ -16,7 +16,7 @@ if __name__ == '__main__':
     default_user = User.get(User.username == username)
     default_group = Group.get(Group.title == Group.DEFAULT_GROUP)    
     
-    feeds = opml.add_feeds_from_file('./subscriptions.xml')
+    feeds = opml.add_feeds_from_file('./subscriptions.xml', fetch_icons=True)
 
     with coldsweat_db.transaction():
         for feed in feeds:         

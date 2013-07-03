@@ -232,7 +232,7 @@ def connect():
     
     coldsweat_db.connect()
 
-    log.debug('connected to %s database' % engine)
+    #log.debug('connected to %s database' % engine)
 
 
 def setup(username, password):

@@ -15,7 +15,7 @@ Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusin
 ## Technical underpinnings
 
 * SQLite and MySQL databases (trivial to add Postgres if you want, since it uses the Peewee ORM)
-* WSGI compatible, currently tested under FastCGI environments
+* WSGI compatible, currently tested under CGI, FastCGI and Passenger environments
 * Uses Mark Pilgrim's [Universal Feed Parser][fp]
 
 ## Current status
@@ -26,15 +26,7 @@ Coldsweat correctly syncs read and saved items with Reeder for iOS — see issu
 
 See <https://github.com/passiomatic/coldsweat/wiki/Setup>
 
-## On the web 
 
-### Project home
-
-@@TODO
-
-### Source code
-
-[Available on GitHub][s].
 
 [fp]: https://pypi.python.org/pypi/feedparser/
 [f]: http://www.feedafever.com/

@@ -15,9 +15,12 @@ filename: data/coldsweat.db
 [fetcher]
 
 min_interval:       900     ; Seconds
-error_threshold:    100
+error_threshold:    50      ; Number of errors before disabling feed
 max_history:        7       ; Days
 timeout:            15      ; Seconds
+multiprocessing:    on      
+processes:          4
+chunk_size:         32
 
 ; Overrides default Coldsweat user agent string
 ;user_agent:

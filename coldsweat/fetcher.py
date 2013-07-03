@@ -8,7 +8,6 @@ License: MIT (see LICENSE.md for details)
 '''
 
 import sys, os, re, time, cgi, urlparse
-from calendar import timegm
 from datetime import datetime
 
 import feedparser
@@ -121,8 +120,6 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
     
 def fetch_feed(feed):
     
-    log.debug("fetching %s" % feed.self_link)
-           
     def post_fetch(status, error=False):
         if status:
             feed.last_status = status
@@ -134,8 +131,11 @@ def fetch_feed(feed):
         feed.save()
 
     if not feed.is_enabled:
+        log.info("feed %s is disabled, skipped" % feed.self_link)
         return
 
+    log.debug("fetching %s" % feed.self_link)
+           
     (schema, netloc, path, params, query, fragment) = urlparse.urlparse(feed.self_link)
 
     now = datetime.utcnow()
@@ -244,6 +244,32 @@ def fetch_feed(feed):
         log.debug(u"added entry '%s'" % entry.title)
  
 
+def fetch_feeds(force_all=False):
+    """
+    Fetch all feeds, possibly parallelizing requests
+    """
+                       
+    start = time.time()
 
+    #@@TODO: honor force_all arg
     
+    feeds = Feed.select()
+    
+    multiprocessing = config.getboolean('fetcher', 'multiprocessing')     
+    if multiprocessing:
+        from multiprocessing import Pool
+        processes = config.getint('fetcher', 'processes')        
+        log.debug("starting fetcher with %d workers" % processes)
+
+        p = Pool(processes)        
+        p.map(fetch_feed, feeds, config.getint('fetcher', 'chunk_size'))
+
+    else:
+        log.debug("starting fetcher")
+        # Just sequence requests
+        for feed in feeds:
+            fetch_feed(feed)
+    
+    log.info("%d feeds fetched in %fs" % (feeds.count(), time.time() - start))
+
     

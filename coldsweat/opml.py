@@ -9,7 +9,6 @@ License: MIT (see LICENSE.md for details)
 """
 
 from xml.etree import ElementTree
-#from xml.sax.saxutils import unescape
 #from collections import defaultdict
 
 from models import *
@@ -32,7 +31,7 @@ def add_feeds_from_file(source, fetch_icons=False):
     feeds = []    
     #group = ''
     
-    with coldsweat_db.transaction():
+    with transaction():
 
         #for event, element in ElementTree.iterparse(source, events=['start','end']):    
         for event, element in ElementTree.iterparse(source):
@@ -47,16 +46,17 @@ def add_feeds_from_file(source, fetch_icons=False):
                     if k in allowed_attribs:
                         setattr(feed, allowed_attribs[k], v)
 
-                if fetch_icons:
-                    icon = Icon.create(data=favicon.fetch(feed.self_link))
-                    feed.icon = icon
-                
                 try:
                     feed.save()
                 except IntegrityError:
                     log.info('feed %s has been already added, ignored' % feed.self_link)
                     continue
 
+                if fetch_icons:
+                    icon = Icon.create(data=favicon.fetch(feed.self_link))
+                    feed.icon = icon
+                    feed.save()
+                
                 feeds.append(feed)
     
     return feeds

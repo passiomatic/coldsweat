@@ -18,11 +18,11 @@ if __name__ == '__main__':
     
     feeds = opml.add_feeds_from_file('./subscriptions.xml', fetch_icons=True)
 
-    with coldsweat_db.transaction():
+    with transaction():
         for feed in feeds:         
             Subscription.create(user=default_user, group=default_group, feed=feed)
 
 
-    coldsweat_db.close()
+    close()
 
                         

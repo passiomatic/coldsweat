@@ -154,7 +154,7 @@ def mark_command(request, user, result):
             return              
         
         q = feed.entries.where(Entry.last_updated_on < before)            
-        with coldsweat_db.transaction():
+        with transaction():
             for entry in q:
                 try:
                     Read.create(user=user, entry=entry)
@@ -191,7 +191,7 @@ def mark_command(request, user, result):
                 (Entry.last_updated_on < before)
             ).naive()
 
-        with coldsweat_db.transaction():
+        with transaction():
             for entry in q:
                 try:
                     Read.create(user=user, entry=entry)
@@ -252,7 +252,7 @@ def endpoint(ctx):
 
     result.last_refreshed_on_time = get_last_refreshed_on_time()
 
-    coldsweat_db.close()
+    close()
                
     return serialize(result)
 

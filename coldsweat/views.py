@@ -7,7 +7,6 @@ Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
-from tempita import HTMLTemplate
 from webob.exc import HTTPSeeOther 
 
 from app import *
@@ -23,8 +22,7 @@ def index(ctx):
 
     connect()
 
-    #@@TODO: remove read entries from list                                                
-    last_entries = Entry.select().join(Feed).join(Icon).order_by(Entry.last_updated_on.desc()).limit(5)
+    last_entries = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry))).order_by(Entry.last_updated_on.desc()).limit(5).naive()
         
     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
     if last_checked_on:
@@ -38,7 +36,7 @@ def index(ctx):
     
     feed_count = Feed.select(Feed.is_enabled==True).count()
 
-    coldsweat_db.close()
+    close()
 
 
     return locals()
@@ -63,7 +61,7 @@ def index_post(ctx):
                 
     default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
 
-    with coldsweat_db.transaction():    
+    with transaction():    
         feed = fetcher.add_feed(self_link, fetch_icon=True)    
         try:
             Subscription.create(user=user, feed=feed, group=default_group)
@@ -73,12 +71,8 @@ def index_post(ctx):
             set_message(response, u'INFO Feed %s is already in your subscriptions.' % self_link)
             log.info('user %s has already feed %s in her subscriptions' % (username, self_link))    
 
-    coldsweat_db.close()
+    close()
         
     return response
 
-
-# def get_stats():
-#     pass
-    
 

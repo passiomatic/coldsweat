@@ -60,13 +60,13 @@
     
       <div class="grid-50 suffix-10">
           
-          <h2>Latest Entries</h2>
+          <h2>Latest Unread Entries</h2>
     
           
           <ul class="entries">
               
             {{for e in last_entries}}
-                <li><img src="{{e.feed.icon.data}}" width="16" height="16"  alt="Domain.com"> <a href="{{e.link}}">{{e.title}}</a></li>
+                <li><img src="{{e.feed.icon.data}}" width="16" height="16"  alt=""> <a href="{{e.link}}">{{e.title}}</a></li>
             {{endfor}}
 
           </ul>

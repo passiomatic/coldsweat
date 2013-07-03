@@ -7,7 +7,6 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
-from os import path
 from datetime import datetime
 from peewee import *
 
@@ -15,14 +14,15 @@ from utilities import *
 import favicon
 from coldsweat import config, log
 
+
 # Defer database init, see connect() below
 engine = config.get('database', 'engine')
 if engine == 'sqlite':
     from sqlite3 import IntegrityError
-    coldsweat_db = SqliteDatabase(None) 
+    _db = SqliteDatabase(None, threadlocals=True) 
 elif engine == 'mysql':
     from MySQLdb import IntegrityError
-    coldsweat_db = MySQLDatabase(None)
+    _db = MySQLDatabase(None)
 else:
     raise ValueError('Unknown database engine %s. Should be sqlite or mysql' % engine)
 
@@ -34,7 +34,7 @@ class CustomModel(Model):
     """
 
     class Meta:
-        database = coldsweat_db
+        database = _db
 
 
 class User(CustomModel):
@@ -214,10 +214,10 @@ def connect():
     if engine == 'sqlite':
         filename = config.get('database', 'filename')
         
-        coldsweat_db.init(filename)    
+        _db.init(filename)    
         
         # See http://www.sqlite.org/wal.html
-        coldsweat_db.execute_sql('PRAGMA journal_mode=WAL')
+        _db.execute_sql('PRAGMA journal_mode=WAL')
         
     elif engine == 'mysql':            
         database = config.get('database', 'database')
@@ -228,13 +228,17 @@ def connect():
             passwd  = config.get('database', 'password')        
         )
 
-        coldsweat_db.init(database, **kwargs)
+        _db.init(database, **kwargs)
     
-    coldsweat_db.connect()
-
-    #log.debug('connected to %s database' % engine)
+    _db.connect()
 
 
+def transaction():
+    return _db.transaction()
+
+def close():
+    _db.close()
+    
 def setup(username, password):
     """
     Create database and tables for all models and setup bootstrap data
@@ -252,7 +256,7 @@ def setup(username, password):
         pass
 
     # Create the bare minimum to boostrap system
-    with coldsweat_db.transaction():
+    with _db.transaction():
         User.create(username=username, password=password, api_key=User.make_api_key(username, password))
         Group.create(title=Group.DEFAULT_GROUP)        
         Icon.create(data=favicon.DEFAULT_FAVICON) 

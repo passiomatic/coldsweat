@@ -10,7 +10,7 @@ import sys, os, re
 
 from webob import Request, Response
 from webob.exc import *
-import tempita
+from tempita import Template #, HTMLTemplate 
 
 from utilities import *
 from coldsweat import log, config, installation_dir, VERSION_STRING
@@ -89,7 +89,8 @@ def view(pattern='^/$', method='GET'):
     
     return wrapped  
 
-def template(filename):
+import json 
+def template(filename, content_type='text/html'):
 
     def wrapped(handler): 
 
@@ -100,21 +101,25 @@ def template(filename):
             else:
                 message = ''
             
-            # Global symbols
-            kwargs = {
+            # Global namespace
+            namespace = {
                 'alert_message': render_message(message),                
                 'version_string': VERSION_STRING,
                 'ctx': ctx,
                 'request': ctx.request,
                 'response': ctx.response,
                 'static_url': ctx.static_url,
+                'application_url': ctx.request.application_url,
+                'js': json.dumps,
+                #'': '',
             }
             
-            d = handler(ctx, *args)
-            if d:
-                kwargs.update(d)
-
-            ctx.response.body = render_template(filename, **kwargs)
+            kwargs = handler(ctx, *args)
+            if not kwargs: kwargs = {}
+                
+            ctx.response.body = render_template(filename, namespace, **kwargs)
+            ctx.response.content_type = content_type
+            #ctx.response.charset=ENCODING
 
             # Delete alert_message cookie, if any
             if message:
@@ -128,15 +133,8 @@ def template(filename):
 # Templates
 # ------------------------------------------------------
 
-def render_template(filename, **kwargs):            
-
-    def _(filename, from_template):
-        """
-        Load an inherited template
-        """
-        return tempita.Template.from_filename(os.path.join(TEMPLATE_DIR, filename))
-
-    return tempita.Template.from_filename(os.path.join(TEMPLATE_DIR, filename), get_template=_).substitute(**kwargs)
+def render_template(filename, namespace, **kwargs):            
+    return Template.from_filename(os.path.join(TEMPLATE_DIR, filename), namespace).substitute(**kwargs)
 
  
 @template('404.html')

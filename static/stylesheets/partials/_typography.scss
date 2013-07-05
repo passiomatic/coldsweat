@@ -34,21 +34,16 @@ h3,
 line-height: 1.3;
 margin-bottom: $baselineheight / 1.5; }
 
-h4,
-.h4 {
-@include font-size($basefontsize * 1.25);
-line-height: 1.25;
-margin-bottom: $baselineheight; }
-
-h5,
-.h5 {
-@include font-size($basefontsize * 1.15); 
-margin-bottom: $baselineheight;}
-
-h6,
-.h6 {
+h4, 
+.h4{
 @include font-size($basefontsize);
-margin-bottom: $baselineheight;
+line-height: 1.5;
+font-weight : $baseheadingfontweight;
+margin-bottom: 0;}
+
+h5, .h5,
+h6, .h6 {
+@include font-size($basefontsize);
 font-weight : normal;
 letter-spacing : 1px;
 text-transform : uppercase; }

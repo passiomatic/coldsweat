@@ -33,7 +33,7 @@
 
 // Start the ‘atmosphere’ of your design by defining the colours of your pages and text
 
-$bodycolor 						: darken(#e6eff5, 15%);  // #e6eff5;
+$bodycolor 						: #E6EFF5; // #175b82;  
 $textcolor 						: #133142;
 
 
@@ -94,7 +94,7 @@ $basefontsize 					: 16;
 $baseheadingfont 				: inherit;
 
 // Choose between normal, bold or set a font-weight number (eg: 700) for your headings
-$baseheadingfontweight 			: 400;
+$baseheadingfontweight 			: 500;
 
 // Your headings may inherit the $textcolor, or you may set a different colour
 $baseheadingfontcolor 			: inherit;
@@ -205,7 +205,7 @@ $basefontbackgroundcolor		: $lightestneutralcolor;
 // By default site navigation has a flat background colour
 // Add an optional gradient in __navigation-toggle.scss
 // Configure the gradient colours in _texture.scss
-$navigationbackgroundcolor 		: $tertiarycolor;
+$navigationbackgroundcolor 		: $primarycolor;
 
 // Set navigation items’ bottom border width
 $navigationborderwidth			: $borderwidth;
@@ -484,7 +484,7 @@ $alertcolorwarning				: darken($warningcolor, 20%);
 // Wells have a default flat background colour
 // Add an optional gradient in _bootstrap-wells.scss
 // Configure the gradient colours in _texture.scss
-$wellbackgroundcolor 			: #e6eff5;
+$wellbackgroundcolor 			: $lightestneutralcolor;
 
 // Set wells’ border width
 $wellborderwidth 				: $alertborderwidth;

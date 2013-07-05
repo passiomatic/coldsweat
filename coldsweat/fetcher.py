@@ -84,7 +84,7 @@ def get_entry_content(entry):
         candidates.append(entry.summary_detail)
     for c in candidates:
         if 'html' in c.type: 
-            return c.value    
+            return c.value
     if candidates:
         return candidates[0].value
     return ''

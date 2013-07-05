@@ -1,113 +1,39 @@
 {{inherit "site.html"}}
 
-{{def content}}
+{{def entries}}
 
-
-<section class="alt">
-
-    <div class="grid-container">
-
-    
-      <div class="grid-100">
-
-            <h1>Add Feed Subscription</h1>
-                  
-      </div>
-                        
-    
-      <div class="grid-50 suffix-10">
-                        
-            <form action="{{request.application_url}}" class="form-add" method="POST">        
-                    <fieldset>
-                        <label>Feed web address</label>
-                        <input type="text" id="self_link" name="self_link" class="input-xxlarge" placeholder="http://example.org/feed.xml" size="40" value="">
-                        <label>Your Coldsweat credentials</label>
-                        <input type="text" id="username" name="username" class="input-medium" placeholder="username" value="" size="20">                
-                        <input type="password" id="password" name="password" class="input-medium" placeholder="password" value="" size="20">
-                    </fieldset>
-                    <fieldset>
-                        <button type="submit" class="btn btn-primary">Add Feed</button>
-                    </fieldset>                
-            </form>
-            
+<!--   <h2 class="h3">{{page_title}}</h2> -->
+  
+  <ul>
       
-      </div>
-      
+    {{for loop, e in looper(last_entries)}}
+        <li class="{{if loop.first}}current{{endif}}">
+            <h3 class="h4">
+                <img src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a data-id="{{e.id}}" href="{{e.link}}">{{e.title}}</a>
+            </h3>
+            <div class="meta">
+                {{if e.author}}
+                    {{e.author}}
+                {{else}}    
+                    {{e.feed.title}}
+                {{endif}}                    
+                &middot; 4 hours ago
+            </div>                  
 
-      <div class="grid-40">
+        </li>
+    {{endfor}}
 
+  </ul>
 
-         <div class="well well--large">
-                <h2>Configure Your Feed Reader</h2>
-              
-              <p>Sync with Coldsweat using the address below:</p>
+  <button type="button" class="btn">Gimme More</button>
+
         
-              <code>{{request.application_url}}/fever</code>
-                        
-         </div>
-      </div>
-      
-    
-    <!-- /grid-container -->
-    </div>
-</section> 
-
-
-<section>
-
-
-    <div class="grid-container">
-    
-      <div class="grid-50 suffix-10">
-          
-          <h2>Latest Unread Entries</h2>
-    
-          
-          <ul class="entries">
-              
-            {{for e in last_entries}}
-                <li><img src="{{e.feed.icon.data}}" width="16" height="16"  alt=""> <a href="{{e.link}}">{{e.title}}</a></li>
-            {{endfor}}
-
-          </ul>
-
-       
-      </div>
-    
-
-      <div class="grid-40">
-          
-            <h2>Stats</h2>
-                    
-          <table class="table">
-              <tbody>
-                  <tr>
-                      <td>Last feeds refresh</td>
-                      <td class="">{{last_checked_on}}</td>
-                  </tr>                        
-
-                  <tr>
-                      <td>Active feeds</td>
-                      <td><b>{{feed_count}}</b></td>
-                  </tr>                        
-
-                  <tr>
-                      <td>Unread entries</td>
-                      <td><b>{{unread_count}}</b></td>
-                  </tr>                        
-
-              </tbody>        
-          </table>
-          
-      
-      </div>
-          
-    
-    <!-- /grid-container -->
-    </div>
-
-</section>
-    
- 
-    
 {{enddef}}
+
+{{def now}}
+    <h1></h1>    
+    <hr>
+{{enddef}}
+
+
+

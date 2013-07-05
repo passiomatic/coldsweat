@@ -12,7 +12,7 @@ URL: http://lab.passiomatic.com/coldsweat/
 
 <head>
 <meta charset="utf-8">
-<title>Coldsweat</title>
+<title>{{page_title}} &middot; Coldsweat</title>
 <meta NAME="robots" CONTENT="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="cleartype" content="on">
@@ -45,26 +45,31 @@ URL: http://lab.passiomatic.com/coldsweat/
 <!-- <meta name="msapplication-TileImage" content="coldsweat/images/apple-touch-icon.png"> -->
 <!-- <meta name="msapplication-TileColor" content="#000"> -->
 </head>
-
-
 <body>
 
 <div class="container">
 
-<!--
-    <a href="#navigation-toggle" class="navigation-toggle">Menu</a>
-    <nav id="navigation-toggle" role="navigation">
-    <ul>
-    <li><a href="#">Lorem Ipsum</a></li>
-    </ul>
-    </nav>   
--->  
-
-<div class="content">
     {{alert_message}}
+        
+    <header>             
+        <nav role="navigation">
+            <ul>
+                <li><a href="{{application_url}}?unread"><i class="icon-circle"></i>&ensp;Unread</a></li>
+                <li><a href="{{application_url}}?starred"><i class="icon-star"></i>&ensp;Starred</a></li>
+                <li><a href="{{application_url}}?all"><i class="icon-align-justify"></i>&ensp;All</a></li>
+            </ul>
+        </nav>  
+    </header>   
+    
+    <div class="entries">
+        {{self.entries}}
+    </div>
 
-    {{self.content}}
-</div>
+    <article>
+        {{self.now}}
+    </article>
+
+    <br class="clear">
 
 <!-- Final ============================== -->
 
@@ -74,15 +79,18 @@ URL: http://lab.passiomatic.com/coldsweat/
 
       <div class="grid-60">    
         <div class="payoff">
+<!--
             <div class="branding">
                 <img src="{{static_url}}/images/branding.png" alt="branding" width="70" height="70">
             </div>
-            Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds
+-->
+            <p>Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds.</p>
+            <p>&copy; 2013&ndash; <a href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a href="https://github.com/passiomatic/coldsweat">Source Code</a></p>
         </div>        
       </div>
     
       <div class="grid-40">    
-        &copy; 2013&ndash; <a href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a href="https://github.com/passiomatic/coldsweat">Source Code</a>
+
         </div>
 
     <!-- /grid-container -->
@@ -122,13 +130,11 @@ head.js(
 //"javascripts/vendor/bootstrap/bootstrap-modal.js",
 //"javascripts/vendor/bootstrap/bootstrap-collapse.js",
 
-// Functionality only used by Rock Hammer
-//"javascripts/navigation-manager.js",
-
 // Remove any navigation patterns below that arent used
-//"javascripts/nav-patterns/nav-toggle.js",
-//"javascripts/nav-patterns/left-nav-flyout.js",
-//"javascripts/nav-patterns/responsive-nav.min.js"
+//"{{static_url}}/javascripts/nav-patterns/responsive-nav.min.js",
+
+// App scripts
+"{{static_url}}/javascripts/app.js"
 );
 
 // Google Analytics code

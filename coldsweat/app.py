@@ -100,18 +100,21 @@ def template(filename, content_type='text/html'):
                 message = ctx.request.cookies['alert_message']
             else:
                 message = ''
+
             
             # Global namespace
             namespace = {
-                'alert_message': render_message(message),                
-                'version_string': VERSION_STRING,
-                'ctx': ctx,
                 'request': ctx.request,
                 'response': ctx.response,
+
                 'static_url': ctx.static_url,
                 'application_url': ctx.request.application_url,
-                'js': json.dumps,
-                #'': '',
+                'alert_message': render_message(message),                
+
+                # Filters 
+                'javascript': escape_javacript,
+                'html': escape_html,
+                'timestamp': timestamp(datetime.utcnow()),
             }
             
             kwargs = handler(ctx, *args)

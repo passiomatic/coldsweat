@@ -1,7 +1,7 @@
 var article = $('article');
 article.find('h1').html(
-    '{{entry.title}}'
+    '<a target="_blank" href="{{entry.link}}">{{entry.title}}</a>'
 );
 article.find('hr').after(
-    {{entry.content|js}}
+    {{entry.content|javascript}}
 );    

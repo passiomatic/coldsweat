@@ -45,31 +45,35 @@ header {
     background: $navigationbackgroundcolor;
     
     nav ul {
+        @include zero;
         list-style: none;
         
-        li {
-            color: $navigationlinkcolor;
-        }
         
-        a {
-            display: block;
-            color: $navigationlinkcolor;
-            @include font-size(14);
-            padding: $baselineheight/4 $baselineheight/2;
-            
-            &:hover {
-                color: $navigationlinkcolorhover;
+        li {
+            &.sep {
+                margin-top: $baselineheight;
+            }
+
+            a {
+                display: block;
+                @include font-size(14);
+                padding: $baselineheight/4 $baselineheight/2;
+/*                 border-bottom: 1px solid darken($primarycolor, 10%); */
             }
         }
+                
     }
     
 
 }
+/*
 
 h1, h2 {
     color: $secondarycolor;
 }
+*/
 
+/*
 section {
     padding: $baselineheight*2 0;
     border-top: 1px dotted $lighterneutralcolor;
@@ -82,6 +86,7 @@ section {
 
 
  
+*/
  
 .entries {
 
@@ -98,6 +103,9 @@ section {
             @include zero;
             padding: $baselineheight/2 $gutterwidth*1.5 $baselineheight/2 $gutterwidth*1.5;        
             border-bottom: 1px dotted $lighterneutralcolor;
+
+            //background: $white;
+            //@include transition(background, 200ms, ease-out);
             
             img {
                 margin-top: 4px;
@@ -108,6 +116,15 @@ section {
             &.current {
                 background: #E6EFF5;
             }
+
+            &.status-read {
+/*                 opacity: .8; */
+                
+                background: $lightestneutralcolor;
+                
+                
+            }
+
     
             .meta {
                 color: $lightneutralcolor;        
@@ -155,22 +172,43 @@ code {
 }
 
 
+.flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -4em;    
+    margin-top: -4em;    
+    
+    z-index: 1;
+    width: 8em;
+    padding: $baselineheight*2 $gutterwidth*2;
+
+    border-radius: $borderradius;    
+    background: rgba(100%, 100%, 100%, .6);    
+    //opacity: .8;
+    
+    //border: 1px solid $lighterneutralcolor;
+    
+    text-align: center;    
+}
+
 
 // Feed entry   formatting
 
-.entry-content {
+article {
 /*         @include hidden; */
     
     background: $white;
+    
+    box-sizing: border-box;
 
 /*     display: none;  */
     padding: $baselineheight*2 $gutterwidth*2;
     
-    background: $lightestneutralcolor;
-    border: 1px solid $lighterneutralcolor;
+/*     border: 1px solid $lighterneutralcolor; */
     border-radius: $borderradius;
 
-    @include box-shadow(inset 0 1px $wellshadowblur * 2 $wellshadow); 
+/*     @include box-shadow(inset 0 1px $wellshadowblur * 2 $wellshadow);  */
 
 
     p, blockquote, table, ul, ol, dl {

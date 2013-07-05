@@ -125,7 +125,7 @@ $midneutralcolor 				: darken($neutralcolor,25%);
 $darkneutralcolor 				: darken($neutralcolor,50%);
 $lightneutralcolor 				: lighten($neutralcolor,25%);
 $lighterneutralcolor 			: lighten($neutralcolor,50%);
-$lightestneutralcolor 			: lighten($neutralcolor,70%);
+$lightestneutralcolor 			: lighten($neutralcolor,65%);
 
 // Sometimes you may want $black and $white to be ‘almost black’ and ’off-white’
 $black 							: rgb(0,0,0);
@@ -211,7 +211,7 @@ $navigationbackgroundcolor 		: $primarycolor;
 $navigationborderwidth			: $borderwidth;
 
 // Set navigation items’ bottom border style
-$navigationborderstyle			: $borderstyle;
+$navigationborderstyle			: none;
 
 // Set navigation items’ bottom border colour
 $navigationbordercolor 			: darken($navigationbackgroundcolor,10%);
@@ -220,7 +220,7 @@ $navigationbordercolor 			: darken($navigationbackgroundcolor,10%);
 $navigationlinkcolor			: $white;
 
 // :hover
-$navigationlinkcolorhover		: darken($navigationlinkcolor,10%);
+$navigationlinkcolorhover		: $lightestneutralcolor; //darken($navigationlinkcolor,10%);
 
 
 

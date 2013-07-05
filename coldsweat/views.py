@@ -23,31 +23,33 @@ def index(ctx):
 
     connect()
 
-    filter_name = 'unread'
+    filter_name = 'Unread Items'
 
-    # Default is unread
-#     if 'unread' in ctx.request.GET:
-    q = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry)))
-        
     if 'starred' in ctx.request.GET:
         q = Entry.select().join(Feed).join(Icon).where((Entry.id << Saved.select(Saved.entry)))
-
-    if 'all' in ctx.request.GET:
+        filter_name = 'Starred Items'
+    elif 'all' in ctx.request.GET:
         q = Entry.select().join(Feed).join(Icon)
-    
+        filter_name = ' Total Items'
+    else:
+        # Default is unread
+        q = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry)))
+            
     entry_count = q.count()
     last_entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()
+
+#     r = Entry.select().join(Read).join(User).where(where_clause).distinct().naive()
+#     s = Entry.select().join(Saved).join(User).where(where_clause).distinct().naive()
+# 
+#     read_ids = [i.id for i in r]
+#     saved_ids = [i.id for i in s]
         
-#     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
-#     if last_checked_on:
-#         last_checked_on = format_datetime(last_checked_on)
-#     else:
-#         last_checked_on = '–'
+    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
         
 #     if not entry_count:
 #         entry_count = 'Zero'
     
-    page_title = u'%s %s Stories' % (entry_count if entry_count else 'Zero', 'Unread')
+    page_title = '%s %s' % (entry_count if entry_count else 'Zero', filter_name)
     
     #feed_count = Feed.select(Feed.is_enabled==True).count()
 

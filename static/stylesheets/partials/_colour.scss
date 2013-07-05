@@ -23,6 +23,27 @@ color : $linkcolorfocus; }
 outline : 0; }
 }
 
+nav {
+    a {
+    //text-decoration : none;
+    //color : $linkcolor;
+    color: $navigationlinkcolor;    
+    
+    &:visited {
+    color : $navigationlinkcolor; }
+    
+    &:hover {
+    text-decoration : none;
+    color : $navigationlinkcolorhover; 
+    background: lighten($primarycolor, 10%); }
+    
+    &:focus {
+    //outline : thin dotted;
+    color : $navigationlinkcolorhover; }
+    }    
+}
+
+
 ::-moz-selection {
 background-color : lighten($primarycolor, 65%);
 color : $primarycolor;

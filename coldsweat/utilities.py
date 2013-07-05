@@ -10,7 +10,7 @@ License: MIT (see LICENSE.md for details)
 from hashlib import md5, sha1
 from calendar import timegm
 from datetime import datetime
-import cgi
+import cgi, json
 
 DEFAULT_ENCODING = 'utf-8'
 
@@ -34,15 +34,25 @@ def make_sha1_hash(s):
 # Date/time functions
 # --------------------
 
+def format_datetime(value, comparsion_value=None):
+    
+    if not comparsion_value:    
+        return value.strftime('%a, %d %b %H:%M:%S UTC')
+    
+    delta = comparsion_value - value    
+    if delta.days < 1:       
+        if delta.seconds > 3600: 
+            s = '%d hours ago' % (delta.seconds/60/60)
+        elif 60 <= delta.seconds <= 3600: 
+            s = '%d minutes ago' % (delta.seconds/60)
+        else:
+            s = 'Just now'
+    else:
+        s = '%d days ago' % delta.days
 
-# def format_iso_datetime(seconds):        
-#     return timeformat.format(u'%Y-%m-%dT%H:%M:%S%z', 
-#         time.gmtime(seconds), utctime=True)
+    return s
 
-def format_datetime(value, smart=True):
-    return value.strftime(u'%a, %d %b %H:%M:%S UTC')
-
-
+   
 def format_http_datetime(value):
     """
     Format datetime to comply with RFC 1123 
@@ -57,19 +67,38 @@ def datetime_as_epoch(value):
     
 def tuple_as_datetime(value):
     return datetime.utcfromtimestamp(timegm(value))
-   
+
+
 # --------------------
-# Misc
+# Teplate filters
 # --------------------
 
-def get_excerpt(value, truncate=200):     
+def escape_html(value):     
     """
-    Escape and truncate an HTML string
+    Return value escaped as HTML string
     """
-    if truncate:
-        value = value[:truncate]
-    
     return cgi.escape(value, quote=True)
+
+def escape_javacript(value):     
+    """
+    Return value escaped as a Javascript string
+    """
+    return json.dumps(value)
+
+def timestamp(utcnow):                                
+    def _(value):
+        if not value: return '—' 
+        return format_datetime(value, utcnow)
+    return _
+
+# def get_excerpt(value, truncate=200):     
+#     """
+#     Escape and truncate an HTML string
+#     """
+#     if truncate:
+#         value = value[:truncate]
+#     
+#     return cgi.escape(value, quote=True)
     
     
 class Struct(dict):
@@ -102,10 +131,17 @@ class Struct(dict):
     
 def run_tests():
     
-    t = datetime.utcnow()
+    t = datetime.utcnow()        
+    
+    v = datetime(2013, 6, 25, 12, 0, 0)
+    print format_datetime(v, t)    
+    v = datetime(t.year, t.month, t.day, 12, 0, 0)
+    print format_datetime(v, t)    
+    v = datetime(t.year, t.month, t.day, t.hour, t.minute, 0)
+    print format_datetime(v, t)    
     
     print format_http_datetime(t)
-    print get_excerpt('Some <script src="http://example.com/evil.js"></script> code.')
+    #print get_excerpt('Some <script src="http://example.com/evil.js"></script> code.')
     
 if __name__ == '__main__':
     run_tests()

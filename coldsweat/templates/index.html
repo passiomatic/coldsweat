@@ -7,7 +7,7 @@
   <ul>
       
     {{for loop, e in looper(last_entries)}}
-        <li class="{{if loop.first}}current{{endif}}">
+        <li id="{{e.id}}" class="{{if loop.first}}current{{endif}}">
             <h3 class="h4">
                 <img src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a data-id="{{e.id}}" href="{{e.link}}">{{e.title}}</a>
             </h3>
@@ -17,7 +17,7 @@
                 {{else}}    
                     {{e.feed.title}}
                 {{endif}}                    
-                &middot; 4 hours ago
+                &middot; {{e.last_updated_on|timestamp}}
             </div>                  
 
         </li>
@@ -27,6 +27,14 @@
 
   <button type="button" class="btn">Gimme More</button>
 
+Last refreshed on {{last_checked_on|timestamp}}
+
+<!--
+<div class="flash">
+    <i class="icon-star icon-4x"></i>    
+    <div>Starred</div>
+</div>
+-->
         
 {{enddef}}
 

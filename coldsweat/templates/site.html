@@ -49,57 +49,35 @@ URL: http://lab.passiomatic.com/coldsweat/
 <div class="container">
 
     {{alert_message}}
-        
-    <header>             
-        <nav role="navigation">
-            <ul>
-                <li><a href="{{application_url}}?unread"><i class="icon-circle"></i>&ensp;Unread</a></li>
-                <li><a href="{{application_url}}?starred"><i class="icon-star"></i>&ensp;Starred</a></li>
-                <li><a href="{{application_url}}?all"><i class="icon-align-justify"></i>&ensp;All</a></li>
 
-
-                <li class="sep"><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;All Entries</a></li>
-
-            </ul>
-        </nav>  
-    </header>   
-    
-    <div class="entries">
-        {{self.entries}}
-    </div>
-
-    <article>
-        {{self.now}}
-    </article>
-
-    <br class="clear">
-
-<!-- Final ============================== -->
-
-<footer role="contentinfo">
-
-    <div class="grid-container">
-
-      <div class="grid-60">    
-        <div class="payoff">
-<!--
+    <section class="panel panel-1">
+        <header>             
             <div class="branding">
-                <img src="{{static_url}}/images/branding.png" alt="branding" width="70" height="70">
+                <i class="icon-tint"></i> Coldsweat
             </div>
--->
-            <p>Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds.</p>
-            <p>&copy; 2013&ndash; <a href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a href="https://github.com/passiomatic/coldsweat">Source Code</a></p>
-        </div>        
-      </div>
-    
-      <div class="grid-40">    
-
-        </div>
-
-    <!-- /grid-container -->
-    </div>
+            <nav role="navigation">
+                {{self.one}}
+            </nav>  
+        </header>   
+    </section>
         
-</footer>
+    <section class="panel panel-2">
+        <div class="entries">
+            {{self.two}}
+        </div>
+    </section>
+
+    <section class="panel panel-3">
+        
+        {{self.three}}        
+        
+        <footer role="contentinfo">
+            <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
+            <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
+        </footer>
+
+    </section>
+    
 </div><!-- container -->
 
 <!-- Load libraries -->

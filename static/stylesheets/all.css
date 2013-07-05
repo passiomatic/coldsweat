@@ -145,7 +145,7 @@ h1,
   font-size: 32px;
   font-size: 3.2rem;
   line-height: 1.2;
-  margin-bottom: 0.75em; }
+  margin-bottom: 0.375em; }
 
 h2,
 .h2 {
@@ -216,7 +216,7 @@ ol.inline {
 blockquote {
   margin: 0 0 1.5em 0;
   padding: 12px;
-  background-color: #ebe9e9;
+  /* background-color : $basefontbackgroundcolor; */
   font-style: normal; }
   blockquote small:before {
     content: '\00A0 \2014'; }
@@ -351,7 +351,7 @@ a {
     color: #9c1c1e; }
   a:focus {
     outline: thin dotted;
-    color: #0f3d57; }
+    color: #9c1c1e; }
   a:hover, a:active {
     outline: 0; }
 
@@ -4301,30 +4301,50 @@ input.search-query {
 
   tr {
     page-break-inside: avoid; } }
+.dim {
+  color: #898080; }
+  .dim a {
+    color: #898080; }
+    .dim a:visited {
+      color: #898080; }
+    .dim a:hover {
+      color: #9c1c1e; }
+    .dim a:focus {
+      color: #9c1c1e; }
+
 .container {
   *zoom: 1;
-  background: #C6C2C2; }
+  background: #c6c2c2 url(../images/faux-nav-column.png) left top repeat-y;
+  background-size: 12% auto; }
   .container:before, .container:after {
     content: " ";
     display: table; }
   .container:after {
     clear: both; }
 
-header, article, .entries {
+.panel {
   float: left;
   box-sizing: border-box; }
+  .panel .panel-title {
+    padding: 0.75em 36px 0.75em 36px;
+    /*
+            .t {
+                float: right;
+                width: 15em;
+            }
+    */ }
+    .panel .panel-title h2 {
+      margin: 0;
+      padding: 0; }
 
-header {
-  width: 10%; }
+.panel-1 {
+  width: 12%; }
 
-.entries {
+.panel-2 {
   width: 40%; }
 
-article {
-  background: white;
-  width: 50%;
-  /*     height: 99%; */
-  padding: 1.5em 24px; }
+.panel-3 {
+  width: 48%; }
 
 header {
   background: #175b82; }
@@ -4333,13 +4353,23 @@ header {
     padding: 0;
     list-style: none; }
     header nav ul li.sep {
-      margin-top: 1.5em; }
+      margin-top: 0.75em; }
     header nav ul li a {
       display: block;
       font-size: 14px;
       font-size: 1.4rem;
-      padding: 0.375em 0.75em;
+      padding: 0.375em 1.5em;
       /*                 border-bottom: 1px solid darken($primarycolor, 10%); */ }
+  header .branding {
+    color: #E6EFF5;
+    padding: 0.375em 1.5em;
+    font-size: 14px;
+    font-size: 1.4rem;
+    background: #0f3d57;
+    text-transform: uppercase;
+    letter-spacing: 2px; }
+    header .branding i {
+      color: white; }
 
 /*
 
@@ -4363,7 +4393,7 @@ section {
 */
 .entries {
   background: white;
-  border-left: 1px solid #c6c2c2;
+  /*     border-left: 1px solid $lighterneutralcolor; */
   border-right: 1px solid #c6c2c2; }
   .entries ul {
     list-style: none;
@@ -4373,7 +4403,12 @@ section {
       margin: 0;
       padding: 0;
       padding: 0.75em 36px 0.75em 36px;
-      border-bottom: 1px dotted #c6c2c2; }
+      border-bottom: 1px dotted #c6c2c2;
+      /*
+                  .meta {
+                      color: $lightneutralcolor;        
+                  }             
+      */ }
       .entries ul li img {
         margin-top: 4px;
         margin-left: -24px;
@@ -4383,13 +4418,18 @@ section {
       .entries ul li.status-read {
         /*                 opacity: .8; */
         background: #ebe9e9; }
-      .entries ul li .meta {
-        color: #898080; }
+  .entries .more {
+    text-align: center;
+    padding: 0.75em; }
 
 footer[role="contentinfo"] {
-  padding-top: 2.25em; }
+  text-align: center;
+  /*     padding-top: $baselineheight*1.5; */
+  /*     @extend .dim; */ }
   footer[role="contentinfo"] .icon-heart {
     color: #9c1c1e; }
+  footer[role="contentinfo"] .payoff {
+    margin-bottom: 0.75em; }
 
 code {
   background: #e6eff5;
@@ -4432,26 +4472,30 @@ code {
 article {
   /*         @include hidden; */
   background: white;
+  padding: 1.5em 24px;
+  /*     @include box-shadow(5px 1px $wellshadowblur*2 $wellshadow);  */
+  background: white;
   box-sizing: border-box;
   /*     display: none;  */
   padding: 3em 48px;
   /*     border: 1px solid $lighterneutralcolor; */
-  border-radius: 4px;
-  /*     @include box-shadow(inset 0 1px $wellshadowblur * 2 $wellshadow);  */ }
+  /*     border-radius: $borderradius; */ }
   article p, article blockquote, article table, article ul, article ol, article dl {
     margin: 0;
     padding: 0;
-    margin: 0 0 0.75em 0; }
+    margin: 0.75em 0; }
   article li, article dd, article dt {
     margin-left: 48px; }
   article blockquote {
-    font-size: 18px;
-    font-size: 1.8rem;
-    font-style: italic;
+    /*         @include font-size(18);                        */
+    /*         font-style: italic; */
     color: #9c1c1e;
-    margin: 0.75em 48px 0.75em 48px; }
-    article blockquote i, article blockquote em {
-      font-style: normal; }
+    margin: 0.75em 48px 0.75em 48px;
+    /*
+            i, em {
+                font-style: normal;
+            }
+    */ }
     article blockquote p:last-child {
       margin-bottom: 0; }
   article hr {
@@ -4476,3 +4520,60 @@ article {
                 @include hidden;
             }
     */ }
+
+.scrollable {
+  /*     width: 520px; clear: both; margin: 20px 0 10px;  */
+  clear: both;
+  /* Position scollbar on top of scrollable content */
+  position: relative; }
+  .scrollable .viewport {
+    min-height: 15em;
+    overflow: hidden;
+    position: relative;
+    border-top: 1px solid #c6c2c2; }
+  .scrollable .overview {
+    list-style: none;
+    position: absolute;
+    left: 0;
+    top: 0; }
+  .scrollable .thumb .end,
+  .scrollable .thumb {
+    background: #898080; }
+  .scrollable .scrollbar {
+    position: relative;
+    /*         float: right;  */
+    width: 6px;
+    /*         margin-right: $gutterwidth/4;  */
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    right: 6px;
+    z-index: 1; }
+  .scrollable .track {
+    height: 100%;
+    width: 6px;
+    position: relative; }
+  .scrollable .thumb {
+    height: 20px;
+    width: 6px;
+    cursor: pointer;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    border-radius: 4px; }
+  .scrollable .thumb .end {
+    overflow: hidden;
+    height: 5px;
+    width: 6px;
+    border-radius: 4px; }
+  .scrollable .disable {
+    display: none; }
+  .scrollable:hover .scrollbar {
+    visibility: visible; }
+
+.noSelect {
+  user-select: none;
+  -o-user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none; }

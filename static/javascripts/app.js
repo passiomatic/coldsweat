@@ -50,7 +50,7 @@ $(document).ready(function() {
         var new_c = c.prevAll('li').first().toggleClass('current');
         console.log(new_c.offset().top)
         
-        $('body').scrollTop(new_c.offset().top + c.height());        
+        $('#scrollbar1').tinyscrollbar_update(new_c.position().top);
 
     });
 
@@ -60,7 +60,8 @@ $(document).ready(function() {
         new_c = c.nextAll('li').first().toggleClass('current');        
         console.log(new_c.offset().top)
 
-        $('body').scrollTop(new_c.offset().top - c.height());
+        //$('body').scrollTop(new_c.offset().top - c.height());
+        $('#scrollbar1').tinyscrollbar_update(new_c.position().top);
     });
     
 
@@ -69,7 +70,7 @@ $(document).ready(function() {
         //@@TODO: cache ? 
         $.ajax(ajax_endpoint + 'entries/' + entry.attr('id'), {dataType: 'script', type:'GET'}) 
         
-        $('article').css('marginTop', entry.offset().top);
+/*         $('article').css('marginTop', entry.offset().top); */
         
         
     })
@@ -78,5 +79,20 @@ $(document).ready(function() {
         e.preventDefault();                                
         // But let event to bubbling up
     })
-		
+
+
+     var h = $(window).height() - $('.panel-2 .panel-title').outerHeight()
+     $('.panel-2 .viewport').css('height', h)
+/*
+    $(window).resize(function(e) {
+    
+    });
+*/
+
+
+     $('#scrollbar1').tinyscrollbar();
+
+     $('.panel-1').scrollToFixed();    
+     $('.panel-2').scrollToFixed();
+        		
 });

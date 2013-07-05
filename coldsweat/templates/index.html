@@ -1,33 +1,67 @@
 {{inherit "site.html"}}
 
-{{def entries}}
+{{def one}}
+    <ul>
+        <li><a href="{{application_url}}?unread"><i class="icon-file"></i>&ensp;Unread</a></li>
+        <li><a href="{{application_url}}?starred"><i class="icon-star"></i>&ensp;Starred</a></li>
+        <li><a href="{{application_url}}?all"><i class="icon-reorder"></i>&ensp;All</a></li>
+        
+<!--                     <li class="sep"><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;All Entries</a></li>     -->
+        <li class="sep"><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;Design</a></li>    
+        <li class=""><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;Programming</a></li>    
+        <li class=""><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;News &amp; Media</a></li>    
+    </ul>
+{{enddef}}
 
-<!--   <h2 class="h3">{{page_title}}</h2> -->
+
+{{def two}}
+
+<div class="panel-title">
+    <h2 class="h3">{{page_title}}</h2>
+<!--
+    <div class="t">
+        <button class="btn"><i class="icon-check"></i> Mark All as Read</button>
+    </div>
+-->
+</div>
+
+<div class="entries">
+
+    <div id="scrollbar1" class="scrollable">
+        <div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+        <div class="viewport">
+            <div class="overview">
+    
+                <ul>
+                  
+                {{for loop, e in looper(last_entries)}}
+                    <li id="{{e.id}}" class="{{if loop.first}}current{{endif}}">
+                        <h3 class="h4">
+                            <img src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a data-id="{{e.id}}" href="{{e.link}}">{{e.title}}</a>
+                        </h3>
+                        <div class="meta dim">
+                            {{if e.author}}
+                                {{e.author}}
+                            {{else}}    
+                                {{e.feed.title}}
+                            {{endif}}                    
+                            &middot; {{e.last_updated_on|timestamp}}
+                        </div>                  
+                
+                    </li>
+                {{endfor}}
+                
+                </ul>
+            
+                <div class="more">
+                    <button type="button" class="btn" data-max-id="{{e.id}}">Gimme More</button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
   
-  <ul>
-      
-    {{for loop, e in looper(last_entries)}}
-        <li id="{{e.id}}" class="{{if loop.first}}current{{endif}}">
-            <h3 class="h4">
-                <img src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a data-id="{{e.id}}" href="{{e.link}}">{{e.title}}</a>
-            </h3>
-            <div class="meta">
-                {{if e.author}}
-                    {{e.author}}
-                {{else}}    
-                    {{e.feed.title}}
-                {{endif}}                    
-                &middot; {{e.last_updated_on|timestamp}}
-            </div>                  
-
-        </li>
-    {{endfor}}
-
-  </ul>
-
-  <button type="button" class="btn">Gimme More</button>
-
-Last refreshed on {{last_checked_on|timestamp}}
+</div>
 
 <!--
 <div class="flash">
@@ -38,9 +72,22 @@ Last refreshed on {{last_checked_on|timestamp}}
         
 {{enddef}}
 
-{{def now}}
-    <h1></h1>    
+{{def three}}
+<article>
+
+    <h1></h1>
+    <div class="meta dim">
+    </div>
+            
     <hr>
+
+</article>
+
+
+<!--
+Last feed refresh on {{last_checked_on}} UTC
+-->
+
 {{enddef}}
 
 

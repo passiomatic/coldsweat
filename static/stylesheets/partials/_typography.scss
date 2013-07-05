@@ -20,7 +20,7 @@ h1,
 .h1 {
 @include font-size($basefontsize * 2);
 line-height: 1.2;
-margin-bottom: $baselineheight / 2; }
+margin-bottom: $baselineheight / 4; }
 
 h2,
 .h2 {
@@ -86,7 +86,7 @@ padding-right : $gutterwidth / 2; }
 blockquote  {
 margin : 0 0 $baselineheight 0;
 padding : $gutterwidth / 2;
-background-color : $basefontbackgroundcolor;
+/* background-color : $basefontbackgroundcolor; */
 font-style : normal;
 
 small {

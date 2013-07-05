@@ -23,19 +23,6 @@ console[method] = noop;
 
 // Place any jQuery/helper plugins in here.
 
-/*! responsive-nav.js v1.0.14 by @viljamis, http://responsive-nav.com, MIT license */
-var responsiveNav=function(g,h){var t=!!g.getComputedStyle;g.getComputedStyle||(g.getComputedStyle=function(a){this.el=a;this.getPropertyValue=function(d){var c=/(\-([a-z]){1})/g;"float"===d&&(d="styleFloat");c.test(d)&&(d=d.replace(c,function(a,d,c){return c.toUpperCase()}));return a.currentStyle[d]?a.currentStyle[d]:null};return this});var b,f,e,u=h.documentElement,v=h.getElementsByTagName("head")[0],m=h.createElement("style"),r=!1,j=function(a,d,c,b){if("addEventListener"in a)try{a.addEventListener(d,
-c,b)}catch(e){if("object"===typeof c&&c.handleEvent)a.addEventListener(d,function(a){c.handleEvent.call(c,a)},b);else throw e;}else"attachEvent"in a&&("object"===typeof c&&c.handleEvent?a.attachEvent("on"+d,function(){c.handleEvent.call(c)}):a.attachEvent("on"+d,c))},k=function(a,d,c,b){if("removeEventListener"in a)try{a.removeEventListener(d,c,b)}catch(e){if("object"===typeof c&&c.handleEvent)a.removeEventListener(d,function(a){c.handleEvent.call(c,a)},b);else throw e;}else"detachEvent"in a&&("object"===
-typeof c&&c.handleEvent?a.detachEvent("on"+d,function(){c.handleEvent.call(c)}):a.detachEvent("on"+d,c))},l=function(a,d){for(var b in d)a.setAttribute(b,d[b])},n=function(a,b){a.className+=" "+b;a.className=a.className.replace(/(^\s*)|(\s*$)/g,"")},p=function(a,b){a.className=a.className.replace(RegExp("(\\s|^)"+b+"(\\s|$)")," ").replace(/(^\s*)|(\s*$)/g,"")},s=function(a,d){var c;this.options={animate:!0,transition:400,label:"Menu",insert:"after",customToggle:"",openPos:"relative",jsClass:"js",
-init:function(){},open:function(){},close:function(){}};for(c in d)this.options[c]=d[c];n(u,this.options.jsClass);this.wrapperEl=a.replace("#","");if(h.getElementById(this.wrapperEl))this.wrapper=h.getElementById(this.wrapperEl);else throw Error("The nav element you are trying to select doesn't exist");c=this.wrapper;for(var e=this.wrapper.firstChild;null!==e&&1!==e.nodeType;)e=e.nextSibling;c.inner=e;f=this.options;b=this.wrapper;this._init(this)};s.prototype={destroy:function(){this._removeStyles();
-p(b,"closed");p(b,"opened");b.removeAttribute("style");b.removeAttribute("aria-hidden");q=b=null;k(g,"load",this,!1);k(g,"resize",this,!1);k(e,"mousedown",this,!1);k(e,"touchstart",this,!1);k(e,"touchend",this,!1);k(e,"keyup",this,!1);k(e,"click",this,!1);f.customToggle?e.removeAttribute("aria-hidden"):e.parentNode.removeChild(e)},toggle:function(){r?(p(b,"opened"),n(b,"closed"),l(b,{"aria-hidden":"true"}),f.animate?setTimeout(function(){b.style.position="absolute"},f.transition+10):b.style.position=
-"absolute",r=!1,f.close()):(p(b,"closed"),n(b,"opened"),b.style.position=f.openPos,l(b,{"aria-hidden":"false"}),r=!0,f.open())},handleEvent:function(a){a=a||g.event;switch(a.type){case "mousedown":this._onmousedown(a);break;case "touchstart":this._ontouchstart(a);break;case "touchend":this._ontouchend(a);break;case "keyup":this._onkeyup(a);break;case "click":this._onclick(a);break;case "load":this._transitions(a);this._resize(a);break;case "resize":this._resize(a)}},_init:function(){n(b,"closed");
-this._createToggle();j(g,"load",this,!1);j(g,"resize",this,!1);j(e,"mousedown",this,!1);j(e,"touchstart",this,!1);j(e,"touchend",this,!1);j(e,"keyup",this,!1);j(e,"click",this,!1)},_createStyles:function(){m.parentNode||v.appendChild(m)},_removeStyles:function(){m.parentNode&&m.parentNode.removeChild(m)},_createToggle:function(){if(f.customToggle){var a=f.customToggle.replace("#","");if(h.getElementById(a))e=h.getElementById(a);else throw Error("The custom nav toggle you are trying to select doesn't exist");
-}else a=h.createElement("a"),a.innerHTML=f.label,l(a,{href:"#",id:"nav-toggle"}),"after"===f.insert?b.parentNode.insertBefore(a,b.nextSibling):b.parentNode.insertBefore(a,b),e=h.getElementById("nav-toggle")},_preventDefault:function(a){a.preventDefault?(a.preventDefault(),a.stopPropagation()):a.returnValue=!1},_onmousedown:function(a){var b=a||g.event;3===b.which||2===b.button||(this._preventDefault(a),this.toggle(a))},_ontouchstart:function(a){e.onmousedown=null;this._preventDefault(a);this.toggle(a)},
-_ontouchend:function(){var a=this;b.addEventListener("click",a._preventDefault,!0);setTimeout(function(){b.removeEventListener("click",a._preventDefault,!0)},f.transition)},_onkeyup:function(a){13===(a||g.event).keyCode&&this.toggle(a)},_onclick:function(a){this._preventDefault(a)},_transitions:function(){if(f.animate){var a=b.style,d="max-height "+f.transition+"ms";a.WebkitTransition=d;a.MozTransition=d;a.OTransition=d;a.transition=d}},_calcHeight:function(){var a="#"+this.wrapperEl+".opened{max-height:"+
-b.inner.offsetHeight+"px}";t&&(m.innerHTML=a)},_resize:function(){"none"!==g.getComputedStyle(e,null).getPropertyValue("display")?(l(e,{"aria-hidden":"false"}),b.className.match(/(^|\s)closed(\s|$)/)&&(l(b,{"aria-hidden":"true"}),b.style.position="absolute"),this._createStyles(),this._calcHeight()):(l(e,{"aria-hidden":"true"}),l(b,{"aria-hidden":"false"}),b.style.position=f.openPos,this._removeStyles());f.init()}};var q;return function(a,b){q||(q=new s(a,b));return q}}(window,document);
-
-
 /*
 jQuery Hotkeys Plugin
 Copyright 2010, John Resig
@@ -58,3 +45,230 @@ if(special){possible[modif+special]=true;}
 if(character){possible[modif+character]=true;possible[modif+jQuery.hotkeys.shiftNums[character]]=true;if(modif==="shift+"){possible[jQuery.hotkeys.shiftNums[character]]=true;}}
 for(var i=0,l=keys.length;i<l;i++){if(possible[keys[i]]){return origHandler.apply(this,arguments);}}};}
 jQuery.each(["keydown","keyup","keypress"],function(){jQuery.event.special[this]={add:keyHandler};});})(this.jQuery);
+
+
+
+/*
+ * Tiny Scrollbar
+ * http://www.baijs.nl/tinyscrollbar/
+ *
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.opensource.org/licenses/gpl-2.0.php
+ *
+ * Date: 13 / 08 / 2012
+ * @version 1.81
+ * @author Maarten Baijs
+ *
+ */
+;( function( $ ) 
+{
+    $.tiny = $.tiny || { };
+
+    $.tiny.scrollbar = {
+        options: {
+                axis         : 'y'    // vertical or horizontal scrollbar? ( x || y ).
+            ,   wheel        : 40     // how many pixels must the mouswheel scroll at a time.
+            ,   scroll       : true   // enable or disable the mousewheel.
+            ,   lockscroll   : true   // return scrollwheel to browser if there is no more content.
+            ,   size         : 'auto' // set the size of the scrollbar to auto or a fixed number.
+            ,   sizethumb    : 'auto' // set the size of the thumb to auto or a fixed number.
+            ,   invertscroll : false  // Enable mobile invert style scrolling
+        }
+    };
+
+    $.fn.tinyscrollbar = function( params )
+    {
+        var options = $.extend( {}, $.tiny.scrollbar.options, params );
+        
+        this.each( function()
+        { 
+            $( this ).data('tsb', new Scrollbar( $( this ), options ) ); 
+        });
+
+        return this;
+    };
+
+    $.fn.tinyscrollbar_update = function(sScroll)
+    {
+        return $( this ).data( 'tsb' ).update( sScroll ); 
+    };
+
+    function Scrollbar( root, options )
+    {
+        var oSelf       = this
+        ,   oWrapper    = root
+        ,   oViewport   = { obj: $( '.viewport', root ) }
+        ,   oContent    = { obj: $( '.overview', root ) }
+        ,   oScrollbar  = { obj: $( '.scrollbar', root ) }
+        ,   oTrack      = { obj: $( '.track', oScrollbar.obj ) }
+        ,   oThumb      = { obj: $( '.thumb', oScrollbar.obj ) }
+        ,   sAxis       = options.axis === 'x'
+        ,   sDirection  = sAxis ? 'left' : 'top'
+        ,   sSize       = sAxis ? 'Width' : 'Height'
+        ,   iScroll     = 0
+        ,   iPosition   = { start: 0, now: 0 }
+        ,   iMouse      = {}
+        ,   touchEvents = 'ontouchstart' in document.documentElement
+        ;
+
+        function initialize()
+        {
+            oSelf.update();
+            setEvents();
+
+            return oSelf;
+        }
+
+        this.update = function( sScroll )
+        {
+            oViewport[ options.axis ] = oViewport.obj[0][ 'offset'+ sSize ];
+            oContent[ options.axis ]  = oContent.obj[0][ 'scroll'+ sSize ];
+            oContent.ratio            = oViewport[ options.axis ] / oContent[ options.axis ];
+
+            oScrollbar.obj.toggleClass( 'disable', oContent.ratio >= 1 );
+
+            oTrack[ options.axis ] = options.size === 'auto' ? oViewport[ options.axis ] : options.size;
+            oThumb[ options.axis ] = Math.min( oTrack[ options.axis ], Math.max( 0, ( options.sizethumb === 'auto' ? ( oTrack[ options.axis ] * oContent.ratio ) : options.sizethumb ) ) );
+        
+            oScrollbar.ratio = options.sizethumb === 'auto' ? ( oContent[ options.axis ] / oTrack[ options.axis ] ) : ( oContent[ options.axis ] - oViewport[ options.axis ] ) / ( oTrack[ options.axis ] - oThumb[ options.axis ] );
+            
+            iScroll = ( sScroll === 'relative' && oContent.ratio <= 1 ) ? Math.min( ( oContent[ options.axis ] - oViewport[ options.axis ] ), Math.max( 0, iScroll )) : 0;
+            iScroll = ( sScroll === 'bottom' && oContent.ratio <= 1 ) ? ( oContent[ options.axis ] - oViewport[ options.axis ] ) : isNaN( parseInt( sScroll, 10 ) ) ? iScroll : parseInt( sScroll, 10 );
+            
+            setSize();
+        };
+
+        function setSize()
+        {
+            var sCssSize = sSize.toLowerCase();
+
+            oThumb.obj.css( sDirection, iScroll / oScrollbar.ratio );
+            oContent.obj.css( sDirection, -iScroll );
+            iMouse.start = oThumb.obj.offset()[ sDirection ];
+
+            oScrollbar.obj.css( sCssSize, oTrack[ options.axis ] );
+            oTrack.obj.css( sCssSize, oTrack[ options.axis ] );
+            oThumb.obj.css( sCssSize, oThumb[ options.axis ] );
+        }
+
+        function setEvents()
+        {
+            if( ! touchEvents )
+            {
+                oThumb.obj.bind( 'mousedown', start );
+                oTrack.obj.bind( 'mouseup', drag );
+            }
+            else
+            {
+                oViewport.obj[0].ontouchstart = function( event )
+                {   
+                    if( 1 === event.touches.length )
+                    {
+                        start( event.touches[ 0 ] );
+                        event.stopPropagation();
+                    }
+                };
+            }
+
+            if( options.scroll && window.addEventListener )
+            {
+                oWrapper[0].addEventListener( 'DOMMouseScroll', wheel, false );
+                oWrapper[0].addEventListener( 'mousewheel', wheel, false );
+                oWrapper[0].addEventListener( 'MozMousePixelScroll', function( event ){
+                    event.preventDefault();
+                }, false);
+            }
+            else if( options.scroll )
+            {
+                oWrapper[0].onmousewheel = wheel;
+            }
+        }
+
+        function start( event )
+        {
+            $( "body" ).addClass( "noSelect" );
+
+            var oThumbDir   = parseInt( oThumb.obj.css( sDirection ), 10 );
+            iMouse.start    = sAxis ? event.pageX : event.pageY;
+            iPosition.start = oThumbDir == 'auto' ? 0 : oThumbDir;
+            
+            if( ! touchEvents )
+            {
+                $( document ).bind( 'mousemove', drag );
+                $( document ).bind( 'mouseup', end );
+                oThumb.obj.bind( 'mouseup', end );
+            }
+            else
+            {
+                document.ontouchmove = function( event )
+                {
+                    event.preventDefault();
+                    drag( event.touches[ 0 ] );
+                };
+                document.ontouchend = end;        
+            }
+        }
+
+        function wheel( event )
+        {
+            if( oContent.ratio < 1 )
+            {
+                var oEvent = event || window.event
+                ,   iDelta = oEvent.wheelDelta ? oEvent.wheelDelta / 120 : -oEvent.detail / 3
+                ;
+
+                iScroll -= iDelta * options.wheel;
+                iScroll = Math.min( ( oContent[ options.axis ] - oViewport[ options.axis ] ), Math.max( 0, iScroll ));
+
+                oThumb.obj.css( sDirection, iScroll / oScrollbar.ratio );
+                oContent.obj.css( sDirection, -iScroll );
+
+                if( options.lockscroll || ( iScroll !== ( oContent[ options.axis ] - oViewport[ options.axis ] ) && iScroll !== 0 ) )
+                {
+                    oEvent = $.event.fix( oEvent );
+                    oEvent.preventDefault();
+                }
+            }
+        }
+
+        function drag( event )
+        {
+            if( oContent.ratio < 1 )
+            {
+                if( options.invertscroll && touchEvents )
+                {
+                    iPosition.now = Math.min( ( oTrack[ options.axis ] - oThumb[ options.axis ] ), Math.max( 0, ( iPosition.start + ( iMouse.start - ( sAxis ? event.pageX : event.pageY ) ))));
+                }
+                else
+                {
+                     iPosition.now = Math.min( ( oTrack[ options.axis ] - oThumb[ options.axis ] ), Math.max( 0, ( iPosition.start + ( ( sAxis ? event.pageX : event.pageY ) - iMouse.start))));
+                }
+
+                iScroll = iPosition.now * oScrollbar.ratio;
+                oContent.obj.css( sDirection, -iScroll );
+                oThumb.obj.css( sDirection, iPosition.now );
+            }
+        }
+        
+        function end()
+        {
+            $( "body" ).removeClass( "noSelect" );
+            $( document ).unbind( 'mousemove', drag );
+            $( document ).unbind( 'mouseup', end );
+            oThumb.obj.unbind( 'mouseup', end );
+            document.ontouchmove = document.ontouchend = null;
+        }
+
+        return initialize();
+    }
+
+}(jQuery));
+
+
+
+
+
+
+(function(a){a.isScrollToFixed=function(b){return a(b).data("ScrollToFixed")!==undefined};a.ScrollToFixed=function(d,h){var k=this;k.$el=a(d);k.el=d;k.$el.data("ScrollToFixed",k);var c=false;var F=k.$el;var G;var D;var p;var C=0;var q=0;var i=-1;var e=-1;var t=null;var y;var f;function u(){F.trigger("preUnfixed.ScrollToFixed");j();F.trigger("unfixed.ScrollToFixed");e=-1;C=F.offset().top;q=F.offset().left;if(k.options.offsets){q+=(F.offset().left-F.position().left)}if(i==-1){i=q}G=F.css("position");c=true;if(k.options.bottom!=-1){F.trigger("preFixed.ScrollToFixed");w();F.trigger("fixed.ScrollToFixed")}}function m(){var H=k.options.limit;if(!H){return 0}if(typeof(H)==="function"){return H.apply(F)}return H}function o(){return G==="fixed"}function x(){return G==="absolute"}function g(){return !(o()||x())}function w(){if(!o()){t.css({display:F.css("display"),width:F.outerWidth(true),height:F.outerHeight(true),"float":F.css("float")});cssOptions={position:"fixed",top:k.options.bottom==-1?s():"",bottom:k.options.bottom==-1?"":k.options.bottom,"margin-left":"0px"};if(!k.options.dontSetWidth){cssOptions.width=F.width()}F.css(cssOptions);F.addClass("scroll-to-fixed-fixed");if(k.options.className){F.addClass(k.options.className)}G="fixed"}}function b(){var I=m();var H=q;if(k.options.removeOffsets){H=0;I=I-C}cssOptions={position:"absolute",top:I,left:H,"margin-left":"0px",bottom:""};if(!k.options.dontSetWidth){cssOptions.width=F.width()}F.css(cssOptions);G="absolute"}function j(){if(!g()){e=-1;t.css("display","none");F.css({width:"",position:D,left:"",top:p.top,"margin-left":""});F.removeClass("scroll-to-fixed-fixed");if(k.options.className){F.removeClass(k.options.className)}G=null}}function v(H){if(H!=e){F.css("left",q-H);e=H}}function s(){var H=k.options.marginTop;if(!H){return 0}if(typeof(H)==="function"){return H.apply(F)}return H}function z(){if(!a.isScrollToFixed(F)){return}var J=c;if(!c){u()}var H=a(window).scrollLeft();var K=a(window).scrollTop();var I=m();if(k.options.minWidth&&a(window).width()<k.options.minWidth){if(!g()||!J){n();F.trigger("preUnfixed.ScrollToFixed");j();F.trigger("unfixed.ScrollToFixed")}}else{if(k.options.bottom==-1){if(I>0&&K>=I-s()){if(!x()||!J){n();F.trigger("preAbsolute.ScrollToFixed");b();F.trigger("unfixed.ScrollToFixed")}}else{if(K>=C-s()){if(!o()||!J){n();F.trigger("preFixed.ScrollToFixed");w();e=-1;F.trigger("fixed.ScrollToFixed")}v(H)}else{if(!g()||!J){n();F.trigger("preUnfixed.ScrollToFixed");j();F.trigger("unfixed.ScrollToFixed")}}}}else{if(I>0){if(K+a(window).height()-F.outerHeight(true)>=I-(s()||-l())){if(o()){n();F.trigger("preUnfixed.ScrollToFixed");if(D==="absolute"){b()}else{j()}F.trigger("unfixed.ScrollToFixed")}}else{if(!o()){n();F.trigger("preFixed.ScrollToFixed");w()}v(H);F.trigger("fixed.ScrollToFixed")}}else{v(H)}}}}function l(){if(!k.options.bottom){return 0}return k.options.bottom}function n(){var H=F.css("position");if(H=="absolute"){F.trigger("postAbsolute.ScrollToFixed")}else{if(H=="fixed"){F.trigger("postFixed.ScrollToFixed")}else{F.trigger("postUnfixed.ScrollToFixed")}}}var B=function(H){if(F.is(":visible")){c=false;z()}};var E=function(H){z()};var A=function(){var I=document.body;if(document.createElement&&I&&I.appendChild&&I.removeChild){var K=document.createElement("div");if(!K.getBoundingClientRect){return null}K.innerHTML="x";K.style.cssText="position:fixed;top:100px;";I.appendChild(K);var L=I.style.height,M=I.scrollTop;I.style.height="3000px";I.scrollTop=500;var H=K.getBoundingClientRect().top;I.style.height=L;var J=(H===100);I.removeChild(K);I.scrollTop=M;return J}return null};var r=function(H){H=H||window.event;if(H.preventDefault){H.preventDefault()}H.returnValue=false};k.init=function(){k.options=a.extend({},a.ScrollToFixed.defaultOptions,h);k.$el.css("z-index",k.options.zIndex);t=a("<div />");G=F.css("position");D=F.css("position");p=a.extend({},F.offset());if(g()){k.$el.after(t)}a(window).bind("resize.ScrollToFixed",B);a(window).bind("scroll.ScrollToFixed",E);if(k.options.preFixed){F.bind("preFixed.ScrollToFixed",k.options.preFixed)}if(k.options.postFixed){F.bind("postFixed.ScrollToFixed",k.options.postFixed)}if(k.options.preUnfixed){F.bind("preUnfixed.ScrollToFixed",k.options.preUnfixed)}if(k.options.postUnfixed){F.bind("postUnfixed.ScrollToFixed",k.options.postUnfixed)}if(k.options.preAbsolute){F.bind("preAbsolute.ScrollToFixed",k.options.preAbsolute)}if(k.options.postAbsolute){F.bind("postAbsolute.ScrollToFixed",k.options.postAbsolute)}if(k.options.fixed){F.bind("fixed.ScrollToFixed",k.options.fixed)}if(k.options.unfixed){F.bind("unfixed.ScrollToFixed",k.options.unfixed)}if(k.options.spacerClass){t.addClass(k.options.spacerClass)}F.bind("resize.ScrollToFixed",function(){t.height(F.height())});F.bind("scroll.ScrollToFixed",function(){F.trigger("preUnfixed.ScrollToFixed");j();F.trigger("unfixed.ScrollToFixed");z()});F.bind("detach.ScrollToFixed",function(H){r(H);F.trigger("preUnfixed.ScrollToFixed");j();F.trigger("unfixed.ScrollToFixed");a(window).unbind("resize.ScrollToFixed",B);a(window).unbind("scroll.ScrollToFixed",E);F.unbind(".ScrollToFixed");k.$el.removeData("ScrollToFixed")});B()};k.init()};a.ScrollToFixed.defaultOptions={marginTop:0,limit:0,bottom:-1,zIndex:1000};a.fn.scrollToFixed=function(b){return this.each(function(){(new a.ScrollToFixed(this,b))})}})(jQuery);
+

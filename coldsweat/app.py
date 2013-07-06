@@ -100,7 +100,6 @@ def template(filename, content_type='text/html'):
                 message = ctx.request.cookies['alert_message']
             else:
                 message = ''
-
             
             # Global namespace
             namespace = {
@@ -112,15 +111,17 @@ def template(filename, content_type='text/html'):
                 'alert_message': render_message(message),                
 
                 # Filters 
-                'javascript': escape_javacript,
+                #'javascript': escape_javacript,
                 'html': escape_html,
                 'timestamp': timestamp(datetime.utcnow()),
             }
             
-            kwargs = handler(ctx, *args)
-            if not kwargs: kwargs = {}
+            # Allow override global namespace symbols
+            d = handler(ctx, *args)
+            if d: 
+                namespace.update(d)
                 
-            ctx.response.body = render_template(filename, namespace, **kwargs)
+            ctx.response.body = render_template(filename, **namespace)
             ctx.response.content_type = content_type
             #ctx.response.charset=ENCODING
 
@@ -136,8 +137,8 @@ def template(filename, content_type='text/html'):
 # Templates
 # ------------------------------------------------------
 
-def render_template(filename, namespace, **kwargs):            
-    return Template.from_filename(os.path.join(TEMPLATE_DIR, filename), namespace).substitute(**kwargs)
+def render_template(filename, **kwargs):            
+    return Template.from_filename(os.path.join(TEMPLATE_DIR, filename)).substitute(**kwargs)
 
  
 @template('404.html')

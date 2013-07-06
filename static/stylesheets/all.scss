@@ -31,7 +31,7 @@ $media-queries-supported : true;
 .container {
     @include clearfix;
     background: #C6C2C2 url(../images/faux-nav-column.png) left top repeat-y;
-    background-size: $panel1width auto;  
+    background-size: $panel1width+1 auto;  /* +1 to avoid scrollToFixed round errors */
 }
 
 .panel  {
@@ -58,7 +58,10 @@ $media-queries-supported : true;
 }
 
 .panel-2 {
-    width: $panel2width;
+    width: $panel2width;    
+    
+    background: $white;
+    border-right: 1px solid $lighterneutralcolor;
 }
 
 .panel-3  {
@@ -129,10 +132,10 @@ section {
  
 .entries {
 
-    background: $white;
+/*     background: $white; */
 
 /*     border-left: 1px solid $lighterneutralcolor; */
-    border-right: 1px solid $lighterneutralcolor;
+
 
     ul {
         list-style: none;
@@ -158,11 +161,8 @@ section {
             }
 
             &.status-read {
-/*                 opacity: .8; */
-                
+                opacity: .8;                
                 background: $lightestneutralcolor;
-                
-                
             }
 
     
@@ -229,20 +229,21 @@ code {
 }
 
 
+// =flash ================================
 
 .flash {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     margin-left: -4em;    
     margin-top: -4em;    
     
-    z-index: 1;
+    z-index: 1001;
     width: 8em;
     padding: $baselineheight*2 $gutterwidth*2;
 
     border-radius: $borderradius;    
-    background: rgba(100%, 100%, 100%, .6);    
+    background: rgba(100%, 100%, 100%, .8);    
     //opacity: .8;
     
     //border: 1px solid $lighterneutralcolor;

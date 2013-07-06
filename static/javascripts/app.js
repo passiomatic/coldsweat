@@ -1,98 +1,116 @@
 $(document).ready(function() {
-    // Put app scripts here.
+    "use strict";
 
-    // Set up responsive nav
-/*
-	var navElement = "#navigation-toggle";
-	var navigation;
-	navigation = responsiveNav("#navigation-toggle");
-	navigation._transitions();
-	navigation._resize();
-    
-    
-*/
+    var flash_fragment = '<div class="flash"><i class="icon-star icon-4x"></i><div>Starred</div></div>';
+      
+    // Put app scripts here
 
-    function current() {
-        return $('.entries li.current'); 
-    }
-
-    var ajax_endpoint = '/coldsweat/index.cgi/ajax/'
-    
-    // Open/close
-    $(document).bind('keypress', 'o', function(e) {
-        current().click();
+    var ajax_endpoint = window.location.pathname + '/ajax/';
+    // Adjust panel-2 height to viewport size. minues page-title total height
+    var h = $(window).height() - $('.panel-2 .panel-title').outerHeight()
+    $('.panel-2 .viewport').css('height', h)    
+    $(window).resize(function(e) {
+        var h = $(window).height() - $('.panel-2 .panel-title').outerHeight()
+        $('.panel-2 .viewport').css('height', h)
     });
 
-    // Mark as read
-    $(document).bind('keypress', 'm', function(e) {        
-        //@@TODO: cache ? 
-        $.ajax(ajax_endpoint + 'entries/' + current().attr('id'), {
+     $('#scrollbar1').tinyscrollbar();
+     $('.panel-1').scrollToFixed();    
+     $('.panel-2').scrollToFixed();
+         
+
+    function findCurrent() { return $('.entries li.current'); }
+
+    function markAsRead() {
+        var c = findCurrent();    
+        c.toggleClass('status-read');    
+    
+        $.ajax(ajax_endpoint + 'entries/' + c.attr('id'), {
             dataType: 'script',             
             type: 'POST', 
             data: 'mark&as=read'
-        })
-    });
+        })        
+    }
 
-    // Star/unstar
-    $(document).bind('keypress', 's', function(e) {
-        //@@TODO: cache ? 
-        $.ajax(ajax_endpoint + 'entries/' + current().attr('data-id'), {
-            dataType: 'script',             
+    function markAsSaved() {
+        var c = findCurrent();    
+        c.toggleClass('status-saved');
+        
+        // Animate
+        var flash = $(flash_fragment);
+        $(document.body).append(flash);
+        flash.animate({'opacity': 'hide'}, 'slow', function() { flash.remove() } ) 
+
+        $.ajax(ajax_endpoint + 'entries/' + c.attr('id'), {
+            dataType: 'html',             
             type: 'POST', 
             data: 'mark&as=saved'
-        })
-    });
+        })        
+    }
+
+    function openEntry(e) {        
+            var c = findCurrent();
+        //@@TODO: check if already open
+        $.ajax(ajax_endpoint + 'entries/' + c.attr('id'), {dataType: 'html', type:'GET'}).done(function(data) {
+            $('article').html(data);
+        })        
+
+        if(e == undefined) {
+
+
+        } else {
+            var c = $(e.target);
+        }
+        
+        
+    }
+
+    function goToEntry(direction) {        
+        function _goToEntry(e) {
+            var c = findCurrent()            
+            //e.preventDefault();                
+            if(direction=='next') {
+                var el = c.next('li')        
+            } else {
+                var el = c.prev('li')
+            }
+
+            // Check if on top or on bottom            
+            if(el.length) {
+                c.toggleClass('current');        
+                el.toggleClass('current');
+                // Adjust scolling position
+                $('#scrollbar1').tinyscrollbar_update(el.position().top);
+            }
+            
+        }
+        return _goToEntry;
+    }
     
-
-    $(document).bind('keypress', 'j', function(e) {
-        //e.preventDefault();                
-        var c = current().toggleClass('current');        
-        var new_c = c.prevAll('li').first().toggleClass('current');
-        console.log(new_c.offset().top)
-        
-        $('#scrollbar1').tinyscrollbar_update(new_c.position().top);
-
-    });
-
-    $(document).bind('keypress', 'k', function(e) {
-        //e.preventDefault();                        
-        var c = current().toggleClass('current');        
-        new_c = c.nextAll('li').first().toggleClass('current');        
-        console.log(new_c.offset().top)
-
-        //$('body').scrollTop(new_c.offset().top - c.height());
-        $('#scrollbar1').tinyscrollbar_update(new_c.position().top);
-    });
+    function bindKeyboardEvents() {
+        var keyboard_events = {
+            'o': openEntry,
+            'm': markAsRead,
+            's': markAsSaved,
+            'j': goToEntry('prev'),
+            'k': goToEntry('next')
+        }
     
-
-    $('.entries li').click(function(e) {
-        var entry = $(this);
-        //@@TODO: cache ? 
-        $.ajax(ajax_endpoint + 'entries/' + entry.attr('id'), {dataType: 'script', type:'GET'}) 
-        
-/*         $('article').css('marginTop', entry.offset().top); */
-        
-        
-    })
+        for (var key in keyboard_events) {      
+            $(document).bind('keypress', key, keyboard_events[key])  
+        }    
+    }
+    
 
     $('.entries li a').click(function(e) {
-        e.preventDefault();                                
+        e.preventDefault();            
         // But let event to bubbling up
     })
 
+    $('.entries li').click(function(e) {
+        openEntry(e)
+    })
 
-     var h = $(window).height() - $('.panel-2 .panel-title').outerHeight()
-     $('.panel-2 .viewport').css('height', h)
-/*
-    $(window).resize(function(e) {
-    
-    });
-*/
-
-
-     $('#scrollbar1').tinyscrollbar();
-
-     $('.panel-1').scrollToFixed();    
-     $('.panel-2').scrollToFixed();
-        		
+    bindKeyboardEvents()
+        
 });

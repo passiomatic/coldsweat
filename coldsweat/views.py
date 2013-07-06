@@ -7,7 +7,7 @@ Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
-from webob.exc import HTTPSeeOther, HTTPNotFound
+from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest
 
 from app import *
 from models import *
@@ -24,42 +24,41 @@ def index(ctx):
     connect()
 
     filter_name = 'Unread Items'
+    saved_ids = []
+    read_ids = []
+    
+    #@@TODO Grab current session user
+    user = User.get((User.username == 'default'))
 
+    r = Entry.select().join(Read).join(User).where((User.id == user.id)).distinct().naive()
+    s = Entry.select().join(Saved).join(User).where((User.id == user.id)).distinct().naive()
+    
     if 'starred' in ctx.request.GET:
-        q = Entry.select().join(Feed).join(Icon).where((Entry.id << Saved.select(Saved.entry)))
+        read_ids = [i.id for i in r]
+        q = Entry.select().join(Feed).join(Icon).where((Entry.id << Saved.select(Saved.entry))).naive()
         filter_name = 'Starred Items'
     elif 'all' in ctx.request.GET:
-        q = Entry.select().join(Feed).join(Icon)
-        filter_name = ' Total Items'
+        read_ids = [i.id for i in r]
+        saved_ids = [i.id for i in s]
+        q = Entry.select().join(Feed).join(Icon).naive()
+        filter_name = 'Total Items'
     else:
         # Default is unread
-        q = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry)))
+        saved_ids = [i.id for i in s]
+        q = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry))).naive()
             
     entry_count = q.count()
     last_entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()
-
-#     r = Entry.select().join(Read).join(User).where(where_clause).distinct().naive()
-#     s = Entry.select().join(Saved).join(User).where(where_clause).distinct().naive()
-# 
-#     read_ids = [i.id for i in r]
-#     saved_ids = [i.id for i in s]
-        
-    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
-        
-#     if not entry_count:
-#         entry_count = 'Zero'
     
+    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+            
     page_title = '%s %s' % (entry_count if entry_count else 'Zero', filter_name)
     
-    #feed_count = Feed.select(Feed.is_enabled==True).count()
-
-    #close()
-
 
     return locals()
 
 @view(r'^/ajax/entries/(\d+)$')
-@template('ajax_entry_get.js', content_type='application/javascript')
+@template('ajax_entry_get.html')
 def ajax_entry_get(ctx, entry_id):
 
     connect()
@@ -72,7 +71,6 @@ def ajax_entry_get(ctx, entry_id):
     return locals()
     
 @view(r'^/ajax/entries/(\d+)$', method='post')
-@template('ajax_entry_post.js', content_type='application/javascript')
 def ajax_entry_post(ctx, entry_id):
 
     connect()
@@ -80,7 +78,7 @@ def ajax_entry_post(ctx, entry_id):
     try:
         status = ctx.request.POST['as']
     except KeyError:
-        return              
+        raise HTTPBadRequest('Missing parameter as=read|unread|saved|unsaved')
 
     try:
         entry = Entry.get((Entry.id == entry_id)) 
@@ -109,7 +107,7 @@ def ajax_entry_post(ctx, entry_id):
         
         log.debug('marked entry %s as %s' % (entry_id, status))
     
-    return locals()
+    #return locals()
         
 
 @view(method='post')

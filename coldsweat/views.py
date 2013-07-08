@@ -23,36 +23,43 @@ def index(ctx):
 
     connect()
 
-    filter_name = 'Unread Items'
-    saved_ids = []
-    read_ids = []
+    # Default is unread
+    filter_name = 'unread'
+    page_title = 'Unread Items' 
+    group_id = 0
     
     #@@TODO Grab current session user
     user = User.get((User.username == 'default'))
 
-    r = Entry.select().join(Read).join(User).where((User.id == user.id)).distinct().naive()
-    s = Entry.select().join(Saved).join(User).where((User.id == user.id)).distinct().naive()
+    r = Entry.select().join(Read).where((Read.user == user)).distinct().naive()
+    s = Entry.select().join(Saved).where((Saved.user == user)).distinct().naive()
+    read_ids = [i.id for i in r]
+    saved_ids = [i.id for i in s]
     
     if 'starred' in ctx.request.GET:
-        read_ids = [i.id for i in r]
         q = Entry.select().join(Feed).join(Icon).where((Entry.id << Saved.select(Saved.entry))).naive()
-        filter_name = 'Starred Items'
-    elif 'all' in ctx.request.GET:
-        read_ids = [i.id for i in r]
-        saved_ids = [i.id for i in s]
-        q = Entry.select().join(Feed).join(Icon).naive()
-        filter_name = 'Total Items'
+        filter_name = 'starred'
+        page_title = 'Starred Items'
+        #filter_name = 
+    elif 'group' in ctx.request.GET:
+        group_id = ctx.request.GET['group']   
+        try:
+            group = Group.get((Group.id == group_id)) 
+        except Group.DoesNotExist:
+            raise HTTPNotFound('No such group %s' % group_id)
+        filter_name = ''
+        page_title = group.title                
+        # TODO: join(Icon) to reduce number of queries
+        q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.group == group)).naive()
     else:
-        # Default is unread
-        saved_ids = [i.id for i in s]
         q = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry))).naive()
             
     entry_count = q.count()
-    last_entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()
-    
+    last_entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()    
     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    groups = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title).naive()
             
-    page_title = '%s %s' % (entry_count if entry_count else 'Zero', filter_name)
+    page_title = '%s%s' % (page_title, ' (%s)' % entry_count if entry_count else '')
     
 
     return locals()
@@ -94,7 +101,12 @@ def ajax_entry_post(ctx, entry_id):
                 Read.create(user=user, entry=entry)
             except IntegrityError:
                 log.info('entry %s already marked as read, ignored' % entry_id)
-        
+                return
+        elif status == 'unread':
+            count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
+            if not count:
+                log.info('entry %d never marked as read, ignored' % entry_id)
+                return
         elif status == 'saved':
             try:
                 Saved.create(user=user, entry=entry)
@@ -103,12 +115,13 @@ def ajax_entry_post(ctx, entry_id):
                 return
     
         elif status == 'unsaved':
-            pass
+            count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
+            if not count:
+                log.info('entry %d never marked as saved, ignored' % entry_id)
+                return
         
         log.debug('marked entry %s as %s' % (entry_id, status))
     
-    #return locals()
-        
 
 @view(method='post')
 def index_post(ctx):     

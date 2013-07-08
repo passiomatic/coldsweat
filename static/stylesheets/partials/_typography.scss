@@ -20,7 +20,7 @@ h1,
 .h1 {
 @include font-size($basefontsize * 2);
 line-height: 1.2;
-margin-bottom: $baselineheight / 4; }
+/* margin-bottom: $baselineheight / 4;  */}
 
 h2,
 .h2 {
@@ -132,7 +132,7 @@ dd {
 margin-bottom : $baselineheight;  }
 
 dt {
-font-weight : bold; }
+font-weight : $basefontweight; }
 
 .dl-horizontal {
 @include clearfix;
@@ -151,7 +151,7 @@ border-bottom : 1px dotted $bordercolor;
 cursor : help; }
 
 b, strong {
-font-weight : bold; }
+font-weight : $basefontweight; }
 
 dfn {
 font-style : italic; }
@@ -165,7 +165,7 @@ mark {
 background-color : $basefontbackgroundcolor;
 color : $textcolor;
 font-style : italic;
-font-weight : bold; }
+font-weight : $basefontweight; }
 
 pre,
 code,

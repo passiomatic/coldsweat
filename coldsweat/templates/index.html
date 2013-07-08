@@ -1,13 +1,12 @@
 {{inherit "site.html"}}
 
 {{def one}}
-    <ul>
-        <li class="filter-unread"><a href="{{application_url}}?unread"><i class="icon-file"></i>&ensp;Unread</a></li>
+    <ul class="{{filter_name}}">
+        <li class="filter-unread"><a href="{{application_url}}?unread"><i class="icon-reorder"></i>&ensp;Unread</a></li>
         <li class="filter-starred"><a href="{{application_url}}?starred"><i class="icon-star"></i>&ensp;Starred</a></li>
-        <li class="filter-none"><a href="{{application_url}}?all"><i class="icon-reorder"></i>&ensp;All</a></li>
-        <li class="sep"><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;Design</a></li>    
-        <li class=""><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;Programming</a></li>    
-        <li class=""><a href="{{application_url}}?name"><i class="icon-folder-close"></i>&ensp;News &amp; Media</a></li>    
+        {{for g in groups}}
+            <li class="{{if g.id == group.id}}filter-group{{endif}}"><a href="{{application_url}}?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
+        {{endfor}}        
     </ul>
 {{enddef}}
 
@@ -52,7 +51,7 @@
                 </ul>
             
                 <div class="more">
-                    <button type="button" class="btn" data-max-id="{{e.id}}">Gimme More</button>
+                    <button type="button" class="btn" data-max-id="">Gimme More</button>
                 </div>
                 
             </div>
@@ -66,8 +65,7 @@
 {{enddef}}
 
 {{def three}}
-<article>
-</article>
+<article>&larr; Open the current item on the right by clicking it or by pressing the <kbd>o</kbd> key.</article>
 <!--
 Last feed refresh on {{last_checked_on}} UTC
 -->

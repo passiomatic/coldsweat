@@ -42,7 +42,7 @@ def index(ctx):
         page_title = 'Starred Items'
         #filter_name = 
     elif 'group' in ctx.request.GET:
-        group_id = ctx.request.GET['group']   
+        group_id = int(ctx.request.GET['group'])   
         try:
             group = Group.get((Group.id == group_id)) 
         except Group.DoesNotExist:
@@ -51,18 +51,30 @@ def index(ctx):
         page_title = group.title                
         # TODO: join(Icon) to reduce number of queries
         q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.group == group)).naive()
+    elif 'feed' in ctx.request.GET:
+        feed_id = int(ctx.request.GET['feed'])
+        try:
+            feed = Feed.get((Feed.id == feed_id)) 
+        except Feed.DoesNotExist:
+            raise HTTPNotFound('No such feed %s' % feed_id)
+        filter_name = 'feed'
+        page_title = feed.title                
+        # TODO: join(Icon) to reduce number of queries
+        q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.feed == feed)).naive()
     else:
         q = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry))).naive()
             
     entry_count = q.count()
-    last_entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()    
-    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()    
+    #last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
     groups = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title).naive()
             
     page_title = '%s%s' % (page_title, ' (%s)' % entry_count if entry_count else '')
     
 
     return locals()
+ 
+    
 
 @view(r'^/ajax/entries/(\d+)$')
 @template('ajax_entry_get.html')
@@ -123,37 +135,37 @@ def ajax_entry_post(ctx, entry_id):
         log.debug('marked entry %s as %s' % (entry_id, status))
     
 
-@view(method='post')
-def index_post(ctx):     
-
-    connect()
-    
-    # Redirect
-    response = HTTPSeeOther(location=ctx.request.url)
-    
-    self_link, username, password = ctx.request.POST['self_link'], ctx.request.POST['username'], ctx.request.POST['password']
-
-    try:
-        #@@TODO: user = get_auth_user(username, password)
-        user = User.get((User.username == username) & (User.password == password) & (User.is_enabled == True)) 
-    except User.DoesNotExist:
-        set_message(response, u'ERROR Wrong username or password, please check your credentials.')            
-        return response
-                
-    default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
-
-    with transaction():    
-        feed = fetcher.add_feed(self_link, fetch_icon=True)    
-        try:
-            Subscription.create(user=user, feed=feed, group=default_group)
-            set_message(response, u'SUCCESS Feed %s added successfully.' % self_link)            
-            log.debug('added feed %s for user %s' % (self_link, username))            
-        except IntegrityError:
-            set_message(response, u'INFO Feed %s is already in your subscriptions.' % self_link)
-            log.info('user %s has already feed %s in her subscriptions' % (username, self_link))    
-
-    #close()
-        
-    return response
+# @view(method='post')
+# def index_post(ctx):     
+# 
+#     connect()
+#     
+#     # Redirect
+#     response = HTTPSeeOther(location=ctx.request.url)
+#     
+#     self_link, username, password = ctx.request.POST['self_link'], ctx.request.POST['username'], ctx.request.POST['password']
+# 
+#     try:
+#         #@@TODO: user = get_auth_user(username, password)
+#         user = User.get((User.username == username) & (User.password == password) & (User.is_enabled == True)) 
+#     except User.DoesNotExist:
+#         set_message(response, u'ERROR Wrong username or password, please check your credentials.')            
+#         return response
+#                 
+#     default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
+# 
+#     with transaction():    
+#         feed = fetcher.add_feed(self_link, fetch_icon=True)    
+#         try:
+#             Subscription.create(user=user, feed=feed, group=default_group)
+#             set_message(response, u'SUCCESS Feed %s added successfully.' % self_link)            
+#             log.debug('added feed %s for user %s' % (self_link, username))            
+#         except IntegrityError:
+#             set_message(response, u'INFO Feed %s is already in your subscriptions.' % self_link)
+#             log.info('user %s has already feed %s in her subscriptions' % (username, self_link))    
+# 
+#     #close()
+#         
+#     return response
 
 

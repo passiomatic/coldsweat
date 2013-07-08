@@ -5,8 +5,9 @@
         <li class="filter-unread"><a href="{{application_url}}?unread"><i class="icon-reorder"></i>&ensp;Unread</a></li>
         <li class="filter-starred"><a href="{{application_url}}?starred"><i class="icon-star"></i>&ensp;Starred</a></li>
         {{for g in groups}}
-            <li class="{{if g.id == group.id}}filter-group{{endif}}"><a href="{{application_url}}?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
+            <li class="{{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
         {{endfor}}        
+<!--         <li class="filter-feeds"><a href="{{application_url}}?feed="><i class="icon-rss"></i>&ensp;All feeds</a></li>             -->
     </ul>
 {{enddef}}
 
@@ -31,7 +32,7 @@
     
                 <ul>
                   
-                {{for loop, e in looper(last_entries)}}
+                {{for loop, e in looper(entries)}}
                     <li id="{{e.id}}" class="{{if loop.first}}current{{endif}} {{if e.id in saved_ids}}status-saved{{endif}} {{if e.id in read_ids}}status-read{{endif}}">
                         <h3 class="h4">
                             <img src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a data-id="{{e.id}}" href="{{e.link}}">{{e.title}}</a>
@@ -49,7 +50,7 @@
                 {{endfor}}
                 
                 </ul>
-            
+
                 <div class="more">
                     <button type="button" class="btn" data-max-id="">Gimme More</button>
                 </div>
@@ -66,9 +67,6 @@
 
 {{def three}}
 <article>&larr; Open the current item on the right by clicking it or by pressing the <kbd>o</kbd> key.</article>
-<!--
-Last feed refresh on {{last_checked_on}} UTC
--->
 {{enddef}}
 
 

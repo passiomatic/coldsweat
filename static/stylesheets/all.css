@@ -4336,7 +4336,8 @@ input.search-query {
     */ }
     .panel .panel-title h2 {
       margin: 0;
-      padding: 0; }
+      padding: 0;
+      text-transform: capitalize; }
 
 .panel-1 {
   width: 12%; }
@@ -4514,7 +4515,9 @@ code {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%; }
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0; }
 
 .flash {
   position: absolute;

@@ -9,10 +9,8 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 
 
 from sgmllib import SGMLParser, charref
-import  urllib, urlparse, re, sys
+import urlparse
 
-from coldsweat import log
-    
 class BaseParser(SGMLParser):
     """
     Code derived from Feedfinder, see: http://www.aaronsw.com/2002/feedfinder/

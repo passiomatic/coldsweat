@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-Quick & dirty test suite for Fever API implementation
+Description: quick & dirty test suite for Fever API implementation
+
 Copyright (c) 2013— Andrea Peltrin
 License: MIT (see LICENSE.md for details)
 '''

@@ -45,24 +45,29 @@ def get_entry_title(entry):
     if 'title' in entry:
         return entry.title
     return "Untitled"
+
+def get_entry_link(entry):
+    # Special case for Feedburner entries,
+    # see: http://code.google.com/p/feedparser/issues/detail?id=171
+    if 'feedburner_origlink' in entry:
+        #log.debug('Using feedburner:origlink for entry')
+        return entry.feedburner_origlink    
+    return entry.link
     
 def get_entry_id(entry):
     """
     Get a useful id from a feed entry
     """    
     if ('id' in entry) and entry.id: 
-        #if type(entry.id) is dict:
-        #    return entry.id.values()[0]
         return entry.id
-
     if 'link' in entry: 
-        return entry.link
+        return get_entry_link(entry)
     content = get_entry_content(entry)
     if content: 
         return make_sha1_hash(content)
     if 'title' in entry: 
         return make_sha1_hash(entry.title)
-
+    
 def get_entry_author(entry, feed):
     """
     Divine authorship
@@ -226,15 +231,13 @@ def fetch_feed(feed):
         except Entry.DoesNotExist:
             pass
 
-        content = get_entry_content(entry)
-        
         d = {
             'guid'              : guid,
             'feed'              : feed,
             'title'             : get_entry_title(entry),
             'author'            : get_entry_author(entry, soup.feed),
-            'content'           : content,
-            'link'              : entry.link,
+            'content'           : get_entry_content(entry),
+            'link'              : get_entry_link(entry),
             'last_updated_on'   : timestamp,         
         }
 

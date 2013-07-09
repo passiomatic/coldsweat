@@ -5,8 +5,6 @@ Description: find the feed for a web page
 Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2006 Aaron Swartz
 Portions are copyright (c) 2002–4 Mark Pilgrim
-
-Code derived from feedfinder <http://www.aaronsw.com/2002/feedfinder/>
 """
 
 
@@ -14,19 +12,14 @@ from sgmllib import SGMLParser, charref
 import  urllib, urlparse, re, sys
 
 from coldsweat import log
-
-FEED_TYPES = [
-    'application/rss+xml',
-    'text/xml',
-    'application/atom+xml',
-    'application/x.atom+xml',
-    'application/x-atom+xml'
-]
     
 class BaseParser(SGMLParser):
+    """
+    Code derived from Feedfinder, see: http://www.aaronsw.com/2002/feedfinder/
+    """
+
     def __init__(self, base_url):
         SGMLParser.__init__(self)
-        self.links = []
         self.base_url = base_url
         
     def normalize_attrs(self, attrs):
@@ -36,7 +29,7 @@ class BaseParser(SGMLParser):
             v = v.replace('&lt;', '<').replace('&gt;', '>').replace('&apos;', "'").replace('&quot;', '"').replace('&amp;', '&')
             return v
         attrs = [(k.lower(), clean_attr(v)) for k, v in attrs]
-        attrs = [(k, k in ('rel', 'type') and v.lower() or v) for k, v in attrs]
+        attrs = [(k, v.lower() if k in ('rel', 'type') else v) for k, v in attrs]
         return attrs
         
     def do_base(self, attrs):
@@ -49,6 +42,19 @@ class BaseParser(SGMLParser):
 
         
 class LinkParser(BaseParser):
+
+    FEED_TYPES = [
+        'application/rss+xml',
+        'text/xml',
+        'application/atom+xml',
+        'application/x.atom+xml',
+        'application/x-atom+xml'
+    ]
+
+    def __init__(self, base_url):
+        BaseParser.__init__(self, base_url)
+        self.links = []
+
     def do_link(self, attrs):
         d = dict(self.normalize_attrs(attrs))
         if 'rel' not in d: 
@@ -56,7 +62,7 @@ class LinkParser(BaseParser):
         rels = d['rel'].split()
         if 'alternate' not in rels:
             return
-        if d.get('type') not in FEED_TYPES:
+        if d.get('type') not in self.FEED_TYPES:
             return
         if 'href' not in d:
             return

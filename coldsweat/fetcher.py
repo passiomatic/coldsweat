@@ -145,10 +145,13 @@ def fetch_feed(feed):
 
     now = datetime.utcnow()
 
+    user_agent = ''
+    if config.has_option('fetcher', 'user_agent'):  
+        user_agent = config.get('fetcher', 'user_agent')        
     headers = {
-        'User-Agent': DEFAULT_USER_AGENT #@@TODO: config.get('fetcher', 'user_agent') if config.has_option('fetcher', 'user_agent') else DEFAULT_USER_AGENT
+        'User-Agent': user_agent if user_agent else DEFAULT_USER_AGENT
     }
-
+    
     if feed.last_checked_on:
         if (now - feed.last_checked_on).seconds < config.getint('fetcher', 'min_interval'):
             log.debug("last_checked_on for %s is below min_interval, skipped" % netloc)

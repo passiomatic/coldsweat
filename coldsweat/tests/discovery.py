@@ -8,7 +8,7 @@ License: MIT (see LICENSE.md for details)
 '''
 
 from os import path
-from ..discovery import get_link
+from ..html import find_feed_link
 
 def run_tests():
 
@@ -23,11 +23,10 @@ def run_tests():
            
     for filename, expected_url in test_files:
         with open(path.join(test_dir, filename)) as f:
-            url = get_link(f.read(), 'http://example.com')
+            url = find_feed_link(f.read(), 'http://example.com')
             assert url == expected_url
             print 'Found', url, '(OK)'
         
-
 if __name__ == '__main__':
     run_tests()
 

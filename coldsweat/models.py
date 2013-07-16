@@ -7,13 +7,13 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
-from datetime import datetime
+import pickle
+from datetime import datetime, timedelta
 from peewee import *
 
 from utilities import *
 import favicon
 from coldsweat import config, log
-
 
 # Defer database init, see connect() below
 engine = config.get('database', 'engine')
@@ -26,7 +26,20 @@ elif engine == 'mysql':
 else:
     raise ValueError('Unknown database engine %s. Should be sqlite or mysql' % engine)
 
+# ------------------------------------------------------
+# Custom fields
+# ------------------------------------------------------
 
+class PickleField(BlobField):
+    def db_value(self, value):
+        return super(PickleField, self).db_value(pickle.dumps(value, 2)) # Use newer protocol 
+
+    def python_value(self, value):
+        return pickle.loads(value)
+
+# ------------------------------------------------------
+# Coldsweat models
+# ------------------------------------------------------
 
 class CustomModel(Model):
     """
@@ -127,7 +140,6 @@ class Feed(CustomModel):
         return 0 
 
 
-
 class Entry(CustomModel):
     """
     Atom/RSS entry
@@ -162,6 +174,7 @@ class Entry(CustomModel):
     @property
     def excerpt(self):
         return get_excerpt(self.content)
+
                 
 class Saved(CustomModel):
     """
@@ -177,6 +190,7 @@ class Saved(CustomModel):
         )
         #db_table = 'saved'        
 
+
 class Read(CustomModel):
     """
     Many-to-many relationship between Users and entries
@@ -190,6 +204,7 @@ class Read(CustomModel):
             (('user', 'entry'), True),
         )
         #db_table = 'read'
+
 
 class Subscription(CustomModel):
     """
@@ -205,6 +220,23 @@ class Subscription(CustomModel):
         )    
         db_table = 'subscriptions'
 
+
+class Session(CustomModel):
+    
+    key             = CharField(null=False)
+    value           = PickleField(null=False)     
+    expires         = DateTimeField(null=False)
+
+    class Meta:
+        indexes = (
+            (('key', ), True),
+        )  
+        db_table = 'sessions' 
+
+
+# ------------------------------------------------------
+# Utility functions
+# ------------------------------------------------------
 
 def connect():
     """
@@ -238,13 +270,14 @@ def transaction():
 
 def close():
     _db.close()
-    
+
+
 def setup(username, password):
     """
     Create database and tables for all models and setup bootstrap data
     """
 
-    models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription
+    models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription, Session
 
     for model in models:
         model.create_table(fail_silently=True)
@@ -261,3 +294,4 @@ def setup(username, password):
         Group.create(title=Group.DEFAULT_GROUP)        
         Icon.create(data=favicon.DEFAULT_FAVICON) 
 
+        

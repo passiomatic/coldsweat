@@ -13,18 +13,22 @@ from webob.exc import *
 import tempita
 
 from utilities import *
+from session import SessionManager
+
 from coldsweat import log, config, installation_dir, VERSION_STRING
 
+SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENCODING = 'utf-8'
 TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
+STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static_url') else ''
 URI_MAP = []
     
 class Context(object):
-    def __init__(self, request, response, static_url):
+    def __init__(self, request, response, session):
         self.request = request
         self.response = response
-        self.static_url = static_url
-        
+        self.session = session
+
 
 # See http://docs.webob.org/en/latest/wiki-example.html    
 class ColdsweatApp(object):
@@ -52,11 +56,12 @@ class ColdsweatApp(object):
 
 
     def __call__(self, environ, start_response):
- 
+
+        session = environ[SESSION_KEY].session 
         request = Request(environ)
         response = Response(content_type='text/html', charset=ENCODING)
 
-        ctx = Context(request, response, self.static_url if self.static_url else request.application_url) 
+        ctx = Context(request, response, session) 
 
         try:
             view, args = self.find_view(request)
@@ -107,7 +112,7 @@ def template(filename):
                 'ctx': ctx,
                 'request': ctx.request,
                 'response': ctx.response,
-                'static_url': ctx.static_url,
+                'static_url': STATIC_URL or ctx.request.application_url,
             }
             
             d = handler(ctx, *args)
@@ -167,8 +172,7 @@ def render_message(message):
 
 class ExceptionMiddleware(object):
     '''
-    Sends out an exception traceback if something goes wrong.
-                
+    WSGI middleware which sends out an exception traceback if something goes wrong.                
     See: http://lucumr.pocoo.org/2007/5/21/getting-started-with-wsgi/
     '''
     def __init__(self, app):
@@ -214,7 +218,48 @@ class ExceptionMiddleware(object):
             self.app.close()
 
 # ------------------------------------------------------
-# All set, import views
+# Session middleware
+# ------------------------------------------------------
+
+class SessionMiddleware(object):
+    '''
+    WSGI middleware that adds a session service in a cookie
+    '''
+
+    def __init__(self, app, **kwargs):
+        self.app = app
+        self.kwargs = kwargs # Pass everything else to SessionManager
+
+    def _initial(self, environ, start_response):
+        '''
+        Initial response to a cookie session
+        '''
+        def session_response(status, headers, exc_info=None):
+            environ[SESSION_KEY].setcookie(headers)
+            return start_response(status, headers, exc_info)
+        return self.app(environ, session_response)
+        
+    def __call__(self, environ, start_response):
+        # New session manager instance each time
+        manager = SessionManager(environ, **self.kwargs)
+        environ[SESSION_KEY] = manager
+        try:
+            # Return intial response if new or session id is random
+            if manager.is_new: 
+                return self._initial(environ, start_response)
+            return self.app(environ, start_response)
+        # Always close session
+        finally:
+            manager.close()
+
+def setup_app():
+    '''
+    Install middlewares and return app
+    '''
+    return ExceptionMiddleware(SessionMiddleware(ColdsweatApp()))
+
+# ------------------------------------------------------
+# All set, setup application and import views
 # ------------------------------------------------------
 
 # Fever API

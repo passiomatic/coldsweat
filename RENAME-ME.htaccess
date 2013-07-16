@@ -1,0 +1,85 @@
+# --------------------------------------------------------
+# CGI scripts settings
+# --------------------------------------------------------
+
+# Needed to run Coldsweat as CGI/FastCGI script
+Options +FollowSymLinks +ExecCGI
+
+# Set up CGI and FastCGI handler
+AddHandler cgi-script .cgi
+AddHandler fastcgi-script .fcgi
+
+# --------------------------------------------------------
+# Index file
+# --------------------------------------------------------
+
+DirectoryIndex index.cgi
+# To use FastCGI uncomment this instead
+#DirectoryIndex dispatch.fcgi
+
+# --------------------------------------------------------
+# Caching
+# --------------------------------------------------------
+
+# Needed for legacy versions of Apache
+AddType application/atom+xml atom
+
+<IfModule mod_expires.c>
+        
+    ExpiresActive Off
+    # To activate caching uncomment this instead
+    #ExpiresActive On
+    
+    # No cache for HTML files
+    ExpiresByType text/html A0
+    
+    # Atom feed
+    ExpiresByType application/atom+xml "access plus 1 hour"
+
+    # CSS, Javascript, etc.
+    ExpiresDefault "access plus 1 week"
+
+    # Unlikely to change often
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+</IfModule>
+
+
+# --------------------------------------------------------
+# Gzip compression
+# --------------------------------------------------------
+
+# Please note: "mod_fastcgi and mod_deflate do not coexist well under certain   
+# versions of Apache (...). A workaround is to not load the deflate module. (...)
+# In most cases, the interaction between mod_deflate and buggy mod_fastcgi will 
+# appear as page loads "hanging" for 15 seconds or more"
+# -- http://wiki.catalystframework.org/wiki/deployment/apache_fastcgi
+
+<IfModule mod_deflate.c>
+
+# Compress various kind of text files
+# -----------------------------------
+
+#    <IfModule filter_module>
+#      FilterDeclare   COMPRESS
+#      FilterProvider  COMPRESS  DEFLATE resp=Content-Type /text/(html|css|javascript|plain|x(ml|-component))/
+#      FilterProvider  COMPRESS  DEFLATE resp=Content-Type /application/(javascript|json|xml|x-javascript)/
+#      FilterChain     COMPRESS
+#      FilterProtocol  COMPRESS  change=yes;byteranges=no
+#    </IfModule>    
+
+# Legacy versions of Apache
+# -------------------------
+
+#    <IfModule !mod_filter.c>
+#      AddOutputFilterByType DEFLATE text/html text/plain text/css application/json
+#      AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript 
+#      AddOutputFilterByType DEFLATE text/xml application/xml text/x-component
+#    </IfModule>
+
+</IfModule>
+
+
+
+

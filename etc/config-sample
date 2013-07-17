@@ -28,7 +28,7 @@ chunk_size:         32
 [log]
 
 ; See http://docs.python.org/2/howto/logging.html#when-to-use-logging
-level: DEBUG
+level: INFO
 filename: coldsweat.log
 format : localhost - - [%(asctime)s] %(process)d %(levelname)s %(message)s
 datefmt: %d/%b/%Y:%H:%M:%S %z

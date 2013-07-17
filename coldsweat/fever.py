@@ -290,22 +290,12 @@ def serialize(result, format='json'):
 # ------------------------------------------------------
         
 def get_groups_for_user(user):
-    q = Group.select(Group).join(Subscription).join(User).where(User.id == user.id).distinct().naive()
+    q = Group.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
     result = [{'id':s.id,'title':s.title} for s in q]
     return result
 
-def get_feed_groups_for_user(user):
-    q = Subscription.select(Subscription).join(User).where(User.id == user.id).distinct().naive()
-    groups = defaultdict(lambda: [])
-    for s in q:
-        groups[str(s.group.id)].append('%d' % s.feed.id)
-    result = []
-    for g in groups.keys():
-        result.append({'group':g, 'feed_ids':','.join(groups[g])})
-    return result
-
 def get_feeds_for_user(user):
-    q = Feed.select(Feed).join(Subscription).join(User).where(User.id == user.id).distinct().naive()
+    q = Feed.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
     result = []
     for feed in q:
 
@@ -319,6 +309,16 @@ def get_feeds_for_user(user):
             'last_updated_on_time': feed.last_updated_on_as_epoch  
         })
     return result        
+
+def get_feed_groups_for_user(user):
+    q = Subscription.select().join(User).where(User.id == user.id).distinct().naive()
+    groups = defaultdict(lambda: [])
+    for s in q:
+        groups[str(s.group.id)].append('%d' % s.feed.id)
+    result = []
+    for g in groups.keys():
+        result.append({'group':g, 'feed_ids':','.join(groups[g])})
+    return result
 
 def get_unread_entries_for_user(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
@@ -438,7 +438,11 @@ def get_last_refreshed_on_time():
     Time of the most recently *refreshed* feed
     """
     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
-    return datetime_as_epoch(last_checked_on)
+    if last_checked_on:        
+        return datetime_as_epoch(last_checked_on)
+            
+    # Return a fallback value
+    return datetime_as_epoch(datetime.utcnow())
 
 
 

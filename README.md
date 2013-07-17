@@ -4,12 +4,18 @@ Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusin
 
 ![Screenshot](http://lab.passiomatic.com/coldsweat/images/coldsweat-screenshot.jpg)
 
+## Motivation
+
+I'm quite fed up of online services that are here today and gone tomorrow. After the Google Reader shutdown is quite clear to me that if you care about your data you should self-host it. A shared hosting these days is quite cheap and with some technical proficiency you can quit to rely on an external service for consuming RSS/Atom feeds. With this in mind I'm writing Coldsweat. It will be my personal take at consuming feeds today. 
+
+There will be blood.
+
 ## Target features
 
 * Multi-user support
-* Compatible with Reeder apps on iOS and Mac OS X
+* Compatible with Reeder app on iOS
 * Grouping of similar items
-* Minimal web interface to add/import feeds
+* Web interface to read, add and import feeds
 * Multiprocessing for parallel feed fetching
 
 ## Technical underpinnings

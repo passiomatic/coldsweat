@@ -98,7 +98,7 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
 
     try:
         previous_feed = Feed.get(Feed.self_link == self_link)
-        log.debug('feed %s has been already added' % self_link)
+        log.debug('feed %s has been already added, skipped' % self_link)
         return previous_feed
     except Feed.DoesNotExist:
         pass
@@ -136,7 +136,7 @@ def fetch_feed(feed):
         feed.save()
 
     if not feed.is_enabled:
-        log.info("feed %s is disabled, skipped" % feed.self_link)
+        log.debug("feed %s is disabled, skipped" % feed.self_link)
         return
 
     log.debug("fetching %s" % feed.self_link)
@@ -172,7 +172,7 @@ def fetch_feed(feed):
     except RequestException:
         # Interpret as 'Service Unavailable'
         post_fetch(503, error=True)
-        log.error("a network error occured while fetching %s, skipped" % netloc)
+        log.warn("a network error occured while fetching %s, skipped" % netloc)
         return
 
     feed.last_checked_on = now
@@ -182,7 +182,7 @@ def fetch_feed(feed):
         post_fetch(response.status_code)
         return
     elif response.status_code == 410: # Gone
-        log.info("%s is gone, disabled" % netloc)
+        log.warn("%s is gone, disabled" % netloc)
         feed.is_enabled = False
         post_fetch(response.status_code)
         return
@@ -197,12 +197,12 @@ def fetch_feed(feed):
     try:
         soup = feedparser.parse(response.text) 
     except Exception, exc:
-        log.error("could not parse %s (%s)" % (feed.self_link, exc))
+        log.warn("could not parse %s (%s)" % (feed.self_link, exc))
         post_fetch(response.status_code, error=True)
         return
 
     feed.etag = response.headers.get('ETag', None)    
-     
+    
     if 'link' in soup.feed:
         feed.alternate_link = soup.feed.link
 
@@ -277,5 +277,7 @@ def fetch_feeds(force_all=False):
             fetch_feed(feed)
     
     log.info("%d feeds fetched in %fs" % (feeds.count(), time.time() - start))
+    
+    return feeds.count()
 
     

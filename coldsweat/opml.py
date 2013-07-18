@@ -48,7 +48,7 @@ def add_feeds_from_file(source, fetch_icons=False):
                 try:
                     feed.save()
                 except IntegrityError:
-                    log.info('feed %s has been already added, ignored' % feed.self_link)
+                    log.debug('feed %s has been already added, ignored' % feed.self_link)
                     continue
 
                 if fetch_icons:

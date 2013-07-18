@@ -85,7 +85,7 @@ def items_command(request, user, result):
 
 
 def unread_recently_command(request, user, result):    
-    log.warn('unread_recently_read command is not implemented')
+    log.info('unread_recently_read command is not implemented')
  
     
 
@@ -107,32 +107,32 @@ def mark_command(request, user, result):
             # Sanity check
             entry = Entry.get(Entry.id == object_id)  
         except Entry.DoesNotExist:
-            log.info('could not find requested entry %d, ignored' % object_id)
+            log.debug('could not find requested entry %d, ignored' % object_id)
             return
 
         if status == 'read':
             try:
                 Read.create(user=user, entry=entry)
             except IntegrityError:
-                log.info('entry %d already marked as read, ignored' % object_id)
+                log.debug('entry %d already marked as read, ignored' % object_id)
                 return
         #Note: strangely enough 'unread' is not mentioned in 
         #  the Fever API, but Reeder app asks for it
         elif status == 'unread':
             count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
             if not count:
-                log.info('entry %d never marked as read, ignored' % object_id)
+                log.debug('entry %d never marked as read, ignored' % object_id)
                 return
         elif status == 'saved':
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
-                log.info('entry %d already marked as saved, ignored' % object_id)
+                log.debug('entry %d already marked as saved, ignored' % object_id)
                 return
         elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
             if not count:
-                log.info('entry %d never marked as saved, ignored' % object_id)
+                log.debug('entry %d never marked as saved, ignored' % object_id)
                 return
                   
         log.debug('marked entry %d as %s' % (object_id, status))
@@ -144,7 +144,7 @@ def mark_command(request, user, result):
             # Sanity check
             feed = Feed.get(Feed.id == object_id)  
         except Feed.DoesNotExist:
-            log.info('could not find requested feed %d, ignored' % object_id)
+            log.debug('could not find requested feed %d, ignored' % object_id)
             return
 
         # Unix timestamp of the the local client’s last items API request
@@ -182,7 +182,7 @@ def mark_command(request, user, result):
             try:        
                 group = Group.get(Group.id == object_id)  
             except Group.DoesNotExist:
-                log.info('could not find requested group %d, ignored' % object_id)
+                log.debug('could not find requested group %d, ignored' % object_id)
                 return
 
             q = Entry.select().join(Feed).join(Subscription).where(

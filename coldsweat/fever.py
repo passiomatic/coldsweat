@@ -85,7 +85,7 @@ def items_command(request, user, result):
 
 
 def unread_recently_command(request, user, result):    
-    log.warn('unread_recently_read command is not implemented')
+    log.info('unread_recently_read command is not implemented')
  
     
 
@@ -107,32 +107,32 @@ def mark_command(request, user, result):
             # Sanity check
             entry = Entry.get(Entry.id == object_id)  
         except Entry.DoesNotExist:
-            log.info('could not find requested entry %d, ignored' % object_id)
+            log.debug('could not find requested entry %d, ignored' % object_id)
             return
 
         if status == 'read':
             try:
                 Read.create(user=user, entry=entry)
             except IntegrityError:
-                log.info('entry %d already marked as read, ignored' % object_id)
+                log.debug('entry %d already marked as read, ignored' % object_id)
                 return
         #Note: strangely enough 'unread' is not mentioned in 
         #  the Fever API, but Reeder app asks for it
         elif status == 'unread':
             count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
             if not count:
-                log.info('entry %d never marked as read, ignored' % object_id)
+                log.debug('entry %d never marked as read, ignored' % object_id)
                 return
         elif status == 'saved':
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
-                log.info('entry %d already marked as saved, ignored' % object_id)
+                log.debug('entry %d already marked as saved, ignored' % object_id)
                 return
         elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
             if not count:
-                log.info('entry %d never marked as saved, ignored' % object_id)
+                log.debug('entry %d never marked as saved, ignored' % object_id)
                 return
                   
         log.debug('marked entry %d as %s' % (object_id, status))
@@ -144,7 +144,7 @@ def mark_command(request, user, result):
             # Sanity check
             feed = Feed.get(Feed.id == object_id)  
         except Feed.DoesNotExist:
-            log.info('could not find requested feed %d, ignored' % object_id)
+            log.debug('could not find requested feed %d, ignored' % object_id)
             return
 
         # Unix timestamp of the the local client’s last items API request
@@ -182,7 +182,7 @@ def mark_command(request, user, result):
             try:        
                 group = Group.get(Group.id == object_id)  
             except Group.DoesNotExist:
-                log.info('could not find requested group %d, ignored' % object_id)
+                log.debug('could not find requested group %d, ignored' % object_id)
                 return
 
             q = Entry.select().join(Feed).join(Subscription).where(
@@ -230,8 +230,6 @@ def endpoint(ctx):
             
     #@@TODO format = 'xml' if request.GET['api'] == 'xml' else 'json'
 
-    connect()
-        
     if 'api_key' in ctx.request.POST:
         api_key = ctx.request.POST['api_key']        
         try:
@@ -252,8 +250,6 @@ def endpoint(ctx):
 
     result.last_refreshed_on_time = get_last_refreshed_on_time()
 
-    close()
-               
     return serialize(result)
 
 
@@ -290,22 +286,12 @@ def serialize(result, format='json'):
 # ------------------------------------------------------
         
 def get_groups_for_user(user):
-    q = Group.select(Group).join(Subscription).join(User).where(User.id == user.id).distinct().naive()
+    q = Group.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
     result = [{'id':s.id,'title':s.title} for s in q]
     return result
 
-def get_feed_groups_for_user(user):
-    q = Subscription.select(Subscription).join(User).where(User.id == user.id).distinct().naive()
-    groups = defaultdict(lambda: [])
-    for s in q:
-        groups[str(s.group.id)].append('%d' % s.feed.id)
-    result = []
-    for g in groups.keys():
-        result.append({'group':g, 'feed_ids':','.join(groups[g])})
-    return result
-
 def get_feeds_for_user(user):
-    q = Feed.select(Feed).join(Subscription).join(User).where(User.id == user.id).distinct().naive()
+    q = Feed.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
     result = []
     for feed in q:
 
@@ -319,6 +305,16 @@ def get_feeds_for_user(user):
             'last_updated_on_time': feed.last_updated_on_as_epoch  
         })
     return result        
+
+def get_feed_groups_for_user(user):
+    q = Subscription.select().join(User).where(User.id == user.id).distinct().naive()
+    groups = defaultdict(lambda: [])
+    for s in q:
+        groups[str(s.group.id)].append('%d' % s.feed.id)
+    result = []
+    for g in groups.keys():
+        result.append({'group':g, 'feed_ids':','.join(groups[g])})
+    return result
 
 def get_unread_entries_for_user(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
@@ -438,7 +434,11 @@ def get_last_refreshed_on_time():
     Time of the most recently *refreshed* feed
     """
     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
-    return datetime_as_epoch(last_checked_on)
+    if last_checked_on:        
+        return datetime_as_epoch(last_checked_on)
+            
+    # Return a fallback value
+    return datetime_as_epoch(datetime.utcnow())
 
 
 

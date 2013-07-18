@@ -20,7 +20,7 @@ DEFAULT_USER_AGENT = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/cold
 
 # Figure out installation directory. This has 
 #  to work for the fetcher script too
-installation_dir, _ = path.split(path.dirname(path.abspath(__file__)))
+installation_dir, _ = path.split(path.dirname(path.abspath(__file__))) 
 
 # Set up configuration settings
 config = RawConfigParser()

@@ -9,4 +9,5 @@ from coldsweat import fetcher
 
 if __name__ == '__main__':
     connect()
-    fetcher.fetch_feeds()
+    counter = fetcher.fetch_feeds()    
+    print '%d feeds checked. See file coldsweat.log for more information.' % counter

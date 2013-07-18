@@ -23,6 +23,7 @@ if __name__ == '__main__':
             Subscription.create(user=default_user, group=default_group, feed=feed)
 
 
-    close()
+    print "%d feeds imported for user '%s'. See file coldsweat.log for more information." % (len(feeds), username)
+    
 
                         

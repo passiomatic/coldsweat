@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-Quick & dirty test suite for Fever API implementation
+Description: quick & dirty test suite for Fever API implementation
+
 Copyright (c) 2013— Andrea Peltrin
 License: MIT (see LICENSE.md for details)
 '''
@@ -141,7 +142,9 @@ if __name__ == '__main__':
 
     if not args:
         parser.error("no Fever API endpoint given, e.g.: http://localhost:8080/coldsweat/fever/")
-
+    elif len(args) > 1:
+        parser.error("extraneous argument found, use -s suite to run a specific test suite")
+        
     suite = options.suite if options.suite else ALL
     
     run_tests(args[0], suite)

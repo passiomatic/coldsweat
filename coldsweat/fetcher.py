@@ -45,24 +45,29 @@ def get_entry_title(entry):
     if 'title' in entry:
         return entry.title
     return "Untitled"
+
+def get_entry_link(entry):
+    # Special case for Feedburner entries,
+    # see: http://code.google.com/p/feedparser/issues/detail?id=171
+    if 'feedburner_origlink' in entry:
+        #log.debug('Using feedburner:origlink for entry')
+        return entry.feedburner_origlink    
+    return entry.link
     
 def get_entry_id(entry):
     """
     Get a useful id from a feed entry
     """    
     if ('id' in entry) and entry.id: 
-        #if type(entry.id) is dict:
-        #    return entry.id.values()[0]
         return entry.id
-
     if 'link' in entry: 
-        return entry.link
+        return get_entry_link(entry)
     content = get_entry_content(entry)
     if content: 
         return make_sha1_hash(content)
     if 'title' in entry: 
         return make_sha1_hash(entry.title)
-
+    
 def get_entry_author(entry, feed):
     """
     Divine authorship
@@ -93,7 +98,7 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
 
     try:
         previous_feed = Feed.get(Feed.self_link == self_link)
-        log.debug('feed %s has been already added' % self_link)
+        log.debug('feed %s has been already added, skipped' % self_link)
         return previous_feed
     except Feed.DoesNotExist:
         pass
@@ -130,9 +135,9 @@ def fetch_feed(feed):
             log.warn("%s has too many errors, disabled" % netloc)
         feed.save()
 
-    if not feed.is_enabled:
-        log.info("feed %s is disabled, skipped" % feed.self_link)
-        return
+#     if not feed.is_enabled:
+#         log.debug("feed %s is disabled, skipped" % feed.self_link)
+#         return
 
     log.debug("fetching %s" % feed.self_link)
            
@@ -140,10 +145,13 @@ def fetch_feed(feed):
 
     now = datetime.utcnow()
 
+    user_agent = ''
+    if config.has_option('fetcher', 'user_agent'):  
+        user_agent = config.get('fetcher', 'user_agent')        
     headers = {
-        'User-Agent': DEFAULT_USER_AGENT #@@TODO: config.get('fetcher', 'user_agent') if config.has_option('fetcher', 'user_agent') else DEFAULT_USER_AGENT
+        'User-Agent': user_agent if user_agent else DEFAULT_USER_AGENT
     }
-
+    
     if feed.last_checked_on:
         if (now - feed.last_checked_on).seconds < config.getint('fetcher', 'min_interval'):
             log.debug("last_checked_on for %s is below min_interval, skipped" % netloc)
@@ -164,7 +172,7 @@ def fetch_feed(feed):
     except RequestException:
         # Interpret as 'Service Unavailable'
         post_fetch(503, error=True)
-        log.error("a network error occured while fetching %s, skipped" % netloc)
+        log.warn("a network error occured while fetching %s, skipped" % netloc)
         return
 
     feed.last_checked_on = now
@@ -174,7 +182,7 @@ def fetch_feed(feed):
         post_fetch(response.status_code)
         return
     elif response.status_code == 410: # Gone
-        log.info("%s is gone, disabled" % netloc)
+        log.warn("%s is gone, disabled" % netloc)
         feed.is_enabled = False
         post_fetch(response.status_code)
         return
@@ -189,12 +197,12 @@ def fetch_feed(feed):
     try:
         soup = feedparser.parse(response.text) 
     except Exception, exc:
-        log.error("could not parse %s (%s)" % (feed.self_link, exc))
+        log.warn("could not parse %s (%s)" % (feed.self_link, exc))
         post_fetch(response.status_code, error=True)
         return
 
     feed.etag = response.headers.get('ETag', None)    
-     
+    
     if 'link' in soup.feed:
         feed.alternate_link = soup.feed.link
 
@@ -226,15 +234,13 @@ def fetch_feed(feed):
         except Entry.DoesNotExist:
             pass
 
-        content = get_entry_content(entry)
-        
         d = {
             'guid'              : guid,
             'feed'              : feed,
             'title'             : get_entry_title(entry),
             'author'            : get_entry_author(entry, soup.feed),
-            'content'           : content,
-            'link'              : entry.link,
+            'content'           : get_entry_content(entry),
+            'link'              : get_entry_link(entry),
             'last_updated_on'   : timestamp,         
         }
 
@@ -251,9 +257,10 @@ def fetch_feeds(force_all=False):
                        
     start = time.time()
 
-    #@@TODO: honor force_all arg
-    
-    feeds = Feed.select()
+    if force_all:
+        feeds = Feed.select()
+    else:
+        feeds = Feed.select().where(Feed.is_enabled==True)
     
     multiprocessing = config.getboolean('fetcher', 'multiprocessing')     
     if multiprocessing:
@@ -270,6 +277,8 @@ def fetch_feeds(force_all=False):
         for feed in feeds:
             fetch_feed(feed)
     
-    log.info("%d feeds fetched in %fs" % (feeds.count(), time.time() - start))
+    log.info("%d feeds checked in %fs" % (feeds.count(), time.time() - start))
+    
+    return feeds.count()
 
     

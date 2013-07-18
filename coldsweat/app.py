@@ -13,25 +13,29 @@ from webob.exc import *
 from tempita import Template #, HTMLTemplate 
 
 from utilities import *
+from session import SessionMiddleware
+
 from coldsweat import log, config, installation_dir, VERSION_STRING
 
+SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENCODING = 'utf-8'
 TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
+STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static_url') else ''
 URI_MAP = []
     
 class Context(object):
-    def __init__(self, request, response, static_url):
+    def __init__(self, request, response, session):
         self.request = request
         self.response = response
-        self.static_url = static_url
-        
+        self.session = session
+
 
 # See http://docs.webob.org/en/latest/wiki-example.html    
 class ColdsweatApp(object):
 
-    def __init__(self, static_url=None):    
-        self.static_url = static_url
-
+#     def __init__(self):    
+#         pass
+        
     def find_view(self, request):
 
         try:
@@ -52,11 +56,17 @@ class ColdsweatApp(object):
 
 
     def __call__(self, environ, start_response):
- 
+
+        session = dict() # Fake it
+
+        # Check if session suppport is enabled
+        if SESSION_KEY in environ:
+            session = environ[SESSION_KEY].session 
+            
         request = Request(environ)
         response = Response(content_type='text/html', charset=ENCODING)
 
-        ctx = Context(request, response, self.static_url if self.static_url else request.application_url) 
+        ctx = Context(request, response, session) 
 
         try:
             view, args = self.find_view(request)
@@ -88,8 +98,7 @@ def view(pattern='^/$', method='GET'):
         return handler   
     
     return wrapped  
-
-import json 
+ 
 def template(filename, content_type='text/html'):
 
     def wrapped(handler): 
@@ -105,8 +114,7 @@ def template(filename, content_type='text/html'):
             namespace = {
                 'request': ctx.request,
                 'response': ctx.response,
-
-                'static_url': ctx.static_url,
+                'static_url': STATIC_URL or ctx.request.application_url,
                 'application_url': ctx.request.application_url,
                 'alert_message': render_message(message),                
 
@@ -170,8 +178,7 @@ def render_message(message):
 
 class ExceptionMiddleware(object):
     '''
-    Sends out an exception traceback if something goes wrong.
-                
+    WSGI middleware which sends out an exception traceback if something goes wrong.                
     See: http://lucumr.pocoo.org/2007/5/21/getting-started-with-wsgi/
     '''
     def __init__(self, app):
@@ -179,7 +186,7 @@ class ExceptionMiddleware(object):
 
     def __call__(self, environ, start_response):
         """
-        Call the application can catch exceptions.
+        Call the application and catch exceptions.
         """
         app_iter = None
         # Just call the application and send the output back
@@ -210,14 +217,23 @@ class ExceptionMiddleware(object):
             log.error(traceback)
                         
             yield traceback
-
-        # Wsgi applications might have a close function. If it exists
-        # it *must* be called
+                
+        # Wsgi applications might have a close function. 
+        # If it exists it *must* be called
         if hasattr(self.app, 'close'):
             self.app.close()
 
+
+
+def setup_app():
+    '''
+    Install middleware and return app
+    '''
+    return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
+
+
 # ------------------------------------------------------
-# All set, import views
+# All set, setup application and import views
 # ------------------------------------------------------
 
 # Fever API

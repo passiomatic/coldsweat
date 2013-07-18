@@ -47,6 +47,7 @@ def get_saved_entries_for_user(user):
     q = Entry.select().join(Feed).join(Icon).where((Entry.id << Saved.select(Saved.entry)))
     return q
 
+
 def get_group_entries_for_user(user, group_id):     
     try:
         group = Group.get((Group.id == group_id)) 
@@ -119,6 +120,7 @@ def ajax_entry_get(ctx, entry_id):
         raise HTTPNotFound('No such entry %s' % entry_id)
     
     return locals()
+
     
 @view(r'^/ajax/entries/(\d+)$', method='post')
 def ajax_entry_post(ctx, entry_id):
@@ -164,39 +166,5 @@ def ajax_entry_post(ctx, entry_id):
                 return
         
         log.debug('marked entry %s as %s' % (entry_id, status))
-    
-    
-    # @view(method='post')
-    # def index_post(ctx):     
-    # 
-    #     connect()
-    #     
-    #     # Redirect
-    #     response = HTTPSeeOther(location=ctx.request.url)
-    #     
-    #     self_link, username, password = ctx.request.POST['self_link'], ctx.request.POST['username'], ctx.request.POST['password']
-    # 
-    #     try:
-    #         #@@TODO: user = get_auth_user(username, password)
-    #         user = User.get((User.username == username) & (User.password == password) & (User.is_enabled == True)) 
-    #     except User.DoesNotExist:
-    #         set_message(response, u'ERROR Wrong username or password, please check your credentials.')            
-    #         return response
-    #                 
-    #     default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
-    # 
-    #     with transaction():    
-    #         feed = fetcher.add_feed(self_link, fetch_icon=True)    
-    #         try:
-    #             Subscription.create(user=user, feed=feed, group=default_group)
-    #             set_message(response, u'SUCCESS Feed %s added successfully.' % self_link)            
-    #             log.debug('added feed %s for user %s' % (self_link, username))            
-    #         except IntegrityError:
-    #             set_message(response, u'INFO Feed %s is already in your subscriptions.' % self_link)
-    #             log.info('user %s has already feed %s in her subscriptions' % (username, self_link))    
-    # 
-    #     #close()
-    #         
-    #     return response
 
 

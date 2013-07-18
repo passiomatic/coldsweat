@@ -79,11 +79,11 @@ def escape_html(value):
     """
     return cgi.escape(value, quote=True)
 
-def escape_javacript(value):     
-    """
-    Return value escaped as a Javascript string
-    """
-    return json.dumps(value)
+# def escape_javacript(value):     
+#     """
+#     Return value escaped as a Javascript string
+#     """
+#     return json.dumps(value)
 
 def timestamp(utcnow):                                
     def _(value):

@@ -1,73 +1,85 @@
 {{inherit "site.html"}}
 
-{{def one}}
-    <ul class="{{filter_name}}">
-        <li class="filter-unread"><a href="{{application_url}}?unread"><i class="icon-reorder"></i>&ensp;Unread</a></li>
-        <li class="filter-starred"><a href="{{application_url}}?starred"><i class="icon-star"></i>&ensp;Starred</a></li>
-        {{for g in groups}}
-            <li class="{{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
-        {{endfor}}        
-<!--         <li class="filter-feeds"><a href="{{application_url}}?feed="><i class="icon-rss"></i>&ensp;All feeds</a></li>             -->
-    </ul>
-{{enddef}}
+{{def container}}
 
-
-{{def two}}
-
-<div class="panel-title">
-    <h2 class="h3">{{page_title}}</h2>
-<!--
-    <div class="t">
-        <button class="btn"><i class="icon-check"></i> Mark All as Read</button>
-    </div>
--->
-</div>
-
-<div class="entries">
-
-    <div id="scrollbar1" class="scrollable">
-        <div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
-        <div class="viewport">
-            <div class="overview">
-    
-                <ul>
-                  
-                {{for loop, e in looper(entries)}}
-                    <li id="{{e.id}}" class="{{if loop.first}}current{{endif}} {{if e.id in saved_ids}}status-saved{{endif}} {{if e.id in read_ids}}status-read{{endif}}">
-                        <h3 class="h4">
-                            <img src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a data-id="{{e.id}}" href="{{e.link}}">{{e.title}}</a>
-                        </h3>
-                        <div class="meta dim">
-                            {{if e.author}}
-                                {{e.author}}
-                            {{else}}    
-                                {{e.feed.title}}
-                            {{endif}}                    
-                            &middot; {{e.last_updated_on|timestamp}}
-                        </div>                  
-                
-                    </li>
-                {{endfor}}
-                
-                </ul>
-
-                <div class="more">
-                    <button type="button" class="btn" data-max-id="">Gimme More</button>
-                </div>
-                
-            </div>
+<section class="panel panel-0 panel-fixed">
+    <header>             
+        <div class="branding">
+            <i class="icon-tint"></i> Coldsweat
         </div>
+        <nav  role="navigation">
+            <ul class="{{filter_name}}">
+                <li class="filter filter-unread"><a href="?unread"><i class="icon-reorder"></i>&ensp;Unread</a></li>
+                <li class="filter filter-starred"><a href="?saved"><i class="icon-star"></i>&ensp;Starred</a></li>
+                {{for g in groups}}
+                    <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
+                {{endfor}}        
+        <!--         <li class="filter-feeds"><a href="?feeds"><i class="icon-rss"></i>&ensp;All feeds</a></li>             -->
+        
+                <li class="sep"><a role="button"  data-toggle="modal" href="#modal-settings"><i class="icon-cog"></i>&ensp;Settings</a></li>
+        
+            </ul>
+        </nav>  
+    </header>   
+</section>
+    
+<section  class="panel panel-1 panel-fixed">
+    <div class="panel-title">
+        <h2 class="h3">&nbsp;</h2>
     </div>
-  
+    <div class="panel-content">
+        <div class="scrollable">
+            <div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+            <div class="viewport">
+                <div class="overview">
+<!--                     <div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div> -->
+                </div>
+            </div>
+        </div>  
+    </div>
+</section>
+
+<section class="panel panel-2">
+    
+    <div class="panel-content">
+        <article>&larr; Open the current item on the left by clicking it or by pressing the <kbd>o</kbd> key.</article>
+    </div>    
+    
+    <footer role="contentinfo">
+
+      <dl class="">
+            <dt>Navigation</dt>
+            <dd><kbd>j</kbd>&ensp;Previous Item 
+            </dd>
+            <dd><kbd>k</kbd>&ensp;Next Item 
+            </dd>
+            <dt>Actions</dt>
+            <dd><kbd>o</kbd>&ensp;Open Item  
+            </dd>
+            <dd><kbd>m</kbd>&ensp;Mark Item as Read 
+            </dd>
+            <dd><kbd>s</kbd>&ensp;Star Item 
+            </dd>
+        </dl>
+
+        <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
+        <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
+    </footer>
+
+</section>
+
+<div id="modal-settings" class="modal hide fade">
+  <div class="modal-header">
+    <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i>
+    <h3>Modal header</h3>
+  </div>
+  <div class="modal-body">
+    <p>One fine body…</p>
+  </div>
+  <div class="modal-footer">
+<!--     <a href="#" class="btn">Close</a> -->
+    <a href="#" class="btn btn-primary">Save Changes</a>
+  </div>
 </div>
 
-
-        
 {{enddef}}
-
-{{def three}}
-<article>&larr; Open the current item on the left by clicking it or by pressing the <kbd>o</kbd> key.</article>
-{{enddef}}
-
-
-

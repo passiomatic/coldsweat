@@ -3,28 +3,21 @@
 $(document).ready(function() {
     "use strict";
 
+    var scroll_options = { zIndex: 1 };
     var ajax_endpoint = window.location.pathname + '/ajax/';
 
     var flash_fragment = $('<div class="flash"><i class="icon-star icon-4x"></i><div>Starred</div></div>');
     var alert_fragment = $('<div class="alert alert--error"></div>');
     var loading_fragment = $('<div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div>');
     
-    $(window).resize(function(e) {
-        // Adjust panel-2 height to viewport size. minues the .panel-title total height
-        var height = $(window).height() - $('.panel-2 .panel-title').outerHeight()
-        $('.panel-2 .viewport').css('height', height)        
-        //console.log('Resized viewport');
-    });
-    $(window).resize();
+    var panels = $('.panel');
     
-    $('#scrollbar1').tinyscrollbar();
-    $('.panel-1').scrollToFixed({
-        zIndex: 1
-    });    
-    $('.panel-2').scrollToFixed({
-        zIndex: 1,
+    $(window).resize(function(e) {
+        // Adjust panel-1 height to viewport size. minues the .panel-title total height
+        var height = $(window).height() - $(panels[1]).find('.panel-title').outerHeight()
+        $(panels[1]).find('.viewport').css('height', height) 
     });
-         
+    
     $(document).ajaxError(function(event, jqxhr, settings, exception) {
         alert_fragment.text('Oops! An error occurred while processing your request: ' + exception);
         $(document.body).prepend(alert_fragment);
@@ -41,7 +34,7 @@ $(document).ready(function() {
 */
 
 
-    function findCurrent() { return $('.entries li.current'); }
+    function findCurrent() { return $(panels[1]).find('li.current'); }
     
     // @TODO: rename in current()
     function setCurrent(el) {
@@ -89,7 +82,7 @@ $(document).ready(function() {
         }
                 
         // Already open?
-        var article = $('article');
+        var article = $(panels[2]).find('article');
         if(article.attr('id') != c.attr('id')) {
             // Loader            
             article.empty().prepend(loading_fragment);
@@ -108,6 +101,23 @@ $(document).ready(function() {
         }
             
     }
+    
+    function loadEntries(filter) {
+        $(panels[1]).append(loading_fragment);
+        
+        $.ajax(ajax_endpoint + 'entries/' + filter, 
+            {dataType: 'html', type:'GET'}).done(function(data) {            
+                $(panels[1]).empty().html(data);
+                
+                // Update layout and navigation                
+                $(window).resize();
+                $(panels[1]).find('.scrollable').makeScrollable();
+
+                // Let event to bubbling up                
+                $(panels[1]).find('li a').click(function(event) { event.preventDefault(); })                
+                $(panels[1]).find('li').click(function(event) { openEntry(event); })
+        })       
+    }
 
     function goToEntry(direction) {        
         function _goToEntry(event) {
@@ -118,12 +128,12 @@ $(document).ready(function() {
                 var el = c.prev('li')
             }
 
-            // Check if on top or on bottom            
+            // Check if on top or on bottom of the list            
             if(el.length) {
                 c.toggleClass('current');        
                 el.toggleClass('current'); //.focus();
                 // Adjust scolling position
-                $('#scrollbar1').tinyscrollbar_update(el.position().top);
+                $('.scrollable').updateScrollPosition(el.position().top);
             }
             
         }
@@ -131,7 +141,7 @@ $(document).ready(function() {
     }
 
     function bindKeyboardEvents() {
-        var keyboard_events = {
+        var events = {
             'o': openEntry,
             'm': toggleRead,
             's': toggleSaved,
@@ -139,23 +149,29 @@ $(document).ready(function() {
             'k': goToEntry('next')
         }
     
-        for (var key in keyboard_events) {      
-            $(document).bind('keypress', key, keyboard_events[key])  
+        for (var key in events) {      
+            $(document).bind('keypress', key, events[key])  
         }    
     }
     
+    function setup() {               
+        $(window).resize();
+        $('.panel-fixed').scrollToFixed(scroll_options);                     
 
-    $('.entries li a').click(function(event) {
-        event.preventDefault();            
-        // ...but let event to bubbling up
-    })
+        loadEntries('?unread');
+        bindKeyboardEvents();
 
-    $('.entries li').click(function(event) {
-        openEntry(event)
-    })
-
-    bindKeyboardEvents()
+        $(panels[0]).find('.filter a').click(function(event) {
+            event.preventDefault();    
+            var filter = $(this).attr('href');
+            //console.log(filter);
+            loadEntries(filter);
+        });
         
+    }
+    
+    setup();
+    
 });
 
 

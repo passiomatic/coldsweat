@@ -114,6 +114,7 @@ def template(filename, content_type='text/html'):
                 #'javascript': escape_javacript,
                 'html': escape_html,
                 'timestamp': timestamp(datetime.utcnow()),
+                'epoch': datetime_as_epoch,
             }
             
             # Allow override global namespace symbols

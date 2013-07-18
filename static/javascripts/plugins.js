@@ -77,7 +77,7 @@ jQuery.each(["keydown","keyup","keypress"],function(){jQuery.event.special[this]
         }
     };
 
-    $.fn.tinyscrollbar = function( params )
+    $.fn.makeScrollable = function( params )
     {
         var options = $.extend( {}, $.tiny.scrollbar.options, params );
         
@@ -89,7 +89,7 @@ jQuery.each(["keydown","keyup","keypress"],function(){jQuery.event.special[this]
         return this;
     };
 
-    $.fn.tinyscrollbar_update = function(sScroll)
+    $.fn.updateScrollPosition = function(sScroll)
     {
         return $( this ).data( 'tsb' ).update( sScroll ); 
     };

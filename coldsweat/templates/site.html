@@ -1,7 +1,7 @@
 <!doctype html>
 
 <!-- 
-Coldsweat by Andrea Peltrin
+Thsi is Coldsweat by Andrea Peltrin
 URL: http://lab.passiomatic.com/coldsweat/
 -->
 <!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
@@ -44,56 +44,11 @@ URL: http://lab.passiomatic.com/coldsweat/
 <!-- <meta name="msapplication-TileImage" content="coldsweat/images/apple-touch-icon.png"> -->
 <!-- <meta name="msapplication-TileColor" content="#000"> -->
 </head>
-<body  tabindex="1">
+<body tabindex="1"> <!-- Make focusable -->
 
 <div class="container">
-
     {{alert_message}}
-
-    <section class="panel panel-1">
-        <header>             
-            <div class="branding">
-                <i class="icon-tint"></i> Coldsweat
-            </div>
-            <nav  role="navigation">
-                {{self.one}}
-            </nav>  
-        </header>   
-    </section>
-        
-    <section  class="panel panel-2">
-            {{self.two}}
-    </section>
-
-    <section class="panel panel-3">
-        
-        {{self.three}}        
-        
-        <footer role="contentinfo">
-
-          <dl class="">
-                <dt>Navigation</dt>
-                <dd><kbd>j</kbd>&ensp;Previous Item 
-                </dd>
-                <dd><kbd>k</kbd>&ensp;Next Item 
-                </dd>
-                <dt>Actions</dt>
-                <dd><kbd>o</kbd>&ensp;Open Item  
-                </dd>
-                <dd><kbd>m</kbd>&ensp;Mark Item as Read 
-                </dd>
-                <dd><kbd>s</kbd>&ensp;Star Item 
-                </dd>
-            </dl>
-
- 
-
-            <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
-            <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
-        </footer>
-
-    </section>
-    
+    {{self.container}}
 </div><!-- container -->
 
 <!-- Load libraries -->
@@ -124,7 +79,7 @@ head.js(
 // Popover has a dependency on tooltip, so make sure and include 
 // bootstrap-tooltip regardless in order for popovers to work
 //"javascripts/vendor/bootstrap/bootstrap-popover.js",
-//"javascripts/vendor/bootstrap/bootstrap-modal.js",
+"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
 //"javascripts/vendor/bootstrap/bootstrap-collapse.js",
 
 // App scripts

@@ -35,7 +35,7 @@ nav {
     &:hover {
     text-decoration : none;
     color : $navigationlinkcolorhover; 
-    background: lighten($primarycolor, 10%); }
+    /* background: darken($navigationbackgroundcolor, 10%); */ }
     
     &:focus {
     //outline : thin dotted;

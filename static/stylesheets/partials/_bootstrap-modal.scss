@@ -49,14 +49,17 @@ border-bottom : $borderwidth $borderstyle $bordercolor; }
 
 .modal-header .close {
 float : right;
-margin-top : 2px;
+margin-top : 8px;
+/*
 background-color : $buttonbackgroundcolor;
-// @include buttongrad;
+@include buttongrad;
 border : $buttonborderwidth $buttonborderstyle $buttonbordercolor;
 border-bottom-color : $buttonbottombordercolor;
 border-radius : $buttonborderradius;
+*/
 cursor : pointer;
-color : $buttoncolor; }
+color : $buttoncolor; 
+}
 
 .modal-header h3 {
 margin : 0;

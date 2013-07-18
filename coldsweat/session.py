@@ -99,9 +99,8 @@ class SessionMiddleware(object):
             manager.close()
 
     def close(self):
-        # Close database connection 
+        # Attempt to close database connection 
         close()
-
 
             
 class SessionManager(object):

@@ -18,10 +18,10 @@ from coldsweat import config, log
 # Defer database init, see connect() below
 engine = config.get('database', 'engine')
 if engine == 'sqlite':
-    from sqlite3 import IntegrityError
+    from sqlite3 import IntegrityError, ProgrammingError
     _db = SqliteDatabase(None, threadlocals=True) 
 elif engine == 'mysql':
-    from MySQLdb import IntegrityError
+    from MySQLdb import IntegrityError, ProgrammingError
     _db = MySQLDatabase(None)
 else:
     raise ValueError('Unknown database engine %s. Should be sqlite or mysql' % engine)
@@ -269,7 +269,11 @@ def transaction():
     return _db.transaction()
 
 def close():
-    _db.close()
+    try: 
+        # Attempt to close database connection 
+        _db.close()
+    except ProgrammingError, exc:
+        log.error('Caught exception while closing database connection: %s' % exc)
 
 
 def setup(username, password):
@@ -292,6 +296,4 @@ def setup(username, password):
     with _db.transaction():
         User.create(username=username, password=password, api_key=User.make_api_key(username, password))
         Group.create(title=Group.DEFAULT_GROUP)        
-        Icon.create(data=favicon.DEFAULT_FAVICON) 
-
-        
+        Icon.create(data=favicon.DEFAULT_FAVICON)

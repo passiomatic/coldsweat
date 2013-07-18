@@ -135,9 +135,9 @@ def fetch_feed(feed):
             log.warn("%s has too many errors, disabled" % netloc)
         feed.save()
 
-    if not feed.is_enabled:
-        log.debug("feed %s is disabled, skipped" % feed.self_link)
-        return
+#     if not feed.is_enabled:
+#         log.debug("feed %s is disabled, skipped" % feed.self_link)
+#         return
 
     log.debug("fetching %s" % feed.self_link)
            
@@ -257,9 +257,10 @@ def fetch_feeds(force_all=False):
                        
     start = time.time()
 
-    #@@TODO: honor force_all arg
-    
-    feeds = Feed.select()
+    if force_all:
+        feeds = Feed.select()
+    else:
+        feeds = Feed.select().where(Feed.is_enabled==True)
     
     multiprocessing = config.getboolean('fetcher', 'multiprocessing')     
     if multiprocessing:
@@ -276,7 +277,7 @@ def fetch_feeds(force_all=False):
         for feed in feeds:
             fetch_feed(feed)
     
-    log.info("%d feeds fetched in %fs" % (feeds.count(), time.time() - start))
+    log.info("%d feeds checked in %fs" % (feeds.count(), time.time() - start))
     
     return feeds.count()
 

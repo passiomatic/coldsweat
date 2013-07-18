@@ -230,8 +230,6 @@ def endpoint(ctx):
             
     #@@TODO format = 'xml' if request.GET['api'] == 'xml' else 'json'
 
-    connect()
-        
     if 'api_key' in ctx.request.POST:
         api_key = ctx.request.POST['api_key']        
         try:
@@ -252,8 +250,6 @@ def endpoint(ctx):
 
     result.last_refreshed_on_time = get_last_refreshed_on_time()
 
-    close()
-               
     return serialize(result)
 
 

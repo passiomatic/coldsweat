@@ -34,9 +34,12 @@ SUCH DAMAGE.
 
 import sys, os, string, threading, atexit, random, weakref
 from datetime import datetime, timedelta
+from Cookie import SimpleCookie
+
 from utilities import make_sha1_hash
 from models import Session, connect, close
-from Cookie import SimpleCookie
+from coldsweat import log
+
 
 SESSION_TIMEOUT = 60*15 # 15 minutes
 
@@ -52,10 +55,59 @@ def synchronized(func):
     wrapper.__doc__ = func.__doc__
     return wrapper
 
+# def session(**kwargs):
+#     '''
+#     Decorator for sessions.
+#     '''    
+#     def decorator(application):
+#         return SessionMiddleware(application, **kwargs)
+#     return decorator
+
+class SessionMiddleware(object):
+    '''
+    WSGI middleware that adds a session service in a cookie
+    '''
+
+    def __init__(self, app, session_key, **kwargs):
+        self.app = app
+        self.session_key = session_key
+        self.kwargs = kwargs # Pass everything else to SessionManager
+
+    def _initial_response(self, environ, start_response):
+        '''
+        Initial response to a cookie session
+        '''
+        def session_response(status, headers, exc_info=None):
+            environ[self.session_key].set_cookie(headers)
+            return start_response(status, headers, exc_info)
+        return self.app(environ, session_response)
+        
+    def __call__(self, environ, start_response):
+        # Init and connect to database
+        connect()
+        
+        # New session manager instance each time
+        manager = SessionManager(environ, **self.kwargs)
+        environ[self.session_key] = manager
+        try:
+            # Return initial response if new or session id is random
+            if manager.is_new: 
+                return self._initial_response(environ, start_response)
+            return self.app(environ, start_response)
+        # Always close session
+        finally:
+            manager.close()
+
+    def close(self):
+        # Close database connection 
+        close()
+
+
+            
 class SessionManager(object):
  
     def __init__(self, environ, fieldname='_SID_', path='/'):   
-        self.cache = SessionCache()
+        self._cache = SessionCache()
         self._fieldname = fieldname
         self._path = path
         
@@ -64,14 +116,16 @@ class SessionManager(object):
         
         self._get(environ)
 
-    def _fromcookie(self, environ): 
+    def _from_cookie(self, environ): 
         '''
         Attempt to load the associated session using the identifier from the cookie
         '''
+        #@@TODO: Use Webob.request
+        
         cookie = SimpleCookie(environ.get('HTTP_COOKIE'))
         morsel = cookie.get(self._fieldname, None)
         if morsel:
-            self._sid, self.session = self.cache.checkout(morsel.value)
+            self._sid, self.session = self._cache.checkout(morsel.value)
             cookie_sid = morsel.value
             if cookie_sid != self._sid: 
                 self.is_new = True
@@ -81,9 +135,9 @@ class SessionManager(object):
         '''
         Attempt to associate with an existing Session
         '''
-        self._fromcookie(environ)
+        self._from_cookie(environ)
         if self.session is None:
-            self._sid, self.session = self.cache.create()
+            self._sid, self.session = self._cache.create()
             self.is_new = True
 
     def close(self):
@@ -91,12 +145,12 @@ class SessionManager(object):
         Checks session back into session cache
         '''
         # Check the session back in and get rid of our reference.
-        self.cache.checkin(self._sid, self.session)
+        self._cache.checkin(self._sid, self.session)
         self.session = None
 
-    def setcookie(self, headers):
+    def set_cookie(self, headers):
         '''
-        Sets a cookie header if needed
+        Sets a session cookie header if needed
         '''
         cookie, name = SimpleCookie(), self._fieldname
         cookie[name], cookie[name]['path'] = self._sid, self._path
@@ -107,6 +161,7 @@ def _shutdown(ref):
     cache = ref()
     if cache is not None: cache.shutdown()
             
+
 class SessionCache(object):
     '''
     You first acquire a session by calling create() or checkout(). After 
@@ -127,8 +182,6 @@ class SessionCache(object):
             for c in os.urandom(self.length))
         # Ensure shutdown is called.
         atexit.register(_shutdown, weakref.ref(self))
-
-        connect()
 
 
     def __del__(self):
@@ -195,7 +248,6 @@ class SessionCache(object):
             self.checkedout.clear()
             #self.cache._cull()
             self._closed = True        
-            close()
 
     # Utilities
 

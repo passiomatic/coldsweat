@@ -13,7 +13,7 @@ from webob.exc import *
 import tempita
 
 from utilities import *
-from session import SessionManager
+from session import SessionMiddleware
 
 from coldsweat import log, config, installation_dir, VERSION_STRING
 
@@ -33,9 +33,9 @@ class Context(object):
 # See http://docs.webob.org/en/latest/wiki-example.html    
 class ColdsweatApp(object):
 
-    def __init__(self, static_url=None):    
-        self.static_url = static_url
-
+#     def __init__(self):    
+#         pass
+        
     def find_view(self, request):
 
         try:
@@ -57,7 +57,12 @@ class ColdsweatApp(object):
 
     def __call__(self, environ, start_response):
 
-        session = environ[SESSION_KEY].session 
+        session = dict() # Fake it
+
+        # Check if session suppport is enabled
+        if SESSION_KEY in environ:
+            session = environ[SESSION_KEY].session 
+            
         request = Request(environ)
         response = Response(content_type='text/html', charset=ENCODING)
 
@@ -180,7 +185,7 @@ class ExceptionMiddleware(object):
 
     def __call__(self, environ, start_response):
         """
-        Call the application can catch exceptions.
+        Call the application and catch exceptions.
         """
         app_iter = None
         # Just call the application and send the output back
@@ -211,52 +216,20 @@ class ExceptionMiddleware(object):
             log.error(traceback)
                         
             yield traceback
-
-        # Wsgi applications might have a close function. If it exists
-        # it *must* be called
+                
+        # Wsgi applications might have a close function. 
+        # If it exists it *must* be called
         if hasattr(self.app, 'close'):
             self.app.close()
 
-# ------------------------------------------------------
-# Session middleware
-# ------------------------------------------------------
 
-class SessionMiddleware(object):
-    '''
-    WSGI middleware that adds a session service in a cookie
-    '''
-
-    def __init__(self, app, **kwargs):
-        self.app = app
-        self.kwargs = kwargs # Pass everything else to SessionManager
-
-    def _initial(self, environ, start_response):
-        '''
-        Initial response to a cookie session
-        '''
-        def session_response(status, headers, exc_info=None):
-            environ[SESSION_KEY].setcookie(headers)
-            return start_response(status, headers, exc_info)
-        return self.app(environ, session_response)
-        
-    def __call__(self, environ, start_response):
-        # New session manager instance each time
-        manager = SessionManager(environ, **self.kwargs)
-        environ[SESSION_KEY] = manager
-        try:
-            # Return intial response if new or session id is random
-            if manager.is_new: 
-                return self._initial(environ, start_response)
-            return self.app(environ, start_response)
-        # Always close session
-        finally:
-            manager.close()
 
 def setup_app():
     '''
-    Install middlewares and return app
+    Install middleware and return app
     '''
-    return ExceptionMiddleware(SessionMiddleware(ColdsweatApp()))
+    return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
+
 
 # ------------------------------------------------------
 # All set, setup application and import views

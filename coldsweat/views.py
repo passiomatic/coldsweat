@@ -20,8 +20,6 @@ from coldsweat import log
 @template('index.html')
 def index(ctx):
 
-    connect()
-
     last_entries = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry))).order_by(Entry.last_updated_on.desc()).limit(5).naive()
         
     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
@@ -36,8 +34,6 @@ def index(ctx):
     
     feed_count = Feed.select(Feed.is_enabled==True).count()
 
-    close()
-
 
     return locals()
     
@@ -45,8 +41,6 @@ def index(ctx):
 @view(method='post')
 def index_post(ctx):     
 
-    connect()
-    
     # Redirect
     response = HTTPSeeOther(location=ctx.request.url)
     
@@ -71,8 +65,6 @@ def index_post(ctx):
             set_message(response, u'INFO Feed %s is already in your subscriptions.' % self_link)
             log.info('user %s has already feed %s in her subscriptions' % (username, self_link))    
 
-    close()
-        
     return response
 
 

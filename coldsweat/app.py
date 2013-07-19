@@ -84,13 +84,14 @@ class ColdsweatApp(object):
 
         return ctx.response(environ, start_response)
 
-
- 
- 
+    
 # ------------------------------------------------------
 # Decorators
 # ------------------------------------------------------
 
+
+
+    
 def view(pattern='^/$', method='GET'):    
     
     def wrapped(handler):         
@@ -114,7 +115,7 @@ def template(filename, content_type='text/html'):
             namespace = {
                 'request': ctx.request,
                 'response': ctx.response,
-                'static_url': STATIC_URL or ctx.request.application_url,
+                'static_url' : STATIC_URL,
                 'application_url': ctx.request.application_url,
                 'alert_message': render_message(message),                
 
@@ -149,7 +150,7 @@ def template(filename, content_type='text/html'):
 def render_template(filename, **kwargs):            
     return Template.from_filename(os.path.join(TEMPLATE_DIR, filename)).substitute(**kwargs)
 
- 
+
 @template('404.html')
 def http_not_found(ctx):
     pass    
@@ -229,8 +230,8 @@ def setup_app():
     '''
     Install middleware and return app
     '''
-    return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
-
+    #return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
+    return ExceptionMiddleware(ColdsweatApp())
 
 # ------------------------------------------------------
 # All set, setup application and import views

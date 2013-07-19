@@ -4,23 +4,23 @@ $(document).ready(function() {
     "use strict";
 
     var scroll_options = { zIndex: 1 };
-    var ajax_endpoint = window.location.pathname + '/ajax/';
-
+    
     var flash_fragment = $('<div class="flash"><i class="icon-star icon-4x"></i><div>Starred</div></div>');
     var alert_fragment = $('<div class="alert alert--error"></div>');
     var loading_fragment = $('<div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div>');
     
-    var panels = $('.panel');
+    var panels = $('.panel')
     
     $(window).resize(function(e) {
         // Adjust panel-1 height to viewport size. minues the .panel-title total height
-        var height = $(window).height() - $(panels[1]).find('.panel-title').outerHeight()
-        $(panels[1]).find('.viewport').css('height', height) 
+        var height = $(window).height() - $(panels[1]).find('.panel-title').outerHeight();
+        $(panels[1]).find('.viewport').css('height', height)
     });
     
     $(document).ajaxError(function(event, jqxhr, settings, exception) {
-        alert_fragment.text('Oops! An error occurred while processing your request: ' + exception);
-        $(document.body).prepend(alert_fragment);
+        //console.log('AJAX call details: ' + settings.url
+        alert_fragment.text('Oops! An error occurred while processing your request: ' + exception)
+        $(document.body).prepend(alert_fragment)
     });
 
 /*
@@ -34,6 +34,15 @@ $(document).ready(function() {
 */
 
 
+    function endpoint(pathname) {
+        var segments = [
+            window.applicationURL,
+            pathname
+        ];
+                          
+        return segments.join('');
+    }
+    
     function findCurrent() { return $(panels[1]).find('li.current'); }
     
     // @TODO: rename in current()
@@ -47,7 +56,7 @@ $(document).ready(function() {
     }
 
     function mark(el, status) {
-        $.ajax(ajax_endpoint + 'entries/' + el.attr('id'), {
+        $.ajax(endpoint('/ajax/entries/') + el.attr('id'), {
             type: 'POST', 
             data: 'mark&as=' + status
         })        
@@ -87,7 +96,7 @@ $(document).ready(function() {
             // Loader            
             article.empty().prepend(loading_fragment);
             
-            $.ajax(ajax_endpoint + 'entries/' + c.attr('id'), 
+            $.ajax(endpoint('/ajax/entries/') + c.attr('id'), 
                 {dataType: 'html', type:'GET'}).done(function(data) {                
                 // Mark article element with current loaded entry
                 article.attr('id', c.attr('id'));
@@ -105,7 +114,7 @@ $(document).ready(function() {
     function loadEntries(filter) {
         $(panels[1]).append(loading_fragment);
         
-        $.ajax(ajax_endpoint + 'entries/' + filter, 
+        $.ajax(endpoint('/ajax/entries/') + filter, 
             {dataType: 'html', type:'GET'}).done(function(data) {            
                 $(panels[1]).empty().html(data);
                 

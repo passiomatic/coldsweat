@@ -24,10 +24,12 @@ installation_dir, _ = path.split(path.dirname(path.abspath(__file__)))
 
 # Set up configuration settings
 config = RawConfigParser()
-#@@TODO: Check environ var first for config path
-# os.environ('COLDSWEAT_CONFIG_PATH')
-config.read(path.join(installation_dir, 'etc/config'))
 
+config_path = path.join(installation_dir, 'etc/config')
+if path.exists(config_path):
+    config.read(config_path)
+else:
+    raise RuntimeError('Could not find configuration file %s' % config_path)
 
 logging.basicConfig(
     filename    = config.get('log', 'filename'),

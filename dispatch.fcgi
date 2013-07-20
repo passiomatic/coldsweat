@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-"""
-Boostrap file for FastCGI environments
-"""
+# -*- coding: utf-8 -*-
+'''
+Description: bootstrap file for FastCGI environments
 
-# -----------------------------------------------
-# Set media base URL, no trailing slash please
-# -----------------------------------------------
+Copyright (c) 2013— Andrea Peltrin
+License: MIT (see LICENSE.md for details)
+'''
 
 try:
     from flup.server.fcgi_fork import WSGIServer
@@ -13,10 +13,12 @@ except ImportError, exc:
     print 'Error: unable to import Flup package.\nColdsweat needs Flup to run as a FastCGI process.\nDownload it from PyPI: http://pypi.python.org/pypi/flup'
     raise exc
 
-from coldsweat.app import setup_app
+from coldsweat.app import ExceptionMiddleware
+from coldsweat.fever import fever_app
+from coldsweat.frontend import frontend_app
+from coldsweat.cascade import Cascade
+
+app = ExceptionMiddleware(Cascade([fever_app, frontend_app]))
 
 if __name__ == '__main__':
-    WSGIServer(setup_app()).run()
-
-
-
+    WSGIServer(app).run()

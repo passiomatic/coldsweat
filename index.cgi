@@ -1,16 +1,22 @@
 #!/usr/bin/env python
-"""
-Boostrap file for CGI environments
-"""
+# -*- coding: utf-8 -*-
+'''
+Description: bootstrap file for CGI environments
 
-# -----------------------------------------------
-# Set media base URL, no trailing slash please
-# -----------------------------------------------
+Copyright (c) 2013— Andrea Peltrin
+License: MIT (see LICENSE.md for details)
+'''
 
 from wsgiref.handlers import CGIHandler
-from coldsweat.app import setup_app
+
+from coldsweat.app import ExceptionMiddleware
+from coldsweat.fever import fever_app
+from coldsweat.frontend import frontend_app
+from coldsweat.cascade import Cascade
+
+app = ExceptionMiddleware(Cascade([fever_app, frontend_app]))
 
 if __name__ == '__main__':
-    CGIHandler().run(setup_app())
+    CGIHandler().run(app)
 
 

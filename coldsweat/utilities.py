@@ -10,7 +10,7 @@ License: MIT (see LICENSE.md for details)
 from hashlib import md5, sha1
 from calendar import timegm
 from datetime import datetime
-import cgi, json
+import cgi #, json
 
 DEFAULT_ENCODING = 'utf-8'
 
@@ -37,7 +37,8 @@ def make_sha1_hash(s):
 def format_datetime(value, comparsion_value=None):
     
     if not comparsion_value:    
-        return value.strftime('%a, %d %b %H:%M:%S UTC')
+        #return value.strftime('%a, %d %b %H:%M:%S UTC')
+        return value.strftime('%a, %d %b %H:%M UTC')
     
     delta = comparsion_value - value    
     if delta.days < 1:       
@@ -85,7 +86,7 @@ def escape_html(value):
 #     """
 #     return json.dumps(value)
 
-def timestamp(utcnow):                                
+def datetime_since(utcnow):                                
     def _(value):
         if not value: return '—' 
         return format_datetime(value, utcnow)

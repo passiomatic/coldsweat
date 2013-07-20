@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Coldsweat - Web app machinery
+Description: Web app machinery
 
 Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
@@ -10,169 +10,82 @@ import sys, os, re
 
 from webob import Request, Response
 from webob.exc import *
-from tempita import Template #, HTMLTemplate 
 
 from utilities import *
-from session import SessionMiddleware
+from models import connect, close
 
-from coldsweat import log, config, installation_dir, VERSION_STRING
+from coldsweat import log, config, installation_dir
 
-SESSION_KEY = 'com.passiomatic.coldsweat.session'
-ENCODING = 'utf-8'
-TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
+#SESSION_KEY = 'com.passiomatic.coldsweat.session'
+#TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
+# Figure out static dir, if given
 STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static_url') else ''
-URI_MAP = []
-    
-class Context(object):
-    def __init__(self, request, response, session):
-        self.request = request
-        self.response = response
-        self.session = session
 
-
-# See http://docs.webob.org/en/latest/wiki-example.html    
-class ColdsweatApp(object):
-
-#     def __init__(self):    
-#         pass
-        
-    def find_view(self, request):
-
-        try:
-            request.path_info
-        except KeyError:
-            request.path_info = ''
-            
-        if not request.path_info:
-            # Requested by CGIHandler 
-            request.path_info = '/'
-                                        
-        for re, method, view in URI_MAP:        
-            match = re.match(request.path_info)
-            if match and (method == request.method):                    
-                return view, match.groups()
-    
-        raise HTTPNotFound('No such view %s' % request.path_info)  
-
-
-    def __call__(self, environ, start_response):
-
-        session = dict() # Fake it
-
-        # Check if session suppport is enabled
-        if SESSION_KEY in environ:
-            session = environ[SESSION_KEY].session 
-            
-        request = Request(environ)
-        response = Response(content_type='text/html', charset=ENCODING)
-
-        ctx = Context(request, response, session) 
-
-        try:
-            view, args = self.find_view(request)
-            if not args:
-                args = ()
-
-            r = view(ctx, *args)
-            if r:
-                ctx.response = r    
-#         except HTTPNotFound, exc:
-#             ctx.response = http_not_found(ctx)
-        except HTTPException, exc:
-            # The exception object itself is a WSGI application/response
-            ctx.response = exc
-
-        return ctx.response(environ, start_response)
-
-    
 # ------------------------------------------------------
 # Decorators
 # ------------------------------------------------------
 
+def on(pattern, http_method):    
+    def _(handler):         
+        handler.pattern = re.compile(pattern, re.U)
+        handler.http_method = http_method.upper()
+        return handler       
+    return _  
 
+def GET(pattern='^/$'):    
+    return on(pattern, 'get')  
 
-    
-def view(pattern='^/$', method='GET'):    
-    
-    def wrapped(handler):         
-        URI_MAP.append((re.compile(pattern, re.U), method.upper(), handler))
-        return handler   
-    
-    return wrapped  
- 
-def template(filename, content_type='text/html'):
-
-    def wrapped(handler): 
-
-        def _wrapped(ctx, *args):
-
-            if ctx.request.cookies.get('alert_message'):
-                message = ctx.request.cookies['alert_message']
-            else:
-                message = ''
-            
-            # Global namespace
-            namespace = {
-                'request': ctx.request,
-                'response': ctx.response,
-                'static_url' : STATIC_URL,
-                'application_url': ctx.request.application_url,
-                'alert_message': render_message(message),                
-
-                # Filters 
-                #'javascript': escape_javacript,
-                'html': escape_html,
-                'timestamp': timestamp(datetime.utcnow()),
-                'epoch': datetime_as_epoch,
-            }
-            
-            # Allow override global namespace symbols
-            d = handler(ctx, *args)
-            if d: 
-                namespace.update(d)
-                
-            ctx.response.body = render_template(filename, **namespace)
-            ctx.response.content_type = content_type
-            #ctx.response.charset=ENCODING
-
-            # Delete alert_message cookie, if any
-            if message:
-                ctx.response.delete_cookie('alert_message')
-                                    
-        return _wrapped
-
-    return wrapped
+def POST(pattern='^/$'):    
+    return on(pattern, 'post')  
 
 # ------------------------------------------------------
-# Templates
+# Base WSGI app
 # ------------------------------------------------------
-
-def render_template(filename, **kwargs):            
-    return Template.from_filename(os.path.join(TEMPLATE_DIR, filename)).substitute(**kwargs)
-
-
-@template('404.html')
-def http_not_found(ctx):
-    pass    
 
     
-# ------------------------------------------------------
-# Misc. utilities
-# ------------------------------------------------------
- 
-def set_message(response, message):
-    response.set_cookie('alert_message', message)
+class WSGIApp(object):
 
-def render_message(message):
-    if not message:
-        return ''
+#     def __init__(self):
+#         pass
+    
+    def __call__(self, environ, start_response):
+        connect()
         
-    try: 
-        klass, text = message.split(u' ', 1)
-    except ValueError:
-        return text
-    return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
+        self.request = Request(environ)
+        
+        handler, args = self.find_handler()
+        if not handler:
+            raise HTTPNotFound('No such view %s' % self.request.path_info)  
+        if not args:
+            args = ()        
+            
+        response = handler(self, self.request, *args)        
+        if not response:
+            response = Response()
+        
+        return response(environ, start_response)
+    
+    def find_handler(self):
+    
+        try:
+            self.request.path_info
+        except KeyError:
+            self.request.path_info = '/'
+                       
+        for name, handler in self.__class__.__dict__.items():        
+            if not hasattr(handler, 'pattern'):
+                continue
 
+            match = handler.pattern.match(self.request.path_info)            
+            if match and handler.http_method == self.request.method:                    
+                return handler, match.groups()
+    
+        return None, None
+    
+    def close(self):
+        close()
+ 
+ 
 # ------------------------------------------------------
 # Exception middleware
 # ------------------------------------------------------
@@ -226,20 +139,10 @@ class ExceptionMiddleware(object):
 
 
 
-def setup_app():
-    '''
-    Install middleware and return app
-    '''
-    #return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
-    return ExceptionMiddleware(ColdsweatApp())
-
-# ------------------------------------------------------
-# All set, setup application and import views
-# ------------------------------------------------------
-
-# Fever API
-import fever
-
-# Web views
-import views
+# def setup_app():
+#     '''
+#     Install middleware and return app
+#     '''
+#     #return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
+#     return ExceptionMiddleware(ColdsweatApp())
 

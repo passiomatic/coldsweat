@@ -56,21 +56,20 @@ def synchronized(func):
     return wrapper
 
 # def session(**kwargs):
-#     '''
-#     Decorator for sessions.
-#     '''    
-#     def decorator(application):
-#         return SessionMiddleware(application, **kwargs)
+#     def decorator(app):
+#         return SessionMiddleware(app(**kwargs), **kwargs)
 #     return decorator
+
+SESSION_KEY = 'com.passiomatic.coldsweat.session'
 
 class SessionMiddleware(object):
     '''
     WSGI middleware that adds a session service in a cookie
     '''
 
-    def __init__(self, app, session_key, **kwargs):
+    def __init__(self, app, **kwargs):
         self.app = app
-        self.session_key = session_key
+        self.session_key = SESSION_KEY #'com.passiomatic.coldsweat.session'
         self.kwargs = kwargs # Pass everything else to SessionManager
 
     def _initial_response(self, environ, start_response):
@@ -89,6 +88,7 @@ class SessionMiddleware(object):
         # New session manager instance each time
         manager = SessionManager(environ, **self.kwargs)
         environ[self.session_key] = manager
+        self.app.session = manager.session
         try:
             # Return initial response if new or session id is random
             if manager.is_new: 

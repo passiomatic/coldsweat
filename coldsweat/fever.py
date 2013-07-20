@@ -6,12 +6,11 @@ Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
-import os, sys, cgi, time, re
+import os, sys, cgi, time, re, json
 from collections import defaultdict
 from datetime import datetime
 from calendar import timegm
-
-from webob import Response
+from webob import Request, Response
 from webob.exc import HTTPBadRequest
 
 from utilities import *    
@@ -20,24 +19,75 @@ from models import *
 from coldsweat import log
 
 RE_DIGITS = re.compile('[0-9]+')
-RECENTLY_READ_DELTA = 60*60 # 1 hour
+#RECENTLY_READ_DELTA = 60*60 # 1 hour
 
+    
+class FeverApp(WSGIApp):
+
+    @POST(r'^/fever/?$')
+    def endpoint(self, request):
+        log.debug('client from %s requested: %s' % (request.remote_addr, request.params))
+        
+        if 'api' not in request.GET:
+            raise HTTPBadRequest()
+    
+        result = Struct({'api_version':2, 'auth':0})   
+                
+        #@@TODO format = 'xml' if request.GET['api'] == 'xml' else 'json'
+    
+        if 'api_key' in request.POST:
+            api_key = request.POST['api_key']        
+            try:
+                user = User.get((User.api_key == api_key) & (User.is_enabled == True))
+            except User.DoesNotExist:
+                #@@TODO: raise HTTPUnauthorized ?
+                return self.respond_with_json(result)  
+        else:
+            #@@TODO: raise HTTPUnauthorized ?
+            return self.respond_with_json(result)   
+    
+        # Authorized
+        result.auth = 1
+    
+        # Note: client *can* send multiple commands at time
+        for command, handler in COMMANDS:
+            if command in request.params:            
+                handler(request, user, result)
+                #break
+    
+        result.last_refreshed_on_time = get_last_refreshed_on_time()
+    
+        return self.respond_with_json(result)
+
+    def respond_with_json(self, data):
+        json_data = json.dumps(data, indent=4)
+        response = Response(
+            json_data, 
+            content_type='application/json',
+            charset='utf-8')        
+        return response
+
+fever_app = FeverApp()
+
+# ------------------------------------------------------
+# Fever API commands
+# ------------------------------------------------------    
 
 def groups_command(request, user, result):            
-    result.groups = get_groups_for_user(user)
-    result.feeds_groups = get_feed_groups_for_user(user)
+    result.groups = get_groups(user)
+    result.feeds_groups = get_feed_groups(user)
         
 def feeds_command(request, user, result):
-    result.feeds = get_feeds_for_user(user)
-    result.feeds_groups = get_feed_groups_for_user(user)
+    result.feeds = get_feeds(user)
+    result.feeds_groups = get_feed_groups(user)
 
 def unread_items_command(request, user, result):
-    unread_items = get_unread_entries_for_user(user)
+    unread_items = get_unread_entries(user)
     if unread_items:
         result.unread_item_ids = ','.join(map(str,unread_items))
             
 def saved_items_command(request, user, result):
-    saved_items = get_saved_entries_for_user(user)
+    saved_items = get_saved_entries(user)
     if saved_items:
         result.saved_item_ids = ','.join(map(str,saved_items))
 
@@ -46,14 +96,14 @@ def favicons_command(request, user, result):
 
 def items_command(request, user, result):
 
-    result.total_items = get_entry_count_for_user(user)
+    result.total_items = get_entry_count(user)
 
     # From the API: "Use the since_id argument with the highest id 
     #  of locally cached items to request 50 additional items.         
     if 'since_id' in request.GET: 
         try:
             min_id = int(request.GET['since_id'])
-            result.items = get_entries_for_user_min(user, min_id)     
+            result.items = get_entries_min(user, min_id)     
         except ValueError:
             pass
 
@@ -65,7 +115,7 @@ def items_command(request, user, result):
         try:
             max_id = int(request.GET['max_id'])
             if max_id: 
-                result.items = get_entries_for_user_max(user, max_id)            
+                result.items = get_entries_max(user, max_id)            
         except ValueError:
             pass
 
@@ -76,11 +126,11 @@ def items_command(request, user, result):
     if 'with_ids' in request.GET: 
         with_ids = request.GET['with_ids']        
         ids = [int(i) for i in with_ids.split(',') if RE_DIGITS.match(i)]
-        result.items = get_entries_for_user(user, ids[:50])
+        result.items = get_entries(user, ids[:50])
         return
     
     # Unfiltered results
-    result.items = get_entries_for_user(user)
+    result.items = get_entries(user)
 
 
 
@@ -218,79 +268,17 @@ COMMANDS = [
     ('links'                         , links_command),
 ]
 
-@view(r'^/fever/?$', 'post')
-def endpoint(ctx):
-
-    log.debug('client from %s requested: %s' % (ctx.request.remote_addr, ctx.request.params))
-    
-    if 'api' not in ctx.request.GET:
-        raise HTTPBadRequest()
-
-    result = Struct({'api_version':2, 'auth':0})   
-            
-    #@@TODO format = 'xml' if request.GET['api'] == 'xml' else 'json'
-
-    if 'api_key' in ctx.request.POST:
-        api_key = ctx.request.POST['api_key']        
-        try:
-            user = User.get((User.api_key == api_key) & (User.is_enabled == True))
-        except User.DoesNotExist:
-            return serialize(result)  #@@TODO: HTTPUnauthorized ?
-    else:
-        return serialize(result)   #@@TODO: HTTPUnauthorized ?
-
-    # Authorized
-    result.auth = 1
-
-    # Note: client *can* send multiple commands at time
-    for command, handler in COMMANDS:
-        if command in ctx.request.params:            
-            handler(ctx.request, user, result)
-            #break
-
-    result.last_refreshed_on_time = get_last_refreshed_on_time()
-
-    return serialize(result)
-
-
-@view(r'^/fever/?$')
-@template('fever.html')
-def placeholder(ctx):
-    pass
-    
-
-
-def serialize(result, format='json'):
-
-    def as_xml(result):
-        #@@TODO: implement XML serialization
-        raise NotImplementedError
-
-    def as_json(result):
-        import json
-        return json.dumps(result, indent=4, encoding=ENCODING)
-
-    serializers = {
-        'json': as_json,
-        'xml': as_xml 
-    }
-  
-    r = Response(content_type='application/json', charset='utf-8')  #application/xml
-    r.body = serializers.get(format)(result)   
-    return r
-
-
 
 # ------------------------------------------------------
 # Queries
 # ------------------------------------------------------
         
-def get_groups_for_user(user):
+def get_groups(user):
     q = Group.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
     result = [{'id':s.id,'title':s.title} for s in q]
     return result
 
-def get_feeds_for_user(user):
+def get_feeds(user):
     q = Feed.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
     result = []
     for feed in q:
@@ -306,7 +294,7 @@ def get_feeds_for_user(user):
         })
     return result        
 
-def get_feed_groups_for_user(user):
+def get_feed_groups(user):
     q = Subscription.select().join(User).where(User.id == user.id).distinct().naive()
     groups = defaultdict(lambda: [])
     for s in q:
@@ -316,19 +304,19 @@ def get_feed_groups_for_user(user):
         result.append({'group':g, 'feed_ids':','.join(groups[g])})
     return result
 
-def get_unread_entries_for_user(user):
+def get_unread_entries(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
         (User.id == user.id), 
         ~(Entry.id << Read.select(Read.entry).where(User.id == user.id))).order_by(Entry.id).distinct().naive()
     return [r.id for r in q]
 
-def get_saved_entries_for_user(user):
+def get_saved_entries(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
         (User.id == user.id), 
         (Entry.id << Saved.select(Saved.entry).where(User.id == user.id))).order_by(Entry.id).distinct().naive()
     return [r.id for r in q]    
 
-def get_entries_for_user(user, ids=None):
+def get_entries(user, ids=None):
 
     if ids:
         where_clause = (User.id == user.id) & (Entry.id << ids)
@@ -358,7 +346,7 @@ def get_entries_for_user(user, ids=None):
         })
     return result 
 
-def get_entries_for_user_min(user, min_id, bound=50):
+def get_entries_min(user, min_id, bound=50):
     #q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id > min_id)).order_by(Entry.id).distinct().limit(bound).naive()
     q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id > min_id)).distinct().limit(bound).naive()
 
@@ -383,7 +371,7 @@ def get_entries_for_user_min(user, min_id, bound=50):
         })
     return result
     
-def get_entries_for_user_max(user, max_id, bound=50):
+def get_entries_max(user, max_id, bound=50):
     #q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id < max_id)).order_by(Entry.id).distinct().limit(bound).naive()
     q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id < max_id)).distinct().limit(bound).naive()
 
@@ -409,7 +397,7 @@ def get_entries_for_user_max(user, max_id, bound=50):
     return result    
 
     
-def get_entry_count_for_user(user):
+def get_entry_count(user):
     q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id)).distinct().count()
     return q
 
@@ -439,6 +427,4 @@ def get_last_refreshed_on_time():
             
     # Return a fallback value
     return datetime_as_epoch(datetime.utcnow())
-
-
 

@@ -69,38 +69,38 @@ class SessionMiddleware(object):
 
     def __init__(self, app, **kwargs):
         self.app = app
-        self.session_key = SESSION_KEY #'com.passiomatic.coldsweat.session'
+        #self.session_key = SESSION_KEY #'com.passiomatic.coldsweat.session'
         self.kwargs = kwargs # Pass everything else to SessionManager
 
-    def _initial_response(self, environ, start_response):
-        '''
-        Initial response to a cookie session
-        '''
-        def session_response(status, headers, exc_info=None):
-            environ[self.session_key].set_cookie(headers)
-            return start_response(status, headers, exc_info)
-        return self.app(environ, session_response)
-        
     def __call__(self, environ, start_response):
-        # Init and connect to database
         connect()
         
         # New session manager instance each time
         manager = SessionManager(environ, **self.kwargs)
-        environ[self.session_key] = manager
+        # Add a session object to wrapped app
+        
         self.app.session = manager.session
+        #environ[SESSION_KEY] = manager.session
+
+        # Initial response to a cookie session
+        def initial_response(environ, start_response):
+            def session_response(status, headers, exc_info=None):
+                manager.set_cookie(headers)
+                return start_response(status, headers, exc_info)
+            return self.app(environ, session_response)
+
         try:
             # Return initial response if new or session id is random
             if manager.is_new: 
-                return self._initial_response(environ, start_response)
+                return initial_response(environ, start_response)
             return self.app(environ, start_response)
         # Always close session
         finally:
             manager.close()
 
-    def close(self):
-        # Attempt to close database connection 
-        close()
+#     def close(self):
+#         # Attempt to close database connection 
+#         close()
 
             
 class SessionManager(object):

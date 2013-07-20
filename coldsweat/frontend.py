@@ -42,6 +42,7 @@ class FrontendApp(WSGIApp):
         )
     
 #         count =  self.session.get('count', 0)
+#         print count
 #         self.session['count'] = count + 1
         
         return self.respond_with_template('index.html', d)
@@ -178,6 +179,7 @@ class FrontendApp(WSGIApp):
         #@@TODO Grab current session user
         user = User.get((User.username == 'default'))
         return user
+
 
 
 frontend_app = SessionMiddleware(FrontendApp())

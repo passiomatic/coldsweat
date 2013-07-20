@@ -16,7 +16,7 @@ from models import connect, close
 
 from coldsweat import log, config, installation_dir
 
-#SESSION_KEY = 'com.passiomatic.coldsweat.session'
+SESSION_KEY = 'com.passiomatic.coldsweat.session'
 #TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
 # Figure out static dir, if given
 STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static_url') else ''
@@ -62,7 +62,13 @@ class WSGIApp(object):
         response = handler(self, self.request, *args)        
         if not response:
             response = Response()
-        
+
+# Base WSGI app shoud be session agnostic
+#         if SESSION_KEY in environ:
+#             self.session = environ[SESSION_KEY]
+#         else:
+#             self.session = {} # Fail soft
+
         return response(environ, start_response)
     
     def find_handler(self):
@@ -81,7 +87,8 @@ class WSGIApp(object):
                 return handler, match.groups()
     
         return None, None
-    
+
+
     def close(self):
         close()
  

@@ -275,7 +275,7 @@ def get_session(sid, default=None):
         return default
     
     # Expired?
-    if session.expires < datetime.utcnow().replace(microsecond=0):
+    if session.expires_on < datetime.utcnow().replace(microsecond=0):
         session.delete_instance()
         return default
     
@@ -289,13 +289,13 @@ def delete_session(sid):
 def set_session(sid, value, timeout=SESSION_TIMEOUT):
 
     # Calculate expiration time
-    expires = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
+    expiration = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
 
     session = get_session(sid)
-    # Insert new sid if sid not present
     if not session:
+        # Insert new sid if sid not present
         session = Session(key=sid)
 
-    session.expires = expires
+    session.expires_on = expiration
     session.value = value
     session.save()

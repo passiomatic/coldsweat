@@ -225,7 +225,7 @@ class Session(CustomModel):
     
     key             = CharField(null=False)
     value           = PickleField(null=False)     
-    expires         = DateTimeField(null=False)
+    expires_on      = DateTimeField(null=False)
 
     class Meta:
         indexes = (

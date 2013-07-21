@@ -55,12 +55,8 @@ def synchronized(func):
     wrapper.__doc__ = func.__doc__
     return wrapper
 
-# def session(**kwargs):
-#     def decorator(app):
-#         return SessionMiddleware(app(**kwargs), **kwargs)
-#     return decorator
 
-SESSION_KEY = 'com.passiomatic.coldsweat.session'
+#SESSION_KEY = 'com.passiomatic.coldsweat.session'
 
 class SessionMiddleware(object):
     '''
@@ -77,9 +73,9 @@ class SessionMiddleware(object):
         
         # New session manager instance each time
         manager = SessionManager(environ, **self.kwargs)
-        # Add a session object to wrapped app
-        
+        # Add a session object to wrapped app        
         self.app.session = manager.session
+
         #environ[SESSION_KEY] = manager.session
 
         # Initial response to a cookie session
@@ -97,10 +93,6 @@ class SessionMiddleware(object):
         # Always close session
         finally:
             manager.close()
-
-#     def close(self):
-#         # Attempt to close database connection 
-#         close()
 
             
 class SessionManager(object):

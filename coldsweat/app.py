@@ -12,12 +12,10 @@ from webob import Request, Response
 from webob.exc import *
 
 from utilities import *
-from models import connect, close
+from models import connect
 
 from coldsweat import log, config, installation_dir
 
-SESSION_KEY = 'com.passiomatic.coldsweat.session'
-#TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
 # Figure out static dir, if given
 STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static_url') else ''
 
@@ -45,9 +43,7 @@ def POST(pattern='^/$'):
     
 class WSGIApp(object):
 
-#     def __init__(self):
-#         pass
-    
+
     def __call__(self, environ, start_response):
         connect()
         
@@ -88,10 +84,6 @@ class WSGIApp(object):
     
         return None, None
 
-
-    def close(self):
-        close()
- 
  
 # ------------------------------------------------------
 # Exception middleware
@@ -139,17 +131,10 @@ class ExceptionMiddleware(object):
                         
             yield traceback
                 
-        # Wsgi applications might have a close function. 
+        # Returned iterable might have a close function. 
         # If it exists it *must* be called
-        if hasattr(self.app, 'close'):
-            self.app.close()
+        if hasattr(app_iter, 'close'):
+            app_iter.close()
 
 
-
-# def setup_app():
-#     '''
-#     Install middleware and return app
-#     '''
-#     #return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
-#     return ExceptionMiddleware(ColdsweatApp())
 

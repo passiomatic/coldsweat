@@ -10,7 +10,7 @@ License: MIT (see LICENSE.md for details)
 from hashlib import md5, sha1
 from calendar import timegm
 from datetime import datetime
-import cgi #, json
+import cgi, urllib #, json
 
 DEFAULT_ENCODING = 'utf-8'
 
@@ -34,6 +34,12 @@ def make_sha1_hash(s):
 # Date/time functions
 # --------------------
 
+# Weekday and month names for HTTP date/time formatting; always English!
+_weekdayname = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+_monthname = [None, # Dummy so we can use 1-based month numbers
+              "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+              
 def format_datetime(value, comparsion_value=None):
     
     if not comparsion_value:    
@@ -53,16 +59,17 @@ def format_datetime(value, comparsion_value=None):
 
     return s
 
-   
 def format_http_datetime(value):
     """
     Format datetime to comply with RFC 1123 
     (ex.: Fri, 12 Feb 2010 16:23:03 GMT). 
     Assume GMT values
     """
-    #@@FIXME: what if locale isn't en?
-    return value.strftime(u'%a, %d %b %Y %H:%M:%S GMT')
-
+    year, month, day, hh, mm, ss, wd, y, z = value.utctimetuple()
+    return "%s, %02d %3s %4d %02d:%02d:%02d GMT" % (
+        _weekdayname[wd], day, _monthname[month], year, hh, mm, ss
+    )
+       
 def datetime_as_epoch(value):
     return int(timegm(value.utctimetuple()))
     
@@ -80,6 +87,12 @@ def escape_html(value):
     """
     return cgi.escape(value, quote=True)
 
+def escape_url(value):     
+    """
+    Return value escaped as URL string
+    """
+    return urllib.quote(value)
+    
 # def escape_javacript(value):     
 #     """
 #     Return value escaped as a Javascript string

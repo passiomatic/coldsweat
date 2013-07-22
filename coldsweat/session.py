@@ -107,21 +107,6 @@ class SessionManager(object):
         
         self._get(environ)
 
-    def _from_cookie(self, environ): 
-        '''
-        Attempt to load the associated session using the identifier from the cookie
-        '''
-        #@@TODO: Use Webob.request
-        
-        cookie = SimpleCookie(environ.get('HTTP_COOKIE'))
-        morsel = cookie.get(self._fieldname, None)
-        if morsel:
-            self._sid, self.session = self._cache.checkout(morsel.value)
-            cookie_sid = morsel.value
-            if cookie_sid != self._sid: 
-                self.is_new = True
-
-
     def _get(self, environ):  
         '''
         Attempt to associate with an existing Session
@@ -139,6 +124,8 @@ class SessionManager(object):
         self._cache.checkin(self._sid, self.session)
         self.session = None
 
+    # Cookie utilities
+
     def set_cookie(self, headers):
         '''
         Sets a session cookie header if needed
@@ -146,6 +133,23 @@ class SessionManager(object):
         cookie, name = SimpleCookie(), self._fieldname
         cookie[name], cookie[name]['path'] = self._sid, self._path
         headers.append(('Set-Cookie', cookie[name].OutputString()))
+
+    def delete_cookie(self, headers):
+        pass
+
+    def _from_cookie(self, environ): 
+        '''
+        Attempt to load the associated session using the identifier from the cookie
+        '''
+        #@@TODO: Use Webob.request
+        
+        cookie = SimpleCookie(environ.get('HTTP_COOKIE'))
+        morsel = cookie.get(self._fieldname, None)
+        if morsel:
+            self._sid, self.session = self._cache.checkout(morsel.value)
+            cookie_sid = morsel.value
+            if cookie_sid != self._sid: 
+                self.is_new = True
 
 
 def _shutdown(ref):

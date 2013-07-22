@@ -1,0 +1,55 @@
+{{inherit "site.html"}}
+
+{{def container}}
+
+<div class="grid-container">
+  <div class="grid-60 prefix-20">
+        
+        <section class="module">
+
+            <h1>Welcome to Coldsweat</h1>            
+            
+            <form action="{{request.url}}" method="POST">        
+    
+                    <fieldset>
+                        <label>Please enter your account credentials to proceed</label>
+                        <input type="text" id="username" name="username" class="input-medium" placeholder="username" value="{{username}}" size="20">                
+                        <input type="password" id="password" name="password" class="input-medium" placeholder="password" value="{{password}}" size="20">
+                    </fieldset>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Let Me In</button>
+                    </div>
+
+                    <input type="hidden" name="from" value="{{from_url}}">
+            </form>
+<!--
+            
+            <hr>
+            
+            <p class="dim">Psst! Don’t you have an account? Run the <i>sweat</i> command-line utility</p>             
+            <div>
+                <code>./sweat createuser -u johndoe</code>
+            </div>
+-->
+           
+
+        </section>
+      
+  </div>
+<!-- /grid-container -->
+</div>
+    
+
+{{enddef}}
+
+
+{{def page_script_block}}
+<script>
+head.js(
+// Libraries
+"{{static_url}}/javascripts/vendor/modernizr-min.js",
+"{{static_url}}/javascripts/vendor/jquery-min.js",
+);
+</script>
+{{enddef}}

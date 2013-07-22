@@ -21,6 +21,7 @@ static_app = DirectoryApp("static", index_page=None)
 #  then tries the other apps
 cascade_app = ExceptionMiddleware(Cascade([static_app, fever_app, frontend_app]))
 
+
 if __name__ == '__main__':
 
     parser = optparse.OptionParser(

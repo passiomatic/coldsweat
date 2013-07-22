@@ -72,7 +72,17 @@ class User(CustomModel):
     @staticmethod
     def make_api_key(username, password):
         return make_md5_hash('%s:%s' % (username, password))
-    
+
+    @staticmethod
+    def validate_credentials(username, password):
+        try:
+            user = User.get((User.username == username) & 
+                (User.password == password) & 
+                (User.is_enabled == True))        
+        except User.DoesNotExist:
+            return None
+
+        return user
 
 class Icon(CustomModel):
     """

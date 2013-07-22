@@ -1,7 +1,7 @@
 <!doctype html>
 
 <!-- 
-This is Coldsweat by Andrea Peltrin
+This is Coldsweat
 URL: http://lab.passiomatic.com/coldsweat/
 -->
 <!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
@@ -18,7 +18,7 @@ URL: http://lab.passiomatic.com/coldsweat/
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
 <meta name="description" content="">
-<meta name="author" content="Andrea Peltrin">
+<meta name="author" content="">
 
 <!-- For all browsers -->
 <link href='http://fonts.googleapis.com/css?family=Ubuntu:500italic,500,400italic,400' rel='stylesheet' type='text/css'>
@@ -51,51 +51,11 @@ URL: http://lab.passiomatic.com/coldsweat/
     {{alert_message}}
 </div><!-- container -->
 
-<!-- Load libraries -->
 <script>
 window.applicationURL = '{{application_url}}';
-head.js(
-// Place scripts to be loaded here, in the order the need to be executed
-// Typically libraries are needed first, such as jQuery (as the plugins 
-// depend on jQuery to execute). The below configuration is what Rock 
-// Hammer uses, but customise this for your own needs.
-// Notice the use of @path here. This is because we need the file names, 
-// not the script tags being generated. Ensure all filenames you wish
-// head.js to load are surrounded with quotes. Also, this is a list, so
-// ensure that all but the last item are followed by a comma.
-
-// Libraries
-"{{static_url}}/javascripts/vendor/modernizr-min.js",
-"{{static_url}}/javascripts/vendor/jquery-min.js",
-
-// Plugins
-"{{static_url}}/javascripts/plugins.js",
-
-// Load bootstrap-transition first so that nice glides/fades 
-// etc for the other bootstrap plugins work
-//"javascripts/vendor/bootstrap/bootstrap-transition.js",
-//"javascripts/vendor/bootstrap/bootstrap-carousel.js",
-//"javascripts/vendor/bootstrap/bootstrap-tooltip.js",
-
-// Popover has a dependency on tooltip, so make sure and include 
-// bootstrap-tooltip regardless in order for popovers to work
-//"javascripts/vendor/bootstrap/bootstrap-popover.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
-//"javascripts/vendor/bootstrap/bootstrap-collapse.js",
-
-// App scripts
-"{{static_url}}/javascripts/app.js"
-);
-
-// Google Analytics code
-// Set your account ID appropriately by replacing UA-XXXXX-X
-/*
-var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-s.parentNode.insertBefore(g,s)}(document,'script'));
-*/
 </script>
+<!-- Load libraries -->
+{{self.page_script_block}}
 </body>
 </html>
 

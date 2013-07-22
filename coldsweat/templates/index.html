@@ -1,72 +1,75 @@
 {{inherit "site.html"}}
 
 {{def container}}
-
-<section class="panel panel-0 panel-fixed">
-    <header>             
-        <div class="branding">
-            <i class="icon-tint"></i> Coldsweat
-        </div>
-        <nav  role="navigation">
-            <ul class="{{filter_name}}">
-                <li class="filter filter-unread"><a href="?unread"><i class="icon-reorder"></i>&ensp;Unread</a></li>
-                <li class="filter filter-starred"><a href="?saved"><i class="icon-star"></i>&ensp;Starred</a></li>
-                {{for g in groups}}
-                    <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
-                {{endfor}}        
-        <!--         <li class="filter-feeds"><a href="?feeds"><i class="icon-rss"></i>&ensp;All feeds</a></li>             -->
-        
-                <li class="sep"><a role="button"  data-toggle="modal" href="#modal-settings"><i class="icon-cog"></i>&ensp;Settings</a></li>
-        
-            </ul>
-        </nav>  
-    </header>   
-</section>
-    
-<section  class="panel panel-1 panel-fixed">
-    <div class="panel-title">
-        <h2 class="h3">&nbsp;</h2>
-    </div>
-    <div class="panel-content">
-        <div class="scrollable">
-            <div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
-            <div class="viewport">
-                <div class="overview">
-<!--                     <div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div> -->
-                </div>
+<div class="panels">
+    <section class="panel panel-0 panel-fixed">
+        <header>             
+            <div class="branding">
+                <i class="icon-tint"></i> Coldsweat
             </div>
-        </div>  
-    </div>
-</section>
-
-<section class="panel panel-2">
+            <nav  role="navigation">
+                <ul class="{{filter_name}}">
+                    <li class="filter filter-unread"><a href="?unread"><i class="icon-reorder"></i>&ensp;Unread</a></li>
+                    <li class="filter filter-starred"><a href="?saved"><i class="icon-star"></i>&ensp;Starred</a></li>
+                    {{for g in groups}}
+                        <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
+                    {{endfor}}        
+            <!--         <li class="filter-feeds"><a href="?feeds"><i class="icon-rss"></i>&ensp;All feeds</a></li>             -->
+            
+<!--                     <li class="sep"><a role="button"  data-toggle="modal" href="#modal-settings"><i class="icon-cog"></i>&ensp;Settings</a></li> -->
+                    <li><a href="logout"><i class="icon-cog"></i>&ensp;Log out</a></li>
+                </ul>
+            </nav>  
+        </header>   
+    </section>
+        
+    <section  class="panel panel-1 panel-fixed">
+        <div class="panel-title">
+            <h2 class="h3">&nbsp;</h2>
+        </div>
+        <div class="panel-content">
+            <div class="scrollable">
+                <div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+                <div class="viewport">
+                    <div class="overview">
+    <!--                     <div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div> -->
+                    </div>
+                </div>
+            </div>  
+        </div>
+    </section>
     
-    <div class="panel-content">
-        <article>&larr; Open the current item on the left by clicking it or by pressing the <kbd>o</kbd> key.</article>
-    </div>    
+    <section class="panel panel-2">
+        
+        <div class="panel-content">
+            <article>&larr; Open the current item on the left by clicking it or by pressing the <kbd>o</kbd> key.</article>
+        </div>    
+        
+        <footer role="contentinfo">
     
-    <footer role="contentinfo">
+          <dl class="">
+                <dt>Navigation</dt>
+                <dd><kbd>j</kbd>&ensp;Previous Item 
+                </dd>
+                <dd><kbd>k</kbd>&ensp;Next Item 
+                </dd>
+                <dt>Actions</dt>
+                <dd><kbd>o</kbd>&ensp;Open Item  
+                </dd>
+                <dd><kbd>m</kbd>&ensp;Mark Item as Read 
+                </dd>
+                <dd><kbd>s</kbd>&ensp;Star Item 
+                </dd>
+            </dl>
+    
+            <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
+            <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
+        </footer>
+    
+    </section>
+<!-- /panel -->
+</div>
 
-      <dl class="">
-            <dt>Navigation</dt>
-            <dd><kbd>j</kbd>&ensp;Previous Item 
-            </dd>
-            <dd><kbd>k</kbd>&ensp;Next Item 
-            </dd>
-            <dt>Actions</dt>
-            <dd><kbd>o</kbd>&ensp;Open Item  
-            </dd>
-            <dd><kbd>m</kbd>&ensp;Mark Item as Read 
-            </dd>
-            <dd><kbd>s</kbd>&ensp;Star Item 
-            </dd>
-        </dl>
-
-        <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
-        <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
-    </footer>
-
-</section>
 
 <div id="modal-settings" class="modal hide fade">
   <div class="modal-header">
@@ -74,7 +77,7 @@
     <h3>Modal header</h3>
   </div>
   <div class="modal-body">
-    <p>One fine body…</p>
+    <p>Settings goes here.…</p>
   </div>
   <div class="modal-footer">
 <!--     <a href="#" class="btn">Close</a> -->
@@ -82,4 +85,41 @@
   </div>
 </div>
 
+{{enddef}}
+
+{{def page_script_block}}
+<script>
+head.js(
+// Place scripts to be loaded here, in the order the need to be executed
+// Typically libraries are needed first, such as jQuery (as the plugins 
+// depend on jQuery to execute). The below configuration is what Rock 
+// Hammer uses, but customise this for your own needs.
+// Notice the use of @path here. This is because we need the file names, 
+// not the script tags being generated. Ensure all filenames you wish
+// head.js to load are surrounded with quotes. Also, this is a list, so
+// ensure that all but the last item are followed by a comma.
+
+// Libraries
+"{{static_url}}/javascripts/vendor/modernizr-min.js",
+"{{static_url}}/javascripts/vendor/jquery-min.js",
+
+// Plugins
+"{{static_url}}/javascripts/plugins.js",
+
+// Load bootstrap-transition first so that nice glides/fades 
+// etc for the other bootstrap plugins work
+//"javascripts/vendor/bootstrap/bootstrap-transition.js",
+//"javascripts/vendor/bootstrap/bootstrap-carousel.js",
+//"javascripts/vendor/bootstrap/bootstrap-tooltip.js",
+
+// Popover has a dependency on tooltip, so make sure and include 
+// bootstrap-tooltip regardless in order for popovers to work
+//"javascripts/vendor/bootstrap/bootstrap-popover.js",
+"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
+//"javascripts/vendor/bootstrap/bootstrap-collapse.js",
+
+// App scripts
+"{{static_url}}/javascripts/app.js"
+);
+</script>
 {{enddef}}

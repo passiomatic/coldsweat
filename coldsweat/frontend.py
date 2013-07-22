@@ -7,7 +7,7 @@ Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
 
-from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest
+from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
 from tempita import Template #, HTMLTemplate 
 
 from app import *
@@ -27,7 +27,6 @@ class FrontendApp(WSGIApp):
         
     @GET()
     def index(self, request):
-    
  
         user = self.get_session_user()   
         
@@ -40,11 +39,7 @@ class FrontendApp(WSGIApp):
             entry_count = 0,
             groups = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title).naive(),
         )
-    
-#         count =  self.session.get('count', 0)
-#         print count
-#         self.session['count'] = count + 1
-        
+
         return self.respond_with_template('index.html', d)
 
     @GET(r'^/ajax/entries/?$')
@@ -138,11 +133,12 @@ class FrontendApp(WSGIApp):
         
     @GET(r'^/fever/?$')
     def fever(self, request):        
+        # Human readable placeholder for Fever API 
         return self.respond_with_template('fever.html', {})
 
-    # Template utilities
+    # Template
 
-    def respond_with_template(self, filename, namespace):
+    def respond_with_template(self, filename, namespace=None):
 
         site_namespace = {
             # Global objects and settings 
@@ -154,6 +150,7 @@ class FrontendApp(WSGIApp):
 
             # Filters 
             'html'              : escape_html,
+            'url'               : escape_url,
             'since'             : datetime_since(datetime.utcnow()),
             'epoch'             : datetime_as_epoch,            
         }
@@ -162,10 +159,10 @@ class FrontendApp(WSGIApp):
         if message:
             namespace['alert_message'] = render_message(message)
 
-        site_namespace.update(namespace)                                    
+        site_namespace.update(namespace or {})
         response = Response(
             render_template(filename, site_namespace),
-            content_type='text/html')
+            content_type='text/html', charset='utf-8')
         
         # Delete alert_message cookie, if any
         if message:
@@ -175,18 +172,72 @@ class FrontendApp(WSGIApp):
 
     # Session user and auth
 
+#     @property()
+#     def _set_session(self, environ, session_key):
+#         self.session = self.environ[session_key].session
+
     def get_session_user(self):                    
-        #@@TODO Grab current session user
-        user = User.get((User.username == 'default'))
-        return user
+        '''
+        Grab current session user if any or redirect to login form
+        '''
+        user = self.session.get('coldsweat.user', None)
+        if user:
+            return user
+        
+        #raise self.redirect('%s/login?from=%s' % (self.request.application_url, escape_url(self.request.path)))
+        raise self.redirect('login?from=%s' %  escape_url(self.request.path))
+
+
+    @GET(r'^/login/?$')
+    def login(self, request):
+        d = dict(
+            username = '',
+            password = '',
+            from_url = request.GET.get('from', '/')
+        )
+        return self.respond_with_template('login.html', d)
+
+    @POST(r'^/login/?$')
+    def login_post(self, request):
+
+        username = request.POST.get('username')        
+        password = request.POST.get('password')
+        from_url = request.POST.get('from', '/')   
+                    
+        user = User.validate_credentials(username, password)
+        if user:
+            self.session['coldsweat.user'] = user
+            #@@TODO response.remote_user = user.username
+            return HTTPSeeOther(location=from_url)
+
+        d = dict(
+            username        = username,        
+            password        = password,
+            from_url        = from_url,        
+            alert_message   = render_message('ERROR Unable to log in. Please check your username and password.')
+        )
+                
+        return self.respond_with_template('login.html', d)
+
+    @GET(r'^/logout/?$')
+    def logout(self, request):
+        response = self.redirect('/')
+        response.delete_cookie('_SID_')
+        return response 
+        
 
 
 
+# Install session support too
 frontend_app = SessionMiddleware(FrontendApp())
+#frontend_app = FrontendApp()
 
 # ------------------------------------------------------
 # Template utilities
 # ------------------------------------------------------        
+
+def set_message(response, message):
+    response.set_cookie('alert_message', message)    
 
 def render_message(message):
     if not message:

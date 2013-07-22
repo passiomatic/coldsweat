@@ -135,10 +135,6 @@ def fetch_feed(feed):
             log.warn("%s has too many errors, disabled" % netloc)
         feed.save()
 
-#     if not feed.is_enabled:
-#         log.debug("feed %s is disabled, skipped" % feed.self_link)
-#         return
-
     log.debug("fetching %s" % feed.self_link)
            
     (schema, netloc, path, params, query, fragment) = urlparse.urlparse(feed.self_link)
@@ -151,17 +147,20 @@ def fetch_feed(feed):
     headers = {
         'User-Agent': user_agent if user_agent else DEFAULT_USER_AGENT
     }
-    
-    if feed.last_checked_on:
-        if (now - feed.last_checked_on).seconds < config.getint('fetcher', 'min_interval'):
-            log.debug("last_checked_on for %s is below min_interval, skipped" % netloc)
-            return
 
-    if feed.last_updated_on:
-        if (now - feed.last_updated_on).seconds < config.getint('fetcher', 'min_interval'):
-            log.debug("last_updated_on for %s is below min_interval, skipped" % netloc)
-            return
-       
+    interval = config.getint('fetcher', 'min_interval')
+    
+    for fieldname in ['last_checked_on', 'last_updated_on']:
+        value = getattr(feed, fieldname)
+        if not value:
+            continue
+
+        # No datetime.timedelta since we need to deal with large seconds values            
+        delta = datetime_as_epoch(now) - datetime_as_epoch(value)    
+        if delta < interval:
+            log.debug("%s for %s is below min_interval, skipped" % (fieldname, netloc))
+            return            
+                      
     # Conditional GET headers
     if feed.etag and feed.last_updated_on:
         headers['If-None-Match'] = feed.etag

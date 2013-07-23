@@ -21,6 +21,7 @@ timeout:            15      ; Seconds
 multiprocessing:    on      
 processes:          4
 chunk_size:         32
+scrub:              off     ; Remove links and images from entries according to /etc/blacklist
 
 ; Overrides default Coldsweat user agent string
 ;user_agent:

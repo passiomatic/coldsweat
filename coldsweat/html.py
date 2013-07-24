@@ -10,6 +10,7 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 
 from sgmllib import SGMLParser, charref
 import urlparse
+from coldsweat import log
 
 class BaseParser(SGMLParser):
 
@@ -165,6 +166,7 @@ class ScrubParser(BaseParser):
         d = dict(self.normalize_attrs(attrs))
         if 'href' in d:
             if self.is_blacklisted(d['href']):
+                log.debug('matched anchor with blacklisted href=%s' % d['href'])
                 self.blacklisted += 1
                 return
                 
@@ -182,6 +184,7 @@ class ScrubParser(BaseParser):
         if 'src' in d:        
             if self.is_blacklisted(d['src']):
                 self.pieces.append(d['alt'] if 'alt' in d else '')
+                log.debug('matched image with blacklisted src=%s' % d['src'])
                 return
         
         self.unknown_starttag('img', attrs)
@@ -199,8 +202,6 @@ class ScrubParser(BaseParser):
             if value.count(site):
                 return True
         return False
-    
-        
 
 
 def scrub_entry(data, blacklist):

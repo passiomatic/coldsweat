@@ -7,7 +7,8 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 '''
 
-import sys, os, re, time, cgi, urlparse
+import sys, re, time, cgi, urlparse
+from os import path
 from datetime import datetime
 
 import feedparser
@@ -16,8 +17,28 @@ from requests.exceptions import RequestException
 
 from models import *
 from utilities import *
+from html import *
 from coldsweat import *
 
+# ------------------------------------------------------
+# Blacklist
+# ------------------------------------------------------
+
+blacklist = []    
+def load_blacklist(filename):
+    try:
+        with open(filename) as f:
+            for line in f:
+                if line == '\n' or line.startswith('#') or line.startswith(';'):
+                    continue # Skip empty values and comments
+                
+                blacklist.append(line.rstrip('\n'))
+    except IOError:
+        log.warn("could not load %s" % filename)
+
+# ------------------------------------------------------
+# Entry data
+# ------------------------------------------------------
 
 def get_feed_updated(feed, default):
     """
@@ -62,6 +83,8 @@ def get_entry_id(entry):
         return entry.id
     if 'link' in entry: 
         return get_entry_link(entry)
+    # Always use the original, "uncrubbed" entry  
+    #  content to calculate SHA1 hash
     content = get_entry_content(entry)
     if content: 
         return make_sha1_hash(content)
@@ -94,6 +117,11 @@ def get_entry_content(entry):
         return candidates[0].value
     return ''
 
+
+# ------------------------------------------------------
+# Feed fetching and parsing 
+# ------------------------------------------------------
+
 def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch_entries=False):
 
     try:
@@ -122,6 +150,7 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
         fetch_feed(feed)
 
     return feed
+
     
 def fetch_feed(feed):
     
@@ -135,10 +164,6 @@ def fetch_feed(feed):
             log.warn("%s has too many errors, disabled" % netloc)
         feed.save()
 
-#     if not feed.is_enabled:
-#         log.debug("feed %s is disabled, skipped" % feed.self_link)
-#         return
-
     log.debug("fetching %s" % feed.self_link)
            
     (schema, netloc, path, params, query, fragment) = urlparse.urlparse(feed.self_link)
@@ -148,27 +173,32 @@ def fetch_feed(feed):
     user_agent = ''
     if config.has_option('fetcher', 'user_agent'):  
         user_agent = config.get('fetcher', 'user_agent')        
-    headers = {
+    
+    request_headers = {
         'User-Agent': user_agent if user_agent else DEFAULT_USER_AGENT
     }
-    
-    if feed.last_checked_on:
-        if (now - feed.last_checked_on).seconds < config.getint('fetcher', 'min_interval'):
-            log.debug("last_checked_on for %s is below min_interval, skipped" % netloc)
-            return
 
-    if feed.last_updated_on:
-        if (now - feed.last_updated_on).seconds < config.getint('fetcher', 'min_interval'):
-            log.debug("last_updated_on for %s is below min_interval, skipped" % netloc)
-            return
-       
+    interval = config.getint('fetcher', 'min_interval')
+
+    # Check freshness
+    for fieldname in ['last_checked_on', 'last_updated_on']:
+        value = getattr(feed, fieldname)
+        if not value:
+            continue
+
+        # No datetime.timedelta since we need to deal with large seconds values            
+        delta = datetime_as_epoch(now) - datetime_as_epoch(value)    
+        if delta < interval:
+            log.debug("%s for %s is below min_interval, skipped" % (fieldname, netloc))
+            return            
+                      
     # Conditional GET headers
     if feed.etag and feed.last_updated_on:
-        headers['If-None-Match'] = feed.etag
-        headers['If-Modified-Since'] = format_http_datetime(feed.last_updated_on)
+        request_headers['If-None-Match'] = feed.etag
+        request_headers['If-Modified-Since'] = format_http_datetime(feed.last_updated_on)
             
     try:
-        response = requests.get(feed.self_link, timeout=config.getint('fetcher', 'timeout'), headers=headers)
+        response = requests.get(feed.self_link, timeout=config.getint('fetcher', 'timeout'), headers=request_headers)
     except RequestException:
         # Interpret as 'Service Unavailable'
         post_fetch(503, error=True)
@@ -209,13 +239,9 @@ def fetch_feed(feed):
     if 'title' in soup.feed:
         feed.title = soup.feed.title
 
-    feed.last_updated_on = get_feed_updated(soup.feed, now)    
-    #feed.last_status = response.status_code
-    
+    feed.last_updated_on = get_feed_updated(soup.feed, now)        
     post_fetch(response.status_code)
     
-
-    #@@TODO: under the same transaction ? 
     for entry in soup.entries:
         timestamp = get_entry_timestamp(entry, now)
 
@@ -234,12 +260,16 @@ def fetch_feed(feed):
         except Entry.DoesNotExist:
             pass
 
+        content = get_entry_content(entry)
+        if blacklist:
+            content = scrub_entry(content, blacklist)
+
         d = {
             'guid'              : guid,
             'feed'              : feed,
             'title'             : get_entry_title(entry),
             'author'            : get_entry_author(entry, soup.feed),
-            'content'           : get_entry_content(entry),
+            'content'           : content,
             'link'              : get_entry_link(entry),
             'last_updated_on'   : timestamp,         
         }
@@ -257,6 +287,10 @@ def fetch_feeds(force_all=False):
                        
     start = time.time()
 
+    if config.getboolean('fetcher', 'scrub'):
+        load_blacklist(path.join(installation_dir, 'etc/blacklist'))
+        log.debug("loaded blacklist: %s" % ', '.join(blacklist))
+        
     if force_all:
         feeds = Feed.select()
     else:
@@ -275,7 +309,7 @@ def fetch_feeds(force_all=False):
         log.debug("starting fetcher")
         # Just sequence requests
         for feed in feeds:
-            fetch_feed(feed)
+            fetch_feed(feed, blacklist)
     
     log.info("%d feeds checked in %fs" % (feeds.count(), time.time() - start))
     

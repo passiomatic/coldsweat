@@ -14,6 +14,7 @@ import tempita
 
 from utilities import *
 from session import SessionMiddleware
+from models import connect
 
 from coldsweat import log, config, installation_dir, VERSION_STRING
 
@@ -73,6 +74,7 @@ class ColdsweatApp(object):
             if not args:
                 args = ()
 
+            connect()
             r = view(ctx, *args)
             if r:
                 ctx.response = r    
@@ -217,10 +219,10 @@ class ExceptionMiddleware(object):
                         
             yield traceback
                 
-        # Wsgi applications might have a close function. 
+        # Returned iterable might have a close function. 
         # If it exists it *must* be called
-        if hasattr(self.app, 'close'):
-            self.app.close()
+        if hasattr(app_iter, 'close'):
+            app_iter.close()
 
 
 
@@ -228,7 +230,8 @@ def setup_app():
     '''
     Install middleware and return app
     '''
-    return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
+    #return ExceptionMiddleware(SessionMiddleware(ColdsweatApp(), session_key=SESSION_KEY))
+    return ExceptionMiddleware(ColdsweatApp())
 
 
 # ------------------------------------------------------

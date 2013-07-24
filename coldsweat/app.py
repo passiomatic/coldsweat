@@ -117,7 +117,7 @@ def template(filename):
                 'ctx': ctx,
                 'request': ctx.request,
                 'response': ctx.response,
-                'static_url': STATIC_URL or ctx.request.application_url,
+                'static_url': STATIC_URL or '',
             }
             
             d = handler(ctx, *args)

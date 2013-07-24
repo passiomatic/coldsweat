@@ -36,13 +36,5 @@ datefmt: %d/%b/%Y:%H:%M:%S %z
 
 [web]
 
-; Not required for Passegner deploy and local server. Uncomment for CGI and FastCGI deploy
-;
-; Coldsweat installed on site root
-;static_url: /static
-
-; Coldsweat installed under a dir, e.g. coldsweat
-;static_url: /coldsweat/static
-
 ; Static files served from a different server
 ;static_url: http://media.example.com/static

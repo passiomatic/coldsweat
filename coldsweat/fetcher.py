@@ -292,10 +292,15 @@ def fetch_feeds(force_all=False):
         log.debug("loaded blacklist: %s" % ', '.join(blacklist))
         
     if force_all:
-        feeds = Feed.select()
+        q = Feed.select()
     else:
-        feeds = Feed.select().where(Feed.is_enabled==True)
+        q = Feed.select().where(Feed.is_enabled==True)
     
+    feeds = list(q)
+    if not feeds:
+        log.debug("no feeds found to refresh, halted")
+        return # Nothing to do
+        
     multiprocessing = config.getboolean('fetcher', 'multiprocessing')     
     if multiprocessing:
         from multiprocessing import Pool
@@ -311,8 +316,6 @@ def fetch_feeds(force_all=False):
         for feed in feeds:
             fetch_feed(feed, blacklist)
     
-    log.info("%d feeds checked in %fs" % (feeds.count(), time.time() - start))
-    
-    return feeds.count()
+    log.info("%d feeds checked in %fs" % (len(feeds), time.time() - start))
 
     

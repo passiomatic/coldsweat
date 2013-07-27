@@ -3,10 +3,6 @@
 Boostrap file for FastCGI environments
 """
 
-# -----------------------------------------------
-# Set media base URL, no trailing slash please
-# -----------------------------------------------
-
 try:
     from flup.server.fcgi_fork import WSGIServer
 except ImportError, exc:

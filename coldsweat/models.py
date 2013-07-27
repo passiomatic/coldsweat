@@ -55,7 +55,7 @@ class User(CustomModel):
     Users - need at least one to store the api_key
     """
     
-    DEFAULT_CREDENTIALS = 'default', 'default'
+    DEFAULT_CREDENTIALS = 'coldsweat', 'secret'
 
     username            = CharField(unique=True)
     password            = CharField() #@@TODO: hashed & salted

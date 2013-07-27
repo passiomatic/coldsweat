@@ -13,7 +13,6 @@ from webob.exc import *
 
 from utilities import *
 from models import connect
-
 from coldsweat import log, config, installation_dir
 
 # Figure out static dir, if given
@@ -161,6 +160,4 @@ class ExceptionMiddleware(object):
         # If it exists it *must* be called
         if hasattr(app_iter, 'close'):
             app_iter.close()
-
-
 

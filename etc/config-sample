@@ -38,5 +38,5 @@ datefmt: %d/%b/%Y:%H:%M:%S %z
 
 [web]
 
-; Static files are served from a different URL
+; Uncomment to serve static files from a different URL
 ;static_url: http://media.example.com/static

@@ -5,10 +5,16 @@ Description: sweat utility commands
 from optparse import OptionParser, make_option
 from getpass import getpass
 
+from wsgiref.simple_server import make_server
+from webob.static import DirectoryApp
+
 from coldsweat.models import *
 from coldsweat import opml
 from coldsweat import fetcher
-#from coldsweat import config
+from coldsweat.app import ExceptionMiddleware
+from coldsweat.fever import fever_app
+from coldsweat.frontend import frontend_app
+from coldsweat.cascade import Cascade
 
 COMMANDS = {}
 
@@ -36,6 +42,23 @@ def command(name):
 #     #parser.print_usage()
 #     print '%s: %s' % (args[0], handler.__doc__)
 
+@command('serve')
+def command_serve(parser, options, ags):
+    '''Starts a local server'''
+
+    static_app = DirectoryApp("static", index_page=None)
+    
+    # Create a cascade that looks for static files first, 
+    #  then tries the other apps
+    cascade_app = ExceptionMiddleware(Cascade([static_app, fever_app, frontend_app]))
+    
+    httpd = make_server('localhost', options.port, cascade_app)
+    print 'Serving on http://localhost:%s' % options.port
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print 'Interrupted by user'    
+    
 @command('refresh')
 def command_refresh(parser, options, ags):
     '''Starts a feeds refresh procedure'''
@@ -105,9 +128,11 @@ def run():
 
     available_options = [
         make_option('-u', '--username', 
-            dest='username', default=default_username, help="specifies a username, default is %s" % default_username),
+            dest='username', default=default_username, help="specifies a username (default %s)" % default_username),
         make_option('-f', '--force',
             dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
+        make_option('-p', '--port', default='8080', 
+            dest='port', type='int', help='the port to serve on (default 8080)'),
 #         make_option('-v', '--verbose',
 #             dest='verbose', action='store_true', help=''),
     ]

@@ -197,9 +197,10 @@ class ScrubParser(BaseParser):
 
 
     def is_blacklisted(self, value):
-        #@@TODO use urlparse to check value against netloc only         
+        schema, netloc, path, params, query, fragment = urlparse.urlparse(value)
+
         for site in self.blacklist:
-            if value.count(site):
+            if site in netloc:
                 return True
         return False
 

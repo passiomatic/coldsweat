@@ -141,7 +141,7 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
 
     if not args:
-        parser.error("no Fever API endpoint given, e.g.: http://localhost:8080/coldsweat/fever/")
+        parser.error("no Fever API endpoint given, e.g.: http://localhost:8080/fever/")
     elif len(args) > 1:
         parser.error("extraneous argument found, use -s suite to run a specific test suite")
         

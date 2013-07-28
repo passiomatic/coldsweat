@@ -19,7 +19,7 @@ allowed_attribs = {
     'xmlUrl': 'self_link', 
     'htmlUrl': 'alternate_link', 
     'title': 'title',
-    #'text': 'title', # Alias?
+    'text': 'title', # Alias
 }
 
 #@@TODO: add suport to grouped subscriptions

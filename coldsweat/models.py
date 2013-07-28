@@ -53,18 +53,14 @@ class CustomModel(Model):
 class User(CustomModel):
     """
     Users - need at least one to store the api_key
-    """
-    
+    """    
     DEFAULT_CREDENTIALS = 'coldsweat', 'secret'
 
     username            = CharField(unique=True)
-    password            = CharField() #@@TODO: hashed & salted
-    
+    password            = CharField() #@@TODO: hashed & salted    
     email               = CharField(null=True)
     api_key             = CharField(unique=True)
-
     is_enabled          = BooleanField(default=True) 
-
 
     class Meta:
         db_table = 'users'
@@ -88,7 +84,6 @@ class Group(CustomModel):
     """
     Feed group/folder
     """
-    
     DEFAULT_GROUP = 'All entries'
     
     title               = CharField(null=True)
@@ -103,26 +98,19 @@ class Feed(CustomModel):
     """
     
     # Fetch?
-    is_enabled          = BooleanField(default=True) 
-    
+    is_enabled          = BooleanField(default=True)     
     # A URL to a small icon representing the feed
     icon                = ForeignKeyField(Icon, default=1)
-    title               = CharField(null=True, default='Untitled')    
-    
+    title               = CharField(null=True, default='Untitled')        
     # The URL of the HTML page associated with the feed
     alternate_link      = CharField(null=True)            
-    
     # The URL of the feed itself (rel=self)
-    self_link           = CharField()
-    
+    self_link           = CharField()    
     etag                = CharField(null=True)    
     last_updated_on     = DateTimeField(null=True) # As UTC
     last_checked_on     = DateTimeField(null=True) # As UTC 
-
-    last_status         = IntegerField(null=True) # Last HTTP code
-    
+    last_status         = IntegerField(null=True) # Last HTTP code    
     error_count         = IntegerField(default=0)
-
 
     class Meta:
         indexes = (
@@ -146,16 +134,12 @@ class Entry(CustomModel):
     """
 
     # It's called 'id' in Atom parlance
-    guid            = CharField() 
-    
-    feed            = ForeignKeyField(Feed,related_name='entries')
-    
+    guid            = CharField()     
+    feed            = ForeignKeyField(Feed,related_name='entries')    
     title           = CharField(default='Untitled')
     author          = CharField(null=True)
     content         = TextField(null=True)
-    
-    link            = CharField()
-    
+    link            = CharField(null=True)    
     last_updated_on = DateTimeField() # As UTC
 
     class Meta:

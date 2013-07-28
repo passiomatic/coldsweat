@@ -243,18 +243,20 @@ def fetch_feed(feed):
     
     for entry in soup.entries:
         
-        link = get_entry_link(entry)
-        if not link:
-            log.warn('could not find link for entry from %s, skipped' % netloc)
+        link        = get_entry_link(entry)
+        guid        = get_entry_id(entry, default=link)
+
+        if not guid:
+            log.warn('could not find guid for entry from %s, skipped' % netloc)
             continue
 
         title       = get_entry_title(entry)
         timestamp   = get_entry_timestamp(entry, default=now)
-        guid        = get_entry_id(entry, default=link)
+        author      = get_entry_author(entry, soup.feed)
                 
         # Skip ancient feed items        
         if (now - timestamp).days > config.getint('fetcher', 'max_history'):  
-            log.debug("entry %s from %s is over max_history, skipped" % (link, netloc))
+            log.debug("entry %s from %s is over max_history, skipped" % (guid, netloc))
             continue
 
         try:
@@ -273,7 +275,7 @@ def fetch_feed(feed):
             'guid'              : guid,
             'feed'              : feed,
             'title'             : title,
-            'author'            : get_entry_author(entry, soup.feed),
+            'author'            : author,
             'content'           : content,
             'link'              : link,
             'last_updated_on'   : timestamp,         
@@ -282,7 +284,7 @@ def fetch_feed(feed):
         # Save to database
         Entry.create(**d)
 
-        log.debug(u"added entry '%s' from %s" % (title, netloc))
+        log.debug(u"added entry %s from %s" % (guid, netloc))
  
  
 def fetch_feeds(force_all=False):

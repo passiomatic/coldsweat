@@ -10,6 +10,7 @@ License: MIT (see LICENSE.md for details)
 from hashlib import md5, sha1
 from calendar import timegm
 from datetime import datetime
+from tempita import HTMLTemplate
 import cgi, urllib #, json
 
 DEFAULT_ENCODING = 'utf-8'
@@ -78,7 +79,7 @@ def tuple_as_datetime(value):
 
 
 # --------------------
-# Teplate filters
+# Teplate filters and utilities
 # --------------------
 
 def escape_html(value):     
@@ -113,7 +114,14 @@ def datetime_since(utcnow):
 #         value = value[:truncate]
 #     
 #     return cgi.escape(value, quote=True)
+
+def render_template(filename, namespace):                    
+    return HTMLTemplate.from_filename(filename, namespace=namespace).substitute()
     
+
+# --------------------
+# Misc.
+# --------------------
     
 class Struct(dict):
     """

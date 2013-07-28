@@ -6,7 +6,7 @@ Copyright (c) 2013—, Andrea Peltrin
 Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
-
+from os import path
 from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
 from tempita import Template #, HTMLTemplate 
 
@@ -14,10 +14,10 @@ from app import *
 from models import *
 from session import SessionMiddleware
 from utilities import *
-from coldsweat import log, config, installation_dir
+from coldsweat import log, config, installation_dir, template_dir
 
 #SESSION_KEY = 'com.passiomatic.coldsweat.session'
-TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
+#TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
 ENTRIES_PER_PAGE = 30
 
 class FrontendApp(WSGIApp):
@@ -249,8 +249,9 @@ def render_message(message):
         return text
     return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
 
+#@@TODO: use utilities.render_template
 def render_template(filename, namespace):                    
-    return Template.from_filename(os.path.join(TEMPLATE_DIR, filename), namespace=namespace).substitute()
+    return Template.from_filename(path.join(template_dir, filename), namespace=namespace).substitute()
 
 # ------------------------------------------------------
 # Queries

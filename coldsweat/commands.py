@@ -3,18 +3,20 @@
 Description: sweat utility commands
 """
 from optparse import OptionParser, make_option
+from os import path
 from getpass import getpass
+import codecs
 
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
 
+from coldsweat import opml, fetcher, template_dir
 from coldsweat.models import *
-from coldsweat import opml
-from coldsweat import fetcher
 from coldsweat.app import ExceptionMiddleware
 from coldsweat.fever import fever_app
 from coldsweat.frontend import frontend_app
 from coldsweat.cascade import Cascade
+from coldsweat.utilities import render_template
 
 COMMANDS = {}
 
@@ -68,7 +70,7 @@ def command_refresh(parser, options, ags):
 
 @command('import')
 def command_import(parser, options, args):
-    '''Imports feeds from a OPML file'''
+    '''Imports feeds from OPML file'''
 
     if not args:
         parser.error("no OPML file given")
@@ -89,6 +91,33 @@ def command_import(parser, options, args):
             Subscription.create(user=user, group=default_group, feed=feed)
 
     print "%d feeds imported for user %s. See log file for more information" % (len(feeds), username)
+
+    
+@command('export')
+def command_export(parser, options, args):
+    '''Exports feeds to OPML file'''
+
+    if not args:
+        parser.error("no OPML file given")
+
+    username = options.username
+
+    try:
+        user = User.get(User.username == username)
+    except User.DoesNotExist:
+        parser.error("unable to find user %s. Use -u option to specify a different user" % username)
+    
+    #default_group = Group.get(Group.title == Group.DEFAULT_GROUP)
+    
+    filename = args[0]
+    
+    timestamp = format_http_datetime(datetime.utcnow())
+    feeds = Feed.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
+    
+    with open(filename, 'w') as f:
+        f.write(render_template(path.join(template_dir, 'export.xml'), locals()))
+        
+    print "%d feeds exported for user %s" % (feeds.count(), username)
 
 @command('setup')
 def command_setup(parser, options, args):

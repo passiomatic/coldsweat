@@ -51,7 +51,7 @@ def get_feed_updated(feed, default):
             return min(tuple_as_datetime(value), default)
     return default
 
-def get_entry_timestamp(entry, default):
+def get_entry_timestamp(entry, default=None):
     """
     Select the best timestamp for an entry
     """
@@ -65,31 +65,30 @@ def get_entry_timestamp(entry, default):
 def get_entry_title(entry):
     if 'title' in entry:
         return entry.title
-    return "Untitled"
+    return 'Untitled'
 
 def get_entry_link(entry):
     # Special case for Feedburner entries,
     # see: http://code.google.com/p/feedparser/issues/detail?id=171
     if 'feedburner_origlink' in entry:
-        #log.debug('Using feedburner:origlink for entry')
-        return entry.feedburner_origlink    
-    return entry.link
+        return entry.feedburner_origlink
+    if 'link' in entry:    
+        return entry.link
+    return None
+
     
-def get_entry_id(entry):
+def get_entry_id(entry, default=None):
     """
     Get a useful id from a feed entry
     """    
     if ('id' in entry) and entry.id: 
         return entry.id
-    if 'link' in entry: 
-        return get_entry_link(entry)
+    return default
     # Always use the original, "uncrubbed" entry  
     #  content to calculate SHA1 hash
-    content = get_entry_content(entry)
-    if content: 
-        return make_sha1_hash(content)
-    if 'title' in entry: 
-        return make_sha1_hash(entry.title)
+#     content = get_entry_content(entry)
+#     if content: 
+#         return make_sha1_hash(content + entry.link)
     
 def get_entry_author(entry, feed):
     """
@@ -166,7 +165,7 @@ def fetch_feed(feed):
 
     log.debug("fetching %s" % feed.self_link)
            
-    (schema, netloc, path, params, query, fragment) = urlparse.urlparse(feed.self_link)
+    schema, netloc, path, params, query, fragment = urlparse.urlparse(feed.self_link)
 
     now = datetime.utcnow()
 
@@ -243,9 +242,17 @@ def fetch_feed(feed):
     post_fetch(response.status_code)
     
     for entry in soup.entries:
-        timestamp = get_entry_timestamp(entry, now)
+        
+        link        = get_entry_link(entry)
+        guid        = get_entry_id(entry, default=link)
 
-        guid = get_entry_id(entry)
+        if not guid:
+            log.warn('could not find guid for entry from %s, skipped' % netloc)
+            continue
+
+        title       = get_entry_title(entry)
+        timestamp   = get_entry_timestamp(entry, default=now)
+        author      = get_entry_author(entry, soup.feed)
                 
         # Skip ancient feed items        
         if (now - timestamp).days > config.getint('fetcher', 'max_history'):  
@@ -267,19 +274,19 @@ def fetch_feed(feed):
         d = {
             'guid'              : guid,
             'feed'              : feed,
-            'title'             : get_entry_title(entry),
-            'author'            : get_entry_author(entry, soup.feed),
+            'title'             : title,
+            'author'            : author,
             'content'           : content,
-            'link'              : get_entry_link(entry),
+            'link'              : link,
             'last_updated_on'   : timestamp,         
         }
 
         # Save to database
         Entry.create(**d)
 
-        log.debug(u"added entry '%s'" % entry.title)
+        log.debug(u"added entry %s from %s" % (guid, netloc))
  
-
+ 
 def fetch_feeds(force_all=False):
     """
     Fetch all feeds, possibly parallelizing requests

@@ -38,7 +38,7 @@ $media-queries-supported : true;
 .panels {
     @include clearfix;
     background: transparent url(../images/faux-nav-column.png) left top repeat-y;
-    background-size: $panel1width+.5% auto;  /* +.5 to avoid scrollToFixed round errors */
+    background-size: $panel1width auto;  
 }
 
 .panel  {
@@ -356,7 +356,7 @@ article {
     background: $white;
  
     
-    @include box-shadow(0 3px $wellshadowblur $lightneutralcolor); 
+/*     @include box-shadow(0 3px $wellshadowblur $lightneutralcolor);  */
 
 
     
@@ -366,12 +366,8 @@ article {
 
 /*     display: none;  */
     padding: $baselineheight*2 $gutterwidth*2;
+    border-bottom: 1px solid $lighterneutralcolor;
     
-/*     border: 1px solid $lighterneutralcolor; */
-/*     border-radius: $borderradius; */
-
-
-
     p, blockquote, table, ul, ol, dl {
         @include zero;
         margin: $baselineheight/2 0;

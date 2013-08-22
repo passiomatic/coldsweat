@@ -94,13 +94,14 @@ $(document).ready(function() {
         var article = $(panels[2]).find('article');
         if(article.attr('id') != c.attr('id')) {
             // Loader            
-            article.empty().prepend(loading_fragment);
+            article.html(loading_fragment);
             
             $.ajax(endpoint('/ajax/entries/') + c.attr('id'), 
                 {dataType: 'html', type:'GET'}).done(function(data) {                
                 // Mark article element with current loaded entry
                 article.attr('id', c.attr('id'));
                 article.html(data);
+
             })        
             //c.addClass('status-read')
             //mark(c, 'read');            
@@ -112,11 +113,11 @@ $(document).ready(function() {
     }
     
     function loadEntries(filter) {
-        $(panels[1]).append(loading_fragment);
+        $(panels[1]).empty().prepend(loading_fragment);
         
         $.ajax(endpoint('/ajax/entries/') + filter, 
             {dataType: 'html', type:'GET'}).done(function(data) {            
-                $(panels[1]).empty().html(data);
+                $(panels[1]).html(data);
                 
                 // Update layout and navigation                
                 $(window).resize();

@@ -235,9 +235,11 @@ def endpoint(ctx):
         try:
             user = User.get((User.api_key == api_key) & (User.is_enabled == True))
         except User.DoesNotExist:
+            log.warn('unknown API key %s, unauthorized' % api_key)
             return serialize(result)  #@@TODO: HTTPUnauthorized ?
     else:
         return serialize(result)   #@@TODO: HTTPUnauthorized ?
+        log.warn('missing API key, unauthorized')
 
     # Authorized
     result.auth = 1

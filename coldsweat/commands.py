@@ -10,6 +10,8 @@ from coldsweat import opml
 from coldsweat import fetcher
 #from coldsweat import config
 
+MIN_PASSWORD_LENGTH = 8
+
 COMMANDS = {}
 
 #log_filename = config.get('log', 'filename')
@@ -74,8 +76,8 @@ def command_setup(parser, options, args):
 
     while True:        
         password = getpass("Enter password for user %s: " % username)
-        if len(password) < 8:
-            print 'Error: password is too short, it should be at least 8 characters long'
+        if len(password) < MIN_PASSWORD_LENGTH:
+            print 'Error: password is too short, it should be at least %d characters long' % MIN_PASSWORD_LENGTH
             continue        
         password_again = getpass("Enter password (again): ")
         

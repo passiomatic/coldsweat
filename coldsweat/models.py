@@ -54,7 +54,7 @@ class User(CustomModel):
     """
     Users - need at least one to store the api_key
     """    
-    DEFAULT_CREDENTIALS = 'coldsweat', 'secret'
+    DEFAULT_CREDENTIALS = 'coldsweat', 'coldsweat'
 
     username            = CharField(unique=True)
     password            = CharField() #@@TODO: hashed & salted    
@@ -96,7 +96,7 @@ class Group(CustomModel):
     """
     DEFAULT_GROUP = 'All entries'
     
-    title               = CharField(null=True)
+    title               = CharField(unique=True)
     
     class Meta:  
         db_table = 'groups'    
@@ -270,7 +270,7 @@ def close():
         log.error('Caught exception while closing database connection: %s' % exc)
 
 
-def setup(username, password):
+def setup():
     """
     Create database and tables for all models and setup bootstrap data
     """
@@ -279,15 +279,14 @@ def setup(username, password):
 
     for model in models:
         model.create_table(fail_silently=True)
-        
-    try:
-        User.get(User.username == username)
-        return # Already set up, bail out
-    except User.DoesNotExist:
-        pass
 
     # Create the bare minimum to boostrap system
-    with _db.transaction():
-        User.create(username=username, password=password, api_key=User.make_api_key(username, password))
-        Group.create(title=Group.DEFAULT_GROUP)        
+    with transaction():
+        
+        # Avoid duplicated default group and icon
+        try:
+            Group.create(title=Group.DEFAULT_GROUP)        
+        except IntegrityError:
+            return
+                        
         Icon.create(data=favicon.DEFAULT_FAVICON)

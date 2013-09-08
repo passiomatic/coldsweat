@@ -41,10 +41,12 @@ class FeverApp(WSGIApp):
                 user = User.get((User.api_key == api_key) & (User.is_enabled == True))
             except User.DoesNotExist:
                 #@@TODO: raise HTTPUnauthorized ?
+                log.warn('unknown API key %s, unauthorized' % api_key)
                 return self.respond_with_json(result)  
         else:
             #@@TODO: raise HTTPUnauthorized ?
-            return self.respond_with_json(result)   
+            return self.respond_with_json(result)
+            log.warn('missing API key, unauthorized')               
     
         # Authorized
         result.auth = 1
@@ -267,7 +269,6 @@ COMMANDS = [
     ('favicons'                      , favicons_command), 
     ('links'                         , links_command),
 ]
-
 
 # ------------------------------------------------------
 # Queries

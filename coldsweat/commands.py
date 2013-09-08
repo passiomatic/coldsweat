@@ -5,7 +5,6 @@ Description: sweat utility commands
 from optparse import OptionParser, make_option
 from os import path
 from getpass import getpass
-import codecs
 
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
@@ -17,6 +16,8 @@ from coldsweat.fever import fever_app
 from coldsweat.frontend import frontend_app
 from coldsweat.cascade import Cascade
 from coldsweat.utilities import render_template
+
+MIN_PASSWORD_LENGTH = 8
 
 COMMANDS = {}
 
@@ -64,6 +65,8 @@ def command_serve(parser, options, ags):
 @command('refresh')
 def command_refresh(parser, options, ags):
     '''Starts a feeds refresh procedure'''
+
+    #@@TODO: Honor options.force
     
     counter = fetcher.fetch_feeds()    
     print 'Refresh completed. See log file for more information'
@@ -124,20 +127,29 @@ def command_setup(parser, options, args):
     '''Sets up a working database'''
     username, password, password_again = options.username, '', ''
 
+    setup()
+
+    # Check if username is already in use
+    try:
+        User.get(User.username == username)
+        print "Error: user %s alredy exists, please pick another username" % username     
+        return 
+    except User.DoesNotExist:
+        pass
+        
     while True:        
         password = getpass("Enter password for user %s: " % username)
-        if len(password) < 8:
-            print 'Error: password is too short, it should be at least 8 characters long'
+        if len(password) < MIN_PASSWORD_LENGTH:
+            print 'Error: password is too short, it should be at least %d characters long' % MIN_PASSWORD_LENGTH
             continue        
         password_again = getpass("Enter password (again): ")
         
         if password != password_again:
-            print "Error: passwords don't match, please try again"
+            print "Error: passwords do not match, please try again"
         else:
             break
 
-    setup(username, password)
-
+    User.create(username=username, password=password, api_key=User.make_api_key(username, password))
     print "Setup for user %s completed." % username
 
 

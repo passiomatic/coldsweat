@@ -224,7 +224,7 @@ def fetch_feed(feed):
         return
 
     try:
-        soup = feedparser.parse(response.text) 
+        soup = feedparser.parse(response.text) #@@TODO: Add response_headers=response.headers
     except Exception, exc:
         log.warn("could not parse %s (%s)" % (feed.self_link, exc))
         post_fetch(response.status_code, error=True)

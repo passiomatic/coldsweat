@@ -312,10 +312,10 @@ def get_feed_groups_for_user(user):
     q = Subscription.select().join(User).where(User.id == user.id).distinct().naive()
     groups = defaultdict(lambda: [])
     for s in q:
-        groups[str(s.group.id)].append('%d' % s.feed.id)
+        groups[s.group.id].append('%d' % s.feed.id)
     result = []
     for g in groups.keys():
-        result.append({'group':g, 'feed_ids':','.join(groups[g])})
+        result.append({'group_id':g, 'feed_ids':','.join(groups[g])})
     return result
 
 def get_unread_entries_for_user(user):

@@ -238,8 +238,8 @@ def endpoint(ctx):
             log.warn('unknown API key %s, unauthorized' % api_key)
             return serialize(result)  #@@TODO: HTTPUnauthorized ?
     else:
-        return serialize(result)   #@@TODO: HTTPUnauthorized ?
         log.warn('missing API key, unauthorized')
+        return serialize(result)   #@@TODO: HTTPUnauthorized ?
 
     # Authorized
     result.auth = 1

@@ -33,11 +33,13 @@ def feeds_command(request, user, result):
 
 def unread_items_command(request, user, result):
     unread_items = get_unread_entries_for_user(user)
+    result.unread_item_ids = ''
     if unread_items:
         result.unread_item_ids = ','.join(map(str,unread_items))
             
 def saved_items_command(request, user, result):
     saved_items = get_saved_entries_for_user(user)
+    result.saved_item_ids = ''
     if saved_items:
         result.saved_item_ids = ','.join(map(str,saved_items))
 

@@ -334,7 +334,7 @@ def fetch_feeds(force_all=False):
         log.debug("starting fetcher")
         # Just sequence requests
         for feed in feeds:
-            fetch_feed(feed, blacklist)
+            fetch_feed(feed)
     
     log.info("%d feeds checked in %fs" % (len(feeds), time.time() - start))
 

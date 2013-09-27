@@ -45,8 +45,8 @@ class FeverApp(WSGIApp):
                 return self.respond_with_json(result)  
         else:
             #@@TODO: raise HTTPUnauthorized ?
-            return self.respond_with_json(result)
             log.warn('missing API key, unauthorized')               
+            return self.respond_with_json(result)
     
         # Authorized
         result.auth = 1
@@ -85,11 +85,13 @@ def feeds_command(request, user, result):
 
 def unread_items_command(request, user, result):
     unread_items = get_unread_entries(user)
+    result.unread_item_ids = ''
     if unread_items:
         result.unread_item_ids = ','.join(map(str,unread_items))
             
 def saved_items_command(request, user, result):
     saved_items = get_saved_entries(user)
+    result.saved_item_ids = ''
     if saved_items:
         result.saved_item_ids = ','.join(map(str,saved_items))
 
@@ -299,10 +301,10 @@ def get_feed_groups(user):
     q = Subscription.select().join(User).where(User.id == user.id).distinct().naive()
     groups = defaultdict(lambda: [])
     for s in q:
-        groups[str(s.group.id)].append('%d' % s.feed.id)
+        groups[s.group.id].append('%d' % s.feed.id)
     result = []
     for g in groups.keys():
-        result.append({'group':g, 'feed_ids':','.join(groups[g])})
+        result.append({'group_id':g, 'feed_ids':','.join(groups[g])})
     return result
 
 def get_unread_entries(user):

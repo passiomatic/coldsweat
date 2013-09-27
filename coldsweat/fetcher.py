@@ -160,7 +160,7 @@ def fetch_feed(feed):
             feed.error_count = feed.error_count + 1        
         if feed.error_count > config.getint('fetcher', 'error_threshold'):
             feed.is_enabled = False
-            log.warn("%s has too many errors, disabled" % netloc)
+            log.warn("%s has too many errors, disabled" % netloc)        
         feed.save()
 
     log.debug("fetching %s" % feed.self_link)
@@ -206,25 +206,38 @@ def fetch_feed(feed):
 
     feed.last_checked_on = now
 
-    if response.status_code == 304: # Not modified
+    if response.history and response.history[0].status_code == 301:     # Moved permanently        
+        self_link = response.url
+        
+        try:
+            Feed.get(self_link=self_link)
+        except Feed.DoesNotExist:
+            feed.self_link = self_link                               
+            log.info("%s has changed its location, updated to %s" % (netloc, self_link))
+        else:
+            feed.is_enabled = False
+            log.warn("new %s location %s is duplicated, disabled" % (netloc, self_link))                
+            # Save final status code anyway
+            post_fetch(response.status_code)
+            return
+
+    if response.status_code == 304:                                     # Not modified
         log.debug("%s hasn't been modified, skipped" % netloc)
         post_fetch(response.status_code)
         return
-    elif response.status_code == 410: # Gone
+    elif response.status_code == 410:                                   # Gone
         log.warn("%s is gone, disabled" % netloc)
         feed.is_enabled = False
         post_fetch(response.status_code)
         return
-    if response.status_code == 301: # Moved permanently
-        log.info("%s has changed location, updated" % netloc)
-        feed.self_link = response.url
-    elif response.status_code not in [200, 302, 307]:
+    elif response.status_code not in [200, 302, 307]:                   # No good
         log.warn("%s replied with status %d, aborted" % (netloc, response.status_code))
         post_fetch(response.status_code, error=True)
         return
 
     try:
-        soup = feedparser.parse(response.text) 
+        # Pass response header to parser
+        soup = feedparser.parse(response.text, response_headers=response.headers)
     except Exception, exc:
         log.warn("could not parse %s (%s)" % (feed.self_link, exc))
         post_fetch(response.status_code, error=True)
@@ -238,7 +251,7 @@ def fetch_feed(feed):
     if 'title' in soup.feed:
         feed.title = soup.feed.title
 
-    feed.last_updated_on = get_feed_updated(soup.feed, now)        
+    feed.last_updated_on = get_feed_updated(soup.feed, now)            
     post_fetch(response.status_code)
     
     for entry in soup.entries:
@@ -321,7 +334,7 @@ def fetch_feeds(force_all=False):
         log.debug("starting fetcher")
         # Just sequence requests
         for feed in feeds:
-            fetch_feed(feed, blacklist)
+            fetch_feed(feed)
     
     log.info("%d feeds checked in %fs" % (len(feeds), time.time() - start))
 

@@ -31,6 +31,11 @@ $media-queries-supported : true;
     @include font-size(14);
 }             
 
+.icon-circle-blank,
+.icon-circle {
+    @include font-size(13);    
+}
+
 .container {
 
 }
@@ -38,6 +43,8 @@ $media-queries-supported : true;
 .panels {
     @include clearfix;
     background: transparent url(../images/faux-nav-column.png) left top repeat-y;
+/*     background: $navigationbackgroundcolor; */
+
     background-size: $panel1width auto;  
 }
 
@@ -46,7 +53,7 @@ $media-queries-supported : true;
     box-sizing: border-box;
 
     .panel-title {
-        padding:  $baselineheight/2 $gutterwidth*1.5 $baselineheight/2 $gutterwidth*1.5; 
+        padding:  $baselineheight $gutterwidth*1.5 $baselineheight $gutterwidth*1.5; 
         
         h2 {
             @include zero;
@@ -67,8 +74,8 @@ $media-queries-supported : true;
 
 .panel-1 {
     width: $panel2width;        
-    background: $white;
-    border-right: 1px solid $lighterneutralcolor;
+/*     background: $white; */
+/*     border-right: 1px solid $lighterneutralcolor; */
 }
 
 .panel-2  {
@@ -79,28 +86,34 @@ $media-queries-supported : true;
 header {
     background: $navigationbackgroundcolor;
     
-    
     nav ul {
         @include zero;
-/*         margin-top: $baselineheight/2; */
-
         list-style: none;
                 
         li {
             
             &.sep {
-                margin-top: $baselineheight;
+                margin-top: $baselineheight/2;
             }
 
             a {
                 display: block;
                 @include font-size(14);
                 padding: $baselineheight/4 $baselineheight;
-                border-top: 1px solid lighten($primarycolor, 5%);
-                border-bottom: 1px solid darken($primarycolor, 5%);
+/*                 border-top: 1px solid lighten($primarycolor, 5%); */
+/*                 border-bottom: 1px solid darken($primarycolor, 5%); */
 
                 text-transform: capitalize;
+                
             }
+            
+            
+            span {
+                width: 1em;
+                text-align: center;
+                display: inline-block;                    
+            }
+
         }
 
         &.unread li.filter-unread,
@@ -178,6 +191,8 @@ h1, h2 {
 
 /*     border-left: 1px solid $lighterneutralcolor; */
 
+    padding: 0 $gutterwidth;
+
 
     ul {
         list-style: none;
@@ -187,24 +202,50 @@ h1, h2 {
         li {
             @include zero;
             padding: $baselineheight/2 $gutterwidth*1.5 $baselineheight/2 $gutterwidth*1.5;        
-            border-bottom: 1px dotted $lighterneutralcolor;
+
+            // Read, unread, etc.
+            .meta .icon-circle-blank {
+                display: none;
+            }
+            
+/*             border-top: 1px solid $lighterneutralcolor;             */
+            border-top: 1px solid transparent;            
+            margin-top: -$baselineheight/4;
 
             //background: $white;
             //@include transition(background, 200ms, ease-out);
             
-            img {
+            background: $white;
+            box-shadow: 0 0 4px $lightneutralcolor;
+            
+            .favicon {
                 margin-top: 4px;
                 margin-left: -$gutterwidth;
                 float: left;
             }
             
             &.current {
-                background: #E6EFF5;
+                border-top-color: $white;            
+                background: #E6EFF5 !important;
             }
 
             &.status-read {
-                opacity: .8;                
-                //background: $lightestneutralcolor;
+/*                 opacity: .8;                 */
+                background: $lightestneutralcolor;
+                
+                .meta .icon-circle-blank {
+                    display: inline;
+                }
+                .meta .icon-circle {
+                    display: none;
+                }
+
+            }
+
+            &.status-disabled {
+                h3 {
+                    text-decoration: line-through;
+                }
             }
 
             &.status-saved {
@@ -223,6 +264,10 @@ h1, h2 {
     .more {
         text-align: center;
         padding: $baselineheight/2;
+        
+        form {
+            margin: 0;
+        }
     }
 
 }
@@ -251,6 +296,7 @@ footer[role="contentinfo"] {
         @include font-size(14);
 
         dd, dt {
+/*             text-align: left; */
         }
         
         dt {
@@ -264,11 +310,7 @@ footer[role="contentinfo"] {
 
             display: inline;
             margin: 0 $gutterwidth/4;
-/*             color: $white; */
-/*             @include font-size(14); */
             @extend .dim;
-            
-
         }
     }
         
@@ -298,7 +340,7 @@ code {
     text-align: center;
     z-index: 2;
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     width: 100%;
     box-sizing: border-box;
@@ -351,27 +393,25 @@ code {
 // Feed entry formatting
 
 article {
-/*         @include hidden; */
-
-    background: $white;
- 
-    
+/*         @include hidden; */    
 /*     @include box-shadow(0 3px $wellshadowblur $lightneutralcolor);  */
 
+    display: none;
 
+/*     background: $white; */
     
-    background: $white;
-    
-    box-sizing: border-box;
+/*     box-sizing: border-box; */
 
 /*     display: none;  */
-    padding: $baselineheight*2 $gutterwidth*2;
-    border-bottom: 1px solid $lighterneutralcolor;
+    padding: $baselineheight 0;
+
     
     p, blockquote, table, ul, ol, dl {
         @include zero;
         margin: $baselineheight/2 0;
     }
+
+    
 
 /*
     h1 {
@@ -401,15 +441,6 @@ article {
         display: block;
         margin: 0 auto $baselineheight/2 auto;        
         border: $baselineheight/2 solid $white;
-        
-        // Tracking inages, hide
-/*
-        &[height='1'],
-        &[width='1'] {
-            @include hidden;
-        }
-*/
-        
     }
 
 
@@ -430,7 +461,7 @@ article {
 }
         
         
-.scrollable {
+._scrollable {
 /*     width: 520px; clear: both; margin: 20px 0 10px;  */
     clear: both; 
     /* Position scollbar on top of scrollable content */

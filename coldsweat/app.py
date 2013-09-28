@@ -136,6 +136,9 @@ class ExceptionMiddleware(object):
         # If an exception occours we get the exception information
         # and prepare a traceback we can render
         except Exception:
+        
+            #@@TODO: catch HTTPNotFound and others
+        
             from traceback import format_tb
 
             type, value, tb = sys.exc_info()

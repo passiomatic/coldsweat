@@ -40,7 +40,7 @@ def load_blacklist(filename):
 # Entry data
 # ------------------------------------------------------
 
-def get_feed_updated(feed, default):
+def get_feed_timestamp(feed, default):
     """
     Get the date a feed was last updated
     """
@@ -251,7 +251,7 @@ def fetch_feed(feed):
     if 'title' in soup.feed:
         feed.title = soup.feed.title
 
-    feed.last_updated_on = get_feed_updated(soup.feed, now)            
+    feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
     post_fetch(response.status_code)
     
     for entry in soup.entries:

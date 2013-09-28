@@ -5,19 +5,19 @@
     <section class="panel panel-0 panel-fixed">
         <header>             
             <div class="branding">
-                <i class="icon-tint"></i> Coldsweat
+                <span><i class="icon-tint"></i></span> Coldsweat
             </div>
-            <nav  role="navigation">
+            <nav role="navigation">
                 <ul class="{{filter_name}}">
-                    <li class="filter filter-unread"><a href="?unread"><i class="icon-reorder"></i>&ensp;Unread</a></li>
-                    <li class="filter filter-starred"><a href="?saved"><i class="icon-star"></i>&ensp;Starred</a></li>
+                    <li class="filter filter-unread"><a href="/ajax/entries/?unread"><span><i class="icon-circle"></i></span>&ensp;Unread</a></li>
+                    <li class="filter filter-starred"><a href="/ajax/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Starred</a></li>
                     {{for g in groups}}
-                        <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="?group={{g.id}}"><i class="icon-folder-close"></i>&ensp;{{g.title}}</a></li>            
+                        <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="/ajax/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title}}</a></li>            
                     {{endfor}}        
-            <!--         <li class="filter-feeds"><a href="?feeds"><i class="icon-rss"></i>&ensp;All feeds</a></li>             -->
-            
+                    <li class="sep filter filter-feeds"><a href="/ajax/feeds/"><i class="icon-rss"></i>&ensp;All feeds</a></li>            
+                    <li><a href="#modal-add-feed"  data-toggle="modal"><i class="icon-plus-sign-alt"></i>&ensp;Add feed</a></li>            
 <!--                     <li class="sep"><a role="button"  data-toggle="modal" href="#modal-settings"><i class="icon-cog"></i>&ensp;Settings</a></li> -->
-                    <li><a href="logout"><i class="icon-cog"></i>&ensp;Log out</a></li>
+                    <li class="sep"><a href="/logout"><span><i class="icon-cog"></i></span>&ensp;Log out</a></li>
                 </ul>
             </nav>  
         </header>   
@@ -28,64 +28,80 @@
             <h2 class="h3">&nbsp;</h2>
         </div>
         <div class="panel-content">
-            <div class="scrollable">
-                <div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
-                <div class="viewport">
-                    <div class="overview">
-    <!--                     <div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div> -->
-                    </div>
-                </div>
-            </div>  
+            &nbsp;
         </div>
     </section>
     
-    <section class="panel panel-2">
-        
-        <div class="panel-content">
-            <article>
-                <div class="article-content">
-                    &larr; Open the current item on the left by clicking it or by pressing the <kbd>o</kbd> key.
-                </div>
-            </article>
-        </div>    
-        
-        <footer role="contentinfo">
-    
-          <dl class="">
-                <dt>Navigation</dt>
-                <dd><kbd>j</kbd>&ensp;Previous Item 
-                </dd>
-                <dd><kbd>k</kbd>&ensp;Next Item 
-                </dd>
-                <dt>Actions</dt>
-                <dd><kbd>o</kbd>&ensp;Open Item  
-                </dd>
-                <dd><kbd>m</kbd>&ensp;Mark Item as Read 
-                </dd>
-                <dd><kbd>s</kbd>&ensp;Star Item 
-                </dd>
-            </dl>
-    
-            <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
-            <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="README.md">About</a> &middot; <a href="LICENSE.md">License</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
-        </footer>
-    
-    </section>
 <!-- /panel -->
 </div>
 
 
-<div id="modal-settings" class="modal hide fade">
+<footer role="contentinfo">
+
+<div class="grid-container">
+  <div class="grid-40 prefix-20">
+      <dl class="">
+            <dt>Navigation</dt>
+            <dd><kbd>j</kbd>&ensp;Previous Item 
+            </dd>
+            <dd><kbd>k</kbd>&ensp;Next Item 
+            </dd>
+      </dl>
+  </div>
+  <div class="grid-40">
+      <dl class="">
+            <dt>Actions</dt>
+            <dd><kbd>o</kbd>&ensp;Open Item  
+            </dd>
+            <dd><kbd>m</kbd>&ensp;Mark Item as Read 
+            </dd>
+            <dd><kbd>s</kbd>&ensp;Star Item 
+            </dd>
+      </dl>
+  </div>
+
+<!-- /grid-container -->
+</div>
+<!--
+
+  <dl class="">
+        <dt>Navigation</dt>
+        <dd><kbd>j</kbd>&ensp;Previous Item 
+        </dd>
+        <dd><kbd>k</kbd>&ensp;Next Item 
+        </dd>
+        <dt>Actions</dt>
+        <dd><kbd>o</kbd>&ensp;Open Item  
+        </dd>
+        <dd><kbd>m</kbd>&ensp;Mark Item as Read 
+        </dd>
+        <dd><kbd>s</kbd>&ensp;Star Item 
+        </dd>
+    </dl>
+-->
+
+    <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
+    <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="#">About</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
+</footer>
+    
+
+<div id="modal-add-feed" class="modal hide">
   <div class="modal-header">
     <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i>
-    <h3>Modal header</h3>
+    <h3>Add Feed</h3>
   </div>
   <div class="modal-body">
-    <p>Settings goes here.…</p>
+      
+        <form action="." class="" method="POST">        
+            <input type="text" id="self_link" name="self_link" class="input-xlarge" size="40" value="http://www.repubblica.it/rss/homepage/rss2.0.xml">
+            <span class="help-block">Feed autodiscovery is coming</span>
+        </form><!-- form-horizontal -->
+        
+
   </div>
   <div class="modal-footer">
 <!--     <a href="#" class="btn">Close</a> -->
-    <a href="#" class="btn btn-primary">Save Changes</a>
+    <a href="#" class="btn btn-primary">Continue &rarr;</a>
   </div>
 </div>
 

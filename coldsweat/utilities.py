@@ -73,7 +73,7 @@ def format_http_datetime(value):
        
 def datetime_as_epoch(value):
     return int(timegm(value.utctimetuple()))
-    
+
 def tuple_as_datetime(value):
     return datetime.utcfromtimestamp(timegm(value))
 
@@ -102,8 +102,10 @@ def escape_url(value):
 
 def datetime_since(utcnow):                                
     def _(value):
-        if not value: return '—' 
-        return format_datetime(value, utcnow)
+        if value:
+            return format_datetime(value, utcnow)
+        else:
+            return '—' 
     return _
 
 # def get_excerpt(value, truncate=200):     

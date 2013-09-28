@@ -750,10 +750,10 @@ $popoverarrowcolor  			: $popoverbackgroundcolor;
 
 
 
-// = panels ============
+// =panels ============
 
-$panel1width                    : 12%;
-$panel2width                    : 40%;
-$panel3width                    : 100% - $panel1width - $panel2width; 
+$panel1width                    : 14%;
+$panel2width                    : 100% - $panel1width;
+$panel3width                    : 100% - $panel1width; 
 
 

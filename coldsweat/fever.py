@@ -308,12 +308,14 @@ def get_feed_groups(user):
     return result
 
 def get_unread_entries(user):
+    #@@REMOVEME: order_by
     q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
         (User.id == user.id), 
         ~(Entry.id << Read.select(Read.entry).where(User.id == user.id))).order_by(Entry.id).distinct().naive()
     return [r.id for r in q]
 
 def get_saved_entries(user):
+    #@@REMOVEME: order_by 
     q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
         (User.id == user.id), 
         (Entry.id << Saved.select(Saved.entry).where(User.id == user.id))).order_by(Entry.id).distinct().naive()
@@ -350,7 +352,6 @@ def get_entries(user, ids=None):
     return result 
 
 def get_entries_min(user, min_id, bound=50):
-    #q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id > min_id)).order_by(Entry.id).distinct().limit(bound).naive()
     q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id > min_id)).distinct().limit(bound).naive()
 
     r = Entry.select().join(Read).join(User).where((User.id == user.id) & (Entry.id > min_id)).order_by(Entry.id).distinct().naive()
@@ -375,7 +376,6 @@ def get_entries_min(user, min_id, bound=50):
     return result
     
 def get_entries_max(user, max_id, bound=50):
-    #q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id < max_id)).order_by(Entry.id).distinct().limit(bound).naive()
     q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id < max_id)).distinct().limit(bound).naive()
 
     r = Entry.select().join(Read).join(User).where((User.id == user.id) & (Entry.id < max_id)).order_by(Entry.id).distinct().naive()
@@ -401,8 +401,8 @@ def get_entries_max(user, max_id, bound=50):
 
     
 def get_entry_count(user):
-    q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id)).distinct().count()
-    return q
+    return Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id)).distinct().count()
+
 
 def get_icons():
     """

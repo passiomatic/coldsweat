@@ -41,7 +41,7 @@ from models import Session, connect, close
 from coldsweat import log
 
 
-SESSION_TIMEOUT = 60*15 # 15 minutes
+SESSION_TIMEOUT = 60*60 # 1 hour
 
 def synchronized(func):
     def wrapper(self, *__args, **__kw):
@@ -154,7 +154,8 @@ class SessionManager(object):
 
 def _shutdown(ref):
     cache = ref()
-    if cache is not None: cache.shutdown()
+    if cache:
+        cache.shutdown()
             
 
 class SessionCache(object):

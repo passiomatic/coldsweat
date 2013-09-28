@@ -17,7 +17,6 @@ from utilities import *
 from coldsweat import log, config, installation_dir, template_dir
 
 #SESSION_KEY = 'com.passiomatic.coldsweat.session'
-#TEMPLATE_DIR = os.path.join(installation_dir, 'coldsweat/templates')
 ENTRIES_PER_PAGE = 30
 
 class FrontendApp(WSGIApp):
@@ -27,27 +26,59 @@ class FrontendApp(WSGIApp):
         
     @GET()
     def index(self, request):
+
+        user = self.get_session_user()
  
-        user = self.get_session_user()   
-        
         d = dict(
             user        = user,
             filter_name = 'unread',
             #page_title  = 'Unread Items',     
             #page_title = '%s%s' % (page_title, ' (%s)' % entry_count if entry_count else '')
+            #feed_id     = 0,
             group_id    = 0,
             entry_count = 0,
-            groups = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title).naive(),
+            groups = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title).naive()
         )
 
         return self.respond_with_template('index.html', d)
 
+    @POST(r'^/feeds/add$')
+    def add_feed(self, request):     
+
+        # Redirect
+        #response = HTTPSeeOther(location=ctx.request.url)
+        
+        self_link = request.POST['self_link']
+
+        user = self.get_session_user()
+                        
+        default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
+    
+        with transaction():    
+            feed = fetcher.add_feed(self_link, fetch_icon=True)    
+            try:
+                Subscription.create(user=user, feed=feed, group=default_group)
+                set_message(response, u'SUCCESS Feed %s added successfully.' % self_link)            
+                log.debug('added feed %s for user %s' % (self_link, username))            
+            except IntegrityError:
+                set_message(response, u'INFO Feed %s is already in your subscriptions.' % self_link)
+                log.debug('user %s has already feed %s in her subscriptions' % (username, self_link))    
+    
+        raise self.redirect('?feed?id=%s' % feed.id)
+
+
+    # Ajax calls
+
     @GET(r'^/ajax/entries/?$')
     def ajax_entry_list(self, request):
+        '''
+        Show entries filtered and possibly paginated by: 
+            unread, saved, group or feed
+        '''
 
-        group_id = 0
-        panel_title = 'Unread Items' 
-            
+        # Defaults 
+        page_id, group_id, feed_id, panel_title = 0, 0, 0, 'Unread Items' 
+        
         user = self.get_session_user()  
     
         r = Entry.select().join(Read).where((Read.user == user)).distinct().naive()
@@ -68,16 +99,54 @@ class FrontendApp(WSGIApp):
             feed, q = get_feed_entries(user, feed_id)
             panel_title = feed.title                
         else:
-            # Default is unread
             q = get_unread_entries(user)
-            
-        #t = int(request.GET['t'])         
+
+        if 'page' in request.GET:            
+            page_id = int(request.GET['page'])         
             
         entry_count = q.count()
-        entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()    
+        if page_id:
+            entries = q.order_by(Entry.last_updated_on.desc()).paginate(page_id, ENTRIES_PER_PAGE).naive()    
+            templatename = '_panel_entries_more.html'            
+        else:
+            entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()    
+            templatename = '_panel_entries.html'            
+
+        return self.respond_with_template(templatename, locals())
+
+
+
+    @GET(r'^/ajax/feeds/?$')
+    def ajax_feed_list(self, request):
+        '''
+        Show subscribed feeds for current user
+        '''
+
+        # Defaults 
+        t, panel_title = 0, 'All Feeds' 
+
+        user = self.get_session_user()  
+
+        if 't' in request.GET:            
+            t = int(request.GET['t']) 
+
+        q = get_feeds(user)
+        feed_count = q.count()
+        
+        feeds = q.order_by(Feed.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()
+        
+        return self.respond_with_template('_panel_feeds.html', locals())  
+
+    @GET(r'^/ajax/feeds/(\d+)$')
+    def ajax_feed(self, request, feed_id):
+
+        try:
+            feed = Feed.get((Feed.id == feed_id)) 
+        except Feed.DoesNotExist:
+            raise HTTPNotFound('No such feed %s' % feed_id)
+        
+        return self.respond_with_template('_feed.html', locals())   
     
-        return self.respond_with_template('_panel_1.html', locals())   
-  
     @GET(r'^/ajax/entries/(\d+)$')
     def ajax_entry(self, request, entry_id):
     
@@ -90,6 +159,9 @@ class FrontendApp(WSGIApp):
     
     @POST(r'^/ajax/entries/(\d+)$')
     def ajax_entry_post(self, request, entry_id):
+        '''
+        Mark an entry
+        '''
     
         try:
             status = request.POST['as']
@@ -133,8 +205,12 @@ class FrontendApp(WSGIApp):
         
     @GET(r'^/fever/?$')
     def fever(self, request):        
-        # Human readable placeholder for Fever API 
+        '''
+        Human readable placeholder for Fever API entry point
+        '''
         return self.respond_with_template('fever.html', {})
+
+
 
     # Template
 
@@ -228,9 +304,8 @@ class FrontendApp(WSGIApp):
 
 
 
-# Install session support too
+# Install session support
 frontend_app = SessionMiddleware(FrontendApp())
-#frontend_app = FrontendApp()
 
 # ------------------------------------------------------
 # Template utilities
@@ -258,12 +333,13 @@ def render_template(filename, namespace):
 # ------------------------------------------------------        
  
 def get_unread_entries(user):     
-    #@@TODO: user
-    q = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry)))
+    #@@TODO: join(Icon) to reduce number of queries
+    q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & ~(Entry.id << Read.select(Read.entry)))
     return q
 
-def get_saved_entries(user):     
-    q = Entry.select().join(Feed).join(Icon).where((Entry.id << Saved.select(Saved.entry)))
+def get_saved_entries(user):   
+    #@@TODO: join(Icon) to reduce number of queries  
+    q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Entry.id << Saved.select(Saved.entry)))
     return q
 
 def get_group_entries(user, group_id):     
@@ -283,6 +359,11 @@ def get_feed_entries(user, feed_id):
     #@@TODO: join(Icon) to reduce number of queries
     q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.feed == feed))
     return feed, q
+    
+def get_feeds(user):     
+    #@@TODO: join(Icon) to reduce number of queries
+    q = Feed.select().join(Subscription).where(Subscription.user == user)
+    return q    
 
 
 

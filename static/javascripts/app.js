@@ -5,17 +5,19 @@ $(document).ready(function() {
 
     var scroll_options = { zIndex: 1 };
     
-    var flash_fragment = $('<div class="flash"><i class="icon-star icon-4x"></i><div>Starred</div></div>');
+    var flash_fragment = $('<div class="flash"><i class="icon-star icon-4x"></i><div class="message">Starred</div></div>');
     var alert_fragment = $('<div class="alert alert--error"></div>');
     var loading_fragment = $('<div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div>');
     
-    var panels = $('.panel')
+    var panels = $('.panel');
     
+/*
     $(window).resize(function(e) {
         // Adjust panel-1 height to viewport size. minues the .panel-title total height
         var height = $(window).height() - $(panels[1]).find('.panel-title').outerHeight();
         $(panels[1]).find('.viewport').css('height', height)
     });
+*/
     
     $(document).ajaxError(function(event, jqxhr, settings, exception) {
         //console.log('AJAX call details: ' + settings.url
@@ -33,6 +35,12 @@ $(document).ready(function() {
     });
 */
 
+    function flash(icon, message) {
+            //flash_fragment.find('i').addClass(icon)
+            //flash_fragment.find('.message').text(message)
+            $(document.body).append(flash_fragment);
+            flash_fragment.show().animate({'opacity': 'hide'}, 'slow', function() { flash_fragment.remove() } )         
+    }
 
     function endpoint(pathname) {
         var segments = [
@@ -52,6 +60,7 @@ $(document).ready(function() {
             current.toggleClass('current');        
             el.toggleClass('current');
         }        
+        //@@ flash('At top')
         return current;
     }
 
@@ -91,46 +100,74 @@ $(document).ready(function() {
         }
                 
         // Already open?
-        var article = $(panels[2]).find('article');
+        var article = $(c).find('article');
         if(article.attr('id') != c.attr('id')) {
+            article.show();
+        
             // Loader            
             article.html(loading_fragment);
-            
-            $.ajax(endpoint('/ajax/entries/') + c.attr('id'), 
-                {dataType: 'html', type:'GET'}).done(function(data) {                
-                // Mark article element with current loaded entry
-                article.attr('id', c.attr('id'));
-                article.html(data);
 
+            var url = $(c).find('h3 a').attr('href');
+            //console.log(url);
+            $.ajax(endpoint(url), 
+                {dataType: 'html', type:'GET'}).done(function(data) {
+                // Mark article element with current loaded entry
+                //article.attr('id', c.attr('id'));
+                article.html(data);
             })        
             //c.addClass('status-read')
             //mark(c, 'read');            
         } else {
-            //@@TODO Play a *thump* sound  
-            $(document.body).animate({'scrollTop': '0'}, 400);                        
+            //@@TODO Play a *thump* sound 
+            //$(document.body).animate({'scrollTop': '0'}, 400);                        
+            //article.hide();
+
         }
             
     }
     
-    function loadEntries(filter) {
+    function loadListing(filter) {
         $(panels[1]).empty().prepend(loading_fragment);
-        
-        $.ajax(endpoint('/ajax/entries/') + filter, 
+
+        $.ajax(endpoint(filter),         
             {dataType: 'html', type:'GET'}).done(function(data) {            
                 $(panels[1]).html(data);
-                
-                // Update layout and navigation                
-                $(window).resize();
-                $(panels[1]).find('.scrollable').makeScrollable();
 
-                // Let event to bubbling up                
                 $(panels[1]).find('li a').click(function(event) { event.preventDefault(); })                
                 $(panels[1]).find('li').click(function(event) { openEntry(event); })
+                
+                // Load more
+                var form = $(panels[1]).find('li.more form');
+                $(form).submit(function(event) { 
+                     event.preventDefault();
+                     //console.log('Submit');
+                    
+                    $.ajax(endpoint($(form).attr('action')), 
+                        {dataType: 'html', type:'GET'}).done(function(data) {            
+                            //console.log(data);                            
+                            
+                            
+                    })       
+                     
+                     
+                })
+                
         })       
     }
 
-    function goToEntry(direction) {        
-        function _goToEntry(event) {
+/*
+    function appendEntries(filter) {
+        $(panels[1]).find('li.more').html(loading_fragment);
+        
+        $.ajax(endpoint('/ajax/entries/') + filter, 
+            {dataType: 'html', type:'GET'}).done(function(data) {            
+                $(panels[1]).find('ul').append(data);
+        })       
+    }
+*/
+
+    function moveTo(direction) {        
+        function _moveTo(event) {
             var c = findCurrent()            
             if(direction=='next') {
                 var el = c.next('li')        
@@ -142,12 +179,11 @@ $(document).ready(function() {
             if(el.length) {
                 c.toggleClass('current');        
                 el.toggleClass('current'); //.focus();
-                // Adjust scolling position
-                $('.scrollable').updateScrollPosition(el.position().top);
+                $(document.body).animate({'scrollTop': el.position().top}, 100);
             }
             
         }
-        return _goToEntry;
+        return _moveTo;
     }
 
     function bindKeyboardEvents() {
@@ -155,8 +191,8 @@ $(document).ready(function() {
             'o': openEntry,
             'm': toggleRead,
             's': toggleSaved,
-            'j': goToEntry('prev'),
-            'k': goToEntry('next')
+            'j': moveTo('prev'),
+            'k': moveTo('next')
         }
     
         for (var key in events) {      
@@ -165,19 +201,19 @@ $(document).ready(function() {
     }
     
     function setup() {               
-        $(window).resize();
-        $('.panel-fixed').scrollToFixed(scroll_options);                     
-
-        loadEntries('?unread');
+        var filter = window.location.search;
+        if(!filter) {
+            filter = '/ajax/entries/?unread'; // Default is unread
+        }    
+        //console.log(filter);        
+        loadListing(filter);        
         bindKeyboardEvents();
-
+        
         $(panels[0]).find('.filter a').click(function(event) {
             event.preventDefault();    
             var filter = $(this).attr('href');
-            //console.log(filter);
-            loadEntries(filter);
+            loadListing(filter);
         });
-        
     }
     
     setup();

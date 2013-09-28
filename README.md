@@ -1,6 +1,8 @@
 # Coldsweat
 
-Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and a simple feed store based on SQLite or MySQL. Coldsweat started as a fork of [Bottle Fever][b] by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds. 
+Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and a simple feed store based on SQLite or MySQL. 
+
+Coldsweat started as a fork of [Bottle Fever][b] by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds. 
 
 ![Screenshot](http://lab.passiomatic.com/coldsweat/images/coldsweat-screenshot.jpg)
 
@@ -13,10 +15,10 @@ There will be blood.
 ## Target features
 
 * Multi-user support
-* Compatible with Reeder app on iOS
+* Compatible with existing Fever desktop and mobile clients
 * Support for grouping of similar items
-* Web interface to read, add and import feeds
 * Multiprocessing for parallel feed fetching
+* Web interface to read, add and import feeds
 
 ## Technical underpinnings
 
@@ -26,7 +28,7 @@ There will be blood.
 
 ## Current status
 
-Coldsweat correctly syncs read and saved items with Reeder for iOS — see issue #3 for more information. A command-line utility is provided to import existing feeds as an OPML file, create users and store new feed entries in the database.
+Coldsweat correctly syncs read and saved items with [Reeder][r] for iOS and [ReadKit][rk] on OS X — see issue #3 for more information. A command-line utility is provided to import existing feeds as an OPML file, create users and store new feed entries in the database.
 
 ## Setup
 
@@ -38,3 +40,5 @@ See <https://github.com/passiomatic/coldsweat/wiki/Setup>
 [f]: http://www.feedafever.com/
 [s]: https://github.com/passiomatic/coldsweat
 [b]: https://github.com/rcarmo/bottle-fever
+[rk]: http://readkitapp.com/
+[r]: http://reederapp.com/

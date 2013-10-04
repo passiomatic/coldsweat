@@ -16,6 +16,7 @@ from models import *
 from session import SessionMiddleware
 from utilities import *
 from coldsweat import log, config, installation_dir, template_dir, VERSION_STRING
+import fetcher
 
 #SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENTRIES_PER_PAGE = 30
@@ -43,32 +44,34 @@ class FrontendApp(WSGIApp):
 
         return self.respond_with_template('index.html', d)
 
-    @POST(r'^/feeds/add$')
-    def add_feed(self, request):     
 
-        # Redirect
-        #response = HTTPSeeOther(location=ctx.request.url)
-        
+    # Ajax calls
+
+    @POST(r'^/ajax/feeds/add$')
+    def ajax_add_feed(self, request):     
+
         self_link = request.POST['self_link']
-
-        user = self.get_session_user()
+        if not self_link:
+            #@@TODO Check if well-formed is_valid_url(self_link)
+            message = u'ERROR Please specify a valid URL'
+            return self.respond_with_template('_feed_added.html', locals())
                         
+        user = self.get_session_user()
         default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
     
         with transaction():    
             feed = fetcher.add_feed(self_link, fetch_icon=True)    
             try:
                 Subscription.create(user=user, feed=feed, group=default_group)
-                set_message(response, u'SUCCESS Feed %s added successfully.' % self_link)            
-                log.debug('added feed %s for user %s' % (self_link, username))            
+                log.debug('added feed %s for user %s' % (self_link, user.username))            
+                #message = render_message(u'SUCCESS Feed %s added successfully.' % self_link)
+                message = u'SUCCESS Feed %s added successfully.' % self_link
+
             except IntegrityError:
-                set_message(response, u'INFO Feed %s is already in your subscriptions.' % self_link)
-                log.debug('user %s has already feed %s in her subscriptions' % (username, self_link))    
+                log.debug('user %s has already feed %s in her subscriptions' % (user.username, self_link))    
+                message = u'INFO Feed %s is already in your subscriptions.' % self_link
     
-        raise self.redirect('?feed?id=%s' % feed.id)
-
-
-    # Ajax calls
+        return self.respond_with_template('_feed_added.html', locals())
 
     @GET(r'^/ajax/entries/?$')
     def ajax_entry_list(self, request):
@@ -149,6 +152,7 @@ class FrontendApp(WSGIApp):
             raise HTTPNotFound('No such feed %s' % feed_id)
         
         return self.respond_with_template('_feed.html', locals())   
+    
     
     @GET(r'^/ajax/entries/(\d+)$')
     def ajax_entry(self, request, entry_id):

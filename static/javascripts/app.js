@@ -200,6 +200,19 @@ $(document).ready(function() {
             var filter = $(this).attr('href');
             loadListing(filter);
         });
+
+        var form = $(document).find('#modal-add-subscription form');
+        form.on('submit', function(event) { 
+            event.preventDefault();
+            var serializedData = form.serialize();
+            console.log(serializedData);
+            form.html(loading_fragment);
+            $.ajax(endpoint(form.attr('action')), 
+                {dataType: 'html', type:form.attr('method'), data: serializedData}).done(function(data) {            
+                   form.replaceWith(data);                   
+            })       
+        })
+
     }
     
     setup();

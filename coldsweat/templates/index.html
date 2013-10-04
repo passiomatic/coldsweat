@@ -40,14 +40,14 @@
     
 
 <div id="modal-add-subscription" role="dialog" class="modal fade hide" tabindex="-1">
-  <form action="." method="POST">        
+  <form action="/ajax/feeds/add" method="POST">        
       <div class="modal-header">
     <!--     <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i> -->
         <h3>Add Subscription</h3>
       </div>
       <div class="modal-body">          
-            <label for="self_link">Web address (URL) of the feed</label> 
-            <input type="text" id="self_link" name="self_link" class="input-xlarge" size="40" value="http://www.repubblica.it/rss/homepage/rss2.0.xml">
+            <label for="self_link">Web address (URL) for the feed</label> 
+            <input type="text" id="self_link" name="self_link" class="input-xlarge" size="40" value="">
     <!--             <span class="help-block">Feed autodiscovery is coming</span> -->
       </div>
       <div class="modal-footer">

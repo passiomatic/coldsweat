@@ -11,7 +11,7 @@ from hashlib import md5, sha1
 from calendar import timegm
 from datetime import datetime
 from tempita import HTMLTemplate
-import cgi, urllib #, json
+import re, cgi, urllib
 
 DEFAULT_ENCODING = 'utf-8'
 
@@ -31,6 +31,23 @@ def make_md5_hash(s):
 def make_sha1_hash(s):          
     return sha1(encode(s)).hexdigest()
 
+
+# --------------------
+# URL functions
+# --------------------
+
+# Lifted from https://github.com/django/django/blob/master/django/core/validators.py
+RE_URL = re.compile(
+    r'^https?://'  # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+    r'localhost|'  # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+    r'(?::\d+)?'  # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+def is_valid_url(value):
+    return (value is not None) and RE_URL.search(value)
+    
 # --------------------
 # Date/time functions
 # --------------------
@@ -160,10 +177,17 @@ def run_tests():
     print format_datetime(v, t)    
     v = datetime(t.year, t.month, t.day, 12, 0, 0)
     print format_datetime(v, t)    
+    v = datetime(t.year, t.month, t.day, t.hour, 0, 0)
+    print format_datetime(v, t)    
     v = datetime(t.year, t.month, t.day, t.hour, t.minute, 0)
     print format_datetime(v, t)    
     
     print format_http_datetime(t)
+     
+    assert is_valid_url('https://example.com')          # OK
+    assert is_valid_url('http://example.org/feed.xml')  # OK
+    assert not is_valid_url('example.com')              # Fail
+    
     #print get_excerpt('Some <script src="http://example.com/evil.js"></script> code.')
     
 if __name__ == '__main__':

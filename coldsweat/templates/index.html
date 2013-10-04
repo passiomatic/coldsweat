@@ -1,29 +1,26 @@
 {{inherit "site.html"}}
 
 {{def container}}
-<div class="panels">
-    <section class="panel panel-0 panel-fixed">
-        <header>             
-            <div class="branding">
+    <nav role="navigation">
+        <ul class="{{filter_name}}">
+            <li class="branding">
                 <span><i class="icon-tint"></i></span> Coldsweat
-            </div>
-            <nav role="navigation">
-                <ul class="{{filter_name}}">
-                    <li class="filter filter-unread"><a href="/ajax/entries/?unread"><span><i class="icon-circle"></i></span>&ensp;Unread</a></li>
-                    <li class="filter filter-starred"><a href="/ajax/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Starred</a></li>
-                    {{for g in groups}}
-                        <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="/ajax/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title}}</a></li>            
-                    {{endfor}}        
-                    <li class="sep filter filter-feeds"><a href="/ajax/feeds/"><i class="icon-rss"></i>&ensp;All feeds</a></li>            
-                    <li><a href="#modal-add-feed"  data-toggle="modal"><i class="icon-plus-sign-alt"></i>&ensp;Add feed</a></li>            
+            </li>
+
+            <li class="filter filter-unread"><a href="/ajax/entries/?unread"><span><i class="icon-circle"></i></span>&ensp;Unread</a></li>
+            <li class="filter filter-starred"><a href="/ajax/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Starred</a></li>
+            {{for g in groups}}
+                <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="/ajax/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title}}</a></li>            
+            {{endfor}}        
+
+            <li class="sep filter filter-feeds"><a href="/ajax/feeds/"><i class="icon-rss"></i>&ensp;All feeds</a></li>            
+            <li><a href="#modal-add-subscription"  data-keyboard="true" data-toggle="modal"><i class="icon-plus-sign-alt"></i>&ensp;Add subscription</a></li>            
 <!--                     <li class="sep"><a role="button"  data-toggle="modal" href="#modal-settings"><i class="icon-cog"></i>&ensp;Settings</a></li> -->
-                    <li class="sep"><a href="/logout"><span><i class="icon-cog"></i></span>&ensp;Log out</a></li>
-                </ul>
-            </nav>  
-        </header>   
-    </section>
+            <li class="sep"><a href="{{application_url}}/logout"><span><i class="icon-cog"></i></span>&ensp;Log out</a></li>
+        </ul>
+    </nav>  
         
-    <section  class="panel panel-1 panel-fixed">
+    <section  class="panel">
         <div class="panel-title">
             <h2 class="h3">&nbsp;</h2>
         </div>
@@ -31,79 +28,83 @@
             &nbsp;
         </div>
     </section>
-    
-<!-- /panel -->
-</div>
 
 
 <footer role="contentinfo">
 
-<div class="grid-container">
-  <div class="grid-40 prefix-20">
-      <dl class="">
-            <dt>Navigation</dt>
-            <dd><kbd>j</kbd>&ensp;Previous Item 
-            </dd>
-            <dd><kbd>k</kbd>&ensp;Next Item 
-            </dd>
-      </dl>
-  </div>
-  <div class="grid-40">
-      <dl class="">
-            <dt>Actions</dt>
-            <dd><kbd>o</kbd>&ensp;Open Item  
-            </dd>
-            <dd><kbd>m</kbd>&ensp;Mark Item as Read 
-            </dd>
-            <dd><kbd>s</kbd>&ensp;Star Item 
-            </dd>
-      </dl>
-  </div>
-
-<!-- /grid-container -->
-</div>
-<!--
-
-  <dl class="">
-        <dt>Navigation</dt>
-        <dd><kbd>j</kbd>&ensp;Previous Item 
-        </dd>
-        <dd><kbd>k</kbd>&ensp;Next Item 
-        </dd>
-        <dt>Actions</dt>
-        <dd><kbd>o</kbd>&ensp;Open Item  
-        </dd>
-        <dd><kbd>m</kbd>&ensp;Mark Item as Read 
-        </dd>
-        <dd><kbd>s</kbd>&ensp;Star Item 
-        </dd>
-    </dl>
--->
-
     <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
-    <div class="credits dim">&copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a> &middot; <a href="#">About</a> &middot; <a target="_blank" href="https://github.com/passiomatic/coldsweat">Source Code</a></div>
+    <div class="credits dim">
+        &copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a>&emsp;<a href="#modal-keyboard-shortcuts" data-keyboard="true" data-toggle="modal">Keyboard Shortcuts</a>&emsp;<a href="{{application_url}}/guide">Configure Your Feed Reader</a>&emsp;<a href="{{application_url}}/about">About</a>
+    </div>
 </footer>
     
 
-<div id="modal-add-feed" class="modal hide">
+<div id="modal-add-subscription" role="dialog" class="modal fade hide" tabindex="-1">
+  <form action="." method="POST">        
+      <div class="modal-header">
+    <!--     <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i> -->
+        <h3>Add Subscription</h3>
+      </div>
+      <div class="modal-body">          
+            <label for="self_link">Web address (URL) of the feed</label> 
+            <input type="text" id="self_link" name="self_link" class="input-xlarge" size="40" value="http://www.repubblica.it/rss/homepage/rss2.0.xml">
+    <!--             <span class="help-block">Feed autodiscovery is coming</span> -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Continue &rarr;</button>
+      </div>
+  </form>
+</div>
+
+
+<div id="modal-keyboard-shortcuts" role="dialog" class="modal fade hide" tabindex="-1">
   <div class="modal-header">
-    <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i>
-    <h3>Add Feed</h3>
+<!--     <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i> -->
+    <h3>Keyboard Shortcuts</h3>
   </div>
   <div class="modal-body">
+<!--       <p></p> -->
       
-        <form action="." class="" method="POST">        
-            <input type="text" id="self_link" name="self_link" class="input-xlarge" size="40" value="http://www.repubblica.it/rss/homepage/rss2.0.xml">
-            <span class="help-block">Feed autodiscovery is coming</span>
-        </form><!-- form-horizontal -->
-        
+      <dl class="">
+        <dt>Navigation</dt>
+        <dd><kbd>j</kbd>&ensp;Previous entry/feed 
+        </dd>
+        <dd><kbd>k</kbd>&ensp;Next entry/feed 
+        </dd>        
+        <dt>Entry Listing</dt>
+        <dd><kbd>o</kbd>&ensp;Open entry  
+        </dd>
+        <dd><kbd>m</kbd>&ensp;Mark entry as read 
+        </dd>
+        <dd><kbd>s</kbd>&ensp;Star entry 
 
+        <dt>Feed listing</dt>
+<!--
+        <dd><kbd>o</kbd>&ensp;Open feed  
+        </dd>
+-->
+        <dd><kbd>m</kbd>&ensp;Mark entire feed as read 
+        </dd>
+<!--
+        <dd><kbd>d</kbd>&ensp;Disable feed
+        </dd>
+-->
+        <dt>Misc.</dt>
+<!--
+        <dd><kbd>?</kbd>&ensp;Show this help text 
+        </dd>
+-->
+        <dd><kbd>a</kbd>&ensp;Add a subscription 
+        </dd>
+      </dl>
   </div>
   <div class="modal-footer">
-<!--     <a href="#" class="btn">Close</a> -->
-    <a href="#" class="btn btn-primary">Continue &rarr;</a>
+    <button data-dismiss="modal" type="button" class="btn btn-primary">Close</button>
   </div>
 </div>
+
+
 
 {{enddef}}
 
@@ -114,10 +115,9 @@ head.js(
 // Typically libraries are needed first, such as jQuery (as the plugins 
 // depend on jQuery to execute). The below configuration is what Rock 
 // Hammer uses, but customise this for your own needs.
-// Notice the use of @path here. This is because we need the file names, 
-// not the script tags being generated. Ensure all filenames you wish
-// head.js to load are surrounded with quotes. Also, this is a list, so
-// ensure that all but the last item are followed by a comma.
+// Ensure all filenames you wish head.js to load are surrounded with 
+// quotes. Also, this is a list, so ensure that all but the last item 
+// are followed by a comma.
 
 // Libraries
 "{{static_url}}/javascripts/vendor/modernizr-min.js",
@@ -128,7 +128,7 @@ head.js(
 
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
-//"javascripts/vendor/bootstrap/bootstrap-transition.js",
+"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-transition.js",
 //"javascripts/vendor/bootstrap/bootstrap-carousel.js",
 //"javascripts/vendor/bootstrap/bootstrap-tooltip.js",
 

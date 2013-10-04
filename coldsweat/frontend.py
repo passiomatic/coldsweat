@@ -6,6 +6,7 @@ Copyright (c) 2013—, Andrea Peltrin
 Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
+from __future__ import division
 from os import path
 from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
 from tempita import Template #, HTMLTemplate 
@@ -14,7 +15,7 @@ from app import *
 from models import *
 from session import SessionMiddleware
 from utilities import *
-from coldsweat import log, config, installation_dir, template_dir
+from coldsweat import log, config, installation_dir, template_dir, VERSION_STRING
 
 #SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENTRIES_PER_PAGE = 30
@@ -77,7 +78,7 @@ class FrontendApp(WSGIApp):
         '''
 
         # Defaults 
-        page_id, group_id, feed_id, panel_title = 0, 0, 0, 'Unread Items' 
+        offset, group_id, feed_id, panel_title = 0, 0, 0, 'Unread Items' 
         
         user = self.get_session_user()  
     
@@ -101,17 +102,19 @@ class FrontendApp(WSGIApp):
         else:
             q = get_unread_entries(user)
 
-        if 'page' in request.GET:            
-            page_id = int(request.GET['page'])         
+        if 'offset' in request.GET:            
+            offset = int(request.GET['offset'])
             
         entry_count = q.count()
-        if page_id:
-            entries = q.order_by(Entry.last_updated_on.desc()).paginate(page_id, ENTRIES_PER_PAGE).naive()    
+        entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()    
+
+        if offset:
             templatename = '_panel_entries_more.html'            
         else:
-            entries = q.order_by(Entry.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()    
             templatename = '_panel_entries.html'            
-
+            
+        offset += ENTRIES_PER_PAGE
+        
         return self.respond_with_template(templatename, locals())
 
 
@@ -210,6 +213,13 @@ class FrontendApp(WSGIApp):
         '''
         return self.respond_with_template('fever.html', {})
 
+    @GET(r'^/guide/?$')
+    def guide(self, request):        
+        return self.respond_with_template('guide.html', {})
+
+    @GET(r'^/about/?$')
+    def about(self, request):        
+        return self.respond_with_template('about.html', {})
 
 
     # Template
@@ -218,6 +228,7 @@ class FrontendApp(WSGIApp):
 
         site_namespace = {
             # Global objects and settings 
+            'version_string'    : VERSION_STRING,
             'request'           : self.request,
             'static_url'        : STATIC_URL,
             'application_url'   : self.request.application_url,
@@ -271,6 +282,9 @@ class FrontendApp(WSGIApp):
             password = '',
             from_url = request.GET.get('from', '/')
         )
+        
+        d.update(get_health())
+        
         return self.respond_with_template('login.html', d)
 
     @POST(r'^/login/?$')
@@ -292,8 +306,15 @@ class FrontendApp(WSGIApp):
             from_url        = from_url,        
             alert_message   = render_message('ERROR Unable to log in. Please check your username and password.')
         )
-                
+        
+        d.update(get_health())
+
+        #@@TODO: use redirect?
+        #set_message(response, u'ERROR Unable to log in. Please check your username and password.')            
+        #raise self.redirect(self.request.path)
+        
         return self.respond_with_template('login.html', d)
+
 
     @GET(r'^/logout/?$')
     def logout(self, request):
@@ -366,6 +387,38 @@ def get_feeds(user):
     return q    
 
 
+def get_health():
+    '''
+    Get some user-agnostic stats from Coldsweat database 
+    '''
+    
+    now = datetime.utcnow()
+    
+    #last_entries = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry))).order_by(Entry.last_updated_on.desc()).limit(5).naive()
+        
+    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    if last_checked_on:
+        b = (now - last_checked_on).days
+        last_checked_on = format_datetime(last_checked_on)
+        # Between 0 and timedelta.max     
+    else:
+        last_checked_on = 'Never'
+        b = 0 #timedelta.max.days
+        
+    unread_count = Entry.select().where(~(Entry.id << Read.select(Read.entry))).naive().count()
+    if not unread_count:
+        unread_count = 'None'
+    
+    feed_count = Feed.select().count()
+    active_feed_count = Feed.select().where(Feed.is_enabled==True).count()
+
+    # Between 0.0 and 1,0 
+    #a = feed_count/active_feed_count        
+    
+    
+    health = 1.0
+
+    return locals()
 
 
 

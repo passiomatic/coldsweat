@@ -27,3 +27,7 @@ padding : $gutterwidth;
 padding : $gutterwidth / 4;
 //@include box-shadow(inset 0 1px $wellshadowblur / 2 $wellshadow);  
 }
+
+.well--dim {
+    background-color: $wellaltbackgroundcolor;
+}

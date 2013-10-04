@@ -1,25 +1,23 @@
 
 {{if entry_count}}
     {{for loop, e in looper(entries)}}
-        <li id="{{e.id}}" class="{{if loop.first}}current{{endif}} {{if e.id in saved_ids}}status-saved{{endif}} {{if e.id in read_ids}}status-read{{endif}}">
+        <li id="{{e.id}}" class="entry {{if loop.first}}current{{endif}} {{if e.id in saved_ids}}status-saved{{endif}} {{if e.id in read_ids}}status-read{{endif}}">
             <h3 class="h4">
                 <img class="favicon" src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a href="/ajax/entries/{{e.id}}">{{e.title}}</a>
             </h3>
             <div class="meta dim">
-                <i class="icon-circle" title="Unread"></i><i class="icon-circle-blank" title="Read"></i>&ensp;
-                <a title="Show all entres for this feed" href="?feed={{e.feed.id}}">
-                    {{if e.author}}{{e.author}}{{else}}{{e.feed.title}}{{endif}}
-                </a>             
-                &ensp;{{e.last_updated_on|since}}
+                <i class="icon-circle" title="Unread"></i><i class="icon-circle-blank" title="Read"></i>&ensp;<a title="Show all entres for this feed" href="{{application_url}}/?feed={{e.feed.id}}">{{e.feed.title}}</a>&ensp;{{e.last_updated_on|since}}
             </div>                  
             <article></article>
         </li>
     {{endfor}}
+    {{if offset < entry_count }}
     <li class="more">
-        <form action="/ajax/entries/?{{request.query_string}}&amp;page={{page_id+1}}">
-            <button type="submit" class="btn">Load more entries</button>
+        <form action="/ajax/entries/?{{request.query_string}}&amp;offset={{offset}}">
+            <button type="submit" class="btn">Load More Entries</button>
         </form>
     </li>
+    {{endif}}
 {{else}}
         <li>
             <i>No entries found.</i>

@@ -1,15 +1,15 @@
 <div class="content">
     
+    <p>
+        There are <a href="?feed={{feed.id}}">999 unread entries</a> in this feed <a target="_blank" href="{{feed.alternate_link}}">Visit feed web page</a>
+    </p>
     
-    
-    <form action="/ajax/feeds/{{feed.id}}" method="post">
-        
-        There are <a href="?feed={{feed.id}}">32 unread entries</a> in this feed &middot; <a target="_blank" href="{{feed.alternate_link}}">Visit feed web page</a>&middot;
+    <form action="/ajax/feeds/{{feed.id}}" method="POST">
         
         {{if feed.is_enabled}}
-            <button class="btn" type="submit">Disable this Feed</button>
+            <button class="btn btn-primary" type="submit">Disable this Feed</button>
         {{else}}
-            <button class="btn " type="submit">Enable this Feed</button>
+            <button class="btn btn-primary" type="submit">Enable this Feed</button>
         {{endif}}        
     </form>
         

@@ -5,7 +5,7 @@
 // Adapted from: https://github.com/twitter/bootstrap/blob/master/less/forms.less
 
 form {
-margin : 0 0 $baselineheight 0;
+/* margin : 0 0 $baselineheight 0; */
 font-family : $formfontfamily;
 
 p {
@@ -21,7 +21,7 @@ display : none; }
 }
 
 fieldset {
-margin-bottom : $baselineheight;
+/* margin-bottom : $baselineheight/2; */
 padding : 0;
 border-width : 0; 
 
@@ -81,7 +81,8 @@ padding : $forminputpadding;
 line-height : $baselineheight;
 color : inherit;
 border-radius : $forminputborderradius;
-vertical-align : middle; }
+vertical-align : middle; 
+}
 
 input[type="date"],
 input[type="datetime"],
@@ -126,6 +127,10 @@ border-color : $forminputbordercolorhover; }
 border-color : $forminputbordercolorfocus;
 outline : 0;
 outline : thin dotted \ 9; }
+
+// validation errors    
+&.has-error {
+border-color: $forminputerrorbordercolor; }
 }
 
 input[type="radio"],

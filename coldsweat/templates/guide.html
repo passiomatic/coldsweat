@@ -1,0 +1,69 @@
+{{inherit "site.html"}}
+
+{{def container}}
+
+<div class="container-inner">
+
+<div class="grid-container">
+
+  <div class="grid-50">
+<!--     <header> -->
+        <h1>Configure Your Feed Reader</h1>            
+<!--         <p class="subhead">Enter your account credentials to proceed.</p> -->
+<!--     </header>  -->
+  </div>
+
+  <br class="clear">
+                
+  <div class="grid-50">
+      <h2>Reeder 2 for iOS</h2>
+
+      @@TODO: Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Aenean lacinia bibendum nulla sed consectetur. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Nulla vitae elit libero, a pharetra augue.
+  </div>
+
+  <hr>
+
+ 
+  
+<!--
+  <div class="grid-50">
+        
+        <section class="boxed">
+
+            <div class="well well--large well--dim">
+                <h2>Sync Your Feed Reader</h2>
+                
+                <p>Sync with Coldsweat using the address below. Also you’ll be asked for your Coldsweat credentials.</p>            
+                <p><code>{{request.application_url}}/fever</code></p>
+                
+            </div>
+
+                              
+        </section>
+      
+  </div>
+-->
+
+ 
+
+<!-- /grid-container -->
+</div>
+
+<!-- /container-inner -->
+</div>
+
+{{enddef}}
+
+
+{{def page_script_block}}
+<script>
+head.js(
+// Libraries
+"{{static_url}}/javascripts/vendor/modernizr-min.js",
+"{{static_url}}/javascripts/vendor/jquery-min.js",
+function() {
+   // Load complete
+   $('#username').focus();
+});
+</script>
+{{enddef}}

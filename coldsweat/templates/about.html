@@ -1,0 +1,55 @@
+{{inherit "site.html"}}
+
+{{def container}}
+
+<div class="container-inner">
+
+<div class="grid-container">
+
+  <div class="grid-50">
+<!--     <header> -->
+        <h1>About Coldsweat</h1>            
+<!--     </header>  -->
+  </div>
+
+  <br class="clear">
+                
+  <div class="grid-50">
+
+      <h3>Motivation</h3>
+      <p>I'm fed up of online services that are here today and gone tomorrow. After the Google Reader shutdown is clear to me that the less we rely on external services the more the data we care about are preserved. With this in mind I'm writing Coldsweat. It will be my personal take at consuming feeds today.
+      </p>      
+      <h3>Get Support</h3>      
+      <p>
+        <a href="https://github.com/passiomatic/coldsweat/issues">Open an issue on GitHub</a> or contact me via e-mail at<br>
+        coldsweat {at} passiomatic {dot} com.
+      </p>
+
+  </div>
+
+  <hr>
+
+ 
+  
+
+<!-- /grid-container -->
+</div>
+
+<!-- /container-inner -->
+</div>
+
+{{enddef}}
+
+
+{{def page_script_block}}
+<script>
+head.js(
+// Libraries
+"{{static_url}}/javascripts/vendor/modernizr-min.js",
+"{{static_url}}/javascripts/vendor/jquery-min.js",
+function() {
+   // Load complete
+   $('#username').focus();
+});
+</script>
+{{enddef}}

@@ -44,7 +44,6 @@ _monthname = [None, # Dummy so we can use 1-based month numbers
 def format_datetime(value, comparsion_value=None):
     
     if not comparsion_value:    
-        #return value.strftime('%a, %d %b %H:%M:%S UTC')
         return value.strftime('%a, %d %b %H:%M UTC')
     
     delta = comparsion_value - value    

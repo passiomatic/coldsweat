@@ -126,7 +126,7 @@ $midneutralcolor 				: darken($neutralcolor,25%);
 $darkneutralcolor 				: darken($neutralcolor,50%);
 $lightneutralcolor 				: lighten($neutralcolor,25%);
 $lighterneutralcolor 			: lighten($neutralcolor,50%);
-$lightestneutralcolor 			: lighten($neutralcolor,65%);
+$lightestneutralcolor 			: lighten($neutralcolor,62%);
 
 // Sometimes you may want $black and $white to be ‘almost black’ and ’off-white’
 $black 							: rgb(0,0,0);
@@ -206,7 +206,7 @@ $basefontbackgroundcolor		: $lightestneutralcolor;
 // By default site navigation has a flat background colour
 // Add an optional gradient in __navigation-toggle.scss
 // Configure the gradient colours in _texture.scss
-$navigationbackgroundcolor 		: $primarycolor;
+$navigationbackgroundcolor 		: $lightneutralcolor;
 
 // Set navigation items’ bottom border width
 $navigationborderwidth			: $borderwidth;
@@ -218,10 +218,10 @@ $navigationborderstyle			: none;
 $navigationbordercolor 			: darken($navigationbackgroundcolor,10%);
 
 // Set navigation items’ link colours
-$navigationlinkcolor			: $white;
+$navigationlinkcolor			: $lightestneutralcolor;
 
 // :hover
-$navigationlinkcolorhover		: $lightestneutralcolor; //darken($navigationlinkcolor,10%);
+$navigationlinkcolorhover		: $white;
 
 
 
@@ -486,6 +486,7 @@ $alertcolorwarning				: darken($warningcolor, 20%);
 // Add an optional gradient in _bootstrap-wells.scss
 // Configure the gradient colours in _texture.scss
 $wellbackgroundcolor 			: $lightestneutralcolor;
+$wellaltbackgroundcolor 		: darken($lighterneutralcolor, 8%);
 
 // Set wells’ border width
 $wellborderwidth 				: $alertborderwidth;
@@ -525,7 +526,7 @@ $formfontfamily 				: $basefontfamily;
 
 // =inputs ============
 
-$forminputpadding				: 6px 11px;
+$forminputpadding				: 6px 6px;
 
 // Inputs have a default flat background colour
 // Add an optional gradient in _bootstrap-forms.scss
@@ -542,6 +543,7 @@ $forminputborderstyle			: $borderstyle;
 $forminputbordercolor 			: $bordercolor;
 $forminputbordercolorhover 		: darken($forminputbordercolor, 10%);
 $forminputbordercolorfocus 		: darken($forminputbordercolor, 25%);
+$forminputerrorbordercolor      : $errorcolor;
 
 // Set inputs’ border radius. Default is $borderradius defined above
 $forminputborderradius			: $borderradius;

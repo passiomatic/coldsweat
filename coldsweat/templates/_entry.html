@@ -1,17 +1,15 @@
-<!--
-<div class="dim">
-    <a class="filter" href="?feed={{entry.feed.id}}">{{entry.feed.title}}</a>
-</div>
--->
 {{if entry.content}} 
     <div class="content">
         {{entry.content}}
     </div>            
-    {{else}}
+    <hr>
+{{else}}
+<!--
     <div class="content dim">
         <i>No content found for this entry.</i>
     </div>            
+-->
 {{endif}}
-<div>
-    <a target="_blank" href="{{entry.link}}">View original</a>
+<div class="meta dim">
+    {{if entry.author}}Posted by <b>{{entry.author}}</b>&emsp;{{endif}}<a target="_blank" href="{{entry.link}}">View original</a>
 </div>

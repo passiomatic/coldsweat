@@ -192,7 +192,7 @@ class FrontendApp(WSGIApp):
             elif status == 'unread':
                 count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
                 if not count:
-                    log.debug('entry %d never marked as read, ignored' % entry_id)
+                    log.debug('entry %s never marked as read, ignored' % entry_id)
                     return
             elif status == 'saved':
                 try:
@@ -204,7 +204,7 @@ class FrontendApp(WSGIApp):
             elif status == 'unsaved':
                 count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
                 if not count:
-                    log.debug('entry %d never marked as saved, ignored' % entry_id)
+                    log.debug('entry %s never marked as saved, ignored' % entry_id)
                     return
             
             log.debug('marked entry %s as %s' % (entry_id, status))

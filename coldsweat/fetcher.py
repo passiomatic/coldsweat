@@ -298,7 +298,13 @@ def fetch_feed(feed):
         Entry.create(**d)
 
         log.debug(u"added entry %s from %s" % (guid, netloc))
- 
+
+def feed_worker(feed):
+    # Allow each process to open and close its database connection    
+    connect()
+    fetch_feed(feed)
+    close()
+    
  
 def fetch_feeds(force_all=False):
     """
@@ -319,23 +325,25 @@ def fetch_feeds(force_all=False):
     feeds = list(q)
     if not feeds:
         log.debug("no feeds found to refresh, halted")
-        return # Nothing to do
-        
-    multiprocessing = config.getboolean('fetcher', 'multiprocessing')     
-    if multiprocessing:
-        from multiprocessing import Pool
-        processes = config.getint('fetcher', 'processes')        
-        log.debug("starting fetcher with %d workers" % processes)
+        return
 
-        p = Pool(processes)        
-        p.map(fetch_feed, feeds, config.getint('fetcher', 'chunk_size'))
+    log.debug("starting fetcher")
+        
+    if config.getboolean('fetcher', 'multiprocessing'):
+        from multiprocessing import Pool
+        #processes = config.getint('fetcher', 'processes')        
+        #log.debug("starting fetcher with %d workers" % processes)
+
+        p = Pool(processes=None) # Uses cpu_count()        
+        p.map(feed_worker, feeds)
 
     else:
-        log.debug("starting fetcher")
         # Just sequence requests
         for feed in feeds:
             fetch_feed(feed)
     
     log.info("%d feeds checked in %fs" % (len(feeds), time.time() - start))
+
+
 
     

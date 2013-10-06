@@ -4,12 +4,7 @@
     </div>            
     <hr>
 {{else}}
-<!--
-    <div class="content dim">
-        <i>No content found for this entry.</i>
-    </div>            
--->
 {{endif}}
 <div class="meta dim">
-    {{if entry.author}}Posted by <b>{{entry.author}}</b>&emsp;{{endif}}<a target="_blank" href="{{entry.link}}">View original</a>
+    Posted {{entry.last_updated_on|since}}{{if entry.author}} by <b>{{entry.author}}</b>{{endif}}&emsp;<a target="_blank" href="{{entry.link}}">View original</a>
 </div>

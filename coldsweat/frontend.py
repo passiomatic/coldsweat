@@ -129,27 +129,40 @@ class FrontendApp(WSGIApp):
         '''
 
         # Defaults 
-        t, panel_title = 0, 'All Feeds' 
+        offset, panel_title = 0, 'All Feeds' 
 
         user = self.get_session_user()  
 
-        if 't' in request.GET:            
-            t = int(request.GET['t']) 
+        if 'offset' in request.GET:            
+            offset = int(request.GET['offset'])
 
         q = get_feeds(user)
         feed_count = q.count()
         
-        feeds = q.order_by(Feed.last_updated_on.desc()).limit(ENTRIES_PER_PAGE).naive()
+        feeds = q.order_by(Feed.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()
+
+        if offset:
+            templatename = '_panel_feeds_more.html'            
+        else:
+            templatename = '_panel_feeds.html'            
+            
+        offset += ENTRIES_PER_PAGE
         
-        return self.respond_with_template('_panel_feeds.html', locals())  
+        return self.respond_with_template(templatename, locals())  
 
     @GET(r'^/ajax/feeds/(\d+)$')
     def ajax_feed(self, request, feed_id):
 
-        try:
-            feed = Feed.get((Feed.id == feed_id)) 
-        except Feed.DoesNotExist:
-            raise HTTPNotFound('No such feed %s' % feed_id)
+#         try:
+#             feed = Feed.get((Feed.id == feed_id)) 
+#         except Feed.DoesNotExist:
+#             raise HTTPNotFound('No such feed %s' % feed_id)
+
+        user = self.get_session_user()
+
+        
+        feed, q = get_feed_entries(user, feed_id)        
+        entry_count = q.count()
         
         return self.respond_with_template('_feed.html', locals())   
     

@@ -94,8 +94,9 @@ $basefontsize 					: 16;
 $baseheadingfont 				: inherit;
 
 // Choose between normal, bold or set a font-weight number (eg: 700) for your headings
-$baseheadingfontweight 			: 500;
-$basefontweight 			    : 500;
+$basefontweight 			    : 700;
+$baseheadingfontweight 			: $basefontweight;
+
 
 // Your headings may inherit the $textcolor, or you may set a different colour
 $baseheadingfontcolor 			: inherit;
@@ -108,7 +109,7 @@ $altlineheight 					: $baselineheight;
 $ampfontfamily 					: local('Georgia'), local('Garamond'), local('Palatino'), local('Book Antiqua');
 
 //  And if your site’s for geeks, you’ll need a font for code too
-$codefont 						: Consolas, Menlo, Monaco, Courier New, monospace;
+$codefont 						: Consolas, Menlo, Monaco, "Courier New", monospace;
 
 
 
@@ -754,8 +755,7 @@ $popoverarrowcolor  			: $popoverbackgroundcolor;
 
 // =panels ============
 
-$panel1width                    : 14%;
-$panel2width                    : 100% - $panel1width;
-$panel3width                    : 100% - $panel1width; 
+$navwidth                       : 14%;
+$panelwidth                     : 100% - $navwidth;
 
 

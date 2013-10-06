@@ -124,19 +124,7 @@ $(document).ready(function() {
             {dataType: 'html', type:'GET'}).done(function(data) {            
                 panel.html(data);
 
-                $(document).on('click', '.panel h3 a', function(event) { event.preventDefault(); openEntry(event); })                
-                
-                // Load more
-                var li_more = panel.find('li.more');
-                var form = li_more.find('form');
-                form.on('submit', function(event) { 
-                    event.preventDefault();
-                    li_more.html(loading_fragment);
-                    $.ajax(endpoint(form.attr('action')), 
-                        {dataType: 'html', type:'GET'}).done(function(data) {            
-                           li_more.replaceWith(data);
-                    })       
-                })
+                //$(document).on('click', '.panel h3 a', function(event) { event.preventDefault(); openEntry(event); })                
                 
         })       
     }
@@ -200,6 +188,25 @@ $(document).ready(function() {
             var filter = $(this).attr('href');
             loadListing(filter);
         });
+
+        // Bind events
+        $(document).on('click', '.panel h3 a', function(event) { event.preventDefault(); openEntry(event); })  
+
+        // Load more
+        //var li_more = panel.find('li.more');
+        //var form = li_more.find('form');
+        $(document).on('submit', '.panel li.more form', function(event) { 
+            event.preventDefault();
+            
+            var parent = $(this).parents('li.more').first();
+            parent.html(loading_fragment);
+            $.ajax(endpoint($(this).attr('action')), 
+                {dataType: 'html', type:'GET'}).done(function(data) {            
+                   parent.replaceWith(data);
+                   //$(document.body).animate({'scrollTop': li_more.position().top}, 100);                   
+            })       
+        })
+
 
         var form = $(document).find('#modal-add-subscription form');
         form.on('submit', function(event) { 

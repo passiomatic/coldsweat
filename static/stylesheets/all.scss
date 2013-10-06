@@ -33,20 +33,17 @@ $media-queries-supported : true;
 
 .icon-circle-blank,
 .icon-circle {
-    @include font-size(13);    
+    @include font-size(13); // Smaller
 }
 
-.container {
-
-}
 
 
 
 .panel  {
 /*     float: left;     */
     box-sizing: border-box;
-    width: $panel2width;        
-    margin-left: $panel1width;    
+    width: $panelwidth;        
+    margin-left: $navwidth;    
 
     .panel-title {
         padding:  $baselineheight $gutterwidth*1.5 $baselineheight $gutterwidth*1.5; 
@@ -72,18 +69,19 @@ $media-queries-supported : true;
     padding: 0 $gutterwidth;
 
 
-    ul {
+    > ul {
         list-style: none;
         @include zero;
     
     
-        li {
+        > li {
             @include zero;
             padding: $baselineheight/2 $gutterwidth*1.5 $baselineheight/2 $gutterwidth*1.5;        
             margin-top: -$baselineheight/4;
             border-top: 1px solid transparent;            
             background: $white;
             box-shadow: 0 0 4px $lightneutralcolor;
+            //border-top: $baselineheight/4 solid transparent;            
             
             // Title
             h3 {
@@ -97,22 +95,12 @@ $media-queries-supported : true;
                 display: none;
             }
             
-/*             border-top: 1px solid $lighterneutralcolor;             */
-
-            //background: $white;
-            //@include transition(background, 200ms, ease-out);
-            
             .favicon {
                 margin-top: 4px;
                 margin-left: -$gutterwidth;
                 float: left;
             }
             
-            &.current {
-                border-top-color: $white;            
-                background: #E6EFF5 !important;
-            }
-
             // Entries
             &.status-read {
                 background: $lightestneutralcolor;
@@ -127,6 +115,21 @@ $media-queries-supported : true;
             }
 
             &.status-saved {
+            }
+
+            &.current {
+                //border-top-color: $primarycolor;            
+                background: $white url(../images/rarr.png) left 14px no-repeat;
+                //background-origin: border-box;
+                //background: #E6EFF5 !important;
+                //@include vertical(#E6EFF5, $white);
+
+                h3 {
+                    a {
+                        color: $secondarycolor
+                    }
+                }
+    
             }
 
             // Feeds
@@ -159,7 +162,7 @@ nav {
     top: 0;
     left: 0;
     bottom: 0;
-    width: $panel1width;   
+    width: $navwidth;   
     background: $navigationbackgroundcolor;
 
     ul {
@@ -261,7 +264,7 @@ h1, h2 {
 footer[role="contentinfo"] {
     text-align: center;
     @include zero;
-    margin: $baselineheight*3 0 $baselineheight $panel1width;
+    margin: $baselineheight*3 0 $baselineheight $navwidth;
     .icon-heart {
         color: $secondarycolor;
         cursor: help;
@@ -370,127 +373,50 @@ code {
     margin: $baselineheight 0;
 }
 
-// Feed entry formatting
+// =entry ================================
 
 article {
-/*         @include hidden; */    
-/*     @include box-shadow(0 3px $wellshadowblur $lightneutralcolor);  */
-
-    display: none;
-
-/*     background: $white; */
-    
-/*     box-sizing: border-box; */
-
-/*     display: none;  */
+    display:  none; // Initally collapsed
     padding: $baselineheight 0;
-
+    
+    // Block-level elements 
     
     p, blockquote, table, ul, ol, dl {
         @include zero;
         margin: $baselineheight/2 0;
     }
 
-    
-
-/*
-    h1 {
-        @extend h2;
-    }
-*/
-    
-    li, dd, dt {
-        margin-left: $gutterwidth*2;                
-    }
-
-    blockquote {
- 
+    blockquote { 
         color: $secondarycolor;        
-        margin: $baselineheight/2 $gutterwidth $baselineheight/2 $gutterwidth ; 
-       
+        margin: $baselineheight/2 $gutterwidth $baselineheight/2 $gutterwidth ;        
         p:last-child {
             margin-bottom: 0;
         }
     }
+
+    // List items 
+    
+    li, dd, dt {
+/*         @include zero; */
+        margin-left: $gutterwidth*2;                
+    }
+    
+    // Misc. 
     
     hr {
         margin: $baselineheight 0;        
     }
 
+    // Images
+    
     figure {
         display: block;
         margin: 0 auto $baselineheight/2 auto;        
-        border: $baselineheight/2 solid $white;
-    }
-
-
-    img, figure {
-/*         display: block; */
-/*         margin: 0 auto $baselineheight auto;         */
-/*         border: $baselineheight/2 solid $lighterneutralcolor; */
-        
-        // Tracking inages, hide
-/*
-        &[height='1'],
-        &[width='1'] {
-            @include hidden;
-        }
-*/
-        
+        border: $baselineheight/2 solid $lightestneutralcolor;
     }
 }
         
         
-._scrollable {
-/*     width: 520px; clear: both; margin: 20px 0 10px;  */
-    clear: both; 
-    /* Position scollbar on top of scrollable content */
-    position: relative; 
-
-    .viewport {
-         // Redefined via JS
-         min-height: $baselineheight*10;          
-         overflow: hidden; 
-         position: relative; 
-         border-top: 1px solid $lighterneutralcolor;
-    }
-    .overview { 
-        list-style: none; position: absolute; left: 0; top: 0; width: 100%;
-    }
-    
-    .thumb .end,
-    .thumb { background: $lightneutralcolor; }
-    
-    .scrollbar { 
-/*         position: relative;  */
-        width: $gutterwidth/4; 
-        visibility: hidden;
-        position: absolute;
-        top: 0;
-        right: $gutterwidth/4;
-        z-index: 1;
-    }
-    
-    .track { height: 100%; width: $gutterwidth/4; position: relative; }
-    
-    .thumb { height: 20px; width: $gutterwidth/4; cursor: pointer; overflow: hidden; position: absolute; top: 0;   }
-    .thumb .end { overflow: hidden; height: 5px; width: $gutterwidth/4;    }
-    
-    .disable{ display: none; }    
-
-    &:hover {
-        .scrollbar {
-            visibility: visible;
-        }        
-    }
-    
-}
-        
-/*
-.noSelect { 
-    user-select: none; -o-user-select: none; -moz-user-select: none; -khtml-user-select: none; -webkit-user-select: none; 
-}
-*/
 
 
 .module {

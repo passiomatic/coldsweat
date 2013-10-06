@@ -18,8 +18,8 @@
             </li>
         {{endfor}}
             <li class="more">
-                <form action="?{{request.query_string}}&amp;t=0" method="get">
-                    <button type="submit" class="btn">Load more feeds</button>
+                <form action="/ajax/feeds/?{{request.query_string}}&amp;offset={{offset}}" method="get">
+                    <button type="submit" class="btn">Load More Feeds</button>
                 </form>
             </li>
         </ul>

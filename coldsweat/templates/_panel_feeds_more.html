@@ -1,0 +1,21 @@
+{{if feed_count}}
+    {{for loop, f in looper(feeds)}}
+        <li id="{{f.id}}" class="feed {{if loop.first}}current{{endif}} {{if not f.is_enabled}}status-disabled{{endif}}">
+            <h3 class="h4">
+                <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a href="/ajax/feeds/{{f.id}}">{{f.title}}</a>
+            </h3>
+            <div class="meta dim">
+                Last updated {{f.last_updated_on|since}}
+            </div>                                              
+            <!-- {{f.alternate_link}} -->
+            <article>&nbsp;<!-- placeholder -->                                
+            </article>                
+        </li>
+    {{endfor}}
+        <li class="more">
+            <form action="/ajax/feeds/?{{request.query_string}}&amp;offset={{offset}}" method="get">
+                <button type="submit" class="btn">Load More Feeds</button>
+            </form>
+        </li>
+{{else}}
+{{endif}}

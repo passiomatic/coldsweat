@@ -53,7 +53,7 @@ class FrontendApp(WSGIApp):
         self_link = request.POST['self_link']
         if not self_link:
             #@@TODO Check if well-formed is_valid_url(self_link)
-            message = u'ERROR Please specify a valid URL'
+            message = u'ERROR Please specify a valid web address'
             return self.respond_with_template('_feed_added.html', locals())
                         
         user = self.get_session_user()
@@ -61,6 +61,7 @@ class FrontendApp(WSGIApp):
     
         with transaction():    
             feed = fetcher.add_feed(self_link, fetch_icon=True)    
+            #@@TODO: use feed.add_subscription
             try:
                 Subscription.create(user=user, feed=feed, group=default_group)
                 log.debug('added feed %s for user %s' % (self_link, user.username))            

@@ -21,8 +21,6 @@ MIN_PASSWORD_LENGTH = 8
 
 COMMANDS = {}
 
-#log_filename = config.get('log', 'filename')
-
 def command(name):        
     '''
     Decorator to define a command
@@ -66,9 +64,7 @@ def command_serve(parser, options, ags):
 def command_refresh(parser, options, ags):
     '''Starts a feeds refresh procedure'''
 
-    #@@TODO: Honor options.force
-    
-    counter = fetcher.fetch_feeds()    
+    counter = fetcher.fetch_feeds(options.force)    
     print 'Refresh completed. See log file for more information'
 
 @command('import')

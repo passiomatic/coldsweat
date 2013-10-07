@@ -327,12 +327,10 @@ def fetch_feeds(force_all=False):
         log.debug("no feeds found to refresh, halted")
         return
 
-    log.debug("starting fetcher")
+    log.debug("starting fetcher (force_all is %s)" % ('on' if force_all else 'off'))
         
     if config.getboolean('fetcher', 'multiprocessing'):
         from multiprocessing import Pool
-        #processes = config.getint('fetcher', 'processes')        
-        #log.debug("starting fetcher with %d workers" % processes)
 
         p = Pool(processes=None) # Uses cpu_count()        
         p.map(feed_worker, feeds)

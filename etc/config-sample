@@ -3,34 +3,41 @@
 ;engine: mysql
 engine: sqlite
 
-; mysql
+; MySQL database settings
 hostname: localhost
 username: root
 password: secret
 database: coldsweat
 
-; sqlite3
+; SQLite3 settings
 filename: data/coldsweat.db
 
 [fetcher]
 
-min_interval:       900     ; Seconds
-error_threshold:    50      ; Number of errors before disabling feed
-max_history:        7       ; Days
-timeout:            15      ; Seconds
-multiprocessing:    on      
-processes:          4
-chunk_size:         32
-scrub:              off     ; Remove links and images from entries according to /etc/blacklist
+; Minimun number of seconds allowed between each feed fetch
+min_interval: 900
 
-; Overrides default Coldsweat user agent string
+; Number of errors before disabling feed
+error_threshold: 50
+
+; Do not retrieve entries older than given days
+max_history: 7
+
+; Number of seconds before timeout a web request 
+timeout: 10
+
+; Enable or disable parallel feed fetching 
+multiprocessing: on
+
+; Remove links and images from entries according to etc/blacklist
+scrub: off
+
+; Overrides default Coldsweat user agent information
 ;user_agent:
-
-;scrub_sharing_links: on
 
 [log]
 
-; See http://docs.python.org/2/howto/logging.html#when-to-use-logging
+; Values are: DEBUG (more verbose), INFO, WARNING, ERROR (less verbose)
 level: INFO
 filename: coldsweat.log
 format : localhost - - [%(asctime)s] %(process)d %(levelname)s %(message)s
@@ -38,5 +45,5 @@ datefmt: %d/%b/%Y:%H:%M:%S %z
 
 [web]
 
-; Uncomment to serve static files from a different URL
+; Static files served from a different server
 ;static_url: http://media.example.com/static

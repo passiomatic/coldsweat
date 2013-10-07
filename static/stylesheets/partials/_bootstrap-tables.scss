@@ -43,10 +43,6 @@ border-top : $tableborderwidth * 2 $tableborderstyle $tablebordercolor; }
 tbody tr td,
 tbody tr th {
 @include transition(background-color $transitionduration 0 ease); }
-
-tbody tr:hover td,
-tbody tr:hover th {
-background-color : $tablebackgroundhover; }
 }
 
 // CONDENSED ====================================================

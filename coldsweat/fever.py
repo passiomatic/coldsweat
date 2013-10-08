@@ -277,12 +277,12 @@ COMMANDS = [
 # ------------------------------------------------------
         
 def get_groups(user):
-    q = Group.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
-    result = [{'id':s.id,'title':s.title} for s in q]
+    q = Group.select().join(Subscription).where(Subscription.user == user).distinct()
+    result = [{'id':g.id,'title':g.title} for g in q]
     return result
 
 def get_feeds(user):
-    q = Feed.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
+    q = Feed.select(Subscription, Feed, Icon).join(Subscription).switch(Feed).join(Icon).where(Subscription.user == user).distinct()
     result = []
     for feed in q:
 
@@ -298,44 +298,36 @@ def get_feeds(user):
     return result        
 
 def get_feed_groups(user):
-    q = Subscription.select().join(User).where(User.id == user.id).distinct().naive()
+    q = Subscription.select(Subscription, Feed, Group).join(Feed).switch(Subscription).join(Group).where(Subscription.user == user).distinct()
     groups = defaultdict(lambda: [])
     for s in q:
-        groups[s.group.id].append('%d' % s.feed.id)
+        groups[s.group.id].append('%s' % s.feed.id)
     result = []
     for g in groups.keys():
         result.append({'group_id':g, 'feed_ids':','.join(groups[g])})
     return result
 
 def get_unread_entries(user):
-    #@@REMOVEME: order_by
-    q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
-        (User.id == user.id), 
-        ~(Entry.id << Read.select(Read.entry).where(User.id == user.id))).order_by(Entry.id).distinct().naive()
+    q = Entry.select(Entry.id).join(Feed).join(Subscription).where(
+        (Subscription.user == user), 
+        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive())).distinct().naive()
     return [r.id for r in q]
 
 def get_saved_entries(user):
-    #@@REMOVEME: order_by 
-    q = Entry.select(Entry.id).join(Feed).join(Subscription).join(User).where(
-        (User.id == user.id), 
-        (Entry.id << Saved.select(Saved.entry).where(User.id == user.id))).order_by(Entry.id).distinct().naive()
-    return [r.id for r in q]    
+    q = Entry.select(Entry.id).join(Feed).join(Subscription).where(
+        (Subscription.user == user), 
+        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user).naive())).distinct().naive()
+    return [s.id for s in q]    
 
-def get_entries(user, ids=None):
 
-    if ids:
-        where_clause = (User.id == user.id) & (Entry.id << ids)
-    else:
-        where_clause = (User.id == user.id)
+def _get_entries(user, q):
+
+    r = Entry.select(Entry.id).join(Read).where(Read.user == user).distinct().naive()
+    s = Entry.select(Entry.id).join(Saved).where(Saved.user == user).distinct().naive()
     
-    #@@TODO: Use Peewee aggregated records instead? http://peewee.readthedocs.org/en/latest/peewee/cookbook.html#aggregating-records
-    q = Entry.select().join(Feed).join(Subscription).join(User).where(where_clause).distinct().naive()
-    r = Entry.select().join(Read).join(User).where(where_clause).distinct().naive()
-    s = Entry.select().join(Saved).join(User).where(where_clause).distinct().naive()
-
-    read_ids = [i.id for i in r]
-    saved_ids = [i.id for i in s]
-
+    read_ids    = dict((i.id, None) for i in r)
+    saved_ids   = dict((i.id, None) for i in s)
+    
     result = []
     for entry in q:
         result.append({
@@ -350,58 +342,27 @@ def get_entries(user, ids=None):
             'created_on_time': entry.last_updated_on_as_epoch
         })
     return result 
+    
+def get_entries(user, ids=None):
+
+    if ids:
+        where_clause = (Subscription.user == user) & (Entry.id << ids)
+    else:
+        where_clause = (Subscription.user == user)
+    
+    q = Entry.select(Entry, Feed).join(Feed).join(Subscription).where(where_clause).distinct()
+    return _get_entries(user, q) 
 
 def get_entries_min(user, min_id, bound=50):
-    q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id > min_id)).distinct().limit(bound).naive()
+    q = Entry.select(Entry, Feed).join(Feed).join(Subscription).where((Subscription.user == user) & (Entry.id > min_id)).distinct().limit(bound)
+    return _get_entries(user, q) 
 
-    r = Entry.select().join(Read).join(User).where((User.id == user.id) & (Entry.id > min_id)).order_by(Entry.id).distinct().naive()
-    s = Entry.select().join(Saved).join(User).where((User.id == user.id) & (Entry.id > min_id)).order_by(Entry.id).distinct().naive()
-
-    read_ids = [i.id for i in r]
-    saved_ids = [i.id for i in s]
-
-    result = []
-    for entry in q:
-        result.append({
-            'id': entry.id,
-            'feed_id': entry.feed.id,
-            'title': entry.title,
-            'author': entry.author,
-            'html': entry.content,
-            'url': entry.link,
-            'is_saved': 1 if entry.id in saved_ids else 0,
-            'is_read': 1 if entry.id in read_ids else 0,
-            'created_on_time': entry.last_updated_on_as_epoch 
-        })
-    return result
-    
 def get_entries_max(user, max_id, bound=50):
-    q = Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id) & (Entry.id < max_id)).distinct().limit(bound).naive()
+    q = Entry.select(Entry, Feed).join(Feed).join(Subscription).where((Subscription.user == user) & (Entry.id < max_id)).distinct().limit(bound)
+    return _get_entries(user, q) 
 
-    r = Entry.select().join(Read).join(User).where((User.id == user.id) & (Entry.id < max_id)).order_by(Entry.id).distinct().naive()
-    s = Entry.select().join(Saved).join(User).where((User.id == user.id) & (Entry.id < max_id)).order_by(Entry.id).distinct().naive()
-
-    read_ids = [i.id for i in r]
-    saved_ids = [i.id for i in s]
-
-    result = []
-    for entry in q:
-        result.append({
-            'id': entry.id,
-            'feed_id': entry.feed.id,
-            'title': entry.title,
-            'author': entry.author,
-            'html': entry.content,
-            'url': entry.link,
-            'is_saved': 1 if entry.id in saved_ids else 0,
-            'is_read': 1 if entry.id in read_ids else 0,
-            'created_on_time': entry.last_updated_on_as_epoch
-        })
-    return result    
-
-    
 def get_entry_count(user):
-    return Entry.select().join(Feed).join(Subscription).join(User).where((User.id == user.id)).distinct().count()
+    return Entry.select().join(Feed).join(Subscription).where(Subscription.user == user).distinct().count()
 
 
 def get_icons():

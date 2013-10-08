@@ -51,8 +51,9 @@ def run_tests(endpoint, suites=ALL):
     if 'items' in suites:
         queries.extend([
             (False, 'items'),         
-            (False, 'items&max_id=10'),
-            (False, 'items&since_id=5')
+            (False, 'items&with_ids=50,51,52'),         
+            (False, 'items&max_id=5'),
+            (False, 'items&since_id=50')
         ])
 
     if 'links' in suites:
@@ -97,11 +98,11 @@ def run_tests(endpoint, suites=ALL):
         ])          
                               
     # Test auth failure
-    print ('\n= auth\n')
+    print ('\n= auth (failure)\n')
 
     subprocess.call([
         "curl", 
-        "-dapi_key=%s" % 'wrong-key',
+        "-dapi_key=%s" % 'wrong-api-key',
         "%s?api&unread_item_ids" % endpoint
     ])
 

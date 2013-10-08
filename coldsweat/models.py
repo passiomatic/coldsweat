@@ -275,7 +275,8 @@ def setup():
     models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription, Session
 
     # WAL mode is persistent, so we can to setup it once - see http://www.sqlite.org/wal.html
-    _db.execute_sql('PRAGMA journal_mode=WAL')
+    if engine == 'sqlite':
+        _db.execute_sql('PRAGMA journal_mode=WAL')
 
     for model in models:
         model.create_table(fail_silently=True)

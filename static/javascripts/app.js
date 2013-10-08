@@ -11,6 +11,8 @@ $(document).ready(function() {
 
     var panel = $('.panel');
     
+    //var speeds = [200, 100];
+    
 /*
     $(window).resize(function(e) {
         // Adjust panel-1 height to viewport size. minues the .panel-title total height
@@ -101,6 +103,9 @@ $(document).ready(function() {
                 
         var article = $(c).find('article');
         if(!article.is(":visible")) {
+        
+            // Close open entries
+            panel.find('article').filter(':visible').slideUp(100);
             
             // Show spinner            
             var img = $(c).find('.favicon').replaceWith(loading_favicon_fragment);

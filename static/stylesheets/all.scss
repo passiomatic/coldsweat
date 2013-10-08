@@ -50,7 +50,10 @@ $media-queries-supported : true;
         
         h2 {
             @include zero;
-            text-transform: capitalize;
+            text-transform: capitalize;        
+            span {
+                @extend .dim;
+            }
         }
 /*
         .t {
@@ -80,11 +83,11 @@ $media-queries-supported : true;
             margin-top: -$baselineheight/4;
             border-top: 1px solid transparent;            
             background: $white;
-            box-shadow: 0 0 4px $lightneutralcolor;
+            @include box-shadow(0 0 4px $lightneutralcolor);
             //border-top: $baselineheight/4 solid transparent;            
             
             // Title
-            h3 {
+            > h3 {
                 a {
                     display: block;
                 }
@@ -95,6 +98,7 @@ $media-queries-supported : true;
                 display: none;
             }
             
+/*             .icon-spinner, */
             .favicon {
                 margin-top: 4px;
                 margin-left: -$gutterwidth;
@@ -134,7 +138,7 @@ $media-queries-supported : true;
 
             // Feeds
             &.status-disabled {
-                h3 {
+                h3 a {
                     text-decoration: line-through;
                 }
             }
@@ -164,6 +168,8 @@ nav {
     bottom: 0;
     width: $navwidth;   
     background: $navigationbackgroundcolor;
+    
+    @include box-shadow(inset -3px 0 2px -2px $neutralcolor);    
 
     ul {
 
@@ -205,7 +211,8 @@ nav {
         }
 
         &.unread li.filter-unread,
-        &.starred li.filter-starred,
+        &.saved li.filter-saved,
+        &.feeds li.filter-feeds,
         li.filter-group {
             a {
                 background: $lighterneutralcolor;               
@@ -376,14 +383,14 @@ code {
 // =entry ================================
 
 article {
-    display:  none; // Initally collapsed
-    padding: $baselineheight 0;
+    display: none; // Initally hidden
+    padding: $baselineheight 0 $baselineheight/2 0;
     
     // Block-level elements 
     
     p, blockquote, table, ul, ol, dl {
         @include zero;
-        margin: $baselineheight/2 0;
+        margin: 0 0 $baselineheight/2 0;
     }
 
     blockquote { 
@@ -397,8 +404,8 @@ article {
     // List items 
     
     li, dd, dt {
-/*         @include zero; */
-        margin-left: $gutterwidth*2;                
+        @include zero;
+        margin-left: $gutterwidth;                
     }
     
     // Misc. 

@@ -67,11 +67,13 @@ ol {
 margin : 0 0 $baselineheight #{-$gutterwidth};
 padding : 0 0 0 $gutterwidth; }
 
+/*
 li ul,
 li ol {
 list-style-type : none;
 margin : $baselineheight 0;
 @include font-size(16); }
+*/
 
 ul.inline,
 ol.inline {

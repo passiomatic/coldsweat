@@ -3,10 +3,12 @@
 $(document).ready(function() {
     "use strict";
 
-    var scroll_options = { zIndex: 1 };
+    //var scroll_options = { zIndex: 1 };
     var flash_fragment = $('<div class="flash"><i class="icon-star icon-4x"></i><div class="message">Starred</div></div>');
     var alert_fragment = $('<div class="alert alert--error"></div>');
     var loading_fragment = $('<div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div>');
+    var loading_favicon_fragment = $('<i class="favicon icon-spinner icon-spin"></i>');
+
     var panel = $('.panel');
     
 /*
@@ -62,7 +64,7 @@ $(document).ready(function() {
     }
 
     function mark(el, status) {
-        $.ajax(endpoint('/ajax/entries/') + el.attr('id'), {
+        $.ajax(endpoint('/entries/') + el.attr('id'), {
             type: 'POST', 
             data: 'mark&as=' + status
         })        
@@ -98,29 +100,33 @@ $(document).ready(function() {
         }
                 
         var article = $(c).find('article');
-        // Already open?
         if(!article.is(":visible")) {
-            // Loader            
-            //article.html(loading_fragment);
+            
+            // Show spinner            
+            var img = $(c).find('.favicon').replaceWith(loading_favicon_fragment);
             
             var url = $(c).find('h3 a').attr('href');
-            $.ajax(endpoint(url), 
-                {dataType: 'html', type:'GET'}).done(function(data) {
+            $.ajax(url, {dataType: 'html', type:'GET'}).done(function(data) {
                 article.html(data);
+                $(c).find('h3 i').replaceWith(img);
                 article.slideDown(200);
             })        
-            c.addClass('status-read')
-            mark(c, 'read');            
+            
+            // Mark as read if entry
+            if($(c).hasClass('entry')) {
+                c.addClass('status-read')
+                mark(c, 'read');            
+            }            
         } else {
             article.slideUp(100);
         }
             
     }
     
-    function loadListing(filter) {
+    function loadListing(url) {
         panel.empty().prepend(loading_fragment);
 
-        $.ajax(endpoint(filter),         
+        $.ajax(url,         
             {dataType: 'html', type:'GET'}).done(function(data) {            
                 panel.html(data);
 
@@ -175,19 +181,7 @@ $(document).ready(function() {
     }
     
     function setup() {               
-        var filter = window.location.search;
-        if(!filter) {
-            filter = '/ajax/entries/?unread'; // Default
-        }    
-        //console.log(filter);        
-        loadListing(filter);        
         bindKeyboardShortcuts();
-        
-        $('nav').find('.filter a').on('click', function(event) {
-            event.preventDefault();    
-            var filter = $(this).attr('href');
-            loadListing(filter);
-        });
 
         // Bind events
         $(document).on('click', '.panel h3 a', function(event) { event.preventDefault(); openEntry(event); })  
@@ -200,7 +194,7 @@ $(document).ready(function() {
             
             var parent = $(this).parents('li.more').first();
             parent.html(loading_fragment);
-            $.ajax(endpoint($(this).attr('action')), 
+            $.ajax($(this).attr('action'), 
                 {dataType: 'html', type:'GET'}).done(function(data) {            
                    parent.replaceWith(data);
                    //$(document.body).animate({'scrollTop': li_more.position().top}, 100);                   
@@ -212,9 +206,9 @@ $(document).ready(function() {
         form.on('submit', function(event) { 
             event.preventDefault();
             var serializedData = form.serialize();
-            console.log(serializedData);
+            //console.log(serializedData);
             form.html(loading_fragment);
-            $.ajax(endpoint(form.attr('action')), 
+            $.ajax(form.attr('action'), 
                 {dataType: 'html', type:form.attr('method'), data: serializedData}).done(function(data) {            
                    form.replaceWith(data);                   
             })       

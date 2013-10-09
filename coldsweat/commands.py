@@ -118,6 +118,12 @@ def command_export(parser, options, args):
         
     print "%d feeds exported for user %s" % (feeds.count(), username)
 
+# @command('upgrade')
+# def command_refresh(parser, options, ags):
+#     '''Upgrade database from a previous version'''
+#     migrate_schema()
+#     print 'Upgrade completed. See log file for more information'
+    
 @command('setup')
 def command_setup(parser, options, args):
     '''Sets up a working database'''

@@ -10,6 +10,7 @@ License: MIT (see LICENSE.md for details)
 import pickle
 from datetime import datetime, timedelta
 from peewee import *
+from playhouse import migrate
 
 from utilities import *
 import favicon
@@ -266,6 +267,19 @@ def close():
     except ProgrammingError, exc:
         log.error('Caught exception while closing database connection: %s' % exc)
 
+
+def migrate_schema():
+    '''
+    Migrate database schema from previous versions (0.80 and up)
+    '''
+
+    # Current Peewee's Migrator doesn't work with MySQL/SQLite
+    #   I keep the code here for future reference
+    migrator = migrate.Migrator(_db)
+
+    with _db.transaction():
+        migrator.rename_column(Session, 'expires', 'expires_on')
+        #@@TODO: migrator.set_unique(Group, Group.title, True)
 
 def setup():
     """

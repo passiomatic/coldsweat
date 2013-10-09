@@ -6,7 +6,7 @@ Copyright (c) 2013—, Andrea Peltrin
 Portions are copyright (c) 2013, Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
-from __future__ import division
+#from __future__ import division
 from os import path
 from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
 from tempita import Template #, HTMLTemplate 
@@ -23,153 +23,16 @@ ENTRIES_PER_PAGE = 30
 
 class FrontendApp(WSGIApp):
 
-#     def __init__(self, **kwargs):
-#         pass
-        
+    # Home
+
     @GET()
     def index(self, request):
+        return self.entry_list(request)
 
-        user = self.get_session_user()
- 
-        d = dict(
-            user        = user,
-            filter_name = 'unread',
-            #page_title  = 'Unread Items',     
-            #page_title = '%s%s' % (page_title, ' (%s)' % entry_count if entry_count else '')
-            #feed_id     = 0,
-            group_id    = 0,
-            entry_count = 0,
-            groups = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title).naive()
-        )
+    # Entries
 
-        return self.respond_with_template('index.html', d)
-
-
-    # Ajax calls
-
-    @POST(r'^/ajax/feeds/add$')
-    def ajax_add_feed(self, request):     
-
-        self_link = request.POST['self_link']
-        if not self_link:
-            #@@TODO Check if well-formed is_valid_url(self_link)
-            message = u'ERROR Please specify a valid web address'
-            return self.respond_with_template('_feed_added.html', locals())
-                        
-        user = self.get_session_user()
-        default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
-    
-        with transaction():    
-            feed = fetcher.add_feed(self_link, fetch_icon=True)    
-            #@@TODO: use feed.add_subscription
-            try:
-                Subscription.create(user=user, feed=feed, group=default_group)
-                log.debug('added feed %s for user %s' % (self_link, user.username))            
-                #message = render_message(u'SUCCESS Feed %s added successfully.' % self_link)
-                message = u'SUCCESS Feed %s added successfully.' % self_link
-
-            except IntegrityError:
-                log.debug('user %s has already feed %s in her subscriptions' % (user.username, self_link))    
-                message = u'INFO Feed %s is already in your subscriptions.' % self_link
-    
-        return self.respond_with_template('_feed_added.html', locals())
-
-    @GET(r'^/ajax/entries/?$')
-    def ajax_entry_list(self, request):
-        '''
-        Show entries filtered and possibly paginated by: 
-            unread, saved, group or feed
-        '''
-
-        # Defaults 
-        offset, group_id, feed_id, panel_title = 0, 0, 0, 'Unread Items' 
-        
-        user = self.get_session_user()  
-    
-        r = Entry.select().join(Read).where((Read.user == user)).distinct().naive()
-        s = Entry.select().join(Saved).where((Saved.user == user)).distinct().naive()
-        read_ids = [i.id for i in r]
-        saved_ids = [i.id for i in s]
-        
-        if 'saved' in request.GET:
-            panel_title = 'Starred Items'
-            q = get_saved_entries(user)
-        elif 'group' in request.GET:
-            group_id = int(request.GET['group'])    
-            group, q = get_group_entries(user, group_id)
-            panel_title = group.title                
-        elif 'feed' in request.GET:
-            feed_id = int(request.GET['feed'])
-            # TODO: join(Icon) to reduce number of queries
-            feed, q = get_feed_entries(user, feed_id)
-            panel_title = feed.title                
-        else:
-            q = get_unread_entries(user)
-
-        if 'offset' in request.GET:            
-            offset = int(request.GET['offset'])
-            
-        entry_count = q.count()
-        entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()    
-
-        if offset:
-            templatename = '_panel_entries_more.html'            
-        else:
-            templatename = '_panel_entries.html'            
-            
-        offset += ENTRIES_PER_PAGE
-        
-        return self.respond_with_template(templatename, locals())
-
-
-
-    @GET(r'^/ajax/feeds/?$')
-    def ajax_feed_list(self, request):
-        '''
-        Show subscribed feeds for current user
-        '''
-
-        # Defaults 
-        offset, panel_title = 0, 'All Feeds' 
-
-        user = self.get_session_user()  
-
-        if 'offset' in request.GET:            
-            offset = int(request.GET['offset'])
-
-        q = get_feeds(user)
-        feed_count = q.count()
-        
-        feeds = q.order_by(Feed.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()
-
-        if offset:
-            templatename = '_panel_feeds_more.html'            
-        else:
-            templatename = '_panel_feeds.html'            
-            
-        offset += ENTRIES_PER_PAGE
-        
-        return self.respond_with_template(templatename, locals())  
-
-    @GET(r'^/ajax/feeds/(\d+)$')
-    def ajax_feed(self, request, feed_id):
-
-#         try:
-#             feed = Feed.get((Feed.id == feed_id)) 
-#         except Feed.DoesNotExist:
-#             raise HTTPNotFound('No such feed %s' % feed_id)
-
-        user = self.get_session_user()
-
-        
-        feed, q = get_feed_entries(user, feed_id)        
-        entry_count = q.count()
-        
-        return self.respond_with_template('_feed.html', locals())   
-    
-    
-    @GET(r'^/ajax/entries/(\d+)$')
-    def ajax_entry(self, request, entry_id):
+    @GET(r'^/entries/(\d+)$')
+    def entry(self, request, entry_id):
     
         try:
             entry = Entry.get((Entry.id == entry_id)) 
@@ -178,8 +41,8 @@ class FrontendApp(WSGIApp):
         
         return self.respond_with_template('_entry.html', locals())   
     
-    @POST(r'^/ajax/entries/(\d+)$')
-    def ajax_entry_post(self, request, entry_id):
+    @POST(r'^/entries/(\d+)$')
+    def entry_post(self, request, entry_id):
         '''
         Mark an entry
         '''
@@ -222,6 +85,133 @@ class FrontendApp(WSGIApp):
                     return
             
             log.debug('marked entry %s as %s' % (entry_id, status))
+            
+    @GET(r'^/entries/?$')
+    def entry_list(self, request):
+        '''
+        Show entries filtered and possibly paginated by: 
+            unread, saved, group or feed
+        '''
+
+        # Defaults 
+        offset, group_id, feed_id, filter_name, panel_title = 0, 0, 0, '', 'Unread Items'
+        
+        user = self.get_session_user()  
+        groups = get_groups(user)
+    
+        r = Entry.select().join(Read).where((Read.user == user)).distinct().naive()
+        s = Entry.select().join(Saved).where((Saved.user == user)).distinct().naive()
+        read_ids = [i.id for i in r]
+        saved_ids = [i.id for i in s]
+        
+        if 'saved' in request.GET:
+            q = get_saved_entries(user)
+            panel_title = 'Starred Items'
+            filter_name = 'saved'
+        elif 'group' in request.GET:
+            group_id = int(request.GET['group'])    
+            group, q = get_group_entries(user, group_id)
+            panel_title = group.title                
+        elif 'feed' in request.GET:
+            feed_id = int(request.GET['feed'])
+            feed, q = get_feed_entries(user, feed_id)
+            panel_title = feed.title                
+        else:
+            q = get_unread_entries(user)
+            filter_name = 'unread'
+
+        if 'offset' in request.GET:            
+            offset = int(request.GET['offset'])
+            
+        entry_count = q.count()
+        entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()    
+
+        if offset:
+            templatename = '_entries_more.html'            
+        else:
+            templatename = 'entries.html'            
+            
+        offset += ENTRIES_PER_PAGE
+
+        return self.respond_with_template(templatename, locals())
+
+
+    # Feeds
+
+    @GET(r'^/feeds/?$')
+    def feed_list(self, request):
+        '''
+        Show subscribed feeds for current user
+        '''
+
+        # Defaults 
+        offset, group_id, filter_name, panel_title = 0, 0, 'feeds', 'All Feeds' 
+
+        user = self.get_session_user()  
+        groups = get_groups(user)  
+
+        if 'offset' in request.GET:            
+            offset = int(request.GET['offset'])
+
+        q = get_feeds(user)
+        feed_count = q.count()        
+        feeds = q.order_by(Feed.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()
+
+        if offset:
+            templatename = '_feeds_more.html'            
+        else:
+            templatename = 'feeds.html'            
+            
+        offset += ENTRIES_PER_PAGE
+        
+        return self.respond_with_template(templatename, locals())  
+
+
+    @GET(r'^/feeds/(\d+)$')
+    def feed(self, request, feed_id):
+        '''
+        Show entries for the given feed
+        '''
+
+        user = self.get_session_user()
+
+        feed, q = get_feed_entries(user, feed_id)        
+        entry_count = q.count()
+        
+        return self.respond_with_template('_feed.html', locals())   
+
+    @POST(r'^/ajax/feeds/add$')
+    def feed_put(self, request): #@@TODO: Use PUT verb?
+        '''
+        Add a new feed to database
+        '''
+
+        self_link = request.POST['self_link']
+        if not self_link:
+            #@@TODO Check if well-formed is_valid_url(self_link)
+            message = u'ERROR Please specify a valid web address'
+            return self.respond_with_template('_feed_added.html', locals())
+                        
+        user = self.get_session_user()
+        default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
+    
+        with transaction():    
+            feed = fetcher.add_feed(self_link, fetch_icon=True)    
+            #@@TODO: use feed.add_subscription
+            try:
+                Subscription.create(user=user, feed=feed, group=default_group)
+                log.debug('added feed %s for user %s' % (self_link, user.username))            
+                #message = render_message(u'SUCCESS Feed %s added successfully.' % self_link)
+                message = u'SUCCESS Feed %s added successfully.' % self_link
+
+            except IntegrityError:
+                log.debug('user %s has already feed %s in her subscriptions' % (user.username, self_link))    
+                message = u'INFO Feed %s is already in your subscriptions.' % self_link
+    
+        return self.respond_with_template('_feed_added.html', locals())
+    
+    
+
 
         
     @GET(r'^/fever/?$')
@@ -244,6 +234,8 @@ class FrontendApp(WSGIApp):
 
     def respond_with_template(self, filename, namespace=None):
 
+        namespace = namespace or {}
+
         site_namespace = {
             # Global objects and settings 
             'version_string'    : VERSION_STRING,
@@ -263,6 +255,9 @@ class FrontendApp(WSGIApp):
         message = self.request.cookies.get('alert_message', '')
         if message:
             namespace['alert_message'] = render_message(message)
+
+        if 'self' in namespace:
+            del namespace['self'] # Avoid passing self to Tempita
 
         site_namespace.update(namespace or {})
         response = Response(
@@ -289,8 +284,8 @@ class FrontendApp(WSGIApp):
         if user:
             return user
         
-        #raise self.redirect('%s/login?from=%s' % (self.request.application_url, escape_url(self.request.path)))
-        raise self.redirect('login?from=%s' %  escape_url(self.request.path))
+        raise self.redirect('%s/login?from=%s' % (self.request.application_url, escape_url(self.request.path)))
+        #raise self.redirect('login?from=%s' % escape_url(self.request.path))
 
 
     @GET(r'^/login/?$')
@@ -402,6 +397,10 @@ def get_feed_entries(user, feed_id):
 def get_feeds(user):     
     #@@TODO: join(Icon) to reduce number of queries
     q = Feed.select().join(Subscription).where(Subscription.user == user)
+    return q    
+
+def get_groups(user):     
+    q = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title) 
     return q    
 
 

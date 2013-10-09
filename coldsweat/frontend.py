@@ -94,7 +94,7 @@ class FrontendApp(WSGIApp):
         '''
 
         # Defaults 
-        offset, group_id, feed_id, filter_name, panel_title = 0, 0, 0, '', ''
+        offset, group_id, feed_id, filter_name, filter_class, panel_title = 0, 0, 0, '', '', ''
         
         user = self.get_session_user()  
         groups = get_groups(user)
@@ -107,7 +107,7 @@ class FrontendApp(WSGIApp):
         if 'saved' in request.GET:
             q = get_saved_entries(user)
             panel_title = 'Starred Items'
-            filter_name = 'saved'
+            filter_class = filter_name = 'saved'
         elif 'group' in request.GET:
             group_id = int(request.GET['group'])    
             group, q = get_group_entries(user, group_id)
@@ -117,11 +117,12 @@ class FrontendApp(WSGIApp):
             feed_id = int(request.GET['feed'])
             feed, q = get_feed_entries(user, feed_id)
             panel_title = feed.title                
+            filter_class = 'feeds'
             filter_name = 'feed=%s' % feed_id
         else:
             q = get_unread_entries(user)
             panel_title = 'Unread Items'
-            filter_name = 'unread'
+            filter_class = filter_name = 'unread'
 
         if 'offset' in request.GET:            
             offset = int(request.GET['offset'])
@@ -148,7 +149,7 @@ class FrontendApp(WSGIApp):
         '''
 
         # Defaults 
-        offset, group_id, filter_name, panel_title = 0, 0, 'feeds', 'All Feeds' 
+        offset, group_id, filter_class, panel_title = 0, 0, 'feeds', 'All Feeds' 
 
         user = self.get_session_user()  
         groups = get_groups(user)  

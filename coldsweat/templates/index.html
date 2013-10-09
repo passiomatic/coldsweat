@@ -1,6 +1,6 @@
 {{inherit "site.html"}}
 
-{{def container}}
+{{def container_block}}
     <nav role="navigation">
         <ul class="{{filter_class}}">
             <li class="branding">
@@ -20,7 +20,7 @@
     </nav>  
         
     <section  class="panel">
-        {{self.panel}}
+        {{self.panel_block}}
     </section>
     
 <footer role="contentinfo">

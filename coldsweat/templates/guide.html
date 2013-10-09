@@ -1,6 +1,6 @@
 {{inherit "site.html"}}
 
-{{def container}}
+{{def container_block}}
 
 <div class="container-inner">
 
@@ -55,15 +55,3 @@
 {{enddef}}
 
 
-{{def page_script_block}}
-<script>
-head.js(
-// Libraries
-"{{static_url}}/javascripts/vendor/modernizr-min.js",
-"{{static_url}}/javascripts/vendor/jquery-min.js",
-function() {
-   // Load complete
-   $('#username').focus();
-});
-</script>
-{{enddef}}

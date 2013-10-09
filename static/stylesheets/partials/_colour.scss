@@ -25,21 +25,17 @@ outline : 0; }
 
 nav {
     a {
-    //text-decoration : none;
-    //color : $linkcolor;
-    color: $navigationlinkcolor;    
-    
-    &:visited {
-    color : $navigationlinkcolor; }
-    
-    &:hover {
-    text-decoration : none;
-    color : $navigationlinkcolorhover; 
-    /* background: darken($navigationbackgroundcolor, 10%); */ }
-    
-    &:focus {
-    //outline : thin dotted;
-    color : $navigationlinkcolorhover; }
+        color : $navigationlinkcolor;    
+        
+        &:visited {
+        color : $navigationlinkcolor; }
+        
+        &:hover {
+        text-decoration : none;
+        color : $navigationlinkcolorhover; }
+        
+        &:focus {
+        color : $navigationlinkcolorhover; }
     }    
 }
 

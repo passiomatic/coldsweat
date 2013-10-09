@@ -12,18 +12,20 @@ margin : $baselineheight * 2 0;
 padding : 0;
 height : 1px;
 border : 0;
-border-top : 1px solid $bordercolor; 
-&.tight {
-margin: $baselineheight/2 0}
-}
+border-top : 1px solid $bordercolor; }
 
 // img
 
 img {
+// Scale images http://bit.ly/16jhfi9
 max-width : 100%;
+height: auto;
 border-width : 0;
 vertical-align : middle;
 -ms-interpolation-mode : bicubic; }
+.lt-ie9 img {
+    width: auto; // IE 8
+}
 
 .img-rounded {
 border-radius :$borderradius; }

@@ -29,6 +29,17 @@ $media-queries-supported : true;
 
 .meta {
     @include font-size(14);
+
+    ul {
+        list-style: none;
+        @include zero;
+        @include font-size(14);
+        
+        li {
+            padding: $baselineheight/2 0;
+            border-top: 1px $borderstyle $bordercolor;
+        }        
+    }
 }             
 
 .icon-circle-blank,
@@ -63,11 +74,7 @@ $media-queries-supported : true;
 */
     }
 
-    .panel-content {
-
-/*     background: $white; */
-
-/*     border-left: 1px solid $lighterneutralcolor; */
+.panel-content {
 
     padding: 0 $gutterwidth;
 
@@ -195,9 +202,10 @@ nav {
                 @include font-size(14);
                 padding: $baselineheight/4 $baselineheight;
                 text-transform: capitalize;
+                @include transition(background-color .1s ease-out);
                                 
                 &:hover {
-                    background: $neutralcolor; 
+                    //background: $neutralcolor; 
                 }    
             }
             
@@ -215,8 +223,16 @@ nav {
         &.feeds li.filter-feeds,
         li.filter-group {
             a {
-                background: $lighterneutralcolor;               
-                color: $textcolor;                                    
+                //background: $lighterneutralcolor;           
+/*                 background: $neutralcolor url(../images/nav-rarr-h.png) left 7px no-repeat;                     */
+                background: $neutralcolor;                    
+                color: $lightestneutralcolor;
+                
+                &:hover {
+/*                     color: $navigationlinkcolorhover;  */
+                    //background: $neutralcolor url(../images/nav-rarr-h.png) left 7px no-repeat; 
+                }    
+                                                  
             }
         }
 
@@ -384,43 +400,63 @@ code {
 
 article {
     display: none; // Initally hidden
-    padding: $baselineheight 0 $baselineheight/2 0;
-    
-    // Block-level elements 
-    
-    p, blockquote, table, ul, ol, dl {
-        @include zero;
-        margin: 0 0 $baselineheight/2 0;
+    padding: $baselineheight/2 0 $baselineheight/2 0;    
+    @include clearfix;
+
+    aside, .content {
+        float: left;                
     }
 
-    blockquote { 
-        color: $secondarycolor;        
-        margin: $baselineheight/2 $gutterwidth $baselineheight/2 $gutterwidth ;        
-        p:last-child {
-            margin-bottom: 0;
+    aside {
+        width: 33.33333%;     
+    }
+    
+    .content {        
+        max-width: 44em;
+        width: 66.66667%;
+        float: left;
+        box-sizing: border-box;
+        padding-right: $gutterwidth*2;
+    
+        // Headings
+
+        // ???
+        
+        // Other block-level elements 
+        
+        p, blockquote, figure, table, ul, ol, dl {
+            @include zero;
+            margin: $baselineheight/2 0;
         }
-    }
-
-    // List items 
     
-    li, dd, dt {
-        @include zero;
-        margin-left: $gutterwidth;                
+        blockquote { 
+            color: $secondarycolor;        
+            margin: $baselineheight/2 $gutterwidth $baselineheight/2 $gutterwidth;
+            p:last-child {
+                margin-bottom: 0;
+            }
+        }
+    
+        // List items 
+        
+        li, dd, dt {
+            @include zero;
+            margin-left: $gutterwidth;                
+        }
+    
+        // Images
+        
+        img, figure {
+        }
+        
+        // Misc. 
+        
+        hr {
+            margin: $baselineheight 0;        
+        }
+        
     }
     
-    // Misc. 
-    
-    hr {
-        margin: $baselineheight 0;        
-    }
-
-    // Images
-    
-    figure {
-        display: block;
-        margin: 0 auto $baselineheight/2 auto;        
-        border: $baselineheight/2 solid $lightestneutralcolor;
-    }
 }
         
         

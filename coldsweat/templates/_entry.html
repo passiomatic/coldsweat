@@ -2,9 +2,19 @@
     <div class="content">
         {{entry.content}}
     </div>            
-    <hr class="tight">
-{{else}}
+<!--     <hr class="tight"> -->
 {{endif}}
-<div class="meta dim">
-    Posted {{entry.last_updated_on|since}}{{if entry.author}} by <b>{{entry.author}}</b>{{endif}}&emsp;<a target="_blank" href="{{entry.link}}">View original</a>
-</div>
+<aside>
+    <div class="meta dim">
+        <ul>
+            <li>
+                Posted {{entry.last_updated_on|since}}{{if entry.author}} by <b>{{entry.author}}</b>{{endif}}
+            </li>
+            {{if entry.link}}
+            <li>
+                <a target="_blank" href="{{entry.link}}">View original</a>
+            </li>
+            {{endif}}
+        </ul>
+    </div>
+</aside>

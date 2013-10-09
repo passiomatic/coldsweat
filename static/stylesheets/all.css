@@ -349,7 +349,12 @@ sub {
 
 a {
   text-decoration: none;
-  color: #175b82; }
+  color: #175b82;
+  -webkit-transition: color 0.1s ease-out;
+  -moz-transition: color 0.1s ease-out;
+  -ms-transition: color 0.1s ease-out;
+  -o-transition: color 0.1s ease-out;
+  transition: color 0.1s ease-out; }
   a:visited {
     color: #0f3d57; }
   a:hover {
@@ -3968,12 +3973,7 @@ nav {
       font-size: 14px;
       font-size: 1.4rem;
       padding: 0.375em 1.5em;
-      text-transform: capitalize;
-      -webkit-transition: background-color 0.1s ease-out;
-      -moz-transition: background-color 0.1s ease-out;
-      -ms-transition: background-color 0.1s ease-out;
-      -o-transition: background-color 0.1s ease-out;
-      transition: background-color 0.1s ease-out; }
+      text-transform: capitalize; }
     nav ul li span {
       width: 1em;
       text-align: center;

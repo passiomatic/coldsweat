@@ -202,11 +202,6 @@ nav {
                 @include font-size(14);
                 padding: $baselineheight/4 $baselineheight;
                 text-transform: capitalize;
-                @include transition(background-color .1s ease-out);
-                                
-                &:hover {
-                    //background: $neutralcolor; 
-                }    
             }
             
             

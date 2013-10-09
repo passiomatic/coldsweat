@@ -6,7 +6,8 @@
 a {
 text-decoration : none;
 color : $linkcolor;
-
+@include transition(color .1s ease-out);
+        
 &:visited {
 color : $linkcolorvisited; }
 
@@ -23,20 +24,18 @@ color : $linkcolorfocus; }
 outline : 0; }
 }
 
-nav {
-    a {
-        color : $navigationlinkcolor;    
-        
-        &:visited {
-        color : $navigationlinkcolor; }
-        
-        &:hover {
-        text-decoration : none;
-        color : $navigationlinkcolorhover; }
-        
-        &:focus {
-        color : $navigationlinkcolorhover; }
-    }    
+nav a {
+    color : $navigationlinkcolor;    
+    
+    &:visited {
+    color : $navigationlinkcolor; }
+    
+    &:hover {
+    text-decoration : none;
+    color : $navigationlinkcolorhover; }
+    
+    &:focus {
+    color : $navigationlinkcolorhover; }
 }
 
 

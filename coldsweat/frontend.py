@@ -99,8 +99,8 @@ class FrontendApp(WSGIApp):
         user = self.get_session_user()  
         groups = get_groups(user)
     
-        r = Entry.select().join(Read).where((Read.user == user)).distinct().naive()
-        s = Entry.select().join(Saved).where((Saved.user == user)).distinct().naive()
+        r = Entry.select(Entry.id).join(Read).where((Read.user == user)).naive()
+        s = Entry.select(Entry.id).join(Saved).where((Saved.user == user)).naive()
         read_ids = [i.id for i in r]
         saved_ids = [i.id for i in s]
         
@@ -110,12 +110,14 @@ class FrontendApp(WSGIApp):
             filter_class = filter_name = 'saved'
         elif 'group' in request.GET:
             group_id = int(request.GET['group'])    
-            group, q = get_group_entries(user, group_id)
+            group = Group.get(Group.id == group_id) 
+            q = get_group_entries(user, group)
             panel_title = group.title                
             filter_name = 'group=%s' % group_id
         elif 'feed' in request.GET:
             feed_id = int(request.GET['feed'])
-            feed, q = get_feed_entries(user, feed_id)
+            feed = Feed.get(Feed.id == feed_id) 
+            q = get_feed_entries(user, feed)
             panel_title = feed.title                
             filter_class = 'feeds'
             filter_name = 'feed=%s' % feed_id
@@ -128,7 +130,7 @@ class FrontendApp(WSGIApp):
             offset = int(request.GET['offset'])
             
         entry_count = q.count()
-        entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()    
+        entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)    
 
         if offset:
             templatename = '_entries_more.html'            
@@ -159,7 +161,7 @@ class FrontendApp(WSGIApp):
 
         q = get_feeds(user)
         feed_count = q.count()        
-        feeds = q.order_by(Feed.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE).naive()
+        feeds = q.order_by(Feed.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
 
         if offset:
             templatename = '_feeds_more.html'            
@@ -178,8 +180,8 @@ class FrontendApp(WSGIApp):
         '''
 
         user = self.get_session_user()
-
-        feed, q = get_feed_entries(user, feed_id)        
+        feed = Feed.get(Feed.id == feed_id) 
+        q = get_feed_entries(user, feed)        
         entry_count = q.count()
         
         return self.respond_with_template('_feed.html', locals())   
@@ -223,15 +225,15 @@ class FrontendApp(WSGIApp):
         '''
         Human readable placeholder for Fever API entry point
         '''
-        return self.respond_with_template('fever.html', {})
+        return self.respond_with_template('fever.html')
 
     @GET(r'^/guide/?$')
     def guide(self, request):        
-        return self.respond_with_template('guide.html', {})
+        return self.respond_with_template('guide.html')
 
     @GET(r'^/about/?$')
     def about(self, request):        
-        return self.respond_with_template('about.html', {})
+        return self.respond_with_template('about.html')
 
 
     # Template
@@ -370,43 +372,39 @@ def render_template(filename, namespace):
 # Queries
 # ------------------------------------------------------        
  
+# Entries
+
 def get_unread_entries(user):     
-    #@@TODO: join(Icon) to reduce number of queries
-    q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & ~(Entry.id << Read.select(Read.entry)))
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & ~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
     return q
 
 def get_saved_entries(user):   
-    #@@TODO: join(Icon) to reduce number of queries  
-    q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Entry.id << Saved.select(Saved.entry)))
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Entry.id << Saved.select(Saved.entry).where(Saved.user == user)))
     return q
 
-def get_group_entries(user, group_id):     
-    try:
-        group = Group.get((Group.id == group_id)) 
-    except Group.DoesNotExist:
-        raise HTTPNotFound('No such group %s' % group_id)
-    #@@TODO: join(Icon) to reduce number of queries
-    q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.group == group))
-    return group, q
+def get_group_entries(user, group):     
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.group == group))
+    return q
 
-def get_feed_entries(user, feed_id):     
-    try:
-        feed = Feed.get((Feed.id == feed_id)) 
-    except Feed.DoesNotExist:
-        raise HTTPNotFound('No such feed %s' % feed_id)
-    #@@TODO: join(Icon) to reduce number of queries
-    q = Entry.select().join(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.feed == feed))
-    return feed, q
+def get_feed_entries(user, feed):     
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.feed == feed))
+    return q
     
+# Feeds
+
 def get_feeds(user):     
-    #@@TODO: join(Icon) to reduce number of queries
-    q = Feed.select().join(Subscription).where(Subscription.user == user)
+    #@@TODO: Add join(Entry, JOIN_LEFT_OUTER).annotate(Entry) # No. of entries in feed
+    q = Feed.select(Feed, Icon).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user)
     return q    
+
+# Groups
 
 def get_groups(user):     
     q = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title) 
     return q    
 
+
+# Stats
 
 def get_health():
     '''
@@ -426,7 +424,7 @@ def get_health():
         last_checked_on = 'Never'
         b = 0 #timedelta.max.days
         
-    unread_count = Entry.select().where(~(Entry.id << Read.select(Read.entry))).naive().count()
+    unread_count = Entry.select().where(~(Entry.id << Read.select(Read.entry))).count()
     if not unread_count:
         unread_count = 'None'
     

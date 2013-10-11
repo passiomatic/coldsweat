@@ -111,7 +111,7 @@ def command_export(parser, options, args):
     filename = args[0]
     
     timestamp = format_http_datetime(datetime.utcnow())
-    feeds = Feed.select().join(Subscription).join(User).where(User.id == user.id).distinct().naive()
+    feeds = Feed.select().join(Subscription).where(Subscription.user == user).order_by(Feed.title)
     
     with open(filename, 'w') as f:
         f.write(render_template(path.join(template_dir, 'export.xml'), locals()))
@@ -134,7 +134,7 @@ def command_setup(parser, options, args):
     # Check if username is already in use
     try:
         User.get(User.username == username)
-        print "Error: user %s alredy exists, please pick another username" % username     
+        print "Error: user %s already exists, please pick another username" % username     
         return 
     except User.DoesNotExist:
         pass
@@ -142,7 +142,7 @@ def command_setup(parser, options, args):
     while True:        
         password = getpass("Enter password for user %s: " % username)
         if len(password) < MIN_PASSWORD_LENGTH:
-            print 'Error: password is too short, it should be at least %d characters long' % MIN_PASSWORD_LENGTH
+            print 'Error: password should be at least %d characters long' % MIN_PASSWORD_LENGTH
             continue        
         password_again = getpass("Enter password (again): ")
         
@@ -171,7 +171,7 @@ def run():
 
     available_options = [
         make_option('-u', '--username', 
-            dest='username', default=default_username, help="specifies a username (default %s)" % default_username),
+            dest='username', default=default_username, help="specifies a username (default is %s)" % default_username),
         make_option('-f', '--force',
             dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
         make_option('-p', '--port', default='8080', 

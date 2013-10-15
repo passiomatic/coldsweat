@@ -161,7 +161,7 @@ class FrontendApp(WSGIApp):
 
         q = get_feeds(user)
         feed_count = q.count()        
-        feeds = q.order_by(Feed.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
+        feeds = q.order_by(Feed.title).offset(offset).limit(ENTRIES_PER_PAGE)
 
         if offset:
             templatename = '_feeds_more.html'            

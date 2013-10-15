@@ -137,7 +137,6 @@ def datetime_since(utcnow):
 
 def render_template(filename, namespace):                    
     return HTMLTemplate.from_filename(filename, namespace=namespace).substitute()
-    
 
 # --------------------
 # Misc.

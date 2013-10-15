@@ -11,6 +11,7 @@ import pickle
 from datetime import datetime, timedelta
 from peewee import *
 from playhouse import migrate
+from webob.exc import status_map
 
 from utilities import *
 import favicon
@@ -134,9 +135,15 @@ class Feed(CustomModel):
 
     @property
     def last_updated_on_as_epoch(self):
-        if self.last_updated_on: # Never updated?
+        if self.last_updated_on:        # Never updated?
             return datetime_as_epoch(self.last_updated_on)
         return 0 
+
+    @property
+    def last_status_title(self):
+        if self.last_status in status_map:   # Never updated?
+            return status_map[self.last_status].title.lower()
+        return '—'
 
 
 class Entry(CustomModel):

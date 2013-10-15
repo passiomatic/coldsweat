@@ -93,6 +93,7 @@ $media-queries-supported : true;
             
             .item-inner {
                 background: $white;
+                @include transition(background-color .1s ease-out);
                 @include box-shadow(0 0 4px $lightneutralcolor);
                 padding: $baselineheight/2 $gutterwidth*1.5; 
 
@@ -166,10 +167,19 @@ $media-queries-supported : true;
             // Entries
             
             &.status-read {
-                background: $lightestneutralcolor;                
-                .meta .icon-unread {
-                    display: none;
-                }
+                .item-inner {
+                    background: rgba($white, .85);
+/*
+                    h3 {
+                        a:link {
+                            color: rgba($linkcolor, .8);
+                        }
+                    }
+*/                    
+                    .meta .icon-unread {
+                        display: none;
+                    }
+                }                
             }
 
             &.status-saved {
@@ -179,13 +189,16 @@ $media-queries-supported : true;
             }
 
             &.current {
-                
-                .item-inner {
-                    background: $white url(../images/rarr.png) left 14px no-repeat;
-    
+                .item-inner {                    
+                    background: $white url(../images/rarr.png) left 14px  no-repeat;
+/*
+                    background-image: url(../images/rarr.png);
+                    background-position: left 14px; 
+                    background-repeat:;
+*/
                     h3 {
                         a {
-                            color: $secondarycolor
+                            color: $secondarycolor;
                         }
                     }
                 }
@@ -311,42 +324,6 @@ nav {
 
                 
     }
-
-/*
-    dl {
-        @include zero;
-        margin-top: $baselineheight/2;        
-
-        dd, dt {
-            margin: $baselineheight/4 $baselineheight;
-            //color: #E6EFF5;   
-
-        }
-        
-        dt {
-            color: #E6EFF5; //lighten($primarycolor, 10%);
-            text-transform: uppercase;            
-            @include font-size(12);
-            letter-spacing: 2px
-        }
-
-        dd {
-            color: $white;
-            @include font-size(14);
-            
-            kbd {
-                width: 1.5em;
-                display: inline-block;
-                background: lighten($primarycolor, 10%); ;
-                text-align: center;                            
-                border-radius: $borderradius;
-                color: $white;
-            }
-        }
-    }
-*/
-                
-    
   
 }
 /*

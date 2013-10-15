@@ -3905,6 +3905,11 @@ input.search-query {
         padding: 0; }
         .panel .panel-content ul.view > li .item-inner {
           background: white;
+          -webkit-transition: background 0.1s ease-out;
+          -moz-transition: background 0.1s ease-out;
+          -ms-transition: background 0.1s ease-out;
+          -o-transition: background 0.1s ease-out;
+          transition: background 0.1s ease-out;
           -webkit-box-shadow: 0 0 4px #898080;
           -moz-box-shadow: 0 0 4px #898080;
           box-shadow: 0 0 4px #898080;
@@ -3936,14 +3941,26 @@ input.search-query {
       margin-right: 6px; }
     .panel .panel-content ul.list-view > li .meta .icon-saved {
       display: none; }
-    .panel .panel-content ul.list-view > li.status-read {
-      background: #e4e2e2; }
-      .panel .panel-content ul.list-view > li.status-read .meta .icon-unread {
+    .panel .panel-content ul.list-view > li.status-read .item-inner {
+      background: rgba(255, 255, 255, 0.85);
+      /*
+                          h3 {
+                              a:link {
+                                  color: rgba($linkcolor, .8);
+                              }
+                          }
+      */ }
+      .panel .panel-content ul.list-view > li.status-read .item-inner .meta .icon-unread {
         display: none; }
     .panel .panel-content ul.list-view > li.status-saved .meta .icon-saved {
       display: inline; }
     .panel .panel-content ul.list-view > li.current .item-inner {
-      background: white url(../images/rarr.png) left 14px no-repeat; }
+      background: white url(../images/rarr.png) left 14px no-repeat;
+      /*
+                          background-image: url(../images/rarr.png);
+                          background-position: left 14px; 
+                          background-repeat:;
+      */ }
       .panel .panel-content ul.list-view > li.current .item-inner h3 a {
         color: #9c1c1e; }
     .panel .panel-content ul.grid-view {
@@ -3992,40 +4009,7 @@ nav {
   background: #898080;
   -webkit-box-shadow: inset -3px 0 2px -2px #474242;
   -moz-box-shadow: inset -3px 0 2px -2px #474242;
-  box-shadow: inset -3px 0 2px -2px #474242;
-  /*
-      dl {
-          @include zero;
-          margin-top: $baselineheight/2;        
-  
-          dd, dt {
-              margin: $baselineheight/4 $baselineheight;
-              //color: #E6EFF5;   
-  
-          }
-          
-          dt {
-              color: #E6EFF5; //lighten($primarycolor, 10%);
-              text-transform: uppercase;            
-              @include font-size(12);
-              letter-spacing: 2px
-          }
-  
-          dd {
-              color: $white;
-              @include font-size(14);
-              
-              kbd {
-                  width: 1.5em;
-                  display: inline-block;
-                  background: lighten($primarycolor, 10%); ;
-                  text-align: center;                            
-                  border-radius: $borderradius;
-                  color: $white;
-              }
-          }
-      }
-  */ }
+  box-shadow: inset -3px 0 2px -2px #474242; }
   nav ul {
     margin: 0;
     padding: 0;

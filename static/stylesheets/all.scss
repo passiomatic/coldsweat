@@ -114,7 +114,7 @@ $media-queries-supported : true;
             &.status-disabled {
 
                 .item-inner {
-                    background-color: lighten($secondarycolor, 53%);
+                    background-color: lighten($secondarycolor, 57%);
                     h3 {
                         text-decoration: line-through;
                     }

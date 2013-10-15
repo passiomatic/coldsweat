@@ -42,7 +42,11 @@ $media-queries-supported : true;
     }
 }             
 
-.icon-circle-blank,
+.help-text {
+    @extend abbr[title];
+}
+
+//.icon-circle-blank,
 .icon-circle {
     @include font-size(13); // Smaller
 }
@@ -80,41 +84,56 @@ $media-queries-supported : true;
 
     // Common elements
 
-    > ul {
+    ul.view {
         list-style: none;
         @include zero;
 
         > li {
             @include zero;
-            background: $white;
-            padding: $baselineheight/2 $gutterwidth*1.5 $baselineheight/2 $gutterwidth*1.5;        
             
-            // Title
-            > h3 {
-                a {
-                    display: block;
-                }
-            }
+            .item-inner {
+                background: $white;
+                @include box-shadow(0 0 4px $lightneutralcolor);
+                padding: $baselineheight/2 $gutterwidth*1.5; 
 
-            .favicon {
-                margin-top: 4px;
-                margin-left: -$gutterwidth;
-                float: left;
-            }
+                // Title
+        
+                > h3 {
+                    text-transform: capitalize;
+                    a { display: block; }
+                }
+    
+                .favicon {
+                    float: left;
+                    margin: 4px 0 0 (-$gutterwidth);
+                }
+            }        
         }
         
+        .more {
+            clear:both;
+            text-align: center;
+            padding: $baselineheight/2 0 0 0;        
+            form {
+                @include zero;
+            }
+        }        
     }
 
     // List view
 
-    > ul.list {
+    ul.list-view {
+
+        //background: $white;
     
-        > li {
-            margin-top: -$baselineheight/4;
-            border-top: 1px solid transparent;            
-            @include box-shadow(0 0 4px $lightneutralcolor);
-            //border-top: $baselineheight/4 solid transparent;            
-            
+        > li {        
+            .item-inner {
+                border-bottom: 1px dotted $lighterneutralcolor;                       
+            }
+
+            &:last-child {
+                .item-inner { border-bottom: none; }
+            }
 
             // Read, unread, etc.
             
@@ -145,14 +164,17 @@ $media-queries-supported : true;
             }
 
             &.current {
-                background: $white url(../images/rarr.png) left 14px no-repeat;
-
-                h3 {
-                    a {
-                        color: $secondarycolor
+                
+                .item-inner {
+                    background: $white url(../images/rarr.png) left 14px no-repeat;
+    
+                    h3 {
+                        a {
+                            color: $secondarycolor
+                        }
                     }
                 }
-    
+                    
             }
 
             // Feeds
@@ -167,19 +189,43 @@ $media-queries-supported : true;
 
     // Grid view
 
-    > ul.grid {
+    ul.grid-view {
+        @include clearfix;
+    
+        > li.entry, 
+        > li.feed  {
+            @include box-sizing(border-box);
+            padding-right: $gutterwidth/2;            
+            float: left;
+            width: 33.33333%;
+            margin-bottom: $baselineheight/2;
+            
+            .item-inner {
+                position: relative;                    
+                @include box-shadow(0 0 4px $lightneutralcolor);                
+                min-height: 96px; // Two rows for h3
+                border-radius: $borderradius;
+/*                 background-clip: content-box; */
+                
+                .meta {
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    position: absolute;
+                    background: $lightestneutralcolor;                    
+                    padding: $baselineheight/4 0 $baselineheight/4 $gutterwidth*1.5;
+                    border-bottom-right-radius: $borderradius;
+                    border-bottom-left-radius: $borderradius;
+                    
+                }
+            }
+
+        }
+
         
-        
+
     }
 
-    .more {
-        text-align: center;
-        padding: $baselineheight/2;
-        
-        form {
-            @include zero;
-        }
-    }
 
 }
 

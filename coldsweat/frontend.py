@@ -151,7 +151,7 @@ class FrontendApp(WSGIApp):
         '''
 
         # Defaults 
-        offset, group_id, filter_class, panel_title = 0, 0, 'feeds', 'All Feeds' 
+        offset, group_id, filter_class, panel_title = 0, 0, 'feeds', 'Feeds' 
 
         user = self.get_session_user()  
         groups = get_groups(user)  

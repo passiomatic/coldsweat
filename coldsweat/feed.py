@@ -26,16 +26,18 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
 
     feed = Feed()            
 
+    if fetch_icon:
+        # Prefer alternate_link if available since self_link could 
+        #   point to Feed Burner or similar services
+        icon_link = alternate_link if alternate_link else self_link    
+        (schema, netloc, path, params, query, fragment) = urlparse.urlparse(icon_link)
+        icon = Icon.create(data=favicon.fetch(icon_link))
+        feed.icon = icon
+        log.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
+
     feed.self_link = self_link
     feed.alternate_link = alternate_link 
     feed.title = title 
-
-    (schema, netloc, path, params, query, fragment) = urlparse.urlparse(feed.self_link)
-    
-    if fetch_icon:
-        icon = Icon.create(data=favicon.fetch(self_link))
-        feed.icon = icon
-        log.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
 
     feed.save()
 

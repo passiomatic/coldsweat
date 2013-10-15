@@ -3916,6 +3916,10 @@ input.search-query {
           .panel .panel-content ul.view > li .item-inner .favicon {
             float: left;
             margin: 4px 0 0 -24px; }
+        .panel .panel-content ul.view > li.status-disabled .item-inner {
+          background-color: #f7d0d0; }
+          .panel .panel-content ul.view > li.status-disabled .item-inner h3 {
+            text-decoration: line-through; }
       .panel .panel-content ul.view .more {
         clear: both;
         text-align: center;
@@ -3942,8 +3946,6 @@ input.search-query {
       background: white url(../images/rarr.png) left 14px no-repeat; }
       .panel .panel-content ul.list-view > li.current .item-inner h3 a {
         color: #9c1c1e; }
-    .panel .panel-content ul.list-view > li.status-disabled h3 a {
-      text-decoration: line-through; }
     .panel .panel-content ul.grid-view {
       *zoom: 1; }
       .panel .panel-content ul.grid-view:before, .panel .panel-content ul.grid-view:after {
@@ -3975,7 +3977,7 @@ input.search-query {
             left: 0;
             right: 0;
             position: absolute;
-            background: #e4e2e2;
+            background: rgba(228, 226, 226, 0.8);
             padding: 0.375em 0 0.375em 36px;
             border-bottom-right-radius: 3px;
             border-bottom-left-radius: 3px; }

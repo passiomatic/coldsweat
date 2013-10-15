@@ -108,6 +108,20 @@ $media-queries-supported : true;
                     margin: 4px 0 0 (-$gutterwidth);
                 }
             }        
+
+            // Feeds
+            
+            &.status-disabled {
+
+                .item-inner {
+                    background-color: lighten($secondarycolor, 53%);
+                    h3 {
+                        text-decoration: line-through;
+                    }
+                }                
+                
+            }
+
         }
         
         .more {
@@ -118,6 +132,7 @@ $media-queries-supported : true;
                 @include zero;
             }
         }        
+
     }
 
     // List view
@@ -177,13 +192,7 @@ $media-queries-supported : true;
                     
             }
 
-            // Feeds
-            
-            &.status-disabled {
-                h3 a {
-                    text-decoration: line-through;
-                }
-            }
+
         }
     }
 
@@ -212,7 +221,7 @@ $media-queries-supported : true;
                     left: 0;
                     right: 0;
                     position: absolute;
-                    background: $lightestneutralcolor;                    
+                    background: rgba($lightestneutralcolor, .8);                    
                     padding: $baselineheight/4 0 $baselineheight/4 $gutterwidth*1.5;
                     border-bottom-right-radius: $borderradius;
                     border-bottom-left-radius: $borderradius;

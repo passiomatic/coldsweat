@@ -11,7 +11,7 @@ License: MIT (see LICENSE.md for details)
 from cStringIO import StringIO
 
 from webob.exc import HTTPException, HTTPNotFound
-from coldsweat import log
+#from coldsweat import log
 
 CHUNK_SIZE = 4096
     

@@ -8,11 +8,20 @@
     <div class="meta dim">
         <ul>
             <li>
-                Posted {{entry.last_updated_on|since}}{{if entry.author}} by <b>{{entry.author}}</b>{{endif}}
+                <b>Posted</b><br>
+                {{entry.last_updated_on|since}}
             </li>
+
+            {{if entry.author}}
+            <li>
+                <b>Author</b><br>
+                {{entry.author}}
+            </li>
+            {{endif}}            
+            
             {{if entry.link}}
             <li>
-                <a target="_blank" href="{{entry.link}}">View original</a>
+                <a target="_blank" href="{{entry.link}}">Visit website</a>
             </li>
             {{endif}}
         </ul>

@@ -21,7 +21,7 @@
                         <input type="hidden" name="from" value="{{from_url}}">
                         <fieldset>
 <!--                             <label for="username">Username</label>  -->
-                            <input type="text" id="username" name="username" placeholder="Username" class="input-large"  value="{{username}}" size="30">                
+                            <input autofocus type="text" id="username" name="username" placeholder="Username" class="input-large"  value="{{username}}" size="30">                
 <!--                             <label for="password">Password</label>  -->
                             <input type="password" id="password" name="password" placeholder="Password" class="input-large" value="{{password}}" size="30">
                         </fieldset>
@@ -42,8 +42,7 @@
                 <h2>Don’t You Have an Account?</h2>
                 
                 <p class="_">Run the <i>sweat</i> command-line utility:</p>             
-                <p><code>python sweat.py setup -u johndoe</code></p>
-    
+                <p><pre><code>python sweat.py setup -u johndoe</code></pre></p>
     
             </div>
         </section>
@@ -104,7 +103,7 @@
                 <h2>Configure Your Feed Reader</h2>
                 
                 <p>Sync with Coldsweat using the address below:</p>            
-                <p><code>{{request.application_url}}/fever</code></p>
+                <p><pre><code>{{request.application_url}}/fever</code></pre></p>
                 
                 <div>
                     <a class="btn" href="{{application_url}}/guide">See the Step by Step Guide</a>
@@ -124,18 +123,4 @@
 <!-- /container-inner -->
 </div>
 
-{{enddef}}
-
-
-{{def page_script_block}}
-<script>
-head.js(
-// Libraries
-"{{static_url}}/javascripts/vendor/modernizr-min.js",
-"{{static_url}}/javascripts/vendor/jquery-min.js",
-function() {
-   // Load complete
-   $('#username').focus();
-});
-</script>
 {{enddef}}

@@ -419,7 +419,7 @@ $heroshadowblur					: 10px;
 
 // =alerts ============
 
-$alertpadding					: 8px;
+$alertpadding					: $baselineheight/4 0;   
 
 // Alerts have a default flat background colour
 // Add an optional gradient in _bootstrap-alerts.scss
@@ -441,7 +441,7 @@ $alertborderradius 				: 0; //$borderradius;
 // Set the alert’s font-size. 
 // Use only a number. Units (em/px/%) are not required
 // Default is $basefontsize defined above
-$alertfontsize 					: $basefontsize;
+$alertfontsize 					: 14;
 
 // By default colour is a tint of background colour. Adjust percentage as required
 $alertcolor						: darken($alertbackgroundcolor, 75%);

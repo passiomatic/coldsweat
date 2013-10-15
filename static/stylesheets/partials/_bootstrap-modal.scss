@@ -22,7 +22,7 @@ opacity : .8; }
 
 .modal {
 position : fixed;
-top : 10%;
+top : 25%;
 left : 50%;
 z-index : 1050;
 width : 560px;
@@ -33,15 +33,30 @@ border-radius : $borderradius;
 outline : none;
 @include background-clip(padding-box); }
 
+/*
 .modal.fade {
 top : -25%;
 -webkit-transition : opacity $transitionduration linear, top $transitionduration ease-out;
 -moz-transition : opacity $transitionduration linear, top $transitionduration ease-out;
 -o-transition : opacity $transitionduration linear, top $transitionduration ease-out;
 transition : opacity $transitionduration linear, top $transitionduration ease-out; }
+*/
+
+.modal.fade {
+@include scale(.95);
+opacity : .75; 
+@include transition(all .25s ease-out);
+}
+
+/*
+.modal.fade.in {
+top : 20%; }
+*/
 
 .modal.fade.in {
-top : 10%; }
+@include scale(1);
+opacity : 1; 
+}
 
 .modal-header {
 padding : $baselineheight / 2 $gutterwidth;

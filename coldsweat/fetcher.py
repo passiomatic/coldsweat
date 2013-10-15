@@ -15,9 +15,9 @@ import feedparser
 import requests
 from requests.exceptions import RequestException
 
+from markup import html
 from models import *
 from utilities import *
-from html import *
 from coldsweat import *
 
 # ------------------------------------------------------
@@ -282,7 +282,7 @@ def fetch_feed(feed):
 
         content = get_entry_content(entry)
         if blacklist:
-            content = scrub_entry(content, blacklist)
+            content = html.scrub_entry(content, blacklist)
 
         d = {
             'guid'              : guid,

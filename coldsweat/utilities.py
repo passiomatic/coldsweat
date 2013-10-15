@@ -43,10 +43,12 @@ RE_URL = re.compile(
     r'localhost|'  # localhost...
     r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
     r'(?::\d+)?'  # optional port
-    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)    
+    #@@TODO: Add IPv6
+    
 
 def is_valid_url(value):
-    return (value is not None) and RE_URL.search(value)
+    return value and RE_URL.search(value)
     
 # --------------------
 # Date/time functions

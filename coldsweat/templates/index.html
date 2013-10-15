@@ -8,13 +8,13 @@
             </li>
 
             <li class="filter filter-unread"><a href="{{application_url}}/entries/?unread"><span><i class="icon-circle"></i></span>&ensp;Unread</a></li>
-            <li class="filter filter-saved"><a href="{{application_url}}/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Starred</a></li>
+            <li class="filter filter-saved"><a href="{{application_url}}/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Saved</a></li>
             {{for g in groups}}
                 <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title}}</a></li>            
             {{endfor}}        
 
             <li class="sep filter filter-feeds"><a href="{{application_url}}/feeds/"><i class="icon-rss"></i>&ensp;Feeds</a></li>            
-            <li><a href="#modal-add-subscription"  data-keyboard="true" data-toggle="modal"><i class="icon-plus-sign-alt"></i>&ensp;Add subscription</a></li>            
+            <li><a href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><i class="icon-plus-sign-alt"></i>&ensp;Add subscription</a></li>            
             <li class="sep"><a href="{{application_url}}/logout"><span><i class="icon-cog"></i></span>&ensp;Log out</a></li>
         </ul>
     </nav>  
@@ -27,78 +27,10 @@
 
     <div class="payoff">Coldsweat&ensp;<i title="Loves" class="icon-heart"></i>&ensp;Your Feeds</div>
     <div class="credits dim">
-        &copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a>&emsp;<a href="#modal-keyboard-shortcuts" data-keyboard="true" data-toggle="modal">Keyboard Shortcuts</a>&emsp;<a href="{{application_url}}/guide">Configure Your Feed Reader</a>&emsp;<a href="{{application_url}}/about">About</a>
+        &copy; 2013&ndash; <a target="_blank" href="http://passiomatic.com/">Andrea Peltrin</a>&emsp;<a data-remote-modal href="{{application_url}}/shortcuts">Keyboard Shortcuts</a>&emsp;<a href="{{application_url}}/guide">Configure Your Feed Reader</a>&emsp;<a href="{{application_url}}/about">About</a>
     </div>
 </footer>
     
-
-<div id="modal-add-subscription" role="dialog" class="modal fade hide" tabindex="-1">
-  <form action="{{application_url}}/ajax/feeds/add" method="POST">
-      <div class="modal-header">
-    <!--     <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i> -->
-        <h3>Add Subscription</h3>
-      </div>
-      <div class="modal-body">          
-            <label for="self_link">Web address (URL) for the feed</label> 
-            <input type="text" id="self_link" name="self_link" class="input-xlarge" size="40" value="">
-    <!--             <span class="help-block">Feed autodiscovery is coming</span> -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
-        <button type="submit" class="btn btn-primary">Continue &rarr;</button>
-      </div>
-  </form>
-</div>
-
-
-<div id="modal-keyboard-shortcuts" role="dialog" class="modal fade hide" tabindex="-1">
-  <div class="modal-header">
-<!--     <i data-dismiss="modal" aria-hidden="true" class="close icon-remove-sign"></i> -->
-    <h3>Keyboard Shortcuts</h3>
-  </div>
-  <div class="modal-body">
-<!--       <p></p> -->
-      
-      <dl class="">
-        <dt>Navigation</dt>
-        <dd><kbd>j</kbd>&ensp;Previous entry/feed 
-        </dd>
-        <dd><kbd>k</kbd>&ensp;Next entry/feed 
-        </dd>        
-        <dt>Entry Listing</dt>
-        <dd><kbd>o</kbd>&ensp;Open entry  
-        </dd>
-        <dd><kbd>m</kbd>&ensp;Mark entry as read 
-        </dd>
-        <dd><kbd>s</kbd>&ensp;Star entry 
-
-        <dt>Feed listing</dt>
-<!--
-        <dd><kbd>o</kbd>&ensp;Open feed  
-        </dd>
--->
-        <dd><kbd>m</kbd>&ensp;Mark entire feed as read 
-        </dd>
-<!--
-        <dd><kbd>d</kbd>&ensp;Disable feed
-        </dd>
--->
-        <dt>Misc.</dt>
-<!--
-        <dd><kbd>?</kbd>&ensp;Show this help text 
-        </dd>
--->
-        <dd><kbd>a</kbd>&ensp;Add a subscription 
-        </dd>
-      </dl>
-  </div>
-  <div class="modal-footer">
-    <button data-dismiss="modal" type="button" class="btn btn-primary">Close</button>
-  </div>
-</div>
-
-
-
 {{enddef}}
 
 {{def page_script_block}}

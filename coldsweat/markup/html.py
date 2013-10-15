@@ -10,6 +10,7 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 
 from sgmllib import SGMLParser, charref
 import urlparse
+
 from coldsweat import log
 
 class BaseParser(SGMLParser):

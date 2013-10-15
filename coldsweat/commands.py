@@ -9,7 +9,8 @@ from getpass import getpass
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
 
-from coldsweat import opml, fetcher, template_dir
+from coldsweat import fetcher, template_dir
+from coldsweat.markup import opml
 from coldsweat.models import *
 from coldsweat.app import ExceptionMiddleware
 from coldsweat.fever import fever_app

@@ -106,7 +106,7 @@ class FrontendApp(WSGIApp):
         
         if 'saved' in request.GET:
             q = get_saved_entries(user)
-            panel_title = 'Starred Items'
+            panel_title = 'Saved Items'
             filter_class = filter_name = 'saved'
         elif 'group' in request.GET:
             group_id = int(request.GET['group'])    
@@ -186,17 +186,20 @@ class FrontendApp(WSGIApp):
         
         return self.respond_with_template('_feed.html', locals())   
 
-    @POST(r'^/ajax/feeds/add$')
-    def feed_put(self, request): #@@TODO: Use PUT verb?
+    @GET(r'^/feeds/add?$')
+    def feed_post_1(self, request):        
+        return self.respond_with_template('_feed_add_wizard_1.html')
+        
+    @POST(r'^/feeds/add$')
+    def feed_post_done(self, request):
         '''
         Add a new feed to database
         '''
 
         self_link = request.POST['self_link']
-        if not self_link:
-            #@@TODO Check if well-formed is_valid_url(self_link)
-            message = u'ERROR Please specify a valid web address'
-            return self.respond_with_template('_feed_added.html', locals())
+        if not is_valid_url(self_link):
+            message = u'<i class="icon-warning-sign"></i> Error, please specify a valid web address'
+            return self.respond_with_template('_feed_add_wizard_done.html', locals())
                         
         user = self.get_session_user()
         default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
@@ -207,24 +210,23 @@ class FrontendApp(WSGIApp):
             try:
                 Subscription.create(user=user, feed=feed, group=default_group)
                 log.debug('added feed %s for user %s' % (self_link, user.username))            
-                #message = render_message(u'SUCCESS Feed %s added successfully.' % self_link)
-                message = u'SUCCESS Feed %s added successfully.' % self_link
-
             except IntegrityError:
                 log.debug('user %s has already feed %s in her subscriptions' % (user.username, self_link))    
-                message = u'INFO Feed %s is already in your subscriptions.' % self_link
+                #message = u'INFO Feed %s is already in your subscriptions.' % self_link
     
-        return self.respond_with_template('_feed_added.html', locals())
+        message = u'<i class="icon-check-sign"></i> Feed %s added successfully.' % self_link
+
+        return self.respond_with_template('_feed_add_wizard_done.html', locals())
     
     
 
+    @GET(r'^/shortcuts/?$')
+    def shortcuts(self, request):        
+        return self.respond_with_template('_shortcuts.html')
 
         
     @GET(r'^/fever/?$')
     def fever(self, request):        
-        '''
-        Human readable placeholder for Fever API entry point
-        '''
         return self.respond_with_template('fever.html')
 
     @GET(r'^/guide/?$')

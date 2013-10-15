@@ -2,32 +2,25 @@
 
 {{def container_block}}
 
+<div class="container-inner">
+<div class="grid-container">
 
-<section class="alt">
+    <div class="grid-50">
 
-    <div class="grid-container">
-
-    
-      <div class="grid-100">
-
-            <h1>Fever Endpoint</h1>
-
-         <div class="well well--large">
-                <h2>Configure Your Feed Reader</h2>
-              
-              <p>Sync with Coldsweat using the address below:</p>
+        <h1>Fever Endpoint</h1>
         
-              <code>{{request.application_url}}/fever</code>
-                        
-         </div>
-                           
-      </div>
-                        
-    
-    <!-- /grid-container -->
+        <p>You should use the address of this page to configure your Fever client.
+        </p>      
+        
+        <div>
+            <a class="btn" href="{{application_url}}/guide">Configure Your Client</a>
+        </div>
     </div>
-</section> 
-     
+                        
+<!-- /grid-container -->
+</div>
+<!-- /container-inner -->     
+</div>
  
     
 {{enddef}}

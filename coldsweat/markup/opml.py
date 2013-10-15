@@ -10,9 +10,8 @@ License: MIT (see LICENSE.md for details)
 from xml.etree import ElementTree
 #from collections import defaultdict
 
-from models import *
-import favicon
-from coldsweat import log
+from ..models import *
+from coldsweat import log, favicon
 
 
 allowed_attribs = {

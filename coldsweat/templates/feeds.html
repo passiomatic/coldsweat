@@ -6,16 +6,17 @@
     </div>
     <div class="panel-content">
         {{if feed_count}}
-            <ul>                      
+            <ul class="list">                      
             {{for loop, f in looper(feeds)}}
                 <li class="feed {{if loop.first}}current{{endif}} {{if not f.is_enabled}}status-disabled{{endif}}">
                     <h3 class="h4">
-                        <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a href="{{application_url}}/feeds/{{f.id}}">{{f.title}}</a>
+<!--                         <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a href="{{application_url}}/feeds/{{f.id}}">{{f.title}}</a> -->
+                        <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a href="{{application_url}}/?feed={{f.id}}">{{f.title}}</a>
                     </h3>
                     <div class="meta dim">
-                        Last updated {{f.last_updated_on|since}}
+                        Last checked {{f.last_checked_on|since}}&emsp;{{if f.alternate_link}}<a target="_blank" href="{{f.alternate_link}}">View feed web page</a>{{endif}}
                     </div>                                              
-                    <article></article>                
+<!--                     <article></article>                 -->
                 </li>
             {{endfor}}
 
@@ -34,6 +35,7 @@
                 No feeds found. <a href="#">Add some feeds now</a>.
             </div>
         {{endif}}
+
     </div>
 {{enddef}}
 

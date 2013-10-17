@@ -7,22 +7,20 @@
 <aside>
     <div class="meta dim">
         <ul>
-            <li>
-                <b>Posted</b><br>
-                {{entry.last_updated_on|since}}
-            </li>
-
             {{if entry.author}}
-            <li>
-                <b>Author</b><br>
-                {{entry.author}}
-            </li>
+                <li>
+                    <i class="icon-user"></i>&ensp;{{entry.author}}
+                </li>
             {{endif}}            
             
-            {{if entry.link}}
             <li>
-                <a target="_blank" href="{{entry.link}}">Visit website</a>
+                <i class="icon-time"></i>&ensp;<span class="help-text" title="Time posted">{{entry.last_updated_on|since}}</span>
             </li>
+
+            {{if entry.link}}
+                <li>
+                    <i class="icon-globe"></i>&ensp;<a target="_blank" href="{{entry.link}}">Visit website</a>
+                </li>
             {{endif}}
         </ul>
     </div>

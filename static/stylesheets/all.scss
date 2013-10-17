@@ -82,7 +82,7 @@ $media-queries-supported : true;
 
     padding: 0 $gutterwidth;
 
-    // Common elements
+    // Common styles
 
     ul.view {
         list-style: none;
@@ -168,14 +168,14 @@ $media-queries-supported : true;
             
             &.status-read {
                 .item-inner {
-                    background: rgba($white, .85);
-/*
                     h3 {
                         a:link {
-                            color: rgba($linkcolor, .8);
+                            color: rgba($linkcolor, .7);
                         }
-                    }
-*/                    
+                        a:hover {
+                            color: $linkcolorhover;
+                        }
+                    }                    
                     .meta .icon-unread {
                         display: none;
                     }
@@ -309,6 +309,7 @@ nav {
         &.unread li.filter-unread,
         &.saved li.filter-saved,
         &.feeds li.filter-feeds,
+        &.all li.filter-all,
         li.filter-group {
             a {
                 background: $neutralcolor;                    

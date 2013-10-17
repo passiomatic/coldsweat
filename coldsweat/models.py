@@ -96,7 +96,7 @@ class Group(CustomModel):
     """
     Feed group/folder
     """
-    DEFAULT_GROUP = 'All entries'
+    DEFAULT_GROUP = 'Default'
     
     title               = CharField(unique=True)
     

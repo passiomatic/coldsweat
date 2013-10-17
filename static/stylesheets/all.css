@@ -519,35 +519,36 @@ nav a {
   background-repeat: repeat-x; }
 
 /*
- *  Font Awesome 3.1.0
+ *  Font Awesome 3.2.1
  *  the iconic font designed for Bootstrap
- *  -------------------------------------------------------
- *  The full suite of pictographic icons, examples, and documentation
- *  can be found at: http://fontawesome.io
+ *  ------------------------------------------------------------------------------
+ *  The full suite of pictographic icons, examples, and documentation can be
+ *  found at http://fontawesome.io.  Stay up to date on Twitter at
+ *  http://twitter.com/fontawesome.
  *
  *  License
- *  -------------------------------------------------------
- *  - The Font Awesome font is licensed under the SIL Open Font License v1.1 -
+ *  ------------------------------------------------------------------------------
+ *  - The Font Awesome font is licensed under SIL OFL 1.1 -
  *    http://scripts.sil.org/OFL
- *  - Font Awesome CSS, LESS, and SASS files are licensed under the MIT License -
+ *  - Font Awesome CSS, LESS, and SASS files are licensed under MIT License -
  *    http://opensource.org/licenses/mit-license.html
- *  - Font Awesome documentation licensed under CC BY 3.0 License -
+ *  - Font Awesome documentation licensed under CC BY 3.0 -
  *    http://creativecommons.org/licenses/by/3.0/
  *  - Attribution is no longer required in Font Awesome 3.0, but much appreciated:
  *    "Font Awesome by Dave Gandy - http://fontawesome.io"
-
- *  Contact
- *  -------------------------------------------------------
+ *
+ *  Author - Dave Gandy
+ *  ------------------------------------------------------------------------------
  *  Email: dave@fontawesome.io
- *  Twitter: http://twitter.com/fortaweso_me
- *  Work: Lead Product Designer @ http://kyruus.com
+ *  Twitter: http://twitter.com/davegandy
+ *  Work: Lead Product Designer @ Kyruus - http://kyruus.com
  */
 /* FONT PATH
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url("../fonts/fontawesome-webfont.eot?v=3.1.0");
-  src: url("../fonts/fontawesome-webfont.eot?#iefix&v=3.1.0") format("embedded-opentype"), url("../fonts/fontawesome-webfont.woff?v=3.1.0") format("woff"), url("../fonts/fontawesome-webfont.ttf?v=3.1.0") format("truetype"), url("../fonts/fontawesome-webfont.svg#fontawesomeregular?v=3.1.0") format("svg");
+  src: url("../fonts/fontawesome-webfont.eot?v=3.2.1");
+  src: url("../fonts/fontawesome-webfont.eot?#iefix&v=3.2.1") format("embedded-opentype"), url("../fonts/fontawesome-webfont.woff?v=3.2.1") format("woff"), url("../fonts/fontawesome-webfont.ttf?v=3.2.1") format("truetype"), url("../fonts/fontawesome-webfont.svg#fontawesomeregular?v=3.2.1") format("svg");
   font-weight: normal;
   font-style: normal; }
 
@@ -575,41 +576,44 @@ nav a {
 
 /* makes sure icons active on rollover in links */
 a [class^="icon-"],
-a [class*=" icon-"],
-a [class^="icon-"]:before,
-a [class*=" icon-"]:before {
+a [class*=" icon-"] {
   display: inline; }
 
 /* increased font size for icon-large */
 [class^="icon-"].icon-fixed-width,
 [class*=" icon-"].icon-fixed-width {
   display: inline-block;
-  width: 1.2857142857142858em;
-  text-align: center; }
+  width: 1.1428571428571428em;
+  text-align: right;
+  padding-right: 0.2857142857142857em; }
 
 [class^="icon-"].icon-fixed-width.icon-large,
 [class*=" icon-"].icon-fixed-width.icon-large {
-  width: 1.5714285714285714em; }
+  width: 1.4285714285714286em; }
 
-ul.icons-ul {
-  list-style-type: none;
-  text-indent: -0.71429em;
-  margin-left: 2.142857142857143em; }
+.icons-ul {
+  margin-left: 2.142857142857143em;
+  list-style-type: none; }
 
-ul.icons-ul > li .icon-li {
-  width: 0.7142857142857143em;
-  display: inline-block;
-  text-align: center; }
+.icons-ul > li {
+  position: relative; }
+
+.icons-ul .icon-li {
+  position: absolute;
+  left: -2.14286em;
+  width: 2.142857142857143em;
+  text-align: center;
+  line-height: inherit; }
 
 [class^="icon-"].hide,
 [class*=" icon-"].hide {
   display: none; }
 
 .icon-muted {
-  color: #666666; }
+  color: #898080; }
 
 .icon-light {
-  color: white; }
+  color: #ffffff; }
 
 .icon-dark {
   color: #333333; }
@@ -759,6 +763,11 @@ ul.icons-ul > li .icon-li {
 .btn.btn-large [class*=" icon-"].pull-right.icon-2x {
   margin-left: .2em; }
 
+/* Fixes alignment in nav lists */
+.nav-list [class^="icon-"],
+.nav-list [class*=" icon-"] {
+  line-height: inherit; }
+
 /* EXTRAS
  * -------------------------- */
 /* Stacked and layered icon */
@@ -792,6 +801,12 @@ ul.icons-ul > li .icon-li {
   -o-animation: spin 2s infinite linear;
   -webkit-animation: spin 2s infinite linear;
   animation: spin 2s infinite linear; }
+
+/* Prevent stack and spinners from being taken inline when inside a link */
+a .icon-stack,
+a .icon-spin {
+  display: inline-block;
+  text-decoration: none; }
 
 @-moz-keyframes spin {
   0% {
@@ -867,6 +882,14 @@ ul.icons-ul > li .icon-li {
   -o-transform: scale(1, -1);
   transform: scale(1, -1); }
 
+/* ensure rotation occurs inside anchor tags */
+a .icon-rotate-90:before,
+a .icon-rotate-180:before,
+a .icon-rotate-270:before,
+a .icon-flip-horizontal:before,
+a .icon-flip-vertical:before {
+  display: inline-block; }
+
 /* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
    readers do not read off random characters that represent icons */
 .icon-glass:before {
@@ -878,7 +901,7 @@ ul.icons-ul > li .icon-li {
 .icon-search:before {
   content: "\f002"; }
 
-.icon-envelope:before {
+.icon-envelope-alt:before {
   content: "\f003"; }
 
 .icon-heart:before {
@@ -917,12 +940,14 @@ ul.icons-ul > li .icon-li {
 .icon-zoom-out:before {
   content: "\f010"; }
 
+.icon-power-off:before,
 .icon-off:before {
   content: "\f011"; }
 
 .icon-signal:before {
   content: "\f012"; }
 
+.icon-gear:before,
 .icon-cog:before {
   content: "\f013"; }
 
@@ -932,7 +957,7 @@ ul.icons-ul > li .icon-li {
 .icon-home:before {
   content: "\f015"; }
 
-.icon-file:before {
+.icon-file-alt:before {
   content: "\f016"; }
 
 .icon-time:before {
@@ -956,11 +981,10 @@ ul.icons-ul > li .icon-li {
 .icon-play-circle:before {
   content: "\f01d"; }
 
-.icon-repeat:before,
-.icon-rotate-right:before {
+.icon-rotate-right:before,
+.icon-repeat:before {
   content: "\f01e"; }
 
-/* F020 doesn't work in Safari. all shifted one down */
 .icon-refresh:before {
   content: "\f021"; }
 
@@ -1153,8 +1177,8 @@ ul.icons-ul > li .icon-li {
 .icon-arrow-down:before {
   content: "\f063"; }
 
-.icon-share-alt:before,
-.icon-mail-forward:before {
+.icon-mail-forward:before,
+.icon-share-alt:before {
   content: "\f064"; }
 
 .icon-resize-full:before {
@@ -1247,16 +1271,17 @@ ul.icons-ul > li .icon-li {
 .icon-key:before {
   content: "\f084"; }
 
+.icon-gears:before,
 .icon-cogs:before {
   content: "\f085"; }
 
 .icon-comments:before {
   content: "\f086"; }
 
-.icon-thumbs-up:before {
+.icon-thumbs-up-alt:before {
   content: "\f087"; }
 
-.icon-thumbs-down:before {
+.icon-thumbs-down-alt:before {
   content: "\f088"; }
 
 .icon-star-half:before {
@@ -1295,6 +1320,7 @@ ul.icons-ul > li .icon-li {
 .icon-phone:before {
   content: "\f095"; }
 
+.icon-unchecked:before,
 .icon-check-empty:before {
   content: "\f096"; }
 
@@ -1394,6 +1420,7 @@ ul.icons-ul > li .icon-li {
 .icon-copy:before {
   content: "\f0c5"; }
 
+.icon-paperclip:before,
 .icon-paper-clip:before {
   content: "\f0c6"; }
 
@@ -1466,14 +1493,14 @@ ul.icons-ul > li .icon-li {
 .icon-sort-up:before {
   content: "\f0de"; }
 
-.icon-envelope-alt:before {
+.icon-envelope:before {
   content: "\f0e0"; }
 
 .icon-linkedin:before {
   content: "\f0e1"; }
 
-.icon-undo:before,
-.icon-rotate-left:before {
+.icon-rotate-left:before,
+.icon-undo:before {
   content: "\f0e2"; }
 
 .icon-legal:before {
@@ -1530,7 +1557,7 @@ ul.icons-ul > li .icon-li {
 .icon-food:before {
   content: "\f0f5"; }
 
-.icon-file-alt:before {
+.icon-file-text-alt:before {
   content: "\f0f6"; }
 
 .icon-building:before {
@@ -1608,9 +1635,12 @@ ul.icons-ul > li .icon-li {
 .icon-circle:before {
   content: "\f111"; }
 
-.icon-reply:before,
-.icon-mail-reply:before {
+.icon-mail-reply:before,
+.icon-reply:before {
   content: "\f112"; }
+
+.icon-github-alt:before {
+  content: "\f113"; }
 
 .icon-folder-close-alt:before {
   content: "\f114"; }
@@ -1780,6 +1810,187 @@ ul.icons-ul > li .icon-li {
 
 .icon-share-sign:before {
   content: "\f14d"; }
+
+.icon-compass:before {
+  content: "\f14e"; }
+
+.icon-collapse:before {
+  content: "\f150"; }
+
+.icon-collapse-top:before {
+  content: "\f151"; }
+
+.icon-expand:before {
+  content: "\f152"; }
+
+.icon-euro:before,
+.icon-eur:before {
+  content: "\f153"; }
+
+.icon-gbp:before {
+  content: "\f154"; }
+
+.icon-dollar:before,
+.icon-usd:before {
+  content: "\f155"; }
+
+.icon-rupee:before,
+.icon-inr:before {
+  content: "\f156"; }
+
+.icon-yen:before,
+.icon-jpy:before {
+  content: "\f157"; }
+
+.icon-renminbi:before,
+.icon-cny:before {
+  content: "\f158"; }
+
+.icon-won:before,
+.icon-krw:before {
+  content: "\f159"; }
+
+.icon-bitcoin:before,
+.icon-btc:before {
+  content: "\f15a"; }
+
+.icon-file:before {
+  content: "\f15b"; }
+
+.icon-file-text:before {
+  content: "\f15c"; }
+
+.icon-sort-by-alphabet:before {
+  content: "\f15d"; }
+
+.icon-sort-by-alphabet-alt:before {
+  content: "\f15e"; }
+
+.icon-sort-by-attributes:before {
+  content: "\f160"; }
+
+.icon-sort-by-attributes-alt:before {
+  content: "\f161"; }
+
+.icon-sort-by-order:before {
+  content: "\f162"; }
+
+.icon-sort-by-order-alt:before {
+  content: "\f163"; }
+
+.icon-thumbs-up:before {
+  content: "\f164"; }
+
+.icon-thumbs-down:before {
+  content: "\f165"; }
+
+.icon-youtube-sign:before {
+  content: "\f166"; }
+
+.icon-youtube:before {
+  content: "\f167"; }
+
+.icon-xing:before {
+  content: "\f168"; }
+
+.icon-xing-sign:before {
+  content: "\f169"; }
+
+.icon-youtube-play:before {
+  content: "\f16a"; }
+
+.icon-dropbox:before {
+  content: "\f16b"; }
+
+.icon-stackexchange:before {
+  content: "\f16c"; }
+
+.icon-instagram:before {
+  content: "\f16d"; }
+
+.icon-flickr:before {
+  content: "\f16e"; }
+
+.icon-adn:before {
+  content: "\f170"; }
+
+.icon-bitbucket:before {
+  content: "\f171"; }
+
+.icon-bitbucket-sign:before {
+  content: "\f172"; }
+
+.icon-tumblr:before {
+  content: "\f173"; }
+
+.icon-tumblr-sign:before {
+  content: "\f174"; }
+
+.icon-long-arrow-down:before {
+  content: "\f175"; }
+
+.icon-long-arrow-up:before {
+  content: "\f176"; }
+
+.icon-long-arrow-left:before {
+  content: "\f177"; }
+
+.icon-long-arrow-right:before {
+  content: "\f178"; }
+
+.icon-apple:before {
+  content: "\f179"; }
+
+.icon-windows:before {
+  content: "\f17a"; }
+
+.icon-android:before {
+  content: "\f17b"; }
+
+.icon-linux:before {
+  content: "\f17c"; }
+
+.icon-dribbble:before {
+  content: "\f17d"; }
+
+.icon-skype:before {
+  content: "\f17e"; }
+
+.icon-foursquare:before {
+  content: "\f180"; }
+
+.icon-trello:before {
+  content: "\f181"; }
+
+.icon-female:before {
+  content: "\f182"; }
+
+.icon-male:before {
+  content: "\f183"; }
+
+.icon-gittip:before {
+  content: "\f184"; }
+
+.icon-sun:before {
+  content: "\f185"; }
+
+.icon-moon:before {
+  content: "\f186"; }
+
+.icon-archive:before {
+  content: "\f187"; }
+
+.icon-bug:before {
+  content: "\f188"; }
+
+.icon-vk:before {
+  content: "\f189"; }
+
+.icon-weibo:before {
+  content: "\f18a"; }
+
+.icon-renren:before {
+  content: "\f18b"; }
 
 /* ============================================ */
 /* This file has a mobile-to-desktop breakpoint */
@@ -3905,11 +4116,11 @@ input.search-query {
         padding: 0; }
         .panel .panel-content ul.view > li .item-inner {
           background: white;
-          -webkit-transition: background 0.1s ease-out;
-          -moz-transition: background 0.1s ease-out;
-          -ms-transition: background 0.1s ease-out;
-          -o-transition: background 0.1s ease-out;
-          transition: background 0.1s ease-out;
+          -webkit-transition: background-color 0.1s ease-out;
+          -moz-transition: background-color 0.1s ease-out;
+          -ms-transition: background-color 0.1s ease-out;
+          -o-transition: background-color 0.1s ease-out;
+          transition: background-color 0.1s ease-out;
           -webkit-box-shadow: 0 0 4px #898080;
           -moz-box-shadow: 0 0 4px #898080;
           box-shadow: 0 0 4px #898080;
@@ -3941,17 +4152,12 @@ input.search-query {
       margin-right: 6px; }
     .panel .panel-content ul.list-view > li .meta .icon-saved {
       display: none; }
-    .panel .panel-content ul.list-view > li.status-read .item-inner {
-      background: rgba(255, 255, 255, 0.85);
-      /*
-                          h3 {
-                              a:link {
-                                  color: rgba($linkcolor, .8);
-                              }
-                          }
-      */ }
-      .panel .panel-content ul.list-view > li.status-read .item-inner .meta .icon-unread {
-        display: none; }
+    .panel .panel-content ul.list-view > li.status-read .item-inner h3 a:link {
+      color: rgba(23, 91, 130, 0.7); }
+    .panel .panel-content ul.list-view > li.status-read .item-inner h3 a:hover {
+      color: #9c1c1e; }
+    .panel .panel-content ul.list-view > li.status-read .item-inner .meta .icon-unread {
+      display: none; }
     .panel .panel-content ul.list-view > li.status-saved .meta .icon-saved {
       display: inline; }
     .panel .panel-content ul.list-view > li.current .item-inner {
@@ -4038,11 +4244,11 @@ nav {
         width: 1em;
         text-align: center;
         display: inline-block; }
-    nav ul.unread li.filter-unread a, nav ul.saved li.filter-saved a, nav ul.feeds li.filter-feeds a,
+    nav ul.unread li.filter-unread a, nav ul.saved li.filter-saved a, nav ul.feeds li.filter-feeds a, nav ul.all li.filter-all a,
     nav ul li.filter-group a {
       background: #474242;
       color: #e4e2e2; }
-      nav ul.unread li.filter-unread a:hover, nav ul.saved li.filter-saved a:hover, nav ul.feeds li.filter-feeds a:hover,
+      nav ul.unread li.filter-unread a:hover, nav ul.saved li.filter-saved a:hover, nav ul.feeds li.filter-feeds a:hover, nav ul.all li.filter-all a:hover,
       nav ul li.filter-group a:hover {
         /*                     color: $navigationlinkcolorhover;  */ }
 

@@ -97,7 +97,7 @@ class FrontendApp(WSGIApp):
         offset, group_id, feed_id, filter_name, filter_class, panel_title = 0, 0, 0, '', '', ''
         
         user = self.get_session_user()  
-        groups = get_groups(user)
+        group_count, groups = get_groups(user)
     
         r = Entry.select(Entry.id).join(Read).where((Read.user == user)).naive()
         s = Entry.select(Entry.id).join(Saved).where((Saved.user == user)).naive()
@@ -106,7 +106,7 @@ class FrontendApp(WSGIApp):
         
         if 'saved' in request.GET:
             q = get_saved_entries(user)
-            panel_title = 'Saved Items'
+            panel_title = 'Saved Entries'
             filter_class = filter_name = 'saved'
         elif 'group' in request.GET:
             group_id = int(request.GET['group'])    
@@ -121,16 +121,19 @@ class FrontendApp(WSGIApp):
             panel_title = feed.title                
             filter_class = 'feeds'
             filter_name = 'feed=%s' % feed_id
-        else:
+        elif 'all' in request.GET:
+            q = get_all_entries(user)
+            panel_title = 'All Entries'                
+            filter_class = filter_name = 'all'
+        else: # Default
             q = get_unread_entries(user)
-            panel_title = 'Unread Items'
+            panel_title = 'Unread Entries'
             filter_class = filter_name = 'unread'
 
         if 'offset' in request.GET:            
             offset = int(request.GET['offset'])
             
-        entry_count = q.count()
-        entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)    
+        entry_count, entries = q.count(), q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
 
         if offset:
             templatename = '_entries_more.html'            
@@ -154,14 +157,13 @@ class FrontendApp(WSGIApp):
         offset, group_id, filter_class, panel_title = 0, 0, 'feeds', 'Feeds' 
 
         user = self.get_session_user()  
-        groups = get_groups(user)  
+        group_count, groups = get_groups(user)  
 
         if 'offset' in request.GET:            
             offset = int(request.GET['offset'])
 
-        q = get_feeds(user)
-        feed_count = q.count()        
-        feeds = q.order_by(Feed.title).offset(offset).limit(ENTRIES_PER_PAGE)
+        feed_count, feeds_q = get_feeds(user)
+        feeds = feeds_q.order_by(Feed.title).offset(offset).limit(ENTRIES_PER_PAGE)
 
         if offset:
             templatename = '_feeds_more.html'            
@@ -376,6 +378,10 @@ def render_template(filename, namespace):
  
 # Entries
 
+def get_all_entries(user):     
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user)
+    return q
+    
 def get_unread_entries(user):     
     q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & ~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
     return q
@@ -397,13 +403,13 @@ def get_feed_entries(user, feed):
 def get_feeds(user):     
     #@@TODO: Add join(Entry, JOIN_LEFT_OUTER).annotate(Entry) # No. of entries in feed
     q = Feed.select(Feed, Icon).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user)
-    return q    
+    return q.count(), q    
 
 # Groups
 
 def get_groups(user):     
     q = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title) 
-    return q    
+    return q.count(), q    
 
 
 # Stats

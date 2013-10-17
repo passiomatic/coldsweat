@@ -7,12 +7,16 @@
                 <span><i class="icon-tint"></i></span> Coldsweat
             </li>
 
-            <li class="filter filter-unread"><a href="{{application_url}}/entries/?unread"><span><i class="icon-circle"></i></span>&ensp;Unread</a></li>
-            <li class="filter filter-saved"><a href="{{application_url}}/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Saved</a></li>
-            {{for g in groups}}
-                <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title}}</a></li>            
-            {{endfor}}        
+            <li class="filter filter-unread"><a title="Unread entries" href="{{application_url}}/entries/?unread"><span><i class="icon-circle"></i></span>&ensp;Unread</a></li>
+            <li class="filter filter-saved"><a title="Saved entries" href="{{application_url}}/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Saved</a></li>
+            <li class="filter filter-all"><a title="All entries" href="{{application_url}}/entries/?all"><span><i class="icon-archive"></i></span>&ensp;All</a></li>
 
+            {{if group_count > 1}}
+                {{for g in groups}}
+                    <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title}}</a></li>            
+                {{endfor}}        
+            {{endif}}
+            
             <li class="sep filter filter-feeds"><a href="{{application_url}}/feeds/"><i class="icon-rss"></i>&ensp;Feeds</a></li>            
             <li><a href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><i class="icon-plus-sign-alt"></i>&ensp;Add subscription</a></li>            
             <li class="sep"><a href="{{application_url}}/logout"><span><i class="icon-cog"></i></span>&ensp;Log out</a></li>

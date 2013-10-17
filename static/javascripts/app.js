@@ -83,8 +83,6 @@ $(document).ready(function() {
             var target = $(event.target);
             var c = target.parents('li').first()
             setCurrent(c);
-
-            //console.log(target);
         }
                 
         var article = c.find('article')
@@ -102,13 +100,14 @@ $(document).ready(function() {
                 $(c).find('h3 i').replaceWith(img);
                 article.show(200);
                 $(document.body).animate({'scrollTop': c.position().top}, 500);          
+                setTimeout(function() {
+                    //if($(c).hasClass('entry')) {
+                    c.addClass('status-read')
+                    mark(c, 'read');            
+                    //}            
+                }, 1500);
             })        
             
-            // Mark as read if entry
-            if($(c).hasClass('entry')) {
-                c.addClass('status-read')
-                mark(c, 'read');            
-            }            
         } else {
             //article.slideUp(100);
             article.hide();

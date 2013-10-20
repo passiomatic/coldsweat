@@ -44,6 +44,8 @@ def add_feeds_from_file(source, fetch_icons=False):
                     if k in allowed_attribs:
                         setattr(feed, allowed_attribs[k], v)
 
+                #@@TODO: Use fetcher.add_feed
+
                 try:
                     feed.save()
                 except IntegrityError:

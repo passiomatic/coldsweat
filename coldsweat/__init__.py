@@ -16,8 +16,7 @@ from ConfigParser import RawConfigParser
 import logging
 
 VERSION_STRING = '%d.%d.%d%s' % __version__
-DEFAULT_USER_AGENT = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING
-
+         
 # Figure out installation directory. This has 
 #  to work for the fetcher script too
 installation_dir, _ = path.split(path.dirname(path.abspath(__file__))) 
@@ -32,6 +31,18 @@ if path.exists(config_path):
 else:
     raise RuntimeError('Could not find configuration file %s' % config_path)
 
+# ------------------------------------------------------
+# User agent string
+# ------------------------------------------------------
+
+user_agent = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING
+if config.has_option('fetcher', 'user_agent'):  
+    user_agent = config.get('fetcher', 'user_agent')     
+
+# ------------------------------------------------------
+# Configure logger
+# ------------------------------------------------------
+
 logging.basicConfig(
     filename    = config.get('log', 'filename'),
     level       = getattr(logging, config.get('log', 'level')),
@@ -39,7 +50,7 @@ logging.basicConfig(
     datefmt     = config.get('log', 'datefmt'),
 )
                   
-logging.getLogger("peewee").setLevel(logging.INFO)
+logging.getLogger("peewee").setLevel(logging.WARN)
 logging.getLogger("requests").setLevel(logging.WARN)
 
 # Shared logger instance

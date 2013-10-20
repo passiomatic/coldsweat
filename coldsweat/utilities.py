@@ -6,12 +6,12 @@ Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
-
+import re, cgi, urllib
 from hashlib import md5, sha1
 from calendar import timegm
 from datetime import datetime
 from tempita import HTMLTemplate
-import re, cgi, urllib
+from webob.exc import status_map
 
 DEFAULT_ENCODING = 'utf-8'
 
@@ -138,6 +138,14 @@ def datetime_since(utcnow):
 def render_template(filename, namespace):                    
     return HTMLTemplate.from_filename(filename, namespace=namespace).substitute()
 
+def get_status_title(code):
+    title = 'Unknown (%s)' % code
+    try:
+        title = status_map[code].title
+    except KeyError:
+        pass 
+    return title
+    
 # --------------------
 # Misc.
 # --------------------

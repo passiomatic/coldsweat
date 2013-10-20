@@ -22,22 +22,22 @@ STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static
 # Decorators
 # ------------------------------------------------------
 
-def on(pattern, http_method):    
+def on(pattern, http_methods):    
     def wrapper(handler):         
         handler.pattern = re.compile(pattern, re.U)
-        handler.http_method = http_method.upper()
+        handler.http_methods = [m.upper() for m in http_methods]
         return handler         
     return wrapper  
 
 def GET(pattern='^/$'):    
-    return on(pattern, 'get')  
+    return on(pattern, ('get', ))  
 
 def POST(pattern='^/$'):    
-    return on(pattern, 'post')  
+    return on(pattern, ('post', ))  
 
 # Handler for both GET and POST requests
-# def form(pattern='^/$'):    
-#     return on(pattern, ['get', 'post'])  
+def form(pattern='^/$'):    
+    return on(pattern, ('get', 'post'))  
 
 # ------------------------------------------------------
 # Base WSGI app
@@ -94,7 +94,7 @@ class WSGIApp(object):
                 continue
 
             match = handler.pattern.match(self.request.path_info)            
-            if match and handler.http_method == self.request.method:                    
+            if match and self.request.method in handler.http_methods:                    
                 return handler, match.groups()
     
         return None, None

@@ -100,7 +100,7 @@ $media-queries-supported : true;
                 // Title
         
                 > h3 {
-                    text-transform: capitalize;
+                    //text-transform: capitalize;
                     a { display: block; }
                 }
     
@@ -265,7 +265,7 @@ nav {
     width: $navwidth;   
     background: $navigationbackgroundcolor;
     
-    @include box-shadow(inset -3px 0 2px -2px $neutralcolor);    
+/*     @include box-shadow(inset -3px 0 2px -2px $neutralcolor); */
 
     ul {
 
@@ -288,6 +288,7 @@ nav {
                 @include font-size(14);
                 text-transform: uppercase;
                 letter-spacing: 2px;                
+/*                 border-bottom: 1px solid $lighterneutralcolor; */
             }
     
             a {
@@ -299,7 +300,7 @@ nav {
             
             
             span {
-                width: 1em;
+                width: 1.4em;
                 text-align: center;
                 display: inline-block;                    
             }
@@ -312,14 +313,10 @@ nav {
         &.all li.filter-all,
         li.filter-group {
             a {
-                background: $neutralcolor;                    
-                color: $lightestneutralcolor;
-                
-                &:hover {
-/*                     color: $navigationlinkcolorhover;  */
-                    //background: $neutralcolor url(../images/nav-rarr-h.png) left 7px no-repeat; 
-                }    
-                                                  
+                color: $white;
+                background-image: url(../images/nav-rarr.png);
+                background-position: left 7px;
+                background-repeat: no-repeat;
             }
         }
 
@@ -327,30 +324,32 @@ nav {
     }
   
 }
-/*
-
-h1, h2 {
-    color: $secondarycolor;
-}
-*/
 
   
 footer[role="contentinfo"] {
-    text-align: center;
     @include zero;
     margin: $baselineheight*3 0 $baselineheight $navwidth;
-    .icon-heart {
-        color: $secondarycolor;
-        cursor: help;
-    }
+    text-align: center;
     
     .payoff {
-        margin-bottom: $baselineheight/2;
+//        @include font-size(14);
+        margin: 0 0 $baselineheight/2 0;
+
+        .icon-heart {
+            color: $secondarycolor;
+            cursor: help;
+        }
     }
 
     .credits {
         @include font-size(14);
     }
+}
+
+
+.container-inner + footer {
+    // Reset margin, since main nav isn't in the DOM
+    margin-left: 0;       
 }
 
 dl {
@@ -396,26 +395,26 @@ code {
 }
 
 
+// Colored one-liner messages on forms or sitting on top of the page
 .alert {
-    display: none;
     text-align: center;
-/*
-    z-index: 2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-*/
-//    box-sizing: border-box;
-    margin: 0 0 0 $navwidth;
+    margin: 0;
+/*     border-bottom: 1px solid $lightestneutralcolor; */
 }
 
+form {
+    .alert {
+        margin: 0 0 $baselineheight 0;
+        border-bottom: none;
+    }    
+}
+
+
+// Messages taking all panel height
 .notice {
     text-align: center;
-    margin: 25% 0 25% 0;
-    
-    @extend .dim;
-    
+    margin: 25% 0 25% 0;    
+    @extend .dim;    
     i {
         display: block;
         opacity: .6;
@@ -521,26 +520,7 @@ article {
     
 }
         
-        
-
-
-.module {
-/*     margin: $baselineheight*4 0 0 0;     */
-/*     text-align: center; */
-
-    h1 {
-        margin: 0 0 $baselineheight 0;        
-    }
-
-/*
-    form {
-        padding-top: $baselineheight;
-        background: $lightestneutralcolor;
-        border-radius: $borderradius;
-    }
-*/
-}
-
+ 
 .boxed {
     
     .well {
@@ -551,16 +531,9 @@ article {
 
 .container-inner {
     margin: $baselineheight*3 0 0 0;
+    // Push down footer
+    min-height: $baselineheight*25;
 }
-
-/*
-.subhead {
-    @extend .dim;
-    margin: 0 0 $baselineheight*2 0;
-
-    
-}
-*/
 
 // Forms
 

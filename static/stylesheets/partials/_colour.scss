@@ -6,7 +6,7 @@
 a {
 text-decoration : none;
 color : $linkcolor;
-@include transition(color .1s ease-out);
+@include transition(all .1s ease-out);
         
 &:visited {
 color : $linkcolorvisited; }
@@ -32,7 +32,8 @@ nav a {
     
     &:hover {
     text-decoration : none;
-    color : $navigationlinkcolorhover; }
+    color : $navigationlinkcolorhover; 
+    background: $neutralcolor }
     
     &:focus {
     color : $navigationlinkcolorhover; }

@@ -4,7 +4,7 @@ $(document).ready(function() {
     "use strict";
 
     var flash_fragment = $('<div class="flash"><i class="icon-4x"></i><div class="message">&nbsp;</div></div>')
-    var alert_fragment = $('<div class="alert alert--error"></div>')
+    var alert_fragment = $('<div class="alert alert--error style="display:none"></div>')
     var modal_fragment = $('<div role="dialog" class="modal fade hide"></div>')
     var loading_fragment = $('<div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div>')
     var loading_favicon_fragment = $('<i class="favicon icon-spinner icon-spin"></i>')
@@ -203,17 +203,15 @@ $(document).ready(function() {
             });            
         })
 
-
-        // Form 'Add subscription' submit
-        $(document).on('submit', '#modal-add-subscription form', function(event) { 
-            event.preventDefault();
+        $(document).on('submit', '.modal form[method=POST]', function(event) { 
+            event.preventDefault()
             var form = $(event.target)
             var serializedData = form.serialize()
             form.find('.modal-footer').hide()
             form.find('.modal-body').html(loading_fragment)
             $.ajax(form.attr('action'), 
                 {dataType: 'html', type:form.attr('method'), data: serializedData}).done(function(data) {            
-                   form.html(data)                   
+                   form.replaceWith(data)                   
             })       
         })
 

@@ -38,6 +38,14 @@ text-decoration : none; }
 .btn:first-child { 
 *margin-left : 0; }
 
+
+.btn-text {
+//@include zero;
+padding : 0;
+border : none;
+background : none;
+}
+
 .btn-disabled {
 opacity : .5;
 cursor : default; }

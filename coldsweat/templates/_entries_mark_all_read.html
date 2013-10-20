@@ -1,0 +1,10 @@
+<form action="{{application_url}}/entries/mark" method="POST">
+    <input type="hidden"  name="before" value="{{now|epoch}}">
+    <div class="modal-body">                  
+        Mark all entries as read?
+    </div>
+    <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+        <button type="submit" class="btn btn-primary">Mark as Read</button>
+  </div>
+</form>

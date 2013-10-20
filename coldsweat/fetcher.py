@@ -13,7 +13,7 @@ from datetime import datetime
 
 import feedparser
 import requests
-from requests.exceptions import RequestException
+from requests.exceptions import *
 
 from markup import html
 from models import *
@@ -64,12 +64,11 @@ def get_entry_timestamp(entry, default=None):
         
 def get_entry_title(entry):
     if 'title' in entry:
-        return entry.title
+        return entry.title #@@ Strip HTML
     return 'Untitled'
 
 def get_entry_link(entry):
-    # Special case for Feedburner entries,
-    # see: http://code.google.com/p/feedparser/issues/detail?id=171
+    # Special case for Feedburner entries, see: http://bit.ly/1gRAvJv
     if 'feedburner_origlink' in entry:
         return entry.feedburner_origlink
     if 'link' in entry:    
@@ -84,11 +83,6 @@ def get_entry_id(entry, default=None):
     if ('id' in entry) and entry.id: 
         return entry.id
     return default
-    # Always use the original, "uncrubbed" entry  
-    #  content to calculate SHA1 hash
-#     content = get_entry_content(entry)
-#     if content: 
-#         return make_sha1_hash(content + entry.link)
     
 def get_entry_author(entry, feed):
     """
@@ -116,12 +110,14 @@ def get_entry_content(entry):
         return candidates[0].value
     return ''
 
-
 # ------------------------------------------------------
-# Feed fetching and parsing 
+# Add feed and subscription
 # ------------------------------------------------------
 
-def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch_entries=False):
+def add_feed(self_link, title='', fetch_icon=False, add_entries=False):
+    '''
+    Add a feed to database and optionally fetch icon and add entries
+    '''
 
     try:
         previous_feed = Feed.get(Feed.self_link == self_link)
@@ -132,26 +128,77 @@ def add_feed(self_link, alternate_link=None, title=None, fetch_icon=False, fetch
 
     feed = Feed()            
 
-    feed.self_link = self_link
-    feed.alternate_link = alternate_link 
-    feed.title = title 
-
-    (schema, netloc, path, params, query, fragment) = urlparse.urlparse(feed.self_link)
-    
     if fetch_icon:
-        icon = Icon.create(data=favicon.fetch(self_link))
+        # Prefer alternate_link if available since self_link could 
+        #   point to Feed Burner or similar services
+        #@@TODO icon_link = alternate_link if alternate_link else self_link    
+        icon_link = self_link    
+        (schema, netloc, path, params, query, fragment) = urlparse.urlparse(icon_link)
+        icon = Icon.create(data=favicon.fetch(icon_link))
         feed.icon = icon
         log.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
 
+    feed.self_link = self_link    
+    feed.title = title 
     feed.save()
 
-    if fetch_entries:
-        fetch_feed(feed)
+    fetch_feed(feed, add_entries)
 
     return feed
-
     
-def fetch_feed(feed):
+def add_subscription(feed, user, group=None):
+
+    if not group:
+        group = Group.get(Group.title == Group.DEFAULT_GROUP)    
+
+    try:
+        subscription = Subscription.create(user=user, feed=feed, group=group)
+    except IntegrityError:
+        log.debug('user %s has already feed %s in her subscriptions' % (user.username, feed.self_link))    
+        return None
+
+    log.debug('added feed %s for user %s' % (feed.self_link, user.username))                
+    return subscription
+    
+# ------------------------------------------------------
+# Feed fetching and parsing 
+# ------------------------------------------------------
+
+def check_url(url, timeout=None, etag=None, modified_since=None):
+    '''
+    Issue an HEAD - and if it fails a GET - to the given URL
+    '''
+    
+    schema, netloc, path, params, query, fragment = urlparse.urlparse(url)
+    
+    request_headers = {
+        'User-Agent': user_agent
+    }
+
+    # Conditional GET/HEAD headers
+    if etag and modified_on:
+        request_headers['If-None-Match'] = etag
+        request_headers['If-Modified-Since'] = format_http_datetime(modified_since)
+        
+    timeout = timeout if timeout else config.getint('fetcher', 'timeout')
+    
+    for verb, r in [('HEAD', requests.head), ('GET', requests.get)]:
+        try:
+            log.debug("checking %s with %s" % (netloc, verb))
+            response = r(url, timeout=timeout, headers=request_headers)
+            status = response.status_code
+            log.debug("got status %d" % status)
+            if status in (200, 304):
+                break
+        except (IOError, RequestException):
+            # Interpret as 'Service Unavailable'
+            log.warn("a network error occured while checking %s" % netloc)
+            status = 503
+    
+    return status
+
+
+def fetch_feed(feed, add_entries=False):
     
     def post_fetch(status, error=False):
         if status:
@@ -169,12 +216,8 @@ def fetch_feed(feed):
 
     now = datetime.utcnow()
 
-    user_agent = ''
-    if config.has_option('fetcher', 'user_agent'):  
-        user_agent = config.get('fetcher', 'user_agent')        
-    
     request_headers = {
-        'User-Agent': user_agent if user_agent else DEFAULT_USER_AGENT
+        'User-Agent': user_agent
     }
 
     interval = config.getint('fetcher', 'min_interval')
@@ -195,10 +238,12 @@ def fetch_feed(feed):
     if feed.etag and feed.last_updated_on:
         request_headers['If-None-Match'] = feed.etag
         request_headers['If-Modified-Since'] = format_http_datetime(feed.last_updated_on)
-            
+
+    timeout = config.getint('fetcher', 'timeout')
+                
     try:
-        response = requests.get(feed.self_link, timeout=config.getint('fetcher', 'timeout'), headers=request_headers)
-    except RequestException:
+        response = requests.get(feed.self_link, timeout=timeout, headers=request_headers)
+    except (IOError, RequestException):
         # Interpret as 'Service Unavailable'
         post_fetch(503, error=True)
         log.warn("a network error occured while fetching %s, skipped" % netloc)
@@ -217,7 +262,7 @@ def fetch_feed(feed):
         else:
             feed.is_enabled = False
             log.warn("new %s location %s is duplicated, disabled" % (netloc, self_link))                
-            # Save final status code anyway
+            # Save final status for posterity
             post_fetch(response.status_code)
             return
 
@@ -230,7 +275,7 @@ def fetch_feed(feed):
         feed.is_enabled = False
         post_fetch(response.status_code)
         return
-    elif response.status_code not in [200, 302, 307]:                   # No good
+    elif response.status_code not in (200, ):                           # No good
         log.warn("%s replied with status %d, aborted" % (netloc, response.status_code))
         post_fetch(response.status_code, error=True)
         return
@@ -248,12 +293,16 @@ def fetch_feed(feed):
     if 'link' in soup.feed:
         feed.alternate_link = soup.feed.link
 
-    if 'title' in soup.feed:
-        feed.title = soup.feed.title
+    # Reset value only if not set before
+    if ('title' in soup.feed) and not feed.title:
+        feed.title = soup.feed.title #@@ Strip HTML
 
     feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
     post_fetch(response.status_code)
     
+    if not add_entries:    
+        return
+        
     for entry in soup.entries:
         
         link        = get_entry_link(entry)
@@ -299,10 +348,11 @@ def fetch_feed(feed):
 
         log.debug(u"added entry %s from %s" % (guid, netloc))
 
+
 def feed_worker(feed):
     # Allow each process to open and close its database connection    
     connect()
-    fetch_feed(feed)
+    fetch_feed(feed, add_entries=True)
     close()
     
  

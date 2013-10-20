@@ -8,7 +8,8 @@ License: MIT (see LICENSE.md for details)
 """
 #from __future__ import division
 from os import path
-from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
+from datetime import datetime, timedelta
+from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect, status_map
 from tempita import Template #, HTMLTemplate 
 
 from app import *
@@ -20,9 +21,14 @@ import fetcher
 
 #SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENTRIES_PER_PAGE = 30
+USER_SESSION_KEY = 'coldsweat.user'
+RECENTLY_READ_DELTA = 5*60 # 5 minutes
 
 class FrontendApp(WSGIApp):
 
+    def __init__(self):
+        self.alert_message = ''
+    
     # Home
 
     @GET()
@@ -44,7 +50,7 @@ class FrontendApp(WSGIApp):
     @POST(r'^/entries/(\d+)$')
     def entry_post(self, request, entry_id):
         '''
-        Mark an entry
+        Mark an entry as read|unread|saved|unsaved
         '''
     
         try:
@@ -86,6 +92,7 @@ class FrontendApp(WSGIApp):
             
             log.debug('marked entry %s as %s' % (entry_id, status))
             
+
     @GET(r'^/entries/?$')
     def entry_list(self, request):
         '''
@@ -95,7 +102,7 @@ class FrontendApp(WSGIApp):
 
         # Defaults 
         offset, group_id, feed_id, filter_name, filter_class, panel_title = 0, 0, 0, '', '', ''
-        
+
         user = self.get_session_user()  
         group_count, groups = get_groups(user)
     
@@ -126,6 +133,7 @@ class FrontendApp(WSGIApp):
             panel_title = 'All Entries'                
             filter_class = filter_name = 'all'
         else: # Default
+            #since = now - timedelta(seconds=RECENTLY_READ_DELTA)
             q = get_unread_entries(user)
             panel_title = 'Unread Entries'
             filter_class = filter_name = 'unread'
@@ -144,7 +152,43 @@ class FrontendApp(WSGIApp):
 
         return self.respond_with_template(templatename, locals())
 
+    @GET(r'^/entries/mark$')
+    def entry_list_mark(self, request):  
+        now = datetime.utcnow()          
+        user = self.get_session_user()      
+        return self.respond_with_template('_entries_mark_all_read.html', locals())
+        
+    @POST(r'^/entries/mark$')
+    def entry_list_mark_post(self, request):
+        '''
+        Mark all entries as read
+        '''
+        try:
+            before = datetime.utcfromtimestamp(int(request.POST['before']))
+        except (KeyError, ValueError):
+            raise HTTPBadRequest('Missing parameter before=time')
+        
+        user = self.get_session_user()      
+        q = Entry.select().join(Feed).join(Subscription).where(
+            (Subscription.user == user) &            
+            # Exclude entries already marked as read
+            ~(Entry.id << Read.select(Read.entry).where(Read.user == user)) &
+            # Exclude entries parsed after the page load
+            (Feed.last_checked_on < before) 
+        )
 
+        with transaction():
+            for entry in q:
+                try:
+                    Read.create(user=user, entry=entry)
+                except IntegrityError:
+                    log.warn('entry %s already marked as read, ignored' % entry.id)
+                    continue                     
+
+        return self.respond_with_modal(request.application_url, 
+            message=render_message('SUCCESS All entries have been marked as read'), 
+            params=[('unread', '')])
+                                                        
     # Feeds
 
     @GET(r'^/feeds/?$')
@@ -182,45 +226,52 @@ class FrontendApp(WSGIApp):
         '''
 
         user = self.get_session_user()
-        feed = Feed.get(Feed.id == feed_id) 
+
+        try:
+            feed = Feed.get(Feed.id == feed_id) 
+        except Entry.DoesNotExist:
+            raise HTTPNotFound('No such feed %s' % feed_id)
+        
         q = get_feed_entries(user, feed)        
         entry_count = q.count()
         
         return self.respond_with_template('_feed.html', locals())   
 
-    @GET(r'^/feeds/add?$')
-    def feed_post_1(self, request):        
-        return self.respond_with_template('_feed_add_wizard_1.html')
-        
+    @GET(r'^/feeds/add$')
+    def feed_add(self, request):        
+        '''
+        1. Show input form
+        '''
+        message = ''
+        return self.respond_with_template('_feed_add_wizard_1.html', locals())
+
     @POST(r'^/feeds/add$')
-    def feed_post_done(self, request):
+    def feed_add_post(self, request):        
         '''
-        Add a new feed to database
+        2. Check, fetch and finally add the feed
         '''
-
-        self_link = request.POST['self_link']
+        self_link = request.POST['self_link'].strip()
         if not is_valid_url(self_link):
-            message = u'<i class="icon-warning-sign"></i> Error, please specify a valid web address'
-            return self.respond_with_template('_feed_add_wizard_done.html', locals())
-                        
-        user = self.get_session_user()
-        default_group = Group.get(Group.title==Group.DEFAULT_GROUP)
-    
-        with transaction():    
-            feed = fetcher.add_feed(self_link, fetch_icon=True)    
-            #@@TODO: use feed.add_subscription
-            try:
-                Subscription.create(user=user, feed=feed, group=default_group)
-                log.debug('added feed %s for user %s' % (self_link, user.username))            
-            except IntegrityError:
-                log.debug('user %s has already feed %s in her subscriptions' % (user.username, self_link))    
-                #message = u'INFO Feed %s is already in your subscriptions.' % self_link
-    
-        message = u'<i class="icon-check-sign"></i> Feed %s added successfully.' % self_link
+            message = render_message(u'ERROR Error, please specify a valid web address')
+            return self.respond_with_template('_feed_add_wizard_1.html', locals())
+        status = fetcher.check_url(self_link)
+        if status in (300, 404, 410, 500):
+            message = render_message(u'ERROR Error, feed host returned status code: %s' % get_status_title(status))
+            return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
-        return self.respond_with_template('_feed_add_wizard_done.html', locals())
-    
-    
+        feed = fetcher.add_feed(self_link, fetch_icon=True, add_entries=True)        
+        user = self.get_session_user()        
+        subscription = fetcher.add_subscription(feed, user)
+        if subscription:
+            message = render_message('SUCCESS Feed has been added to your subscription')
+        else:
+            message = render_message('INFO Feed is already in your subscriptions')
+
+        return self.respond_with_modal(request.application_url, 
+            message=message,
+            button = 'View Feed Entries',
+            params=[('feed', feed.id)])
+                        
 
     @GET(r'^/shortcuts/?$')
     def shortcuts(self, request):        
@@ -241,7 +292,17 @@ class FrontendApp(WSGIApp):
 
 
     # Template
-
+    
+    def respond_with_modal(self, url, message, title='', button='Close', params=None):
+        namespace = {
+            'url': url,
+            'title': title,
+            'message': message,
+            'params': params if params else [],
+            'button_text': button
+        }                    
+        return self.respond_with_template('_modal_alert.html', namespace)
+    
     def respond_with_template(self, filename, namespace=None):
 
         namespace = namespace or {}
@@ -252,7 +313,6 @@ class FrontendApp(WSGIApp):
             'request'           : self.request,
             'static_url'        : STATIC_URL,
             'application_url'   : self.request.application_url,
-
             'alert_message'     : '',
 
             # Filters 
@@ -280,6 +340,31 @@ class FrontendApp(WSGIApp):
                                 
         return response
 
+    def _redirect(self, klass, location):
+        '''
+        Return a temporary or permament redirect response object. 
+          Caller may return it or raise it.
+        '''
+        response = klass(location=location)
+        if self.alert_message:
+            response.set_cookie('alert_message', self.alert_message)
+        return response
+
+    def redirect(self, location):
+        '''
+        Return a temporary redirect response object. 
+          Caller may return it or raise it.
+        '''
+        
+        return self._redirect(HTTPTemporaryRedirect, location)
+
+    def redirect_after_post(self, location):
+        '''
+        Return a 'see other' redirect response object. 
+          Caller may return it or raise it.
+        '''
+        return self._redirect(HTTPSeeOther, location)
+
     # Session user and auth
 
 #     @property()
@@ -290,54 +375,33 @@ class FrontendApp(WSGIApp):
         '''
         Grab current session user if any or redirect to login form
         '''
-        user = self.session.get('coldsweat.user', None)
+        user = self.session.get(USER_SESSION_KEY, None)
         if user:
             return user
         
-        raise self.redirect('%s/login?from=%s' % (self.request.application_url, escape_url(self.request.path)))
-        #raise self.redirect('login?from=%s' % escape_url(self.request.path))
+        raise self.redirect('%s/login?from=%s' % (self.request.application_url, escape_url(self.request.url)))
 
 
-    @GET(r'^/login/?$')
+    @form(r'^/login/?$')
     def login(self, request):
-        d = dict(
-            username = '',
-            password = '',
-            from_url = request.GET.get('from', '/')
-        )
-        
-        d.update(get_health())
-        
-        return self.respond_with_template('login.html', d)
 
-    @POST(r'^/login/?$')
-    def login_post(self, request):
-
-        username = request.POST.get('username')        
-        password = request.POST.get('password')
-        from_url = request.POST.get('from', '/')   
+        username = request.params.get('username', '')        
+        password = request.params.get('password', '')
+        from_url = request.params.get('from', request.application_url)   
                     
-        user = User.validate_credentials(username, password)
-        if user:
-            self.session['coldsweat.user'] = user
-            #@@TODO response.remote_user = user.username
-            return HTTPSeeOther(location=from_url)
+        if request.method == 'POST':
+            user = User.validate_credentials(username, password)
+            if user:
+                self.session[USER_SESSION_KEY] = user
+                return self.redirect_after_post(from_url)
+            else:
+                self.alert_message = 'ERROR Unable to log in. Please check your username and password.'            
+                return self.redirect_after_post(request.url)
 
-        d = dict(
-            username        = username,        
-            password        = password,
-            from_url        = from_url,        
-            alert_message   = render_message('ERROR Unable to log in. Please check your username and password.')
-        )
-        
+        d = locals()
         d.update(get_health())
-
-        #@@TODO: use redirect?
-        #set_message(response, u'ERROR Unable to log in. Please check your username and password.')            
-        #raise self.redirect(self.request.path)
-        
+                
         return self.respond_with_template('login.html', d)
-
 
     @GET(r'^/logout/?$')
     def logout(self, request):
@@ -354,9 +418,9 @@ frontend_app = SessionMiddleware(FrontendApp())
 # ------------------------------------------------------
 # Template utilities
 # ------------------------------------------------------        
-
-def set_message(response, message):
-    response.set_cookie('alert_message', message)    
+# 
+# def set_message(response, message):
+#     response.set_cookie('alert_message', message)    
 
 def render_message(message):
     if not message:
@@ -368,6 +432,7 @@ def render_message(message):
         return text
     return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
 
+            
 #@@TODO: use utilities.render_template
 def render_template(filename, namespace):                    
     return Template.from_filename(path.join(template_dir, filename), namespace=namespace).substitute()
@@ -378,13 +443,22 @@ def render_template(filename, namespace):
  
 # Entries
 
+def get_unread_entries(user, since=None):         
+    '''
+    Get unread entries and optionally entries read after the given time
+    '''
+    if since:
+        q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & \
+        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive()) | \
+        (Entry.id << Read.select(Read.entry).where((Read.user == user) & (Read.read_on > since)).naive()))
+    else:
+        q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & \
+            ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive()))
+    return q
+
 def get_all_entries(user):     
     q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user)
-    return q
-    
-def get_unread_entries(user):     
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & ~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
-    return q
+    return q    
 
 def get_saved_entries(user):   
     q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Entry.id << Saved.select(Saved.entry).where(Saved.user == user)))
@@ -397,7 +471,7 @@ def get_group_entries(user, group):
 def get_feed_entries(user, feed):     
     q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.feed == feed))
     return q
-    
+
 # Feeds
 
 def get_feeds(user):     

@@ -13,12 +13,7 @@ except ImportError, exc:
     print 'Error: unable to import Flup package.\nColdsweat needs Flup to run as a FastCGI process.\nDownload it from PyPI: http://pypi.python.org/pypi/flup'
     raise exc
 
-from coldsweat.app import ExceptionMiddleware
-from coldsweat.fever import fever_app
-from coldsweat.frontend import frontend_app
-from coldsweat.cascade import Cascade
-
-app = ExceptionMiddleware(Cascade([fever_app, frontend_app]))
+from coldsweat.app import setup_app
 
 if __name__ == '__main__':
-    WSGIServer(app).run()
+    WSGIServer(setup_app()).run()

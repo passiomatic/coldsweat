@@ -116,8 +116,8 @@ class WSGIApp(object):
 
 class ExceptionMiddleware(object):
     '''
-    WSGI middleware which sends out an exception traceback if something goes wrong.                
-    See: http://lucumr.pocoo.org/2007/5/21/getting-started-with-wsgi/
+    WSGI middleware which sends out an exception traceback 
+      if something goes wrong. See: http://bit.ly/hQd5b1
     '''
     def __init__(self, app):
         self.app = app
@@ -128,13 +128,13 @@ class ExceptionMiddleware(object):
         """
         app_iter = None
         # Just call the application and send the output back
-        # unchanged but catch exceptions
+        #   unchanged but catch exceptions
         try:
             app_iter = self.app(environ, start_response)
             for item in app_iter:
                 yield item
         # If an exception occours we get the exception information
-        # and prepare a traceback we can render
+        #   and prepare a traceback we can render
         except Exception:
         
             #@@TODO: catch HTTPNotFound and others
@@ -145,9 +145,10 @@ class ExceptionMiddleware(object):
             traceback = ['Traceback (most recent call last):']
             traceback += format_tb(tb)
             traceback.append('%s: %s' % (type.__name__, value))
-            # We might have not a stated response by now. Try
-            # to start one with the status code 500 or ignore any
-            # raised exception if the application already started one            
+            # We might have not a stated response by now. Try to  
+            #   start one with the status code 500 or ignore any
+            #   raised exception if the application already
+            #   started one            
             try:
                 start_response('500 Internal Server Error', [
                                ('Content-Type', 'text/plain')])
@@ -160,7 +161,19 @@ class ExceptionMiddleware(object):
             yield traceback
                 
         # Returned iterable might have a close function. 
-        # If it exists it *must* be called
+        #   If it exists it *must* be called
         if hasattr(app_iter, 'close'):
             app_iter.close()
+
+
+# ------------------------------------------------------
+# Set up WSGI app
+# ------------------------------------------------------
+
+from fever import fever_app
+from frontend import frontend_app
+from cascade import Cascade
+
+def setup_app():
+    return ExceptionMiddleware(Cascade([fever_app, frontend_app]))
 

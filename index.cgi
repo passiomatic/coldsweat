@@ -8,15 +8,9 @@ License: MIT (see LICENSE.md for details)
 '''
 
 from wsgiref.handlers import CGIHandler
-
-from coldsweat.app import ExceptionMiddleware
-from coldsweat.fever import fever_app
-from coldsweat.frontend import frontend_app
-from coldsweat.cascade import Cascade
-
-app = ExceptionMiddleware(Cascade([fever_app, frontend_app]))
+from coldsweat.app import setup_app
 
 if __name__ == '__main__':
-    CGIHandler().run(app)
+    CGIHandler().run(setup_app())
 
 

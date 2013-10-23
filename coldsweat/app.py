@@ -7,6 +7,7 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 '''
 import sys, os, re
+from traceback import format_tb
 
 from webob import Request, Response
 from webob.exc import *
@@ -60,14 +61,10 @@ class WSGIApp(object):
 
         # Prepare database connection
         connect()
-                    
-        try:            
-            response = handler(self, self.request, *args)
-            if not response:
-                response = Response() # Provide an empty response
-        except self.redirect_exceptions, exc:
-            # The exception object itself is a WSGI application/response
-            response = exc
+        
+        response = handler(self, self.request, *args)
+        if not response:
+            response = Response() # Provide an empty response
 
 # Base WSGI app shoud be session agnostic
 #         self.session = dict()
@@ -85,7 +82,6 @@ class WSGIApp(object):
         # Sanity check
         try:
             self.request.path_info
-            #print self.request.path_info
         except KeyError:
             self.request.path_info = ''
                        
@@ -98,16 +94,6 @@ class WSGIApp(object):
                 return handler, match.groups()
     
         return None, None
-
-    def redirect(self, location, permament=False):
-        '''
-        Return a temporary or permament redirect response object. 
-          Caller may return it or raise it.
-        '''
-        klass = HTTPTemporaryRedirect
-        if permament:
-            klass = HTTPMovedPermanently            
-        return klass(location=location)
 
  
 # ------------------------------------------------------
@@ -127,21 +113,16 @@ class ExceptionMiddleware(object):
         Call the application and catch exceptions.
         """
         app_iter = None
+
         # Just call the application and send the output back
-        #   unchanged but catch exceptions
+        #   unchanged and catch relevant HTTP exceptions
         try:
             app_iter = self.app(environ, start_response)
-            for item in app_iter:
-                yield item
-        except (HTTPNotFound, HTTPBadRequest, HTTPUnauthorized), exc:        
+        except (HTTPClientError, HTTPRedirection), exc:        
             app_iter = exc(environ, start_response)            
-            for item in app_iter:
-                yield item                
         # If an exception occours we get the exception information
         #   and prepare a traceback we can render
         except Exception:        
-            from traceback import format_tb
-
             exc_type, exc_value, tb = sys.exc_info()
             traceback = ['Traceback (most recent call last):']
             traceback += format_tb(tb)
@@ -160,7 +141,10 @@ class ExceptionMiddleware(object):
             log.error(traceback)
                         
             yield traceback
-                
+        
+        for item in app_iter:
+            yield item
+
         # Returned iterable might have a close function. 
         #   If it exists it *must* be called
         if hasattr(app_iter, 'close'):

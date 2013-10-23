@@ -182,9 +182,9 @@ def check_url(url, timeout=None, etag=None, modified_since=None):
         
     timeout = timeout if timeout else config.getint('fetcher', 'timeout')
     
-    for verb, r in [('HEAD', requests.head), ('GET', requests.get)]:
+    for method, r in [('HEAD', requests.head), ('GET', requests.get)]:
         try:
-            log.debug("checking %s with %s" % (netloc, verb))
+            log.debug("checking %s with %s" % (netloc, method))
             response = r(url, timeout=timeout, headers=request_headers)
             status = response.status_code
             log.debug("got status %d" % status)
@@ -280,11 +280,10 @@ def fetch_feed(feed, add_entries=False):
         post_fetch(response.status_code, error=True)
         return
 
-    try:
-        # Pass response header to parser
-        soup = feedparser.parse(response.text, response_headers=response.headers)
-    except Exception, exc:
-        log.warn("could not parse %s (%s)" % (feed.self_link, exc))
+    soup = feedparser.parse(response.text) #, response_headers=response.headers)
+    # Got parsing error?     
+    if hasattr(soup, 'bozo') and soup.bozo:
+        log.warn("could not parse %s (%s), aborted" % (netloc, soup.bozo_exception))
         post_fetch(response.status_code, error=True)
         return
 
@@ -295,7 +294,7 @@ def fetch_feed(feed, add_entries=False):
 
     # Reset value only if not set before
     if ('title' in soup.feed) and not feed.title:
-        feed.title = soup.feed.title #@@ Strip HTML
+        feed.title = soup.feed.title #@@TODO Strip HTML
 
     feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
     post_fetch(response.status_code)

@@ -54,7 +54,7 @@ class WSGIApp(object):
         
         handler, args = self.find_handler()
         if not handler:
-            raise HTTPNotFound('No handler defined for %s' % self.request.path_info)  
+            raise HTTPNotFound('No handler defined for %s (%s)' % (self.request.path_info, self.request.method))  
         if not args:
             args = ()        
 
@@ -133,18 +133,19 @@ class ExceptionMiddleware(object):
             app_iter = self.app(environ, start_response)
             for item in app_iter:
                 yield item
+        except (HTTPNotFound, HTTPBadRequest, HTTPUnauthorized), exc:        
+            app_iter = exc(environ, start_response)            
+            for item in app_iter:
+                yield item                
         # If an exception occours we get the exception information
         #   and prepare a traceback we can render
-        except Exception:
-        
-            #@@TODO: catch HTTPNotFound and others
-        
+        except Exception:        
             from traceback import format_tb
 
-            type, value, tb = sys.exc_info()
+            exc_type, exc_value, tb = sys.exc_info()
             traceback = ['Traceback (most recent call last):']
             traceback += format_tb(tb)
-            traceback.append('%s: %s' % (type.__name__, value))
+            traceback.append('%s: %s' % (exc_type.__name__, exc_value))
             # We might have not a stated response by now. Try to  
             #   start one with the status code 500 or ignore any
             #   raised exception if the application already

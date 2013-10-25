@@ -20,7 +20,7 @@ from coldsweat import log
 
 RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 10*60 # 10 minutes
-
+API_VERSION = 3
     
 class FeverApp(WSGIApp):
 
@@ -31,7 +31,7 @@ class FeverApp(WSGIApp):
         if 'api' not in request.GET:
             raise HTTPBadRequest()
     
-        result = Struct({'api_version':2, 'auth':0})   
+        result = Struct({'api_version':API_VERSION, 'auth':0})   
                 
         #@@TODO format = 'xml' if request.GET['api'] == 'xml' else 'json'
     

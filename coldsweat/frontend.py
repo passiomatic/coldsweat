@@ -22,7 +22,7 @@ import fetcher
 #SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENTRIES_PER_PAGE = 30
 USER_SESSION_KEY = 'coldsweat.user'
-RECENTLY_READ_DELTA = 5*60 # 5 minutes
+#RECENTLY_READ_DELTA = 5*60 # 5 minutes
 
 class FrontendApp(WSGIApp):
 

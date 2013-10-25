@@ -6,9 +6,9 @@ Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
-import os, sys, cgi, time, re, json
+import time, re, json
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from calendar import timegm
 from webob import Request, Response
 from webob.exc import HTTPBadRequest
@@ -19,7 +19,7 @@ from models import *
 from coldsweat import log
 
 RE_DIGITS = re.compile('[0-9]+')
-#RECENTLY_READ_DELTA = 60*60 # 1 hour
+RECENTLY_READ_DELTA = 10*60 # 10 minutes
 
     
 class FeverApp(WSGIApp):
@@ -139,7 +139,10 @@ def items_command(request, user, result):
 
 
 def unread_recently_command(request, user, result):    
-    log.info('unread_recently_read command is not implemented')
+    since = datetime.utcnow() - timedelta(seconds=RECENTLY_READ_DELTA)    
+    q = Read.delete().where((Read.user==user) & (Read.read_on > since)) 
+    count = q.execute()
+    log.debug('%d entries marked as unread' % count)
  
     
 

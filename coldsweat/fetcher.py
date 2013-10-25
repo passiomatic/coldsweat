@@ -330,7 +330,7 @@ def fetch_feed(feed, add_entries=False):
 
         content = get_entry_content(entry)
         if blacklist:
-            content = html.scrub_entry(content, blacklist)
+            content = html.scrub_html(content, blacklist)
 
         d = {
             'guid'              : guid,

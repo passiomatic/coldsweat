@@ -10,7 +10,7 @@ License: MIT (see LICENSE.md for details)
 import feedparser    
 
 from os import path
-from ..html import scrub_entry
+from ..markup.html import scrub_html
 
 def run_tests():
 
@@ -27,7 +27,7 @@ def run_tests():
     for filename, unwanted in test_files:           
         soup = feedparser.parse(path.join(test_dir, filename))
         for entry in soup.entries:    
-            data = scrub_entry(entry.description, blacklist)
+            data = scrub_html(entry.description, blacklist)
             assert data.count(unwanted) == 0
             print entry.title, '(OK)'
         

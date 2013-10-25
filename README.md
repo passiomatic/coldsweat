@@ -1,10 +1,10 @@
 # Coldsweat
 
-Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and a simple feed store based on SQLite or MySQL. 
+Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API, a web feed reader and a simple feed store based on SQLite or MySQL. 
 
 Coldsweat started as a fork of [Bottle Fever][b] by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds. 
 
-![Screenshot](http://lab.passiomatic.com/coldsweat/images/coldsweat-screenshot.jpg)
+![Screenshot](http://lab.passiomatic.com/coldsweat/images/coldsweat-0.9.0-screenshot.jpg)
 
 ## Motivation
 
@@ -22,17 +22,21 @@ There will be blood.
 
 ## Technical underpinnings
 
+* Uses the industry standard Mark Pilgrim's [Universal Feed Parser][fp]
 * SQLite and MySQL databases (trivial to add Postgres if you want, since it uses the Peewee ORM)
-* WSGI compatible, currently tested under CGI, FastCGI and Passenger environments
-* Uses Mark Pilgrim's [Universal Feed Parser][fp]
+* WSGI compatible - currently tested under CGI, FastCGI and Passenger environments
+
+For more information about the Coldsweat feed fetcher see the _[fetcher features][ff]_ page.
 
 ## Current status
 
-Coldsweat correctly syncs read and saved items with [Reeder][r] for iOS and [ReadKit][rk] on OS X — see issue #3 for more information. A command-line utility is provided to import existing feeds as an OPML file, create users and store new feed entries in the database.
+* Coldsweat correctly syncs read and saved items with [Reeder][r] for iOS and [ReadKit][rk] on OS X — also see issue #3
+* After the 0.8.2 release in the **master** branch I've recently merged a brand new web UI to add and consume feeds. It's still rough around the edges but it will get better
+* A command-line utility is provided to bulk import and export feeds as an OPML file, create users and store new feed entries in the database
 
 ## Setup
 
-See <https://github.com/passiomatic/coldsweat/wiki/Setup>
+See _[setup]_ page.
 
 
 
@@ -42,3 +46,5 @@ See <https://github.com/passiomatic/coldsweat/wiki/Setup>
 [b]: https://github.com/rcarmo/bottle-fever
 [rk]: http://readkitapp.com/
 [r]: http://reederapp.com/
+[ff]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-features
+[setup]: https://github.com/passiomatic/coldsweat/wiki/Setup

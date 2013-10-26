@@ -8,7 +8,7 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 """
 
 
-from HTMLParser import HTMLParser
+from HTMLParser import HTMLParser, HTMLParseError
 import urlparse
 
 from coldsweat import log
@@ -210,6 +210,14 @@ class Scrubber(BaseProcessor):
         return False
 
 
+def _parse(parser, data):    
+    try:
+        parser.feed(data)    
+    except HTMLParseError, exc:
+        # Log exeption and raise it again
+        log.debug('could not parse markup (%s)' % exc.msg)
+        raise exc
+
 # Link discovery functions
 
 def find_feed_links(data, base_url):
@@ -217,7 +225,7 @@ def find_feed_links(data, base_url):
     Return the feed links found for the page
     '''
     p = FeedLinkFinder(base_url)
-    p.feed(data)
+    _parse(p, data)
     return p.links
 
 def find_feed_link(data, base_url):
@@ -242,7 +250,7 @@ def strip_html(data):
     Stip all HTML tag from the input document
     '''
     p = Stripper()
-    p.feed(data)
+    _parse(p, data)
     return p.output()
 
 def scrub_html(data, blacklist):
@@ -250,7 +258,7 @@ def scrub_html(data, blacklist):
     Remove blacklisted links and images from the input document
     '''
     p = Scrubber(blacklist)
-    p.feed(data)
+    _parse(p, data)
     return p.output()
 
 

@@ -101,14 +101,20 @@ def get_entry_content(entry):
     """
 
     candidates = entry.get('content', [])
+    if candidates:
+        log.debug('content found for entry %s' % entry.link)    
     if 'summary_detail' in entry:
+        log.debug('summary found for entry %s' % entry.link)    
         candidates.append(entry.summary_detail)
     for c in candidates:
-        if 'html' in c.type: 
-            return c.value
-    if candidates:
-        return candidates[0].value
-    return ''
+        if 'html' in c.type: # Match text/html, application/xhtml+xml
+            return c.type, c.value
+        else: 
+            # If the content is declared to be (or is determined to be) text/plain, 
+            #   it will not be sanitized by Feedparser. This is to avoid data loss.
+            return c.type, escape_html(c.value)
+    log.debug('no content found for entry %s' % entry.link)    
+    return '', ''
 
 # ------------------------------------------------------
 # Add feed and subscription
@@ -121,7 +127,7 @@ def add_feed(self_link, title='', fetch_icon=False, add_entries=False):
 
     try:
         previous_feed = Feed.get(Feed.self_link == self_link)
-        log.debug('feed %s has been already added, skipped' % self_link)
+        log.debug('feed %s has been already added to database, skipped' % self_link)
         return previous_feed
     except Feed.DoesNotExist:
         pass
@@ -328,8 +334,8 @@ def fetch_feed(feed, add_entries=False):
         except Entry.DoesNotExist:
             pass
 
-        content = get_entry_content(entry)
-        if blacklist:
+        mime_type, content = get_entry_content(entry)
+        if blacklist and ('html' in mime_type):
             content = html.scrub_html(content, blacklist)
 
         d = {

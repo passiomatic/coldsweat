@@ -214,7 +214,7 @@ def _parse(parser, data):
     try:
         parser.feed(data)    
     except HTMLParseError, exc:
-        # Log exeption and raise it again
+        # Log exception and raise it again
         log.debug('could not parse markup (%s)' % exc.msg)
         raise exc
 

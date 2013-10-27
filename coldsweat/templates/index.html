@@ -13,7 +13,7 @@
 
             {{if group_count > 1}}
                 {{for g in groups}}
-                    <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title}}</a></li>            
+                    <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title|html}}</a></li>            
                 {{endfor}}        
             {{endif}}
             

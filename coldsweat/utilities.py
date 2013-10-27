@@ -13,14 +13,9 @@ from datetime import datetime
 from tempita import HTMLTemplate
 from webob.exc import status_map
 
-DEFAULT_ENCODING = 'utf-8'
-
 def encode(value):
-    return value.encode(DEFAULT_ENCODING, 'replace')
-
-def decode(value):  
-    return unicode(value, DEFAULT_ENCODING, 'replace')        
-
+    return value.encode('utf-8', 'replace')
+    
 # --------------------
 # Hash functions
 # --------------------

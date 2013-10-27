@@ -64,7 +64,7 @@ def get_entry_timestamp(entry, default=None):
         
 def get_entry_title(entry):
     if 'title' in entry:
-        return entry.title #@@ Strip HTML
+        return html.strip_html(entry.title)
     return 'Untitled'
 
 def get_entry_link(entry):
@@ -294,7 +294,7 @@ def fetch_feed(feed, add_entries=False):
 
     # Reset value only if not set before
     if ('title' in soup.feed) and not feed.title:
-        feed.title = soup.feed.title #@@TODO Strip HTML
+        feed.title = html.strip_html(soup.feed.title)
 
     feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
     post_fetch(response.status_code)

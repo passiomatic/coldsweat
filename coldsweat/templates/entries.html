@@ -17,10 +17,10 @@
                     <li data-id="{{e.id}}" class="entry {{if loop.first}}current{{endif}} {{if e.id in saved_ids}}status-saved{{endif}} {{if e.id in read_ids}}status-read{{endif}}">
                         <div class="item-inner">
                             <h3 class="h4">
-                                <img class="favicon" src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a href="{{application_url}}/entries/{{e.id}}">{{e.title}}</a>
+                                <img class="favicon" src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a href="{{application_url}}/entries/{{e.id}}">{{e.title|html}}</a>
                             </h3>
                             <div class="meta dim">
-                                <i class="icon-unread icon-circle" title="Unread"></i><i class="icon-saved icon-star" title="Saved"></i><a title="Show all entries for this feed" href="{{application_url}}/?feed={{e.feed.id}}">{{e.feed.title}}</a>
+                                <i class="icon-unread icon-circle" title="Unread"></i><i class="icon-saved icon-star" title="Saved"></i><a title="Show all entries for this feed" href="{{application_url}}/?feed={{e.feed.id}}">{{e.feed.title|html}}</a>
                             </div>                  
                             <article></article>
                         </div>

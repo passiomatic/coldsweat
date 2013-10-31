@@ -17,11 +17,11 @@ def run_tests():
     # Figure out current dir
     test_dir = path.dirname(path.abspath(__file__))
 
-    blacklist = "feeds.feedburner.com feedsportal.com".split()
+    blacklist = "feedsportal.com feeds.feedburner.com".split()
 
     test_files = [
-        ('scrub/macrumors.xml', blacklist[0]),
-        ('scrub/dotnetmagazine.xml', blacklist[1]),
+        ('markup/sample1.xml', blacklist[0]),
+        ('markup/sample2.xml', blacklist[1]),
     ]
 
     for filename, unwanted in test_files:           

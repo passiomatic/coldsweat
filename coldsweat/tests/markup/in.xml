@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Daring Fireball</title>
+<subtitle>Mac and web curmudgeonry/nerdery. By John Gruber.</subtitle>
+<link rel="alternate" type="text/html" href="http://daringfireball.net/" />
+<link rel="self" type="application/atom+xml" href="http://daringfireball.net/index.xml" />
+<id>http://daringfireball.net/feeds/combo</id>
+
+<updated>2013-10-25T22:24:52Z</updated><rights>Copyright © 2013, John Gruber</rights><entry>
+	<title>Product RED Mac Pro</title>
+	<link rel="alternate" type="text/html" href="http://www.sothebys.com/en/auctions/ecatalogue/2013/null-n09014/lot.27.html" />
+	<link rel="shorturl" href="http://df4.us/lzl" />
+	<id>tag:daringfireball.net,2013:/linked//6.28497</id>
+	<published>2013-10-25T22:24:50Z</published>
+	<updated>2013-10-25T22:24:52Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="http://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>One of a kind, estimated price: $40–60,000. And gorgeous.</p>
+
+<p>(<a href="https://twitter.com/panzer/status/393864967037784064">Via Matthew Panzarino</a>.)</p>
+<img width="100" height="100" src="http://example.com/sample.png" alt="Sample">
+<div>
+<a  title="Permanent link to ‘Product RED Mac Pro’"  href="http://daringfireball.net/linked/2013/10/25/red-mac-pro">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Theodolite Goes to the Great Wall of China</title>
+	<link rel="alternate" type="text/html" href="http://hrtapps.com/blogs/20131023/" />
+	<link rel="shorturl" href="http://df4.us/lzk" />
+	<id>tag:daringfireball.net,2013:/linked//6.28496</id>
+	<published>2013-10-25T17:23:36Z</published>
+	<updated>2013-10-25T17:23:39Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="http://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Craig Hunter:</p>
+
+<blockquote>
+  <p>So there I was on Tuesday, sitting on the living room floor with
+my 7-month-old daughter, watching Apple&#8217;s Special Event live
+stream on my MacBook while we played with some toys. About an hour
+into the Keynote, Tim Cook put up a &#8220;Life on iPad&#8221; <a href="http://www.youtube.com/watch?v=B8Le9wvoY00&amp;feature=c4-overview-vl&amp;list=PLHFlHpPjgk713fMv5O4s4Fv7k6yTkXwkV">video</a> to show
+some amazing things customers have been doing with their iPads.</p>
+
+<p>I imagine every developer sees these videos and hopes their app
+shows up; I know I always have. But in this case, something felt
+different. In addition to the usual feel-good stuff Apple always
+shows, they were demonstrating serious uses of the iPad, in
+settings ranging from medical to industrial, to hard-core sports
+and the outdoors. A <a href="http://www.youtube.com/watch?v=B8Le9wvoY00&amp;list=PLHFlHpPjgk713fMv5O4s4Fv7k6yTkXwkV&amp;feature=player_detailpage#t=99">couple minutes</a> into the video, I was shocked
+to see my signature app, Theodolite HD, being used atop the Great
+Wall of China as an iPad user surveys the mountain scenery and
+architecture around him. Wow!</p>
+</blockquote>
+
+<div>
+<a  title="Permanent link to ‘Theodolite Goes to the Great Wall of China’"  href="http://daringfireball.net/linked/2013/10/25/theodolite-china">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry></feed><!-- THE END -->

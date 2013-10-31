@@ -11,6 +11,11 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 from HTMLParser import HTMLParser, HTMLParseError
 import urlparse
 
+
+HTML_RESERVED_CHARREFS = 38, 60, 62, 34
+HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
+
+from ..utilities import escape_html
 from coldsweat import log
 
 def _normalize_attrs(attrs):
@@ -45,16 +50,18 @@ class BaseParser(HTMLParser):
 
 class BaseProcessor(BaseParser):
     '''
-    A processor parses and partially reconstructs the input document.     
+    Parse and partially reconstruct the input document     
     '''
 
+    # HTML 5 only    
     void_elements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 
       'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr' ]
       
     def __init__(self, xhtml_mode=False):
         BaseParser.__init__(self)
         self.xhtml_mode = xhtml_mode
-        self.pieces = [] 
+
+    #@@NOTE: reset is called implicitly by base class
         
     def reset(self):
         BaseParser.reset(self)
@@ -67,38 +74,44 @@ class BaseProcessor(BaseParser):
         return ''.join(self.pieces)    
         
     def unknown_starttag(self, tag, attrs):
-        # Called for each unknown tag, where attrs is a list of (attr, value) tuples
+        # Called for each unhandled tag, where attrs is a list of (attr, value) tuples
         #   e.g. for <pre class="screen">, tag="pre", attrs=[("class", "screen")]
         #   The attr name will be translated to lower case, and quotes in the  
         #   value have been removed and character and entity references 
         #   have been replaced. Starting Python 2.6 all entity references from 
         #   htmlentitydefs are replaced in the attribute values                    
-        s = "".join([' %s="%s"' % (key, value) for key, value in attrs])
+        s = "".join([' %s="%s"' % (key, escape_html(value)) for key, value in attrs])
         if self.xhtml_mode and (tag in self.void_elements):
             self.pieces.append("<%s%s />" % (tag, s))
         else:
             self.pieces.append("<%s%s>" % (tag, s))
         
     def unknown_endtag(self, tag):
-        # Called for each unknown end tag, e.g. for </pre>, tag will be "pre"
+        # Called for each unhandled end tag, e.g. for </pre>, tag will be "pre"
         #   Reconstruct the original end tag.
         if tag not in self.void_elements:
             self.pieces.append("</%s>" % tag)
             
     def handle_charref(self, ref):
         # Called for each character reference, e.g. for "&#160;", ref will be "160"
-        #   Unescape the original character reference.
-        self.pieces.append(self.unescape("&#%s;" % ref))
+        #   Unescape the original character reference if not reserved
+        if ref in HTML_RESERVED_CHARREFS: 
+            self.pieces.append("&#%s;" % ref) 
+        else:
+            self.pieces.append(self.unescape("&#%s;" % ref))
 
     def handle_entityref(self, ref):
         # Called for each entity reference, e.g. for "&copy;", ref will be "copy"
-        #   Unescape the original entity reference.
-        self.pieces.append(self.unescape("&%s;" % ref))
+        #   Unescape the original entity reference if not reserved
+        if ref in HTML_RESERVED_ENTITIES:
+            self.pieces.append("&%s;" % ref)             
+        else:                        
+            self.pieces.append(self.unescape("&%s;" % ref))
 
     def handle_data(self, text):
         # Called for each block of plain text, i.e. outside of any tag and
         #   not containing any character or entity references
-        #   Store the original text verbatim.
+        #   Store the original text verbatim
         self.pieces.append(text)
 
     # The following elements will be stripped by 
@@ -122,6 +135,11 @@ class Stripper(BaseProcessor):
     def handle_endtag(self, tag):
         pass
 
+    def handle_charref(self, ref):
+        self.pieces.append(self.unescape("&#%s;" % ref))
+
+    def handle_entityref(self, ref):
+        self.pieces.append(self.unescape("&%s;" % ref))
                     
 class FeedLinkFinder(BaseParser):
     '''
@@ -182,6 +200,7 @@ class Scrubber(BaseProcessor):
                 self.blacklisted += 1
                 return
                 
+        # Proceed to default handling        
         self.unknown_starttag('a', attrs)
 
     def end_a(self):
@@ -197,7 +216,8 @@ class Scrubber(BaseProcessor):
                 self.pieces.append(d['alt'] if 'alt' in d else '')
                 log.debug('matched image with blacklisted src=%s' % d['src'])
                 return
-        
+
+        # Proceed to default handling        
         self.unknown_starttag('img', attrs)
    
 
@@ -247,7 +267,8 @@ def find_feed_link(data, base_url):
         
 def strip_html(data):
     '''
-    Stip all HTML tag from the input document
+    Strip all HTML tags and convert all entities/charrefs, effectively 
+      creating a plain text version of the input document
     '''
     p = Stripper()
     _parse(p, data)

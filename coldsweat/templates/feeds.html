@@ -1,46 +1,52 @@
-{{inherit "index.html"}}
-
-{{def panel_block}}
-{{if feed_count}}
-    <div class="panel-title">
-        <h2 class="h3">{{panel_title}}&ensp;<span>{{feed_count}}</span></h2>
-    </div>
-    <div class="panel-content">
-            <ul class="view grid-view">                      
-            {{for loop, f in looper(feeds)}}
-                <li class="feed {{if loop.first}}current{{endif}} {{if not f.is_enabled}}status-disabled{{endif}}">
-                    <div class="item-inner">
-                        <h3 class="h4">
-                            <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>
-                        </h3>
-                        <div class="meta dim">
-                            {{if not f.is_enabled}}<i class="icon-warning-sign"></i> <span class="help-text" title="Feed has too many errors. Last status was ‘{{f.last_status_title}}’">Disabled</span>&emsp;{{endif}}  
-                            {{if f.alternate_link}}<i class="icon-globe"></i> <a target="_blank" title="Visit feed web page" href="{{f.alternate_link}}">Visit</a>&emsp;{{endif}}
-                            <i class="icon-time"></i> <span class="help-text" title="Time of the last check">{{f.last_checked_on|since}}</span>
-                        </div>                                              
-                    </div>
-                </li>
-            {{endfor}}
-            {{if offset < feed_count }}
-                <li class="more">
-                    <form action="{{application_url}}/feeds/?offset={{offset}}" method="GET">
-                        <button type="submit" class="btn">Load More Feeds</button>
-                    </form>
-                </li>
-            {{else}}
-                <li class="more">
-                    <i>~ The end.</i>
-                </li>
-            {{endif}}            
-            </ul>
-    </div>
-{{else}}
-    <div class="notice">
-        <i class="icon-tint icon-4x"></i>
-        No feeds found. <!-- <a href="#">Add some feeds now</a>. -->
-    </div>
-{{endif}}
-
+{{def render_feeds}}
+    {{for loop, f in looper(feeds)}}
+        <li class="feed {{if loop.first}}current{{endif}} {{if not f.is_enabled}}status-disabled{{endif}}">
+            <div class="item-inner">
+                <h3 class="h4">
+                    <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a title="Show all entries for feed " href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>
+                </h3>
+                <div class="meta dim">
+                    {{if not f.is_enabled}}<i class="icon-warning-sign"></i> <span class="help-text" title="Feed has too many errors. Last status was ‘{{f.last_status_title}}’">Disabled</span>&emsp;{{endif}}  
+                    {{if f.alternate_link}}<i class="icon-globe"></i> <a target="_blank" title="Visit feed web page" href="{{f.alternate_link}}">Visit</a>&emsp;{{endif}}
+                    <i class="icon-time"></i> <span class="help-text"  title="Time of the last check, status was ‘{{f.last_status_title}}’">{{f.last_checked_on|since}}</span>
+                </div>                                              
+            </div>
+        </li>
+    {{endfor}}
+    {{if offset < feed_count }}
+        <li class="more">
+            <form action="{{application_url}}/feeds/?offset={{offset}}" method="GET">
+                <button type="submit" class="btn">Load More Feeds</button>
+            </form>
+        </li>
+    {{else}}
+        <li class="more">
+           <i>~ The end.</i>
+        </li>
+    {{endif}}            
 {{enddef}}
 
-
+{{# Ajax request?}}
+{{if request.is_xhr}}
+    {{render_feeds()}}
+{{else}}
+    {{inherit "index.html"}}
+    
+    {{def panel_block}}
+    {{if feed_count}}
+        <div class="panel-title">
+            <h2 class="h3">{{panel_title}}&ensp;<span>{{feed_count}}</span></h2>
+        </div>
+        <div class="panel-content">
+                <ul class="view grid-view">                      
+                    {{render_feeds()}}
+                </ul>
+        </div>
+    {{else}}
+        <div class="notice">
+            <i class="icon-tint icon-4x"></i>
+            No feeds found. <!-- <a href="#">Add some feeds now</a>. -->
+        </div>
+    {{endif}}
+    {{enddef}}
+{{endif}}

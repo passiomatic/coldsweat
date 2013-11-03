@@ -142,15 +142,9 @@ class FrontendApp(WSGIApp):
             offset = int(request.GET['offset'])
             
         entry_count, entries = q.count(), q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
-
-        if offset:
-            templatename = '_entries_more.html'            
-        else:
-            templatename = 'entries.html'            
-            
         offset += ENTRIES_PER_PAGE
 
-        return self.respond_with_template(templatename, locals())
+        return self.respond_with_template('entries.html', locals())
 
     @GET(r'^/entries/mark$')
     def entry_list_mark(self, request):  
@@ -208,15 +202,9 @@ class FrontendApp(WSGIApp):
 
         feed_count, feeds_q = get_feeds(user)
         feeds = feeds_q.order_by(Feed.title).offset(offset).limit(ENTRIES_PER_PAGE)
-
-        if offset:
-            templatename = '_feeds_more.html'            
-        else:
-            templatename = 'feeds.html'            
-            
         offset += ENTRIES_PER_PAGE
         
-        return self.respond_with_template(templatename, locals())  
+        return self.respond_with_template('feeds.html', locals())  
 
 
     @GET(r'^/feeds/(\d+)$')

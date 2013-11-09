@@ -162,3 +162,4 @@ from cascade import Cascade
 def setup_app():
     return ExceptionMiddleware(Cascade([fever_app, frontend_app]))
 
+app = setup_app()

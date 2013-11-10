@@ -19,6 +19,7 @@ from coldsweat import log, config, installation_dir
 # Figure out static dir, if given
 STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static_url') else ''
 
+
 # ------------------------------------------------------
 # Decorators
 # ------------------------------------------------------

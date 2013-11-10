@@ -9,7 +9,7 @@ License: MIT (see LICENSE.md for details)
 #from __future__ import division
 from os import path
 from datetime import datetime, timedelta
-from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect, status_map
+from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
 from tempita import Template #, HTMLTemplate 
 
 from app import *

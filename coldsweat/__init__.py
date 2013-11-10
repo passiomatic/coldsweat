@@ -14,6 +14,7 @@ __license__ = 'MIT'
 from os import path
 from ConfigParser import RawConfigParser
 import logging
+from webob.exc import status_map
 
 VERSION_STRING = '%d.%d.%d%s' % __version__
          
@@ -55,3 +56,20 @@ logging.getLogger("requests").setLevel(logging.WARN)
 
 # Shared logger instance
 log = logging.getLogger()
+
+# ------------------------------------------------------
+# Custom error codes 9xx & exceptions 
+# ------------------------------------------------------
+
+class DuplicatedFeedError(Exception):
+    code        = 900
+    title       = 'Duplicated feed'
+    explanation = 'Feed address matches another already present in the database.'
+
+class ProblematicFeedError(Exception):
+    code        = 901
+    title       = 'Too many errors'
+    explanation =  'Feed has accomulated too many parsing and/or network errors.'
+
+for klass in (DuplicatedFeedError, ProblematicFeedError): 
+    status_map[klass.code] = klass

@@ -213,6 +213,7 @@ def fetch_feed(feed, add_entries=False):
             feed.error_count = feed.error_count + 1        
         if feed.error_count > config.getint('fetcher', 'error_threshold'):
             feed.is_enabled = False
+            feed.last_status = ProblematicFeedError.code            
             log.warn("%s has too many errors, disabled" % netloc)        
         feed.save()
 
@@ -268,8 +269,7 @@ def fetch_feed(feed, add_entries=False):
         else:
             feed.is_enabled = False
             log.warn("new %s location %s is duplicated, disabled" % (netloc, self_link))                
-            # Save final status for posterity
-            post_fetch(response.status_code)
+            post_fetch(DuplicatedFeedError.code)
             return
 
     if response.status_code == 304:                                     # Not modified

@@ -1,76 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
-<opml version="1.1">
-	<body>
-		<outline text="Scripting News" count="580" xmlUrl="http://www.scripting.com/rss.xml"/>
-		<outline text="Wired News" count="546" xmlUrl="http://www.wired.com/news_drop/netcenter/netcenter.rdf"/>
-		<outline text="Boing Boing Blog" count="519" xmlUrl="http://boingboing.net/rss.xml"/>
-		<outline text="The Scobleizer Weblog" count="460" xmlUrl="http://radio.weblogs.com/0001011/rss.xml"/>
-		<outline text="Slashdot" count="347" xmlUrl="http://slashdot.org/slashdot.rss"/>
-		<outline text="Joel on Software" count="328" xmlUrl="http://www.joelonsoftware.com/rss.xml"/>
-		<outline text="Jon's Radio" count="325" xmlUrl="http://weblog.infoworld.com/udell/rss.xml"/>
-		<outline text="Jeffrey Zeldman Presents- The Daily Report" count="312" xmlUrl="http://www.zeldman.com/feed/zeldman.xml"/>
-		<outline text="kuro5hin.org" count="301" xmlUrl="http://www.kuro5hin.org/backend.rdf"/>
-		<outline text="Gizmodo" count="284" xmlUrl="http://www.gizmodo.net/index.xml"/>
-		<outline text="Joi Ito's Web" count="276" xmlUrl="http://joi.ito.com/index.xml"/>
-		<outline text="The Doc Searls Weblog" count="245" xmlUrl="http://partners.userland.com/people/docSearls.xml"/>
-		<outline text="A List Apart: for people who make websites" count="231" xmlUrl="http://www.alistapart.com/rss.xml"/>
-		<outline text="The Shifted Librarian" count="226" xmlUrl="http://www.theshiftedlibrarian.com/rss.xml"/>
-		<outline text="Tim Bray" count="220" xmlUrl="http://www.tbray.org/ongoing/ongoing.rss"/>
-		<outline text="The Register" count="218" xmlUrl="http://www.theregister.co.uk/tonys/slashdot.rdf"/>
-		<outline text="Luke Hutteman's public virtual MemoryStream" count="218" xmlUrl="http://www.hutteman.com/weblog/rss.xml"/>
-		<outline text="Aaron Swartz: The Weblog" count="216" xmlUrl="http://www.aaronsw.com/weblog/index.xml"/>
-		<outline text="MetaFilter" count="214" xmlUrl="http://xml.metafilter.com/rss.xml"/>
-		<outline text="Ranchero" count="204" xmlUrl="http://ranchero.com/xml/rss.xml"/>
-		<outline text="John Gruber" count="200" xmlUrl="http://daringfireball.net/index.xml"/>
-		<outline text="Lessig Blog" count="199" xmlUrl="http://www.lessig.org/blog/index.rdf"/>
-		<outline text="New York Times: Technology" count="175" xmlUrl="http://partners.userland.com/nytRss/technology.xml"/>
-		<outline text="Tomalak's Realm" count="171" xmlUrl="http://static.userland.com/tomalak/links2.xml"/>
-		<outline text="Anil Dash" count="170" xmlUrl="http://www.dashes.com/anil/index.rdf"/>
-		<outline text="Clay Shirky's Essays" count="170" xmlUrl="http://shirky.com/writings/rss.cgi"/>
-		<outline text="Ben Hammersley's Dangerous Precedent" count="168" xmlUrl="http://www.benhammersley.com/index.rdf"/>
-		<outline text="inessential.com" count="166" xmlUrl="http://inessential.com/xml/rss.xml"/>
-		<outline text="Bloglines | News" count="163" xmlUrl="http://www.bloglines.com/rss/about/news"/>
-		<outline text="Sam Ruby" count="162" xmlUrl="http://intertwingly.net/blog/index.atom"/>
-		<outline text="InfoWorld: Top News" count="159" xmlUrl="http://www.infoworld.com/rss/news.rdf"/>
-		<outline text="CNET News.com - Front Door" count="158" xmlUrl="http://news.com.com/2547-1_3-0-5.xml"/>
-		<outline text="Salon.com" count="157" xmlUrl="http://www.salon.com/feed/RDF/salon_use.rdf"/>
-		<outline text="macosxhints" count="150" xmlUrl="http://www.macosxhints.com/backend/geeklog.rdf"/>
-		<outline text="Philip Greenspun Weblog" count="147" xmlUrl="http://blogs.law.harvard.edu/philg/xml/rss.xml"/>
-		<outline text="New York Times: NYT HomePage" count="141" xmlUrl="http://partners.userland.com/nytRss/nytHomepage.xml"/>
-		<outline text="Jeremy Allaire's Radio" count="139" xmlUrl="http://radio.weblogs.com/0113297/rss.xml"/>
-		<outline text="MacCentral" count="139" xmlUrl="http://maccentral.macworld.com/mnn.cgi"/>
-		<outline text="Jeremy Zawodny's blog" count="138" xmlUrl="http://jeremy.zawodny.com/blog/rss2.xml"/>
-		<outline text="kottke.org" count="133" xmlUrl="http://www.kottke.org/index.rdf"/>
-		<outline text="Slashdot" count="133" xmlUrl="http://slashdot.org/index.rss"/>
-		<outline text="kottke.org" count="132" xmlUrl="http://www.kottke.org/index.xml"/>
-		<outline text="C--PIRILLO.EXE" count="130" xmlUrl="http://feeds.pirillo.com/ChrisPirillo"/>
-		<outline text="Smart Mobs" count="129" xmlUrl="http://www.smartmobs.com/index.rdf"/>
-		<outline text="Apple Hot News" count="128" xmlUrl="http://www.apple.com/main/rss/hotnews/hotnews.rss"/>
-		<outline text="mezzoblue" count="126" xmlUrl="http://www.mezzoblue.com/rss/index.xml"/>
-		<outline text="CNET News.com - Front Door" count="126" xmlUrl="http://rss.com.com/2547-1_3-0-5.xml"/>
-		<outline text="Ross Mayfield's Weblog" count="125" xmlUrl="http://ross.typepad.com/blog/index.rdf"/>
-		<outline text="Creative Commons" count="123" xmlUrl="http://creativecommons.org/weblog/rss"/>
-		<outline text="Joho the Blog" count="122" xmlUrl="http://www.hyperorg.com/blogger/index.rdf"/>
-		<outline text="Sebastien Paquet" count="122" xmlUrl="http://radio.weblogs.com/0110772/rss.xml"/>
-		<outline text="MacRumors" count="121" xmlUrl="http://www.macrumors.com/macrumors.xml"/>
-		<outline text="kottke.org remainders" count="118" xmlUrl="http://www.kottke.org/remainder/index.rdf"/>
-		<outline text="BBC News | News Front Page | UK Edition" count="117" xmlUrl="http://www.bbc.co.uk/syndication/feeds/news/ukfs_news/front_page/rss091.xml"/>
-		<outline text="Y! - Top Stories" count="116" xmlUrl="http://rss.news.yahoo.com/rss/topstories"/>
-		<outline text="Cool Tools" count="115" xmlUrl="http://www.kk.org/cooltools/index.xml"/>
-		<outline text="Eric.Weblog()" count="115" xmlUrl="http://software.ericsink.com/rss.xml"/>
-		<outline text="Y! - Technology" count="115" xmlUrl="http://rss.news.yahoo.com/rss/tech"/>
-		<outline text="MacMinute.com: Up-to-the-minute Mac news -- around the clock, around the world." count="113" xmlUrl="http://www.macminute.com/headlines.xml"/>
-		<outline text="Don Park's Blog" count="112" xmlUrl="http://www.docuverse.com/blog/donpark/rss.xml"/>
-		<outline text="Many-to-Many" count="112" xmlUrl="http://www.corante.com/many/index.xml"/>
-		<outline text="WIL WHEATON DOT NET: Where is my mind?" count="109" xmlUrl="http://www.wilwheaton.net/mt/index.xml"/>
-		<outline text="World Wide Web Consortium" count="109" xmlUrl="http://www.w3.org/2000/08/w3c-synd/home.rss"/>
-		<outline text="Slashdot" count="109" xmlUrl="http://slashdot.org/slashdot.rdf"/>
-		<outline text="Windley's Enterprise Computing Weblog" count="108" xmlUrl="http://www.windley.com/rss.xml"/>
-		<outline text="SimpleBits" count="106" xmlUrl="http://www.simplebits.com/xml/rss.xml"/>
-		<outline text="TidBITS" count="101" xmlUrl="http://www.tidbits.com/channels/tidbits.rss"/>
-		<outline text="Anil Dash's daily links" count="101" xmlUrl="http://www.dashes.com/links/index.rdf"/>
-		<outline text="Sjoerd Visscher's weblog" count="101" xmlUrl="http://w3future.com/weblog/rss.xml"/>
-		<outline text="MacMerc.com" count="100" xmlUrl="http://www.macmerc.com/index.rss"/>
-		<outline text="Dare Obasanjo" count="100" xmlUrl="http://www.25hoursaday.com/weblog/SyndicationService.asmx/GetRss"/>
-		</body>
-	</opml>
+<?xml version="1.0"?>
+<opml version="2.0">
+    <head>
+        <title>Coldsweat sample subscriptions</title>
+		<dateCreated>Mon, 11 Nov 2013 17:07:00 GMT</dateCreated>
+    </head>
+    <body>        
+            <outline text="500px:" title="500px:"
+                type="rss" xmlUrl="http://feed.500px.com/500px-editors" htmlUrl="http://500px.com/editors"/>
+            <outline text="Ars Technica" title="Ars Technica"
+                type="rss" xmlUrl="http://feeds.arstechnica.com/arstechnica/index" htmlUrl="http://arstechnica.com"/>
+            <outline text="Daring Fireball" title="Daring Fireball"
+                type="rss" xmlUrl="http://daringfireball.net/index.xml" htmlUrl="http://daringfireball.net/"/>
+            <outline text="Dribbble / Popular" title="Dribbble / Popular"
+                type="rss" xmlUrl="http://dribbble.com/shots/popular.rss" htmlUrl="http://dribbble.com/"/>
+            <outline text="Engadget RSS Feed" title="Engadget RSS Feed"
+                type="rss" xmlUrl="http://www.engadget.com/rss.xml" htmlUrl="http://www.engadget.com"/>
+            <outline text="Mashable" title="Mashable"
+                type="rss" xmlUrl="http://feeds.mashable.com/Mashable" htmlUrl="http://mashable.com/stories/?utm_campaign=Mash-Prod-RSS-Feedburner-All-Partial&amp;utm_cid=Mash-Prod-RSS-Feedburner-All-Partial&amp;utm_medium=feed&amp;utm_source=rss"/>
+            <outline text="NYT &gt; International Home" title="NYT &gt; International Home"
+                type="rss" xmlUrl="http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml" htmlUrl="http://www.nytimes.com/pages/international/index.html?partner=rss&amp;emc=rss"/>
+            <outline text="Polygon -  All" title="Polygon -  All"
+                type="rss" xmlUrl="http://www.polygon.com/rss/index.xml" htmlUrl="http://www.polygon.com/"/>
+            <outline text="reddit: the front page of the internet" title="reddit: the front page of the internet"
+                type="rss" xmlUrl="http://www.reddit.com/.rss" htmlUrl="http://www.reddit.com/"/>
+            <outline text="The Next Web" title="The Next Web"
+                type="rss" xmlUrl="http://feeds2.feedburner.com/thenextweb" htmlUrl="http://thenextweb.com"/>
+            <outline text="The Verge -  All Posts" title="The Verge -  All Posts"
+                type="rss" xmlUrl="http://www.theverge.com/rss/frontpage" htmlUrl="http://www.theverge.com/"/>
+            <outline text="Unsplash" title="Unsplash"
+                type="rss" xmlUrl="http://unsplash.com/rss" htmlUrl="http://unsplash.com/"/>
+    </body>
+</opml>

@@ -211,7 +211,8 @@ def fetch_feed(feed, add_entries=False):
             feed.last_status = status
         if error:
             feed.error_count = feed.error_count + 1        
-        if feed.error_count > config.getint('fetcher', 'error_threshold'):
+        error_threshold = config.getint('fetcher', 'error_threshold')
+        if error_threshold and (feed.error_count > error_threshold):
             feed.is_enabled = False
             feed.last_status = ProblematicFeedError.code            
             log.warn("%s has too many errors, disabled" % netloc)        
@@ -322,7 +323,8 @@ def fetch_feed(feed, add_entries=False):
         author      = get_entry_author(entry, soup.feed)
                 
         # Skip ancient feed items        
-        if (now - timestamp).days > config.getint('fetcher', 'max_history'):  
+        max_history = config.getint('fetcher', 'max_history')
+        if max_history and ((now - timestamp).days > max_history):  
             log.debug("entry %s from %s is over max_history, skipped" % (guid, netloc))
             continue
 

@@ -17,10 +17,10 @@ filename: data/coldsweat.db
 ; Minimun number of seconds allowed between each feed fetch
 min_interval: 900
 
-; Number of errors before disabling feed
+; Number of errors before disabling feed, with 0 the setting is ignored
 error_threshold: 50
 
-; Do not retrieve entries older than given days
+; Do not retrieve entries older than given days, with 0 the setting is ignored
 max_history: 7
 
 ; Number of seconds before timeout a web request 

@@ -120,10 +120,12 @@ def get_entry_content(entry):
 # Add feed and subscription
 # ------------------------------------------------------
 
-def add_feed(self_link, title='', fetch_icon=False, add_entries=False):
+def add_feed(feed, fetch_icon=False, add_entries=False):
     '''
     Add a feed to database and optionally fetch icon and add entries
     '''
+
+    self_link, alternate_link, title = feed.self_link, feed.alternate_link, feed.title
 
     try:
         previous_feed = Feed.get(Feed.self_link == self_link)
@@ -132,22 +134,18 @@ def add_feed(self_link, title='', fetch_icon=False, add_entries=False):
     except Feed.DoesNotExist:
         pass
 
-    feed = Feed()            
-
     if fetch_icon:
         # Prefer alternate_link if available since self_link could 
         #   point to Feed Burner or similar services
-        #@@TODO icon_link = alternate_link if alternate_link else self_link    
-        icon_link = self_link    
+        icon_link = alternate_link if alternate_link else self_link    
         (schema, netloc, path, params, query, fragment) = urlparse.urlparse(icon_link)
         icon = Icon.create(data=favicon.fetch(icon_link))
         feed.icon = icon
         log.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
 
-    feed.self_link = self_link    
-    feed.title = title 
+    #feed.self_link = self_link    
+    #feed.title = title 
     feed.save()
-
     fetch_feed(feed, add_entries)
 
     return feed

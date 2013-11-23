@@ -35,9 +35,6 @@ def google_fetcher(url):
         log.warn("could not fetch favicon for %s (%s)" % (url, exc))
         return DEFAULT_FAVICON
 
-    #log.debug("favicon data length %d" % len(result.content))
-
-
     return make_data_uri(result.headers['Content-Type'], result.content)
 
 # Alias

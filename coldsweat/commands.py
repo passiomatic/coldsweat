@@ -82,15 +82,9 @@ def command_import(parser, options, args):
     except User.DoesNotExist:
         parser.error("unable to find user %s. Use -u option to specify a different user" % username)
     
-    default_group = Group.get(Group.title == Group.DEFAULT_GROUP)    
-    
-    feeds = opml.add_feeds_from_file(args[0], fetch_icons=True)
+    feeds = opml.add_feeds_from_file(args[0], user)
 
-    with transaction():
-        for feed in feeds:         
-            Subscription.create(user=user, group=default_group, feed=feed)
-
-    print "%d feeds imported for user %s. See log file for more information" % (len(feeds), username)
+    print "%d feeds imported and fetched for user %s. See log file for more information." % (len(feeds), username)
 
     
 @command('export')

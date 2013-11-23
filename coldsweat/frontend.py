@@ -247,7 +247,9 @@ class FrontendApp(WSGIApp):
             message = render_message(u'ERROR Error, feed host returned status code: %s' % get_status_title(status))
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
-        feed = fetcher.add_feed(self_link, fetch_icon=True, add_entries=True)        
+        feed = Feed()
+        feed.self_link = self_link
+        feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
         user = self.get_session_user()        
         subscription = fetcher.add_subscription(feed, user)
         if subscription:

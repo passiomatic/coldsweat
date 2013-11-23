@@ -113,7 +113,7 @@ class Feed(CustomModel):
     is_enabled          = BooleanField(default=True)     
     # A URL to a small icon representing the feed
     icon                = ForeignKeyField(Icon, default=1)
-    title               = CharField(null=True, default='Untitled')        
+    title               = CharField(null=True)        
     # The URL of the HTML page associated with the feed (rel=alternate)
     alternate_link      = CharField(null=True)            
     # The URL of the feed itself (rel=self)

@@ -285,12 +285,11 @@ def fetch_feed(feed, add_entries=False):
         post_fetch(response.status_code, error=True)
         return
 
-    soup = feedparser.parse(response.text) #, response_headers=response.headers)
-    # Got parsing error?     
+    soup = feedparser.parse(response.text) 
+    # Got parsing error? Log error but do not increment the error counter
     if hasattr(soup, 'bozo') and soup.bozo:
-        log.warn("could not parse %s (%s), aborted" % (netloc, soup.bozo_exception))
-        post_fetch(response.status_code, error=True)
-        return
+        log.info("%s caused a parser error (%s), tried to parse it anyway" % (netloc, soup.bozo_exception))
+        post_fetch(response.status_code, error=False)
 
     feed.etag = response.headers.get('ETag', None)    
     

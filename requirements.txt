@@ -5,3 +5,4 @@ WebOb==1.2.3
 Tempita==0.5.1
 #Flup>1.0.2
 #Mysql-python
+#psycopg2

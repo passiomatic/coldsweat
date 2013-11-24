@@ -40,15 +40,16 @@ def load_blacklist(filename):
 # Entry data
 # ------------------------------------------------------
 
-def get_feed_timestamp(feed, default):
+def get_feed_timestamp(soup_feed, default):
     """
     Get the date a feed was last updated
     """
     for header in ['updated_parsed', 'published_parsed']:
-        value = feed.get(header, None)
+        value = soup_feed.get(header, None)
         if value:
             # Fix future dates
             return min(tuple_as_datetime(value), default)
+    log.debug('no feed timestamp found, using default')    
     return default
 
 def get_entry_timestamp(entry, default=None):
@@ -60,6 +61,7 @@ def get_entry_timestamp(entry, default=None):
         if value:
             # Fix future dates
             return min(tuple_as_datetime(value), default)
+    log.debug('no entry timestamp found, using default')    
     return default
         
 def get_entry_title(entry):

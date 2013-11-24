@@ -2,7 +2,7 @@
 
 Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and web feed reader. 
 
- ![Screenshot](http://lab.passiomatic.com/coldsweat/images/coldsweat-0.9.0-screenshot.jpg)
+ ![Screenshot](screenshots/coldsweat-0.9.0.jpg)
 
 ## Motivation
 

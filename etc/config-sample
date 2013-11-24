@@ -1,6 +1,7 @@
 [database]
 
 ;engine: mysql
+;engine: postgresql
 engine: sqlite
 
 ; MySQL database settings
@@ -8,6 +9,12 @@ hostname: localhost
 username: root
 password: secret
 database: coldsweat
+
+; PostgreSQL database settings
+;hostname: localhost
+;username: root
+;password: secret
+;database: coldsweat
 
 ; SQLite3 settings
 filename: data/coldsweat.db

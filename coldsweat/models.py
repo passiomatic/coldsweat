@@ -25,8 +25,11 @@ if engine == 'sqlite':
 elif engine == 'mysql':
     from MySQLdb import IntegrityError, ProgrammingError
     _db = MySQLDatabase(None)
+elif engine == 'postgresql':
+    from psycopg2 import IntegrityError, ProgrammingError
+    _db = PostgresqlDatabase(None)
 else:
-    raise ValueError('Unknown database engine %s. Should be sqlite or mysql' % engine)
+    raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
 
 # ------------------------------------------------------
 # Custom fields
@@ -240,29 +243,40 @@ class Session(CustomModel):
 # Utility functions
 # ------------------------------------------------------
 
+def _init_sqlite():
+    filename = config.get('database', 'filename')
+    _db.init(filename)    
+
+def _init_mysql():
+    database = config.get('database', 'database')
+    kwargs = dict(
+        host        = config.get('database', 'hostname'),
+        user        = config.get('database', 'username'),
+        passwd      = config.get('database', 'password')        
+    )
+    _db.init(database, **kwargs)
+
+def _init_postgresql():
+    database = config.get('database', 'database')
+    kwargs = dict(
+        host        = config.get('database', 'hostname'),
+        user        = config.get('database', 'username'),
+        password    = config.get('database', 'password')        
+    )
+    _db.init(database, **kwargs)
+
 def connect():
     """
     Shortcut to init and connect to database
     """
     
-    if engine == 'sqlite':
-        filename = config.get('database', 'filename')
-        
-        _db.init(filename)    
-        
-    elif engine == 'mysql':            
-        database = config.get('database', 'database')
-
-        kwargs = dict(
-            host    = config.get('database', 'hostname'),
-            user    = config.get('database', 'username'),
-            passwd  = config.get('database', 'password')        
-        )
-
-        _db.init(database, **kwargs)
-    
+    engines = {
+        'sqlite'    : _init_sqlite,
+        'mysql'     : _init_mysql,
+        'postgresql': _init_postgresql,        
+    }
+    engines[engine]()
     _db.connect()
-
 
 def transaction():
     return _db.transaction()

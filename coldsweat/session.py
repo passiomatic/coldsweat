@@ -41,7 +41,7 @@ from models import Session, connect, close
 from coldsweat import log
 
 
-SESSION_TIMEOUT = 60*60 # 1 hour
+SESSION_TIMEOUT = 60*60*24*30 # 1 month
 
 def synchronized(func):
     def wrapper(self, *__args, **__kw):

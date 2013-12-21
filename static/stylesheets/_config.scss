@@ -23,8 +23,6 @@
 //		=tooltip						Tooltip
 //		=wells							Wells
 //		=popovers 						Popovers
-//		=panels 						Panels
-
 
 
 
@@ -75,6 +73,10 @@ $bp6 							: 86.375em;
 
 $maxwidth						: 70em;
 
+// Other layout elements
+
+$navwidth                       : 14em;
+
 // What is the class name that the media query mixin should use to target 
 // browsers not supporting media queries?
 
@@ -89,13 +91,13 @@ $no-mq-classname 				: ".lt-ie9";
 // Now define your design’s typography by setting a base typeface and size
 $basefontfamily 				: Ubuntu, Segoe, "Segoe UI", "Helvetica Neue", Arial, Helvetica, sans-serif;
 $basefontsize 					: 16;
+$basefontweight 			    : normal;
 
 // Your headings may inherit the base typeface, or you may set a different font stack
 $baseheadingfont 				: inherit;
 
 // Choose between normal, bold or set a font-weight number (eg: 700) for your headings
-$basefontweight 			    : 700;
-$baseheadingfontweight 			: $basefontweight;
+$baseheadingfontweight 			: 500;
 
 
 // Your headings may inherit the $textcolor, or you may set a different colour
@@ -716,7 +718,7 @@ $tooltiparrowcolor				: $tooltipbackgroundcolor;
 // =popovers ==========
 
 // Set background color for popover body
-$popoverbackgroundcolor 		: $primarycolor;
+$popoverbackgroundcolor 		: $white;
 
 // Set background color for popover title
 $popovertitlebackground 		: $popoverbackgroundcolor;
@@ -725,13 +727,13 @@ $popovertitlebackground 		: $popoverbackgroundcolor;
 $popoverfontfamily				: $altfontfamily;
 
 // Set popover font color
-$popovercolor					: $white;
+$popovercolor					: $textcolor;
 
 // Set popover border-width. Default is twice $borderwidth defined above
 $popoverborderwidth				: $borderwidth * 2;
 
 // Set popover border colour
-$popoverbordercolor 			: darken($popoverbackgroundcolor,5%);
+$popoverbordercolor 			: $lightneutralcolor;
 
 // Set popover border style, Default is $borderstyle defined above
 $popoverborderstyle				: $borderstyle;
@@ -743,19 +745,12 @@ $popoverborderradius			: $borderradius;
 $popoverarrowouterwidth 		: $gutterwidth / 2;
 
 // Set the actual width of the popover arrow
-$popoverarrowwidth 				: $gutterwidth / 2;
+$popoverarrowwidth 				: $gutterwidth / 4;
 
 // Set the outer color of the popover arrow
 $popoverarrowoutercolor 		: $popoverbordercolor;
 
 // Set the color of the popover arrow
-$popoverarrowcolor  			: $popoverbackgroundcolor;
-
-
-
-// =panels ============
-
-$navwidth                       : 14%;
-$panelwidth                     : 100% - $navwidth;
+$popoverarrowcolor  			: $popoverbordercolor;
 
 

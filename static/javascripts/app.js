@@ -3,11 +3,11 @@
 $(document).ready(function() {
     "use strict";
 
-    var flash_fragment = $('<div class="flash"><i class="icon-4x"></i><div class="message">&nbsp;</div></div>')
+    var flash_fragment = $('<div class="flash"><i class="fa fa-4x"></i><div class="message">&nbsp;</div></div>')
     var alert_fragment = $('<div class="alert alert--error style="display:none"></div>')
     var modal_fragment = $('<div role="dialog" class="modal fade hide"></div>')
-    var loading_fragment = $('<div class="loading"><i class="icon-spinner icon-spin"></i> Loading&hellip;</div>')
-    var loading_favicon_fragment = $('<i class="favicon icon-spinner icon-spin"></i>')
+    var loading_fragment = $('<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading&hellip;</div>')
+    //var loading_favicon_fragment = $('<i class="favicon fa fa-spinner fa-spin"></i>')
 
     var panel = $('.panel')
     
@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     function flash(icon, message) {
         var fragment = flash_fragment.clone()
-        fragment.find('i').addClass('icon-' + icon)
+        fragment.find('i').addClass('fa fa-' + icon)
         fragment.find('.message').text(message)
         $(document.body).append(fragment);
         fragment.show().animate({'opacity': 'hide'}, 'slow', function() { fragment.remove() } )         
@@ -71,49 +71,22 @@ $(document).ready(function() {
             flash('star', 'Saved')
             status = 'saved'
         } else {
-            flash('star-empty', 'Unsaved')
+            flash('star-o', 'Unsaved')
         }
         mark(el,  status);
     }
 
     function openEntry(event) {        
-        if(event.type != "click") {
-            var c = findCurrent()
-        } else {
-            var target = $(event.target);
-            var c = target.parents('li').first()
-            setCurrent(c);
-        }
-                
-        var article = c.find('article')
-        if(!article.is(":visible")) {
-        
-            // Close open entries
-            //panel.find('article').filter(':visible').slideUp(200);
-            
-            // Show spinner            
-            var img = c.find('.favicon').replaceWith(loading_favicon_fragment);
-            
-            var url = c.find('h3 a').attr('href');
-            $.ajax(url, {dataType: 'html', type:'GET'}).done(function(data) {
-                article.html(data);
-                $(c).find('h3 i').replaceWith(img);
-                article.show(200);
-                $(document.body).animate({'scrollTop': c.position().top}, 500);          
-                setTimeout(function() {
-                    //if($(c).hasClass('entry')) {
-                    c.addClass('status-read')
-                    mark(c, 'read');            
-                    //}            
-                }, 1500);
-            })        
-            
-        } else {
-            //article.slideUp(100);
-            article.hide();
-
-        }
-            
+        var c = findCurrent()
+        var url = c.find('h3 a').attr('href');
+        window.location.assign(url)
+    }
+    
+    function list(pathname) {       
+        return function() {
+            var url = endpoint(pathname);
+            window.location.assign(url)            
+        } 
     }
     
 /*
@@ -164,9 +137,12 @@ $(document).ready(function() {
 
     function bindKeyboardShortcuts() {
         var events = {
+            '1': list('/entries/?unread'),
+            '2': list('/entries/?saved'),
+            '3': list('/entries/?all'),
+            '4': list('/feeds/'),
             'o': openEntry,
             //'a': addSubscription,
-            //'?': showKeyboardShortcuts,
             'm': toggleRead,
             's': toggleSaved,
             'j': moveTo('prev'),
@@ -180,15 +156,28 @@ $(document).ready(function() {
     
     function setup() {               
         bindKeyboardShortcuts();
-        //$('body').off('.data-api')        
 
-        // Open entry on title click
-        $(document).on('click', '.panel li.entry h3 a', function(event) { event.preventDefault(); openEntry(event) })  
-/*
-        $(document).on('hidden', '.modal', function (event) {
-        })
-*/
-    
+        $('.nav-trigger').hover(
+            // in
+            function(event) {
+                // Slight delay
+                setTimeout(function() { 
+                    $('nav').addClass('open') 
+                }, 100)
+            }, 
+            // out
+            function(event) {}
+        )
+
+        $('nav').hover(
+            // in
+            function(event) {}, 
+            // out
+            function(event) {
+                $(this).removeClass('open')
+            }
+        )
+
         // Remote modals
         $(document).on('click', '[data-remote-modal]', function(event) { 
             event.preventDefault()
@@ -215,12 +204,12 @@ $(document).ready(function() {
             })       
         })
 
-        // 'Load More...' button
-        $(document).on('submit', '.panel li.more form', function(event) { 
+        // 'Load More...' link
+        $(document).on('click', '.panel li.more a', function(event) { 
             event.preventDefault()            
             var parent = $(event.target).parents('li.more').first()
             parent.html(loading_fragment)
-            $.ajax($(this).attr('action'), 
+            $.ajax($(this).attr('href'), 
                 {dataType: 'html', type:'GET'}).done(function(data) {            
                    $(document.body).animate({'scrollTop': parent.position().top}, 500)                   
                    parent.replaceWith(data)
@@ -234,9 +223,3 @@ $(document).ready(function() {
 });
 
 
-/*
-    $.fn.hasAttr = function(attr) { 
-        var value = this.attr(attr); 
-        return (value !== undefined) && (value !== false); 
-    }; 
-*/

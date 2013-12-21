@@ -21,6 +21,7 @@ import fetcher
 
 #SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENTRIES_PER_PAGE = 30
+FEEDS_PER_PAGE = 60
 USER_SESSION_KEY = 'coldsweat.user'
 #RECENTLY_READ_DELTA = 5*60 # 5 minutes
 
@@ -28,8 +29,81 @@ class FrontendApp(WSGIApp):
 
     def __init__(self):
         self.alert_message = ''
+
+    def _mark_entry(self, user, entry, status):
+        if status == 'read':
+            try:
+                Read.create(user=user, entry=entry)
+            except IntegrityError:
+                log.debug('entry %s already marked as read, ignored' % entry.id)
+                return
+        elif status == 'unread':
+            count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
+            if not count:
+                log.debug('entry %s never marked as read, ignored' % entry.id)
+                return
+        elif status == 'saved':
+            try:
+                Saved.create(user=user, entry=entry)
+            except IntegrityError:
+                log.debug('entry %s already marked as saved, ignored' % entry.id)
+                return
+        elif status == 'unsaved':
+            count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
+            if not count:
+                log.debug('entry %s never marked as saved, ignored' % entry.id)
+                return
+        
+        log.debug('marked entry %s as %s' % (entry.id, status))
+
+    def _make_view_variables(self, user, request): 
+        
+        group_id, feed_id, filter_name, filter_class, panel_title, page_title = 0, 0, '', '', '', ''
+        
+        group_count, groups = get_groups(user)
     
-    # Home
+        r = Entry.select(Entry.id).join(Read).where((Read.user == user)).naive()
+        s = Entry.select(Entry.id).join(Saved).where((Saved.user == user)).naive()
+        read_ids    = dict((i.id, None) for i in r)
+        saved_ids   = dict((i.id, None) for i in s)
+        
+        if 'saved' in request.GET:
+            q = get_saved_entries(user)
+            panel_title = '<span><i class="fa fa-star"></i></span>&ensp;Saved Entries'
+            filter_class = filter_name = 'saved'
+            page_title = 'Saved Entries'
+        elif 'group' in request.GET:
+            group_id = int(request.GET['group'])    
+            group = Group.get(Group.id == group_id) 
+            q = get_group_entries(user, group)
+            panel_title = '<span><i class="fa fa-folder-open"></i></span>&ensp;%s' % group.title                
+            filter_name = 'group=%s' % group_id
+            page_title = group.title
+        elif 'feed' in request.GET:
+            feed_id = int(request.GET['feed'])
+            feed = Feed.get(Feed.id == feed_id) 
+            q = get_feed_entries(user, feed)
+            panel_title = '<span><i class="fa fa-rss"></i></span>&ensp;%s' % feed.title                
+            filter_class = 'feeds'
+            filter_name = 'feed=%s' % feed_id
+            page_title = feed.title
+        elif 'all' in request.GET:
+            q = get_all_entries(user)
+            panel_title = '<span><i class="fa fa-archive"></i></span>&ensp;All Entries'                
+            filter_class = filter_name = 'all'
+            page_title = 'All Entries'
+        else: # Default
+            q = get_unread_entries(user)
+            panel_title = '<span><i class="fa fa-circle"></i></span>&ensp;Unread Entries'
+            filter_class = filter_name = 'unread'
+            page_title = 'Unread Entries'
+                    
+        # Cleanup namespace
+        del r, s, self
+        
+        return q, locals()
+                        
+    # Views
 
     @GET()
     def index(self, request):
@@ -39,59 +113,51 @@ class FrontendApp(WSGIApp):
 
     @GET(r'^/entries/(\d+)$')
     def entry(self, request, entry_id):
-    
+        user = self.get_session_user()  
+
         try:
             entry = Entry.get((Entry.id == entry_id)) 
         except Entry.DoesNotExist:
             raise HTTPNotFound('No such entry %s' % entry_id)
+
+        self._mark_entry(user, entry, 'read')                                
+
+        q, namespace = self._make_view_variables(user, request)
+
+        p = q.where(Entry.id < entry_id).order_by(Entry.last_updated_on.asc()).limit(1)
+        n = q.where(Entry.id > entry_id).order_by(Entry.last_updated_on.desc()).limit(1)
+
+        namespace.update({
+            'entry': entry,
+            'page_title': entry.title,
+            #'panel_title':  '<a href="?%s">%s</a>' % (namespace['filter_name'], namespace['panel_title']),
+            'previous_entries': p,
+            'next_entries': n,            
+            'count': 1 if any((p, n)) else 0 # At least one entry present
+        })
+
+        return self.respond_with_template('entry.html', namespace)   
         
-        return self.respond_with_template('_entry.html', locals())   
-    
     @POST(r'^/entries/(\d+)$')
     def entry_post(self, request, entry_id):
         '''
-        Mark an entry as read|unread|saved|unsaved
+        Mark an entry as read, unread, saved and unsaved
         '''
-    
+        user = self.get_session_user()  
+                
         try:
             status = request.POST['as']
         except KeyError:
             raise HTTPBadRequest('Missing parameter as=read|unread|saved|unsaved')
-    
+
         try:
             entry = Entry.get((Entry.id == entry_id)) 
         except Entry.DoesNotExist:
             raise HTTPNotFound('No such entry %s' % entry_id)
     
-        user = self.get_session_user()  
-        
         if 'mark' in request.POST:
-            if status == 'read':
-                try:
-                    Read.create(user=user, entry=entry)
-                except IntegrityError:
-                    log.debug('entry %s already marked as read, ignored' % entry_id)
-                    return
-            elif status == 'unread':
-                count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
-                if not count:
-                    log.debug('entry %s never marked as read, ignored' % entry_id)
-                    return
-            elif status == 'saved':
-                try:
-                    Saved.create(user=user, entry=entry)
-                except IntegrityError:
-                    log.debug('entry %s already marked as saved, ignored' % entry_id)
-                    return
-        
-            elif status == 'unsaved':
-                count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
-                if not count:
-                    log.debug('entry %s never marked as saved, ignored' % entry_id)
-                    return
-            
-            log.debug('marked entry %s as %s' % (entry_id, status))
-            
+            self._mark_entry(user, entry, status)                        
+
 
     @GET(r'^/entries/?$')
     def entry_list(self, request):
@@ -99,57 +165,28 @@ class FrontendApp(WSGIApp):
         Show entries filtered and possibly paginated by: 
             unread, saved, group or feed
         '''
-
-        # Defaults 
-        offset, group_id, feed_id, filter_name, filter_class, panel_title = 0, 0, 0, '', '', ''
-
         user = self.get_session_user()  
-        group_count, groups = get_groups(user)
-    
-        r = Entry.select(Entry.id).join(Read).where((Read.user == user)).naive()
-        s = Entry.select(Entry.id).join(Saved).where((Saved.user == user)).naive()
-        read_ids = [i.id for i in r]
-        saved_ids = [i.id for i in s]
-        
-        if 'saved' in request.GET:
-            q = get_saved_entries(user)
-            panel_title = 'Saved Entries'
-            filter_class = filter_name = 'saved'
-        elif 'group' in request.GET:
-            group_id = int(request.GET['group'])    
-            group = Group.get(Group.id == group_id) 
-            q = get_group_entries(user, group)
-            panel_title = group.title                
-            filter_name = 'group=%s' % group_id
-        elif 'feed' in request.GET:
-            feed_id = int(request.GET['feed'])
-            feed = Feed.get(Feed.id == feed_id) 
-            q = get_feed_entries(user, feed)
-            panel_title = feed.title                
-            filter_class = 'feeds'
-            filter_name = 'feed=%s' % feed_id
-        elif 'all' in request.GET:
-            q = get_all_entries(user)
-            panel_title = 'All Entries'                
-            filter_class = filter_name = 'all'
-        else: # Default
-            #since = now - timedelta(seconds=RECENTLY_READ_DELTA)
-            q = get_unread_entries(user)
-            panel_title = 'Unread Entries'
-            filter_class = filter_name = 'unread'
+            
+        q, namespace = self._make_view_variables(user, request)
 
+        offset = 0
         if 'offset' in request.GET:            
             offset = int(request.GET['offset'])
             
-        entry_count, entries = q.count(), q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
-        offset += ENTRIES_PER_PAGE
-
-        return self.respond_with_template('entries.html', locals())
+        count, entries = q.count(), q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
+        
+        namespace.update({
+            'entries'   : q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE),
+            'offset'    : offset + ENTRIES_PER_PAGE,
+            'count'     : count
+        })
+        
+        return self.respond_with_template('entries.html', namespace)
 
     @GET(r'^/entries/mark$')
     def entry_list_mark(self, request):  
         now = datetime.utcnow()          
-        user = self.get_session_user()      
+        #user = self.get_session_user()      
         return self.respond_with_template('_entries_mark_all_read.html', locals())
         
     @POST(r'^/entries/mark$')
@@ -157,12 +194,13 @@ class FrontendApp(WSGIApp):
         '''
         Mark all entries as read
         '''
+        user = self.get_session_user()      
+
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
         except (KeyError, ValueError):
             raise HTTPBadRequest('Missing parameter before=time')
         
-        user = self.get_session_user()      
         q = Entry.select().join(Feed).join(Subscription).where(
             (Subscription.user == user) &            
             # Exclude entries already marked as read
@@ -170,7 +208,8 @@ class FrontendApp(WSGIApp):
             # Exclude entries parsed after the page load
             (Feed.last_checked_on < before) 
         )
-
+        
+        #@@TODO: use a single create Peewee 'create' statement
         with transaction():
             for entry in q:
                 try:
@@ -190,40 +229,21 @@ class FrontendApp(WSGIApp):
         '''
         Show subscribed feeds for current user
         '''
-
-        # Defaults 
-        offset, group_id, filter_class, panel_title = 0, 0, 'feeds', 'Feeds' 
-
         user = self.get_session_user()  
+
+        offset, group_id, filter_class, panel_title, page_title = 0, 0, 'feeds', '<span><i class="fa fa-rss"></i></span>&ensp;Feeds', 'Feeds'
+
         group_count, groups = get_groups(user)  
 
         if 'offset' in request.GET:            
             offset = int(request.GET['offset'])
 
-        feed_count, feeds_q = get_feeds(user)
-        feeds = feeds_q.order_by(Feed.title).offset(offset).limit(ENTRIES_PER_PAGE)
-        offset += ENTRIES_PER_PAGE
+        count, feeds_q = get_feeds(user)
+        feeds = feeds_q.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
+        offset += FEEDS_PER_PAGE
         
         return self.respond_with_template('feeds.html', locals())  
 
-
-    @GET(r'^/feeds/(\d+)$')
-    def feed(self, request, feed_id):
-        '''
-        Show entries for the given feed
-        '''
-
-        user = self.get_session_user()
-
-        try:
-            feed = Feed.get(Feed.id == feed_id) 
-        except Entry.DoesNotExist:
-            raise HTTPNotFound('No such feed %s' % feed_id)
-        
-        q = get_feed_entries(user, feed)        
-        entry_count = q.count()
-        
-        return self.respond_with_template('_feed.html', locals())   
 
     @GET(r'^/feeds/add$')
     def feed_add(self, request):        
@@ -238,6 +258,8 @@ class FrontendApp(WSGIApp):
         '''
         2. Check, fetch and finally add the feed
         '''
+        user = self.get_session_user()        
+
         self_link = request.POST['self_link'].strip()
         if not is_valid_url(self_link):
             message = render_message(u'ERROR Error, please specify a valid web address')
@@ -250,7 +272,6 @@ class FrontendApp(WSGIApp):
         feed = Feed()
         feed.self_link = self_link
         feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
-        user = self.get_session_user()        
         subscription = fetcher.add_subscription(feed, user)
         if subscription:
             message = render_message('SUCCESS Feed has been added to your subscription')
@@ -263,9 +284,9 @@ class FrontendApp(WSGIApp):
             params=[('feed', feed.id)])
                         
 
-    @GET(r'^/shortcuts/?$')
-    def shortcuts(self, request):        
-        return self.respond_with_template('_shortcuts.html')
+#     @GET(r'^/shortcuts/?$')
+#     def shortcuts(self, request):        
+#         return self.respond_with_template('_shortcuts.html')
 
         
     @GET(r'^/fever/?$')
@@ -274,11 +295,13 @@ class FrontendApp(WSGIApp):
 
     @GET(r'^/guide/?$')
     def guide(self, request):        
-        return self.respond_with_template('guide.html')
+        page_title = 'Configure Your Feed Reader'
+        return self.respond_with_template('guide.html', locals())
 
     @GET(r'^/about/?$')
     def about(self, request):        
-        return self.respond_with_template('about.html')
+        page_title = 'About'
+        return self.respond_with_template('about.html', locals())
 
 
     # Template
@@ -304,6 +327,7 @@ class FrontendApp(WSGIApp):
             'static_url'        : STATIC_URL,
             'application_url'   : self.request.application_url,
             'alert_message'     : '',
+            'page_title'        : '',
 
             # Filters 
             'html'              : escape_html,
@@ -423,7 +447,7 @@ def render_message(message):
     return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
 
             
-#@@TODO: use utilities.render_template
+#@@TODO: use utilities.render_template - see https://bitbucket.org/ianb/tempita/issue/8/htmltemplate-escapes-too-much-in-inherited
 def render_template(filename, namespace):                    
     return Template.from_filename(path.join(template_dir, filename), namespace=namespace).substitute()
 
@@ -433,17 +457,12 @@ def render_template(filename, namespace):
  
 # Entries
 
-def get_unread_entries(user, since=None):         
+def get_unread_entries(user):         
     '''
-    Get unread entries and optionally entries read after the given time
+    Get unread entries
     '''
-    if since:
-        q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & \
-        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive()) | \
-        (Entry.id << Read.select(Read.entry).where((Read.user == user) & (Read.read_on > since)).naive()))
-    else:
-        q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & \
-            ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive()))
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & \
+        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive()))
     return q
 
 def get_all_entries(user):     

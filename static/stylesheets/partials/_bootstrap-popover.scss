@@ -17,6 +17,7 @@ background-color : $popoverbackgroundcolor;
 border : $popoverborderwidth $popoverborderstyle $popoverbordercolor;
 border-radius : $popoverborderradius;
 white-space : normal;
+box-shadow: 0 1px 4px rgba($lightneutralcolor, .7);
 
 &.top { 
 margin-top: -10px; }

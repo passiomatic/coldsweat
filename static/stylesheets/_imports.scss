@@ -4,6 +4,7 @@ Built on Rock Hammer by Stuff and Nonsense
 URL: http://stuffandnonsense.co.uk/projects/rock-hammer/ 
 
 */
+@import url('http://fonts.googleapis.com/css?family=Ubuntu:700italic,700,500italic,500,400italic,400');
 
 // Import bourbon.io
 @import 'vendor/bourbon/bourbon';
@@ -59,6 +60,7 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 @import "partials/bootstrap-pager";
 @import "partials/bootstrap-pagination";
 @import "partials/bootstrap-popover";
+//@import "partials/bootstrap-dropdowns";
 @import "partials/bootstrap-tables";
 @import "partials/bootstrap-tooltip";
 @import "partials/bootstrap-wells";

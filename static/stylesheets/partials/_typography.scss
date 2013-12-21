@@ -20,7 +20,7 @@ h1,
 .h1 {
 @include font-size($basefontsize * 2);
 line-height: 1.2;
-border-bottom: 4px double $lightneutralcolor;
+border-bottom: 4px double $lighterneutralcolor;
 padding-bottom: $baselineheight/4;
 margin-bottom: $baselineheight; }
 
@@ -83,6 +83,12 @@ margin-left : 0;
 display : inline-block;
 padding-left : $gutterwidth / 2;
 padding-right : $gutterwidth / 2; }
+}
+
+ul.unstyled,
+ol.unstyled {
+list-style-type : none;
+@include zero;
 }
 
 // blockquote
@@ -155,7 +161,7 @@ border-bottom : 1px dotted $bordercolor;
 cursor : help; }
 
 b, strong {
-font-weight : $basefontweight; }
+font-weight : bold; }
 
 dfn {
 font-style : italic; }

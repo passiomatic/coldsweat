@@ -1,33 +1,73 @@
 {{inherit "site.html"}}
 
-{{def container_block}}
-    <nav role="navigation">
-        <ul class="{{filter_class}}">
-            <li class="branding">
-                <span><i class="icon-tint"></i></span> Coldsweat
-            </li>
-
-            <li class="filter filter-unread"><a title="Unread entries" href="{{application_url}}/entries/?unread"><span><i class="icon-circle"></i></span>&ensp;Unread</a></li>
-            <li class="filter filter-saved"><a title="Saved entries" href="{{application_url}}/entries/?saved"><span><i class="icon-star"></i></span>&ensp;Saved</a></li>
-            <li class="filter filter-all"><a title="All entries" href="{{application_url}}/entries/?all"><span><i class="icon-archive"></i></span>&ensp;All</a></li>
-
-            {{if group_count > 1}}
-                {{for g in groups}}
-                    <li class="filter {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="{{if g.id == group_id}}icon-folder-open{{else}}icon-folder-close{{endif}}"></i></span>&ensp;{{g.title|html}}</a></li>            
-                {{endfor}}        
-            {{endif}}
-            
-            <li class="sep filter filter-feeds"><a href="{{application_url}}/feeds/"><span><i class="icon-rss"></i></span>&ensp;Feeds</a></li>            
-            <li><a href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><span><i class="icon-plus-sign-alt"></i></span>&ensp;Add subscription</a></li>            
-            <li class="sep"><a data-remote-modal href="{{application_url}}/shortcuts"><span><i class="icon-keyboard"></i></span>&ensp;Keyboard Shortcuts</a></li>            
-            <li class=""><a href="{{application_url}}/logout"><span><i class="icon-cog"></i></span>&ensp;Log out</a></li>
-        </ul>
-    </nav>  
-        
+{{def container_block}}        
     <section  class="panel">
+        <div class="panel-title">
+            {{if count and filter_class in ('unread',) }}
+                <div  style="float: right">
+                    <i class="fa fa-check-square-o"></i> <a href="{{application_url}}/entries/mark" data-remote-modal="">Mark all as read</a>
+                </div>
+            {{endif}}
+            <h2 class="h3">{{panel_title}}</h2>
+        </div>
+
         {{self.panel_block}}
     </section>
+
+    {{if count}}
+        <div class="shortcuts">
+            <dl class="">
+                <dt>Listing</dt>
+                <dd><kbd>1</kbd>&ensp;Unread
+                </dd>
+                <dd><kbd>2</kbd>&ensp;Saved
+                </dd>
+                <dd><kbd>3</kbd>&ensp;All 
+                </dd>
+                <dd><kbd>3</kbd>&ensp;Feeds 
+                </dd>
+                
+                <dt>Actions</dt>                
+                <dd><kbd>j</kbd>&ensp;Previous entry 
+                </dd>
+                <dd><kbd>k</kbd>&ensp;Next entry 
+                </dd>        
+                <dd><kbd>o</kbd>&ensp;Open entry  
+                </dd>
+                <dd><kbd>m</kbd>&ensp;Mark entry as read 
+                </dd>
+                <dd><kbd>s</kbd>&ensp;Save entry 
+            </dl>
+        </div>
+    {{endif}}
+
+
+    <div class="navigation">
+        <div class="nav-trigger"><i class="fa fa-reorder"></i></div>
+        <nav role="navigation">
+            <ul class="{{filter_class}}">
+                <li class="branding">
+                    <span><i class="fa fa-tint"></i></span> Coldsweat
+                </li>
+        
+                <li class="filter-unread"><a title="Unread entries" href="{{application_url}}/entries/?unread"><span><i class="fa fa-circle"></i></span>&ensp;Unread</a></li>
+                <li class="filter-saved"><a title="Saved entries" href="{{application_url}}/entries/?saved"><span><i class="fa fa-star"></i></span>&ensp;Saved</a></li>
+                <li class="filter-all"><a title="All entries" href="{{application_url}}/entries/?all"><span><i class="fa fa-archive"></i></span>&ensp;All</a></li>
+                <li class="sep filter-feeds"><a href="{{application_url}}/feeds/"><span><i class="fa fa-rss"></i></span>&ensp;Feeds</a></li>                            
+                <li><a href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><span><i class="fa fa-plus-circle"></i></span>&ensp;Add subscription</a></li>                                    
+                {{if group_count > 1}}
+                    {{for loop, g in looper(groups)}}
+                        <li class="{{if loop.first}}sep{{endif}} {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}}"></i></span>&ensp;{{g.title|html}}</a></li>            
+                    {{endfor}}        
+                {{endif}}
+                
+                <li class="sep"><a href="{{application_url}}/logout"><span><i class="fa fa-cog"></i></span>&ensp;Log out</a></li>
+            </ul>
+        </nav>  
+    </div>
+
 {{enddef}}
+
 
 {{def page_script_block}}
 <script>
@@ -44,23 +84,24 @@ head.js(
 "{{static_url}}/javascripts/vendor/modernizr-min.js",
 "{{static_url}}/javascripts/vendor/jquery-min.js",
 
-// Plugins
-"{{static_url}}/javascripts/plugins.js",
-
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
 "{{static_url}}/javascripts/vendor/bootstrap/bootstrap-transition.js",
 //"javascripts/vendor/bootstrap/bootstrap-carousel.js",
-//"javascripts/vendor/bootstrap/bootstrap-tooltip.js",
+"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
 
 // Popover has a dependency on tooltip, so make sure and include 
 // bootstrap-tooltip regardless in order for popovers to work
-//"javascripts/vendor/bootstrap/bootstrap-popover.js",
+"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-popover.js",
 "{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
 //"javascripts/vendor/bootstrap/bootstrap-collapse.js",
+
+// Plugins
+"{{static_url}}/javascripts/plugins.js",
 
 // App scripts
 "{{static_url}}/javascripts/app.js?{{version_string}}"
 );
 </script>
 {{enddef}}
+

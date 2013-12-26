@@ -123,9 +123,7 @@ class FrontendApp(WSGIApp):
         self._mark_entry(user, entry, 'read')                                
 
         q, namespace = self._make_view_variables(user, request)
-
-        #p = q.where(Entry.id < entry_id).order_by(Entry.last_updated_on.asc()).limit(1)
-        n = q.where(Entry.id > entry_id).order_by(Entry.last_updated_on.desc()).limit(1)
+        n = q.where(Entry.last_updated_on < entry.last_updated_on).order_by(Entry.last_updated_on.desc()).limit(1)
 
         namespace.update({
             'entry': entry,

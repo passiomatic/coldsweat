@@ -15,9 +15,7 @@
     {{endfor}}
     {{if offset < count }}
         <li class="more">
-            <form action="{{application_url}}/feeds/?offset={{offset}}" method="GET">
-                <button type="submit" class="btn">More Feeds</button>
-            </form>
+            <i class="fa fa-chevron-down"></i>&ensp;<a href="{{application_url}}/feeds/?offset={{offset}}">More feeds</a>
         </li>
     {{endif}}            
 {{enddef}}

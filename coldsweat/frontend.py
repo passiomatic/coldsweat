@@ -46,15 +46,15 @@ class FrontendApp(WSGIApp):
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
-                log.debug('entry %s already marked as saved, ignored' % entry.id)
+                log.debug('entry %s already saved, ignored' % entry.id)
                 return
         elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
             if not count:
-                log.debug('entry %s never marked as saved, ignored' % entry.id)
+                log.debug('entry %s never saved, ignored' % entry.id)
                 return
         
-        log.debug('marked entry %s as %s' % (entry.id, status))
+        log.debug('entry %s %s' % (entry.id, status))
 
     def _make_view_variables(self, user, request): 
         
@@ -124,16 +124,17 @@ class FrontendApp(WSGIApp):
 
         q, namespace = self._make_view_variables(user, request)
 
-        p = q.where(Entry.id < entry_id).order_by(Entry.last_updated_on.asc()).limit(1)
+        #p = q.where(Entry.id < entry_id).order_by(Entry.last_updated_on.asc()).limit(1)
         n = q.where(Entry.id > entry_id).order_by(Entry.last_updated_on.desc()).limit(1)
 
         namespace.update({
             'entry': entry,
             'page_title': entry.title,
             #'panel_title':  '<a href="?%s">%s</a>' % (namespace['filter_name'], namespace['panel_title']),
-            'previous_entries': p,
+            #'previous_entries': p,
             'next_entries': n,            
-            'count': 1 if any((p, n)) else 0 # At least one entry present
+            'count': 0 # Fake it
+
         })
 
         return self.respond_with_template('entry.html', namespace)   

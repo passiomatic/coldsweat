@@ -3,13 +3,13 @@
 $(document).ready(function() {
     "use strict";
 
-    var flash_fragment = $('<div class="flash"><i class="fa fa-4x"></i><div class="message">&nbsp;</div></div>')
+    var flash_fragment = $('<div class="flash"><i class="fa fa-3x"></i><div class="message">&nbsp;</div></div>')
     var alert_fragment = $('<div class="alert alert--error style="display:none"></div>')
     var modal_fragment = $('<div role="dialog" class="modal fade hide"></div>')
     var loading_fragment = $('<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading&hellip;</div>')
     //var loading_favicon_fragment = $('<i class="favicon fa fa-spinner fa-spin"></i>')
 
-    var panel = $('.panel')
+    //var panel = $('.panel')
     
     $(document).ajaxError(function(event, jqxhr, settings, exception) {
         alert('Oops! An error occurred while processing your request: ' + exception)
@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     function flash(icon, message) {
         var fragment = flash_fragment.clone()
-        fragment.find('i').addClass('fa fa-' + icon)
+        fragment.find('i').addClass('fa-' + icon)
         fragment.find('.message').text(message)
         $(document.body).append(fragment);
         fragment.show().animate({'opacity': 'hide'}, 'slow', function() { fragment.remove() } )         
@@ -38,51 +38,55 @@ $(document).ready(function() {
         return segments.join('')
     }
     
-    function findCurrent() { return panel.find('li.current') }
-    
-    // @@TODO: merge and rename in current()
-    function setCurrent(el) {
-        var current = findCurrent()
-        if(current !== el) {
-            current.toggleClass('current')
-            el.toggleClass('current')
-        }        
-        return current;
-    }
-
-    function mark(el, status) {
-        $.ajax(endpoint('/entries/') + el.data('id'), {
+    function mark(id, status) {
+        $.ajax(endpoint('/entries/') + id, {
             type: 'POST', 
             data: 'mark&as=' + status
         })        
     }    
 
     function toggleRead(event) {
-        var el = findCurrent()
-        el.toggleClass('status-read');                
-        mark(el, el.hasClass('status-read') ? 'read' : 'unread')
+        var icon = $(event.target)
+        var li = icon.parents('li').first()
+        li.toggleClass('status-read');                
+        var status = 'read'
+        if(li.hasClass('status-read')) {
+            //if(event.type != 'click') { flash('circle-o', 'Read'); }
+            flash('circle-o', 'Read');
+            icon.removeClass('icon-unread').addClass('icon-read')                            
+        }else{
+            status = 'unread'  
+            flash('circle', 'Unread');
+            icon.removeClass('icon-read').addClass('icon-unread')                
+        } 
+        mark(li.data('entry'), status)
     }
 
     function toggleSaved(event) {
-        var status = 'unsaved'
-        var el = findCurrent()
-        el.toggleClass('status-saved');                
-        if(el.hasClass('status-saved')) {
-            flash('star', 'Saved')
-            status = 'saved'
+        var icon = $(event.target)
+        var li = icon.parents('li').first()
+        li.toggleClass('status-saved')                
+        var status = 'saved'
+        if(li.hasClass('status-saved')) {
+            flash('star', 'Saved');
+            icon.removeClass('icon-unsaved').addClass('icon-saved')                            
         } else {
-            flash('star-o', 'Unsaved')
+            status = 'unsaved'
+            flash('star-o', 'Unsaved');
+            icon.removeClass('icon-saved').addClass('icon-unsaved')                            
         }
-        mark(el,  status);
+        mark(li.data('entry'),  status);
     }
 
+/*
     function openEntry(event) {        
         var c = findCurrent()
         var url = c.find('h3 a').attr('href');
         window.location.assign(url)
     }
+*/
     
-    function list(pathname) {       
+    function open(pathname) {       
         return function() {
             var url = endpoint(pathname);
             window.location.assign(url)            
@@ -100,6 +104,7 @@ $(document).ready(function() {
     }
 */
 
+/*
     function moveTo(direction) {        
         return function (event) {
             var c = findCurrent()            
@@ -122,6 +127,7 @@ $(document).ready(function() {
             
         }
     }
+*/
 
 /*
     function addSubscription() {
@@ -129,23 +135,19 @@ $(document).ready(function() {
     }
 */
     
-/*
-    function showKeyboardShortcuts() {
-        $('#modal-keyboard-shortcuts').modal('show');
-    }
-*/
+
 
     function bindKeyboardShortcuts() {
         var events = {
-            '1': list('/entries/?unread'),
-            '2': list('/entries/?saved'),
-            '3': list('/entries/?all'),
-            '4': list('/feeds/'),
-            'o': openEntry,
+            '1': open('/entries/?unread'),
+            '2': open('/entries/?saved'),
+            '3': open('/entries/?all'),
+            '4': open('/feeds/'),
+            //'o': openEntry,
             //'a': addSubscription,
             'm': toggleRead,
             's': toggleSaved,
-            'j': moveTo('prev'),
+            //'j': moveTo('prev'),
             'k': moveTo('next')
         }
     
@@ -216,6 +218,9 @@ $(document).ready(function() {
             })       
         })
 
+        // Mark entry as read, saved etc.
+        $(document).on('click', '.actions i.read-trigger', function(event) { toggleRead(event) })
+        $(document).on('click', '.actions i.save-trigger', function(event) { toggleSaved(event) })
     }
     
     setup();

@@ -39,11 +39,6 @@ $media-queries-supported : true;
 
     .feed {
         text-transform: uppercase;
-        background: $lightneutralcolor;
-        color: $white;
-        letter-spacing: 1px;
-        padding: 1px 4px;
-        border-radius: $borderradius;
     }
 
     .icon-saved {
@@ -58,7 +53,7 @@ $media-queries-supported : true;
 
 .fa-circle,
 .fa-circle-o {
-    font-size: 0.85em; // Adjust size
+    font-size: 85%; // Adjust size
 }
 
 
@@ -114,7 +109,6 @@ $media-queries-supported : true;
                 // Title
         
                 > h3 {
-                    //text-transform: capitalize;
                     a { display: block; }
                 }
     
@@ -157,16 +151,19 @@ $media-queries-supported : true;
         margin: 0 $gutterwidth 0 $gutterwidth*2;            
         @include box-shadow(0 0 4px $lightneutralcolor);                
 
-        > li {    
+        > li {  
             
             .actions {
-                .fa {
-                    opacity: 0;  }
+                .fa { opacity: 0;  }
             }
 
-            // Always show saved entries
+            &.expanded .actions {
+                .fa { opacity: 1.0;  }
+            }
+
             &.status-saved .icon-saved {
-                opacity: 1.0; 
+                opacity: 1.0; // Always show saved entries
+                @include transform(scale(1.3,1.3));
             }
 
             &:hover {
@@ -180,6 +177,11 @@ $media-queries-supported : true;
 
             }
 
+            &.expanded .item-inner {
+                padding: $baselineheight $gutterwidth*1.5;    
+                border-bottom: none;                       
+            }
+                        
             &:first-child .item-inner {
                 border-top-left-radius: $borderradius;
                 border-top-right-radius: $borderradius;
@@ -190,15 +192,24 @@ $media-queries-supported : true;
                 border-bottom-right-radius: $borderradius;
             }
             
-
             // Read, unread, etc.
             
             .meta .icon-read {
                 display: none;
+                @extend .fa-circle-o;
+            }
+
+            .meta .icon-unread {
+                @extend .fa-circle;
             }
 
             .meta .icon-saved {
                 display: none;
+                @extend .fa-star;
+            }
+
+            .meta .icon-unsaved {
+                @extend .fa-star-o;
             }
             
             &.status-read {
@@ -227,6 +238,7 @@ $media-queries-supported : true;
                 }
             }
 
+/*
             &.current {
                 .item-inner {                    
                     //background: #e1eef5 url(../images/rarr.png) left 14px  no-repeat;
@@ -238,6 +250,7 @@ $media-queries-supported : true;
                     }
                 }
             }
+*/
 
 
         }
@@ -323,12 +336,9 @@ footer[role="contentinfo"] {
  
 
 dl {
-    @include zero;
+    //@include zero;
     @include font-size(14);
 
-    dd, dt {
-    }
-    
     dt {
         margin: $baselineheight 0 $baselineheight/2 0;
         text-transform: uppercase;            
@@ -346,6 +356,7 @@ dl {
 // A keyboard shortcut
 
 kbd {
+    //@include font-size(13);
     padding: 2px 0;
     width: 2em;
     display: inline-block;
@@ -403,14 +414,14 @@ form {
     position: fixed;
     top: 50%;
     left: 50%;
-    margin-left: -4em;    
-    margin-top: -4em;    
+    margin-left: -3em;    
+    margin-top: -3em;    
     z-index: 3;
-    width: 8em;
+    width: 6em;
     padding: $baselineheight*2 $gutterwidth*2;
 
     border-radius: $borderradius;    
-    background: rgba($lightestneutralcolor, .8);        
+    background: rgba($lightestneutralcolor, .85);        
     text-align: center;    
 }
 
@@ -423,14 +434,8 @@ form {
 // =entry ================================
 
 article {
-    padding: $baselineheight $gutterwidth*1.5;    
     @include clearfix;
-
-    background: $white;
-    border-radius: $borderradius;
-    @include box-shadow(0 0 4px $lightneutralcolor);    
-    
-    margin: 0 $gutterwidth $baselineheight $gutterwidth*2;
+    //background: $white;
         
     .content {        
         max-width: 42em;
@@ -448,7 +453,6 @@ article {
         }
     
         table {
-            //@extend .table;
         }
         
         blockquote { 
@@ -501,44 +505,6 @@ article {
 #field-self-link {
     width: 100%;
 }
-
-
-.shortcuts {
-    text-align: center;
-    margin-top: $baselineheight*3;
-}
-
-.popover-content {    
-        
-    ul {
-        list-style-type : none;
-        @include zero;
-    
-        li {
-            border-bottom: 1px dotted $lighterneutralcolor;   
-            padding: 0 $gutterwidth $baselineheight/4 $gutterwidth;
-            margin-bottom: $baselineheight/4;
-
-            &:last-child {
-                border-bottom: none;   
-                padding-bottom: 0;
-                margin-bottom: 0;
-            }
-        }
-
-    }
-    
-    span {
-        width: 1.4em;
-        text-align: center;
-        display: inline-block;                    
-    }
-
-    padding: $baselineheight/2 0 $baselineheight/2 0;
-    @include font-size(16);
-    font-weight: normal;
-}
-
 
 
 .navigation {

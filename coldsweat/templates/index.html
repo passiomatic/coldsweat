@@ -14,34 +14,6 @@
         {{self.panel_block}}
     </section>
 
-    {{if count}}
-        <div class="shortcuts">
-            <dl class="">
-                <dt>Listing</dt>
-                <dd><kbd>1</kbd>&ensp;Unread
-                </dd>
-                <dd><kbd>2</kbd>&ensp;Saved
-                </dd>
-                <dd><kbd>3</kbd>&ensp;All 
-                </dd>
-                <dd><kbd>3</kbd>&ensp;Feeds 
-                </dd>
-                
-                <dt>Actions</dt>                
-                <dd><kbd>j</kbd>&ensp;Previous entry 
-                </dd>
-                <dd><kbd>k</kbd>&ensp;Next entry 
-                </dd>        
-                <dd><kbd>o</kbd>&ensp;Open entry  
-                </dd>
-                <dd><kbd>m</kbd>&ensp;Mark entry as read 
-                </dd>
-                <dd><kbd>s</kbd>&ensp;Save entry 
-            </dl>
-        </div>
-    {{endif}}
-
-
     <div class="navigation">
         <div class="nav-trigger"><i class="fa fa-reorder"></i></div>
         <nav role="navigation">
@@ -50,10 +22,10 @@
                     <span><i class="fa fa-tint"></i></span> Coldsweat
                 </li>
         
-                <li class="filter-unread"><a title="Unread entries" href="{{application_url}}/entries/?unread"><span><i class="fa fa-circle"></i></span>&ensp;Unread</a></li>
-                <li class="filter-saved"><a title="Saved entries" href="{{application_url}}/entries/?saved"><span><i class="fa fa-star"></i></span>&ensp;Saved</a></li>
-                <li class="filter-all"><a title="All entries" href="{{application_url}}/entries/?all"><span><i class="fa fa-archive"></i></span>&ensp;All</a></li>
-                <li class="sep filter-feeds"><a href="{{application_url}}/feeds/"><span><i class="fa fa-rss"></i></span>&ensp;Feeds</a></li>                            
+                <li class="filter-unread"><a title="Unread entries (1 key)" href="{{application_url}}/entries/?unread"><span><i class="fa fa-circle"></i></span>&ensp;Unread</a></li>
+                <li class="filter-saved"><a title="Saved entries (2 key)" href="{{application_url}}/entries/?saved"><span><i class="fa fa-star"></i></span>&ensp;Saved</a></li>
+                <li class="filter-all"><a title="All entries (3 key)" href="{{application_url}}/entries/?all"><span><i class="fa fa-archive"></i></span>&ensp;All</a></li>
+                <li class="sep filter-feeds"><a title="Subscribed feeds (4 key)" href="{{application_url}}/feeds/"><span><i class="fa fa-rss"></i></span>&ensp;Feeds</a></li>                            
                 <li><a href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><span><i class="fa fa-plus-circle"></i></span>&ensp;Add subscription</a></li>                                    
                 {{if group_count > 1}}
                     {{for loop, g in looper(groups)}}

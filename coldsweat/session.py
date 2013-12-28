@@ -40,7 +40,6 @@ from utilities import make_sha1_hash
 from models import Session, connect, close
 from coldsweat import log
 
-
 SESSION_TIMEOUT = 60*60*24*30 # 1 month
 
 def synchronized(func):
@@ -109,7 +108,7 @@ class SessionManager(object):
 
     def _get(self, environ):  
         '''
-        Attempt to associate with an existing Session
+        Attempt to associate with an existing session
         '''
         self._from_cookie(environ)
         if self.session is None:
@@ -131,7 +130,7 @@ class SessionManager(object):
         Sets a session cookie header if needed
         '''
         cookie, name = SimpleCookie(), self._fieldname
-        cookie[name], cookie[name]['path'] = self._sid, self._path
+        cookie[name], cookie[name]['path'],  cookie[name]['max-age'] = self._sid, self._path, SESSION_TIMEOUT
         headers.append(('Set-Cookie', cookie[name].OutputString()))
 
     def delete_cookie(self, headers):
@@ -213,7 +212,7 @@ class SessionCache(object):
         
         session = get_session(sid)
         if session:
-            # Randomize session id if set and remove old session id
+            # Randomize session id if requested and remove old session id
             if self.is_random:
                 delete_session(sid)
                 sid = self.get_new_id()
@@ -235,7 +234,7 @@ class SessionCache(object):
     @synchronized
     def shutdown(self):
         '''
-        Clean up outstanding sessions.
+        Clean up outstanding sessions
         '''
         if not self._closed:
             # Save or delete any sessions that are still out there.
@@ -286,13 +285,13 @@ def delete_session(sid):
 def set_session(sid, value, timeout=SESSION_TIMEOUT):
 
     # Calculate expiration time
-    expiration = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
+    expires_on = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
 
     session = get_session(sid)
     if not session:
-        # Insert new sid if sid not present
+        # New session if sid not present
         session = Session(key=sid)
 
-    session.expires_on = expiration
+    session.expires_on = expires_on
     session.value = value
     session.save()

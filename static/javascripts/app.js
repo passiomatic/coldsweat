@@ -9,8 +9,6 @@ $(document).ready(function() {
     var loading_fragment = $('<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading&hellip;</div>')
     //var loading_favicon_fragment = $('<i class="favicon fa fa-spinner fa-spin"></i>')
 
-    //var panel = $('.panel')
-    
     $(document).ajaxError(function(event, jqxhr, settings, exception) {
         alert('Oops! An error occurred while processing your request: ' + exception)
     });
@@ -78,56 +76,20 @@ $(document).ready(function() {
         mark(li.data('entry'),  status);
     }
 
-/*
-    function openEntry(event) {        
-        var c = findCurrent()
-        var url = c.find('h3 a').attr('href');
-        window.location.assign(url)
-    }
-*/
-    
     function open(pathname) {       
         return function() {
-            var url = endpoint(pathname);
-            window.location.assign(url)            
+            window.location.assign(endpoint(pathname))            
         } 
     }
     
-/*
-    function loadListing(url) {
-        panel.empty().prepend(loading_fragment);
-
-        $.ajax(url,         
-            {dataType: 'html', type:'GET'}).done(function(data) {            
-                panel.html(data);
-        })       
-    }
-*/
-
-/*
     function moveTo(direction) {        
-        return function (event) {
-            var c = findCurrent()            
-            var scrollToTop = false;
-            if(direction=='next') {
-                var el = c.next('li')
-            } else {
-                var el = c.prev('li')
-                var scrollToTop = true;
-            }
-
-            // Check if on top or on bottom of the list            
-            if(el.length) {
-                c.toggleClass('current');        
-                el.toggleClass('current');
-                $(document.body).animate({'scrollTop': el.position().top}, 100);
-            } else if(scrollToTop) {
-                $(document.body).animate({'scrollTop': 0}, 500);                
-            }
-            
+        return function (event) {            
+            // Each() deals with empty set too
+            $(direction == 'next' ? '.view a[rel=next]' : '.view a[rel=prev]').each(function(index, link){                
+                window.location.assign(($(link).attr('href')))
+            })
         }
     }
-*/
 
 /*
     function addSubscription() {
@@ -219,8 +181,8 @@ $(document).ready(function() {
         })
 
         // Mark entry as read, saved etc.
-        $(document).on('click', '.actions i.read-trigger', function(event) { toggleRead(event) })
-        $(document).on('click', '.actions i.save-trigger', function(event) { toggleSaved(event) })
+        $(document).on('click', '.view i.read-trigger', function(event) { toggleRead(event) })
+        $(document).on('click', '.view i.save-trigger', function(event) { toggleSaved(event) })
     }
     
     setup();

@@ -290,6 +290,7 @@ class FrontendApp(WSGIApp):
         
     @GET(r'^/fever/?$')
     def fever(self, request):        
+        page_title = 'Fever Endpoint'
         return self.respond_with_template('fever.html')
 
     @GET(r'^/guide/?$')
@@ -410,7 +411,8 @@ class FrontendApp(WSGIApp):
             else:
                 self.alert_message = 'ERROR Unable to log in. Please check your username and password.'            
                 return self.redirect_after_post(request.url)
-
+        
+        page_title = 'Log In'
         d = locals()
         d.update(get_health())
                 

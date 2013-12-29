@@ -333,7 +333,13 @@ footer[role="contentinfo"] {
     }
 }
 
- 
+.page {    
+    background: $white;
+    margin: $baselineheight*3 $gutterwidth 0 $gutterwidth*2;            
+    padding: $baselineheight $gutterwidth*1.5;   
+    @include box-shadow(0 0 4px $lightneutralcolor);    
+    border-radius: $borderradius;            
+}
 
 dl {
     //@include zero;
@@ -397,7 +403,7 @@ form {
 // Messages taking all panel height
 .notice {
     text-align: center;
-    margin: 25% 0 25% 0;    
+    margin: 20% 0 20% 0;    
     @extend .dim;    
     i {
         display: block;
@@ -435,8 +441,6 @@ form {
 
 article {
     @include clearfix;
-    //background: $white;
-        
     .content {        
         max-width: 42em;
         margin: 0 auto;
@@ -449,9 +453,12 @@ article {
         
         p, blockquote, figure, table, ul, ol, dl {
             @include zero;
-            margin: 0 0 $baselineheight/2 0;
+            margin: $baselineheight/2 0;        
+            &:first-child {
+                margin-top: 0;
+            }
         }
-    
+
         table {
         }
         
@@ -493,12 +500,6 @@ article {
     }
 }
 
-
-.container-inner {
-    margin: $baselineheight*3 0 0 0;
-    // Push down footer
-    min-height: $baselineheight*25;
-}
 
 // Forms
 

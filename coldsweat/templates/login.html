@@ -2,48 +2,26 @@
 
 {{def container_block}}
 
-<div class="container-inner">
+<hr>
 
 <div class="grid-container">
 
   <div class="grid-50">
-        <h1>Welcome to Coldsweat</h1>            
-  </div>
-
-  <br class="clear">
-
-  <div class="grid-50">
         <section class="module">
             <div class="well well--large">
-                <p class="_">Please enter your account credentials to proceed.</p>
+                <h2>Welcome to Coldsweat</h2>
+                <p>Enter your account credentials to proceed.</p>
 
                 <form action="{{application_url}}/login" class="form-inline" method="POST">        
                         <input type="hidden" name="from" value="{{from_url}}">
                         <fieldset>
-<!--                             <label for="username">Username</label>  -->
                             <input autofocus type="text" id="username" name="username" placeholder="Username" class="input-large"  value="{{username}}" size="30">                
-<!--                             <label for="password">Password</label>  -->
                             <input type="password" id="password" name="password" placeholder="Password" class="input-large" value="" size="30">
                         </fieldset>
                         <fieldset>
                             <button type="submit" class="btn btn-primary">Log In</button>
                         </fieldset> 
                 </form>
-            </div>
-        </section>
-  </div>
-
-
-  <div class="grid-50">
-        <section class="module">
-            <div class="well well--large well--dim">
-
-
-                <h2>Don’t You Have an Account?</h2>
-                
-                <p class="_">Run the <i>sweat</i> command-line utility:</p>             
-                <p><pre><code>python sweat.py setup -u johndoe</code></pre></p>
-    
             </div>
         </section>
   </div>
@@ -58,9 +36,6 @@
             <div class="well well--large well--dim">
 
                 <h2>Current Status</h2>
-                
-<!--                 Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Donec id elit non mi porta gravida at eget metus. Cras mattis consectetur purus sit amet fermentum. Curabitur blandit tempus porttitor. Curabitur blandit tempus porttitor. -->
-
 
                 <table class="table">
                   <tbody>
@@ -70,7 +45,6 @@
                           <td class=""><i class="icon-heart"></i>&ensp;Good</td>
                       </tr>   
 -->                     
-
                       <tr>
                           <td>Last refresh</td>
                           <td class="">{{last_checked_on}}</td>
@@ -106,7 +80,7 @@
                 <p><pre><code>{{request.application_url}}/fever</code></pre></p>
                 
                 <div>
-                    <a class="btn" href="{{application_url}}/guide">See the Step by Step Guide</a>
+                    <a class="btn" href="{{application_url}}/guide">Learn more</a>
                 </div>
             </div>
 
@@ -120,7 +94,5 @@
 <!-- /grid-container -->
 </div>
 
-<!-- /container-inner -->
-</div>
 
 {{enddef}}

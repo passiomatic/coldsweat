@@ -515,17 +515,14 @@ article {
         bottom: 0;
         left: 0;
         z-index: 2;
-        padding-top: $baselineheight;        
+        padding: $baselineheight $gutterwidth/4 0 0;        
+        cursor: pointer;
 
-/*
         background: transparent;
-        @include transition(background .1s ease-out);
-        
+        @include transition(background .15s ease-in);
         &:hover {
-            background: rgba($white, .9);
-
+            background: rgba($white, .5);
         }
-*/
 
         .fa {
             // Like .h3

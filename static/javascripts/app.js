@@ -121,16 +121,8 @@ $(document).ready(function() {
     function setup() {               
         bindKeyboardShortcuts();
 
-        $('.nav-trigger').hover(
-            // in
-            function(event) {
-                // Slight delay
-                setTimeout(function() { 
-                    $('nav').addClass('open') 
-                }, 100)
-            }, 
-            // out
-            function(event) {}
+        $('.nav-trigger').click(
+            function(event) { $('nav').addClass('open') } 
         )
 
         $('nav').hover(
@@ -138,7 +130,9 @@ $(document).ready(function() {
             function(event) {}, 
             // out
             function(event) {
-                $(this).removeClass('open')
+                setTimeout(function() { 
+                    $('nav').removeClass('open')
+                }, 100)
             }
         )
 

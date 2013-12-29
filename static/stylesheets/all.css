@@ -4264,16 +4264,16 @@ article {
   bottom: 0;
   left: 0;
   z-index: 2;
-  padding-top: 1.5em;
-  /*
-          background: transparent;
-          @include transition(background .1s ease-out);
-          
-          &:hover {
-              background: rgba($white, .9);
-  
-          }
-  */ }
+  padding: 1.5em 6px 0 0;
+  cursor: pointer;
+  background: transparent;
+  -webkit-transition: background 0.15s ease-in;
+  -moz-transition: background 0.15s ease-in;
+  -ms-transition: background 0.15s ease-in;
+  -o-transition: background 0.15s ease-in;
+  transition: background 0.15s ease-in; }
+  .navigation .nav-trigger:hover {
+    background: rgba(255, 255, 255, 0.5); }
   .navigation .nav-trigger .fa {
     font-size: 20.8px;
     font-size: 2.08rem;

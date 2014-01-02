@@ -25,8 +25,8 @@
                     <div class="meta dim">
                         <span class="feed spaced"><a title="Show more entries for this feed" href="{{application_url}}/?feed={{entry.feed.id}}">{{entry.feed.title|html}}</a></span>
                         <div class="actions">
-                            {{if entry.id in read_ids}}<i class="read-trigger icon-read fa fa-circle-o" title="Mark as unread"></i>&ensp;{{else}}<i class="read-trigger icon-unread fa fa-circle" title="Mark as read"></i>&ensp;{{endif}}                    
-                            {{if entry.id in saved_ids}}<i class="save-trigger icon-saved fa fa-star" title="Unsave"></i>{{else}}<i class="save-trigger icon-unsaved fa fa-star-o" title="Save"></i>{{endif}}
+                            {{if entry.id in read_ids}}<i class="read-trigger icon-read fa fa-circle-o" title="Mark as unread (M key)"></i>&ensp;{{else}}<i class="read-trigger icon-unread fa fa-circle" title="Mark as read (M key)"></i>&ensp;{{endif}}                    
+                            {{if entry.id in saved_ids}}<i class="save-trigger icon-saved fa fa-star" title="Unsave (S key)"></i>{{else}}<i class="save-trigger icon-unsaved fa fa-star-o" title="Save (S key)"></i>{{endif}}
                         </div>
                     </div>
                     <h1 class="">{{entry.title|html}}</h1>        

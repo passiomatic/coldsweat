@@ -105,10 +105,9 @@ $(document).ready(function() {
             '2': open('/entries/?saved'),
             '3': open('/entries/?all'),
             '4': open('/feeds/'),
-            //'o': openEntry,
             //'a': addSubscription,
-            'm': toggleRead,
-            's': toggleSaved,
+            'm': function() { $('.read-trigger').click() },
+            's': function() { $('.save-trigger').click() },
             //'j': moveTo('prev'),
             'k': moveTo('next')
         }

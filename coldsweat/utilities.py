@@ -6,7 +6,7 @@ Copyright (c) 2013— Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
-import re, cgi, urllib
+import re, cgi, urllib, urlparse
 from hashlib import md5, sha1
 from calendar import timegm
 from datetime import datetime
@@ -106,6 +106,14 @@ def escape_url(value):
     Return value escaped as URL string
     """
     return urllib.quote(value)
+
+def friendly_url(value):
+    if value:
+        u = urlparse.urlsplit(value)
+        return u.netloc 
+    else:
+        return ''
+    
     
 # def escape_javacript(value):     
 #     """
@@ -191,6 +199,9 @@ def run_tests():
     assert is_valid_url('https://example.com')          # OK
     assert is_valid_url('http://example.org/feed.xml')  # OK
     assert not is_valid_url('example.com')              # Fail
+
+    assert friendly_url('http://example.org/feed.xml') == 'example.org'
+    assert friendly_url(None) == ''
     
     #print get_excerpt('Some <script src="http://example.com/evil.js"></script> code.')
     

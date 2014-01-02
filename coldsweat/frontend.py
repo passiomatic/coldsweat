@@ -334,6 +334,7 @@ class FrontendApp(WSGIApp):
             'url'               : escape_url,
             'since'             : datetime_since(datetime.utcnow()),
             'epoch'             : datetime_as_epoch,            
+            'friendly_url'      : friendly_url
         }
 
         message = self.request.cookies.get('alert_message', '')

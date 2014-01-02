@@ -4,17 +4,11 @@
 ;engine: postgresql
 engine: sqlite
 
-; MySQL database settings
+; MySQL and PostgreSQL database settings
 hostname: localhost
 username: root
 password: secret
 database: coldsweat
-
-; PostgreSQL database settings
-;hostname: localhost
-;username: root
-;password: secret
-;database: coldsweat
 
 ; SQLite3 settings
 filename: data/coldsweat.db

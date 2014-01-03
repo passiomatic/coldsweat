@@ -106,8 +106,8 @@ $(document).ready(function() {
             '3': open('/entries/?all'),
             '4': open('/feeds/'),
             //'a': addSubscription,
-            'm': function() { $('.read-trigger').click() },
-            's': function() { $('.save-trigger').click() },
+            'm': function() { $('.entry.expanded .read-trigger').click() },
+            's': function() { $('.entry.expanded .save-trigger').click() },
             //'j': moveTo('prev'),
             'k': moveTo('next')
         }
@@ -174,8 +174,8 @@ $(document).ready(function() {
         })
 
         // Mark entry as read, saved etc.
-        $(document).on('click', '.view i.read-trigger', function(event) { toggleRead(event) })
-        $(document).on('click', '.view i.save-trigger', function(event) { toggleSaved(event) })
+        $(document).on('click', '.view .read-trigger', function(event) { toggleRead(event) })
+        $(document).on('click', '.view .save-trigger', function(event) { toggleSaved(event) })
     }
     
     setup();

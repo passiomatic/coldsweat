@@ -354,7 +354,7 @@ sub {
   line-height: 1.4; }
 
 /*footnotes*/
-.spaced {
+.spaced, .expanded .meta .feed {
   letter-spacing: 1px; }
 
 a {
@@ -3968,14 +3968,15 @@ input.search-query {
 .meta {
   font-size: 14px;
   font-size: 1.4rem; }
-  .meta .actions {
-    float: right; }
-    .meta .actions .fa {
-      cursor: pointer; }
-  .meta .feed {
-    text-transform: uppercase; }
+  .meta .actions .fa {
+    cursor: pointer; }
   .meta .icon-saved {
     color: #ebcd0c; }
+
+.expanded .meta .feed {
+  text-transform: uppercase; }
+.expanded .meta .actions {
+  float: right; }
 
 .fa-circle, .panel .panel-content ul.list-view > li .meta .icon-unread,
 .fa-circle-o,
@@ -4012,11 +4013,6 @@ input.search-query {
           letter-spacing: 2px; }
       .panel .panel-content ul.view > li .item-inner {
         background: white;
-        -webkit-transition: background 0.1s ease-out;
-        -moz-transition: background 0.1s ease-out;
-        -ms-transition: background 0.1s ease-out;
-        -o-transition: background 0.1s ease-out;
-        transition: background 0.1s ease-out;
         padding: 0.75em 36px; }
         .panel .panel-content ul.view > li .item-inner > h3 a {
           display: block; }
@@ -4052,24 +4048,41 @@ input.search-query {
                       }
                   }
       */ }
-      .panel .panel-content ul.list-view > li .actions .fa {
-        opacity: 0; }
-      .panel .panel-content ul.list-view > li.expanded .actions .fa {
-        opacity: 1.0; }
-      .panel .panel-content ul.list-view > li.status-saved .icon-saved {
-        opacity: 1.0;
-        -webkit-transform: scale(1.3, 1.3);
-        -moz-transform: scale(1.3, 1.3);
-        -ms-transform: scale(1.3, 1.3);
-        -o-transform: scale(1.3, 1.3);
-        transform: scale(1.3, 1.3); }
-      .panel .panel-content ul.list-view > li:hover .fa {
-        opacity: 1.0;
+      .panel .panel-content ul.list-view > li:not(.expanded) .actions {
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        width: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
         -webkit-transition: opacity 0.15s ease-out;
         -moz-transition: opacity 0.15s ease-out;
         -ms-transition: opacity 0.15s ease-out;
         -o-transition: opacity 0.15s ease-out;
         transition: opacity 0.15s ease-out; }
+        .panel .panel-content ul.list-view > li:not(.expanded) .actions.focusable:active, .panel .panel-content ul.list-view > li:not(.expanded) .actions.focusable:focus {
+          position: static;
+          clip: auto;
+          height: auto;
+          width: auto;
+          margin: 0;
+          overflow: visible; }
+      .panel .panel-content ul.list-view > li:hover .actions {
+        opacity: 1;
+        overflow: visible;
+        position: static;
+        clip: auto;
+        height: auto;
+        width: auto;
+        margin: 0;
+        display: block !important;
+        visibility: visible; }
+      .panel .panel-content ul.list-view > li:hover:not(.expanded) .feed {
+        display: none !important;
+        visibility: hidden; }
       .panel .panel-content ul.list-view > li .item-inner {
         border-bottom: 1px solid #e4e2e2; }
       .panel .panel-content ul.list-view > li.expanded .item-inner {
@@ -4082,7 +4095,10 @@ input.search-query {
         border-bottom-left-radius: 3px;
         border-bottom-right-radius: 3px; }
       .panel .panel-content ul.list-view > li .meta .icon-read {
-        display: none; }
+        display: none;
+        margin-left: 12px; }
+      .panel .panel-content ul.list-view > li .meta .icon-unread {
+        margin-left: 12px; }
       .panel .panel-content ul.list-view > li .meta .icon-saved {
         display: none; }
       .panel .panel-content ul.list-view > li.status-read h3 a:link {
@@ -4094,7 +4110,12 @@ input.search-query {
       .panel .panel-content ul.list-view > li.status-read .meta .icon-unread {
         display: none; }
       .panel .panel-content ul.list-view > li.status-saved .meta .icon-saved {
-        display: inline-block; }
+        display: inline-block;
+        -webkit-transform: scale(1.3, 1.3);
+        -moz-transform: scale(1.3, 1.3);
+        -ms-transform: scale(1.3, 1.3);
+        -o-transform: scale(1.3, 1.3);
+        transform: scale(1.3, 1.3); }
       .panel .panel-content ul.list-view > li.status-saved .meta .icon-unsaved {
         display: none; }
     .panel .panel-content ul.list-view .more {

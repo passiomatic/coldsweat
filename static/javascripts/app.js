@@ -91,21 +91,13 @@ $(document).ready(function() {
         }
     }
 
-/*
-    function addSubscription() {
-        $('#modal-add-subscription').modal();
-    }
-*/
-    
-
-
     function bindKeyboardShortcuts() {
         var events = {
             '1': open('/entries/?unread'),
             '2': open('/entries/?saved'),
             '3': open('/entries/?all'),
             '4': open('/feeds/'),
-            //'a': addSubscription,
+            //'a': function() { $('nav .add-trigger').click() },
             'm': function() { $('.entry.expanded .read-trigger').click() },
             's': function() { $('.entry.expanded .save-trigger').click() },
             //'j': moveTo('prev'),
@@ -131,7 +123,7 @@ $(document).ready(function() {
             function(event) {
                 setTimeout(function() { 
                     $('nav').removeClass('open')
-                }, 100)
+                }, 200)
             }
         )
 

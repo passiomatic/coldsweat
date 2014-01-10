@@ -39,7 +39,8 @@ visibility : hidden; }
 @mixin hide-text {
 text-indent : 100%;
 white-space : nowrap;
-overflow : hidden; }
+overflow : hidden;
+}
 
 @mixin invisible {
 visibility : hidden; }
@@ -65,6 +66,18 @@ width : auto;
 margin : 0;
 overflow: visible; } 
 } 
+}
+
+// cancels visuallyhidden, invisible, hidden
+@mixin visible($display: block) {
+overflow: visible;    
+position : static;
+clip : auto;
+height : auto;
+width : auto;
+margin : 0;
+display : $display !important;
+visibility : visible;
 }
 
 // flexbox

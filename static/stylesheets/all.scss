@@ -30,22 +30,27 @@ $media-queries-supported : true;
 
 .meta {
     @include font-size(14);
-
     .actions {
-        float: right;
-        .fa {
-            cursor: pointer; }
-    }
-
-    .feed {
-        text-transform: uppercase;
+        .fa { cursor: pointer; }
     }
 
     .icon-saved {
         color: #ebcd0c; 
-        //@include font-size(16);        
     }
 }             
+
+.expanded {
+    .meta {
+        .feed {
+            text-transform: uppercase;
+            @extend .spaced;
+        }        
+        .actions {
+            float: right;
+        }
+    }
+}
+
 
 .help-text {
     @extend abbr[title];
@@ -103,7 +108,7 @@ $media-queries-supported : true;
             
             .item-inner {
                 background: $white;
-                @include transition(background .1s ease-out);
+                //@include transition(background .1s ease-out);
                 padding: $baselineheight/2 $gutterwidth*1.5; 
 
                 // Title
@@ -152,29 +157,25 @@ $media-queries-supported : true;
         @include box-shadow(0 0 4px $lightneutralcolor);                
 
         > li {  
-            
-            .actions {
-                .fa { opacity: 0;  }
-            }
 
-            &.expanded .actions {
-                .fa { opacity: 1.0;  }
-            }
-
-            &.status-saved .icon-saved {
-                opacity: 1.0; // Always show saved entries
-                @include transform(scale(1.3,1.3));
+            &:not(.expanded) .actions {
+                opacity: 0;
+                @include visuallyhidden;                
+                @include transition(opacity .15s ease-out);
             }
 
             &:hover {
-                .fa {
-                    opacity: 1.0; 
-                    @include transition(opacity .15s ease-out); }
+                .actions {
+                    opacity: 1;
+                    @include visible;
+                }            
+                &:not(.expanded) .feed {
+                    @include hidden;              
+                }
             }    
             
             .item-inner {
                 border-bottom: 1px solid $lightestneutralcolor;                       
-
             }
 
             &.expanded .item-inner {
@@ -197,10 +198,12 @@ $media-queries-supported : true;
             .meta .icon-read {
                 display: none;
                 @extend .fa-circle-o;
+                margin-left: $gutterwidth/2;   
             }
 
             .meta .icon-unread {
                 @extend .fa-circle;
+                margin-left: $gutterwidth/2;   
             }
 
             .meta .icon-saved {
@@ -232,6 +235,7 @@ $media-queries-supported : true;
             &.status-saved {
                 .meta .icon-saved {
                     display: inline-block;
+                    @include transform(scale(1.3,1.3));
                 }
                 .meta .icon-unsaved {
                     display: none;

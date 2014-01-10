@@ -5,12 +5,12 @@
                 <h3 class="h4">
                     <img class="favicon" src="{{e.feed.icon.data}}" width="16" height="16"  alt="*"><a href="{{application_url}}/entries/{{e.id}}?{{filter_name}}">{{e.title|html}}</a>
                 </h3>
+<!-- <a title="Show more entries for this feed" href="{{application_url}}/?feed={{e.feed.id}}">{{e.feed.title|html}}</a> -->
                 <div class="meta dim">
-                    <a title="Show more entries for this feed" href="{{application_url}}/?feed={{e.feed.id}}">{{e.feed.title|html}}</a>
-                    <div class="actions">
-                        {{if e.id in read_ids}}<i class="read-trigger icon-read fa" title=""></i>&emsp;{{else}}<i class="read-trigger icon-unread fa" title=""></i>&emsp;{{endif}}                    
-                        {{if e.id in saved_ids}}<i class="save-trigger icon-saved fa" title=""></i>{{else}}<i class="save-trigger icon-unsaved fa" title=""></i>{{endif}}
-                    </div>
+                    <span class="feed">{{e.feed.title|html}}</span>
+                    <span class="actions">
+                        {{if e.id in saved_ids}}<i class="save-trigger icon-saved fa" title="Unsave"></i>{{else}}<i class="save-trigger icon-unsaved fa" title="Save"></i>{{endif}}{{if e.id in read_ids}}<i class="read-trigger icon-read fa" title="Make as unread"></i>{{else}}<i class="read-trigger icon-unread fa" title="Mark as read"></i>{{endif}}                    
+                    </span>
                 </div>                  
             </div>
         </li>

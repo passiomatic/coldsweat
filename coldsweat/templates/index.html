@@ -26,7 +26,7 @@
                 <li class="filter-saved"><a title="Saved entries (2 key)" href="{{application_url}}/entries/?saved"><span><i class="fa fa-star"></i></span>&ensp;Saved</a></li>
                 <li class="filter-all"><a title="All entries (3 key)" href="{{application_url}}/entries/?all"><span><i class="fa fa-archive"></i></span>&ensp;All</a></li>
                 <li class="sep filter-feeds"><a title="Subscribed feeds (4 key)" href="{{application_url}}/feeds/"><span><i class="fa fa-rss"></i></span>&ensp;Feeds</a></li>                            
-                <li><a href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><span><i class="fa fa-plus-circle"></i></span>&ensp;Add subscription</a></li>                                    
+                <li><a class="add-trigger" href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><span><i class="fa fa-plus-circle"></i></span>&ensp;Add subscription</a></li>                                    
                 {{if group_count > 1}}
                     {{for loop, g in looper(groups)}}
                         <li class="{{if loop.first}}sep{{endif}} {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}}"></i></span>&ensp;{{g.title|html}}</a></li>            
@@ -60,11 +60,11 @@ head.js(
 // etc for the other bootstrap plugins work
 "{{static_url}}/javascripts/vendor/bootstrap/bootstrap-transition.js",
 //"javascripts/vendor/bootstrap/bootstrap-carousel.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
+//"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
 
 // Popover has a dependency on tooltip, so make sure and include 
 // bootstrap-tooltip regardless in order for popovers to work
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-popover.js",
+//"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-popover.js",
 "{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
 //"javascripts/vendor/bootstrap/bootstrap-collapse.js",
 

@@ -36,7 +36,7 @@
                         <hr class="halved">
                     {{endif}}
                     <div class="meta dim">    
-                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on|since}}{{if entry.author}} by {{entry.author|html}}{{endif}}            
+                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on|since}} <abbr title="Coordinated Universal Time">UTC</abbr>{{if entry.author}} by {{entry.author|html}}{{endif}}            
                         {{if entry.link}}&emsp;<i class="fa fa-globe"></i> <a target="_blank" href="{{entry.link}}">Visit website</a>{{endif}}
                     </div>
                 </article>    

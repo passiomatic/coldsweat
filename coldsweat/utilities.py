@@ -9,7 +9,7 @@ License: MIT (see LICENSE.md for details)
 import re, cgi, urllib, urlparse
 from hashlib import md5, sha1
 from calendar import timegm
-from datetime import datetime
+from datetime import datetime, timedelta
 from tempita import HTMLTemplate
 from webob.exc import status_map
 
@@ -56,22 +56,29 @@ _monthname = [None, # Dummy so we can use 1-based month numbers
               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
               
 def format_datetime(value, comparsion_value=None):
-    
-    if not comparsion_value:    
-        return value.strftime('%a, %d %b %H:%M UTC')
-    
-    delta = comparsion_value - value    
-    if delta.days < 1:       
-        if delta.seconds > 3600: 
-            s = '%d hours ago' % (delta.seconds/60/60)
-        elif 60 <= delta.seconds <= 3600: 
-            s = '%d minutes ago' % (delta.seconds/60)
-        else:
-            s = 'Just now'
-    else:
-        s = '%d days ago' % delta.days
 
-    return s
+    s = '%a, %b %d %H:%M'
+    
+    if comparsion_value:    
+        delta = comparsion_value - value
+        if delta.days == 0:       
+            s = 'today at %H:%M'
+        elif delta.days == -1: 
+            s = 'yesterday at %H:%M'
+
+    return value.strftime(s)
+
+def format_date(value, comparsion_value=None):
+
+    if comparsion_value:    
+        delta = comparsion_value - value    
+        if delta.days == 0:       
+            return 'today'
+        elif delta.days == -1: 
+            return 'yesterday'
+    
+    return value.strftime('%a, %b %d')
+
 
 def format_http_datetime(value):
     """
@@ -113,6 +120,9 @@ def friendly_url(value):
         return u.netloc 
     else:
         return ''
+
+def capitalize(value):
+    return value.capitalize()
     
     
 # def escape_javacript(value):     
@@ -128,6 +138,14 @@ def datetime_since(utcnow):
         else:
             return '—' 
     return _
+
+def datetime_since_days(utcnow):                                
+    def _(value):
+        if value:
+            return format_date(value, utcnow)
+        else:
+            return '—' 
+    return _    
 
 # def get_excerpt(value, truncate=200):     
 #     """
@@ -186,14 +204,19 @@ def run_tests():
     t = datetime.utcnow()        
     
     v = datetime(2013, 6, 25, 12, 0, 0)
-    print format_datetime(v, t)    
+    print format_datetime(v, t) # Jun 25   
+    v = t - timedelta(days=-1)
+    print format_datetime(v, t) # Yesterday
     v = datetime(t.year, t.month, t.day, 12, 0, 0)
-    print format_datetime(v, t)    
-    v = datetime(t.year, t.month, t.day, t.hour, 0, 0)
-    print format_datetime(v, t)    
-    v = datetime(t.year, t.month, t.day, t.hour, t.minute, 0)
-    print format_datetime(v, t)    
-    
+    print format_datetime(v, t) # Today
+
+    v = t
+    assert format_date(v, t) == 'today'
+    v = t - timedelta(days=-1)
+    assert format_date(v, t) == 'yesterday'
+    v = datetime(2013, 6, 25, 12, 0, 0)
+    assert format_date(v, t) == 'Tue, Jun 25'
+        
     print format_http_datetime(t)
      
     assert is_valid_url('https://example.com')          # OK

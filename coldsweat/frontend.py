@@ -168,15 +168,13 @@ class FrontendApp(WSGIApp):
             
         q, namespace = self._make_view_variables(user, request)
 
-        offset = 0
-        if 'offset' in request.GET:            
-            offset = int(request.GET['offset'])
-            
+        offset = int(request.GET.get('offset', 0))            
         count, entries = q.count(), q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
         
         namespace.update({
             'entries'   : q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE),
             'offset'    : offset + ENTRIES_PER_PAGE,
+            'prev_date' : request.GET.get('prev_date', None),
             'count'     : count
         })
         
@@ -234,9 +232,7 @@ class FrontendApp(WSGIApp):
 
         group_count, groups = get_groups(user)  
 
-        if 'offset' in request.GET:            
-            offset = int(request.GET['offset'])
-
+        offset = int(request.GET.get('offset', 0))
         count, feeds_q = get_feeds(user)
         feeds = feeds_q.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
         offset += FEEDS_PER_PAGE
@@ -333,8 +329,10 @@ class FrontendApp(WSGIApp):
             'html'              : escape_html,
             'url'               : escape_url,
             'since'             : datetime_since(datetime.utcnow()),
-            'epoch'             : datetime_as_epoch,            
-            'friendly_url'      : friendly_url
+            'since_days'        : datetime_since_days(datetime.utcnow()),
+            'epoch'             : datetime_as_epoch,                        
+            'friendly_url'      : friendly_url,
+            'capitalize'        : capitalize
         }
 
         message = self.request.cookies.get('alert_message', '')

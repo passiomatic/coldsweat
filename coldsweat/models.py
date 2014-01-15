@@ -176,9 +176,9 @@ class Entry(CustomModel):
     def last_updated_on_as_epoch(self):
         return datetime_as_epoch(self.last_updated_on)
 
-    @property
-    def excerpt(self):
-        return get_excerpt(self.content)
+#     @property
+#     def excerpt(self):
+#         return get_excerpt(self.content)
 
                 
 class Saved(CustomModel):

@@ -8,7 +8,7 @@
                 <div class="meta dim">
                     {{if not f.is_enabled}}<i class="fa fa-warning"></i> <span class="help-text" title="Reason: {{f.last_status_title}}">Disabled</span>&emsp;{{endif}}  
                     {{if f.alternate_link}}<i class="fa fa-globe"></i> <a target="_blank" title="Visit feed web page at {{f.alternate_link|friendly_url}}" href="{{f.alternate_link}}">Visit</a>&emsp;{{endif}}
-                    <i class="fa fa-clock-o"></i> <span class="help-text"  title="Time of the last check">{{f.last_checked_on|since}}</span>
+                    <i class="fa fa-clock-o"></i> <span class="help-text"  title="Time of the last check">{{f.last_checked_on|since_days|capitalize}}</span>
                 </div>                                              
             </div>
         </li>

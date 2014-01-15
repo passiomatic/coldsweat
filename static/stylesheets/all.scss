@@ -99,7 +99,7 @@ $media-queries-supported : true;
                 }
 
                 h2 {
-                    @extend .h4;
+                    @extend .h4;                    
                     text-transform: uppercase;
                     color: $lightneutralcolor;
                     letter-spacing: 2px;

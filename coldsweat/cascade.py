@@ -3,7 +3,7 @@
 Description: Cascades through several applications, 
   so long as applications return '404 Not Found'
 
-Copyright (c) 2013— Andrea Peltrin
+Copyright (c) 2013—2014 Andrea Peltrin
 Portions are copyright (c) 2005 Ian Bicking and contributors
 License: MIT (see LICENSE.md for details)
 """

@@ -10,13 +10,13 @@ I'm fed up of online services that are here today and gone tomorrow. After the G
 
 There will be blood.
 
-## Target features
+## Features
 
 * Multi-user support
 * Compatible with existing Fever desktop and mobile clients
 * Support for grouping of similar items
+* Web interface to read and add feeds
 * Multiprocessing for parallel feed fetching
-* Web interface to read, add and import feeds
 
 ## Technical underpinnings
 

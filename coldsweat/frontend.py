@@ -11,6 +11,7 @@ from os import path
 from datetime import datetime, timedelta
 from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
 from tempita import Template #, HTMLTemplate 
+from peewee import IntegrityError
 
 from app import *
 from models import *

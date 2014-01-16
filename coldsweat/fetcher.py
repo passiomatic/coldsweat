@@ -10,6 +10,7 @@ License: MIT (see LICENSE.md for details)
 import sys, re, time, cgi, urlparse
 from os import path
 from datetime import datetime
+from peewee import IntegrityError
 
 import feedparser
 import requests

@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from calendar import timegm
 from webob import Request, Response
 from webob.exc import HTTPBadRequest
+from peewee import IntegrityError
 
 from utilities import *    
 from app import *

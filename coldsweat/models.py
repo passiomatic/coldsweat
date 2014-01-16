@@ -20,13 +20,10 @@ from coldsweat import config, log
 # Defer database init, see connect() below
 engine = config.get('database', 'engine')
 if engine == 'sqlite':
-    from sqlite3 import IntegrityError, ProgrammingError
     _db = SqliteDatabase(None, threadlocals=True) 
 elif engine == 'mysql':
-    from MySQLdb import IntegrityError, ProgrammingError
     _db = MySQLDatabase(None)
 elif engine == 'postgresql':
-    from psycopg2 import IntegrityError, ProgrammingError
     _db = PostgresqlDatabase(None)
 else:
     raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)

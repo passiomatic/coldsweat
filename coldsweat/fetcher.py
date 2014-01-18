@@ -252,8 +252,9 @@ def fetch_feed(feed, add_entries=False):
                 
     try:
         response = requests.get(feed.self_link, timeout=timeout, headers=request_headers)
-    except (IOError, RequestException):
+    except (IOError, RequestException):        
         # Interpret as 'Service Unavailable'
+        #@@FIXME: catch ContentDecodingError? 
         post_fetch(503, error=True)
         log.warn("a network error occured while fetching %s, skipped" % netloc)
         return

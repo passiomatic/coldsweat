@@ -195,7 +195,7 @@ def check_url(url, timeout=None, etag=None, modified_since=None):
             response = r(url, timeout=timeout, headers=request_headers)
             status = response.status_code
             log.debug("got status %d" % status)
-            if status in (200, 304):
+            if status in (200, 302, 304):
                 break
         except (IOError, RequestException):
             # Interpret as 'Service Unavailable'

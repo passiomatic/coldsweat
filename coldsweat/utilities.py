@@ -63,7 +63,7 @@ def format_datetime(value, comparsion_value=None):
         delta = comparsion_value - value
         if delta.days == 0:       
             s = 'today at %H:%M'
-        elif delta.days == -1: 
+        elif delta.days == 1: 
             s = 'yesterday at %H:%M'
 
     return value.strftime(s)
@@ -74,7 +74,7 @@ def format_date(value, comparsion_value=None):
         delta = comparsion_value - value    
         if delta.days == 0:       
             return 'today'
-        elif delta.days == -1: 
+        elif delta.days == 1: 
             return 'yesterday'
     
     return value.strftime('%a, %b %d')
@@ -205,14 +205,14 @@ def run_tests():
     
     v = datetime(2013, 6, 25, 12, 0, 0)
     print format_datetime(v, t) # Jun 25   
-    v = t - timedelta(days=-1)
+    v = t - timedelta(days=1)
     print format_datetime(v, t) # Yesterday
     v = datetime(t.year, t.month, t.day, 12, 0, 0)
     print format_datetime(v, t) # Today
 
     v = t
     assert format_date(v, t) == 'today'
-    v = t - timedelta(days=-1)
+    v = t - timedelta(days=1)
     assert format_date(v, t) == 'yesterday'
     v = datetime(2013, 6, 25, 12, 0, 0)
     assert format_date(v, t) == 'Tue, Jun 25'

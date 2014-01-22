@@ -421,7 +421,7 @@ class FrontendApp(WSGIApp):
         
         page_title = 'Log In'
         d = locals()
-        d.update(get_health())
+        d.update(get_stats())
                 
         return self.respond_with_template('login.html', d)
 
@@ -505,7 +505,7 @@ def get_groups(user):
 
 # Stats
 
-def get_health():
+def get_stats():
     '''
     Get some user-agnostic stats from Coldsweat database 
     '''
@@ -516,25 +516,14 @@ def get_health():
         
     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
     if last_checked_on:
-        b = (now - last_checked_on).days
         last_checked_on = format_datetime(last_checked_on)
-        # Between 0 and timedelta.max     
     else:
         last_checked_on = 'Never'
-        b = 0 #timedelta.max.days
-        
-    unread_count = Entry.select().where(~(Entry.id << Read.select(Read.entry))).count()
-    if not unread_count:
-        unread_count = 'None'
-    
-    feed_count = Feed.select().count()
-    active_feed_count = Feed.select().where(Feed.is_enabled==True).count()
 
-    # Between 0.0 and 1,0 
-    #a = feed_count/active_feed_count        
-    
-    
-    health = 1.0
+    entry_count = Entry.select().count()        
+    unread_entry_count = Entry.select().where(~(Entry.id << Read.select(Read.entry))).count()
+    feed_count = Feed.select().count()        
+    active_feed_count = Feed.select().where(Feed.is_enabled==True).count()
 
     return locals()
 

@@ -123,8 +123,16 @@ def friendly_url(value):
 
 def capitalize(value):
     return value.capitalize()
-    
-    
+
+def truncate(value, max_length):
+    """
+    Return a truncated string for value if value length is > max_length
+    """
+    if len(value) < max_length:
+        return value
+    return value[:max_length-1] + u'…'    
+
+
 # def escape_javacript(value):     
 #     """
 #     Return value escaped as a Javascript string
@@ -166,7 +174,7 @@ def get_status_title(code):
     except KeyError:
         pass 
     return title
-    
+
 # --------------------
 # Misc.
 # --------------------
@@ -225,6 +233,8 @@ def run_tests():
 
     assert friendly_url('http://example.org/feed.xml') == 'example.org'
     assert friendly_url(None) == ''
+    
+    assert truncate(u'Lorèm ipsum dolor sit ame', 10) == u'Lorèm ips…'
     
     #print get_excerpt('Some <script src="http://example.com/evil.js"></script> code.')
     

@@ -21,6 +21,8 @@ from models import *
 from utilities import *
 from coldsweat import *
 
+MAX_TITLE_LENGTH = 255
+
 # ------------------------------------------------------
 # Blacklist
 # ------------------------------------------------------
@@ -67,14 +69,14 @@ def get_entry_timestamp(entry, default=None):
         
 def get_entry_title(entry):
     if 'title' in entry:
-        return html.strip_html(entry.title)
+        return truncate(html.strip_html(entry.title), MAX_TITLE_LENGTH)
     return 'Untitled'
 
 def get_entry_link(entry):
     # Special case for Feedburner entries, see: http://bit.ly/1gRAvJv
     if 'feedburner_origlink' in entry:
         return entry.feedburner_origlink
-    if 'link' in entry:    
+    if 'link' in entry:
         return entry.link
     return None
 

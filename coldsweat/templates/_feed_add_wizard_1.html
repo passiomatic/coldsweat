@@ -6,6 +6,13 @@
         {{message}}
         <label for="self-link-field">Web address (URL) for the feed</label> 
         <input type="text" id="field-self-link" autofocus name="self_link"  size="40" value="">
+        {{if group_count > 1}}
+            <label>Add to group <select name="group">
+                {{for g in groups}}
+                    <option {{if g.title == g.DEFAULT_GROUP}}selected="selected"{{endif}} value="{{g.id}}">{{g.title}}</option> 
+                {{endfor}}
+            </select></label>             
+        {{endif}}
   </div>
   <div class="modal-footer">
     <button type="button" data-dismiss="modal" class="btn">Cancel</button>

@@ -101,6 +101,7 @@ class Group(CustomModel):
     title               = CharField(unique=True)
     
     class Meta:  
+        order_by = ('title',)
         db_table = 'groups'    
 
 

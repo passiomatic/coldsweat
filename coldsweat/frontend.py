@@ -247,6 +247,8 @@ class FrontendApp(WSGIApp):
         1. Show input form
         '''
         message = ''
+        user = self.get_session_user()  
+        group_count, groups = get_groups(user)
         return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
     @POST(r'^/feeds/add$')
@@ -265,10 +267,15 @@ class FrontendApp(WSGIApp):
             message = render_message(u'ERROR Error, feed host returned status code: %s' % get_status_title(status))
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
+        group = None
+        group_id = int(request.POST.get('group', 0))
+        if group_id:
+            group = Group.get(Group.id == group_id) 
+
         feed = Feed()
         feed.self_link = self_link
         feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
-        subscription = fetcher.add_subscription(feed, user)
+        subscription = fetcher.add_subscription(feed, user, group)
         if subscription:
             message = render_message('SUCCESS Feed has been added to your subscription')
         else:

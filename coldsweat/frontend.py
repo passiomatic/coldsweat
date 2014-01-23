@@ -6,7 +6,6 @@ Copyright (c) 2013—2014 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 """
-#from __future__ import division
 from os import path
 from datetime import datetime, timedelta
 from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
@@ -20,11 +19,18 @@ from utilities import *
 from coldsweat import log, config, installation_dir, template_dir, VERSION_STRING
 import fetcher
 
-#SESSION_KEY = 'com.passiomatic.coldsweat.session'
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60
-USER_SESSION_KEY = 'coldsweat.user'
-#RECENTLY_READ_DELTA = 5*60 # 5 minutes
+USER_SESSION_KEY = 'FrontendApp.user'
+
+def login_required(handler): 
+    def wrapper(self, request, *args):
+        if self.user:
+            return handler(self, request, *args)
+        else:
+            raise self.redirect('%s/login?from=%s' % (request.application_url, escape_url(request.url)))
+    return wrapper
+    
 
 class FrontendApp(WSGIApp):
 
@@ -113,17 +119,16 @@ class FrontendApp(WSGIApp):
     # Entries
 
     @GET(r'^/entries/(\d+)$')
+    @login_required        
     def entry(self, request, entry_id):
-        user = self.get_session_user()  
-
         try:
             entry = Entry.get((Entry.id == entry_id)) 
         except Entry.DoesNotExist:
             raise HTTPNotFound('No such entry %s' % entry_id)
 
-        self._mark_entry(user, entry, 'read')                                
+        self._mark_entry(self.user, entry, 'read')                                
 
-        q, namespace = self._make_view_variables(user, request)
+        q, namespace = self._make_view_variables(self.user, request)
         n = q.where(Entry.last_updated_on < entry.last_updated_on).order_by(Entry.last_updated_on.desc()).limit(1)
 
         namespace.update({
@@ -139,12 +144,11 @@ class FrontendApp(WSGIApp):
         return self.respond_with_template('entry.html', namespace)   
         
     @POST(r'^/entries/(\d+)$')
+    @login_required    
     def entry_post(self, request, entry_id):
         '''
         Mark an entry as read, unread, saved and unsaved
         '''
-        user = self.get_session_user()  
-                
         try:
             status = request.POST['as']
         except KeyError:
@@ -156,18 +160,17 @@ class FrontendApp(WSGIApp):
             raise HTTPNotFound('No such entry %s' % entry_id)
     
         if 'mark' in request.POST:
-            self._mark_entry(user, entry, status)                        
+            self._mark_entry(self.user, entry, status)                        
 
 
     @GET(r'^/entries/?$')
+    @login_required    
     def entry_list(self, request):
         '''
         Show entries filtered and possibly paginated by: 
             unread, saved, group or feed
         '''
-        user = self.get_session_user()  
-            
-        q, namespace = self._make_view_variables(user, request)
+        q, namespace = self._make_view_variables(self.user, request)
 
         offset = int(request.GET.get('offset', 0))            
         count, entries = q.count(), q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
@@ -184,15 +187,14 @@ class FrontendApp(WSGIApp):
     @GET(r'^/entries/mark$')
     def entry_list_mark(self, request):  
         now = datetime.utcnow()          
-        #user = self.get_session_user()      
         return self.respond_with_template('_entries_mark_all_read.html', locals())
         
     @POST(r'^/entries/mark$')
+    @login_required    
     def entry_list_mark_post(self, request):
         '''
         Mark all entries as read
         '''
-        user = self.get_session_user()      
 
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
@@ -200,9 +202,9 @@ class FrontendApp(WSGIApp):
             raise HTTPBadRequest('Missing parameter before=time')
         
         q = Entry.select().join(Feed).join(Subscription).where(
-            (Subscription.user == user) &            
+            (Subscription.user == self.user) &            
             # Exclude entries already marked as read
-            ~(Entry.id << Read.select(Read.entry).where(Read.user == user)) &
+            ~(Entry.id << Read.select(Read.entry).where(Read.user == self.user)) &
             # Exclude entries parsed after the page load
             (Feed.last_checked_on < before) 
         )
@@ -211,7 +213,7 @@ class FrontendApp(WSGIApp):
         with transaction():
             for entry in q:
                 try:
-                    Read.create(user=user, entry=entry)
+                    Read.create(user=self.user, entry=entry)
                 except IntegrityError:
                     log.warn('entry %s already marked as read, ignored' % entry.id)
                     continue                     
@@ -223,18 +225,17 @@ class FrontendApp(WSGIApp):
     # Feeds
 
     @GET(r'^/feeds/?$')
+    @login_required    
     def feed_list(self, request):
         '''
         Show subscribed feeds for current user
         '''
-        user = self.get_session_user()  
-
         offset, group_id, filter_class, panel_title, page_title = 0, 0, 'feeds', '<span><i class="fa fa-rss"></i></span>&ensp;Feeds', 'Feeds'
 
-        group_count, groups = get_groups(user)  
+        group_count, groups = get_groups(self.user)  
 
         offset = int(request.GET.get('offset', 0))
-        count, feeds_q = get_feeds(user)
+        count, feeds_q = get_feeds(self.user)
         feeds = feeds_q.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
         offset += FEEDS_PER_PAGE
         
@@ -242,22 +243,21 @@ class FrontendApp(WSGIApp):
 
 
     @GET(r'^/feeds/add$')
+    @login_required    
     def feed_add(self, request):        
         '''
         1. Show input form
         '''
         message = ''
-        user = self.get_session_user()  
-        group_count, groups = get_groups(user)
+        group_count, groups = get_groups(self.user)
         return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
     @POST(r'^/feeds/add$')
+    @login_required    
     def feed_add_post(self, request):        
         '''
         2. Check, fetch and finally add the feed
         '''
-        user = self.get_session_user()        
-
         self_link = request.POST['self_link'].strip()
         if not is_valid_url(self_link):
             message = render_message(u'ERROR Error, please specify a valid web address')
@@ -275,7 +275,7 @@ class FrontendApp(WSGIApp):
         feed = Feed()
         feed.self_link = self_link
         feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
-        subscription = fetcher.add_subscription(feed, user, group)
+        subscription = fetcher.add_subscription(feed, self.user, group)
         if subscription:
             message = render_message('SUCCESS Feed has been added to your subscription')
         else:
@@ -286,10 +286,6 @@ class FrontendApp(WSGIApp):
             button = 'View Feed Entries',
             params=[('feed', feed.id)])
                         
-
-#     @GET(r'^/shortcuts/?$')
-#     def shortcuts(self, request):        
-#         return self.respond_with_template('_shortcuts.html')
 
         
     @GET(r'^/fever/?$')
@@ -388,21 +384,14 @@ class FrontendApp(WSGIApp):
 
     # Session user and auth
 
-#     @property()
-#     def _set_session(self, environ, session_key):
-#         self.session = self.environ[session_key].session
+    @property
+    def user(self):
+        return self.session.get(USER_SESSION_KEY, None)
 
-    def get_session_user(self):                    
-        '''
-        Grab current session user if any or redirect to login form
-        '''
-        user = self.session.get(USER_SESSION_KEY, None)
-        if user:
-            return user
-        
-        raise self.redirect('%s/login?from=%s' % (self.request.application_url, escape_url(self.request.url)))
-
-
+    @user.setter
+    def user(self, user):
+        self.session[USER_SESSION_KEY] = user
+                
     @form(r'^/login/?$')
     def login(self, request):
 
@@ -413,7 +402,7 @@ class FrontendApp(WSGIApp):
         if request.method == 'POST':
             user = User.validate_credentials(username, password)
             if user:
-                self.session[USER_SESSION_KEY] = user
+                self.user = user
                 return self.redirect_after_post(from_url)
             else:
                 self.alert_message = 'ERROR Unable to log in. Please check your username and password.'            

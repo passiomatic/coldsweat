@@ -82,6 +82,16 @@ class User(CustomModel):
 
         return user
 
+    @staticmethod
+    def validate_api_key(api_key):
+        try:
+            user = User.get((User.api_key == api_key) & 
+                (User.is_enabled == True))        
+        except User.DoesNotExist:
+            return None
+
+        return user
+        
 class Icon(CustomModel):
     """
     Feed (fav)icons, stored as data URIs

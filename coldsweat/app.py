@@ -48,8 +48,6 @@ def form(pattern='^/$'):
     
 class WSGIApp(object):
 
-    redirect_exceptions = (HTTPTemporaryRedirect, HTTPMovedPermanently, HTTPSeeOther)
-
     def __call__(self, environ, start_response):
         
         self.request = Request(environ)
@@ -67,15 +65,6 @@ class WSGIApp(object):
         if not response:
             response = Response() # Provide an empty response
 
-# Base WSGI app shoud be session agnostic
-#         self.session = dict()
-#
-#         if SESSION_KEY in environ:
-#             self.session = environ[SESSION_KEY]
-#         else:
-#             self.session = {} # Fail soft
-
-        #log.debug('Response for call %s is %s' % (self.request.path_info, type(response)))
         return response(environ, start_response)
     
     def find_handler(self):

@@ -55,8 +55,6 @@ def synchronized(func):
     return wrapper
 
 
-#SESSION_KEY = 'com.passiomatic.coldsweat.session'
-
 class SessionMiddleware(object):
     '''
     WSGI middleware that adds a session service in a cookie
@@ -64,7 +62,6 @@ class SessionMiddleware(object):
 
     def __init__(self, app, **kwargs):
         self.app = app
-        #self.session_key = SESSION_KEY #'com.passiomatic.coldsweat.session'
         self.kwargs = kwargs # Pass everything else to SessionManager
 
     def __call__(self, environ, start_response):
@@ -74,8 +71,6 @@ class SessionMiddleware(object):
         manager = SessionManager(environ, **self.kwargs)
         # Add a session object to wrapped app        
         self.app.session = manager.session
-
-        #environ[SESSION_KEY] = manager.session
 
         # Initial response to a cookie session
         def initial_response(environ, start_response):
@@ -93,7 +88,6 @@ class SessionMiddleware(object):
         finally:
             manager.close()
 
-            
 class SessionManager(object):
  
     def __init__(self, environ, fieldname='_SID_', path='/'):   
@@ -273,6 +267,7 @@ def get_session(sid, default=None):
     # Expired?
     if session.expires_on < datetime.utcnow().replace(microsecond=0):
         session.delete_instance()
+        log.debug("session %s is expired, deleted" % sid)
         return default
     
     return session

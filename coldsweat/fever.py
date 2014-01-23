@@ -38,10 +38,8 @@ class FeverApp(WSGIApp):
     
         if 'api_key' in request.POST:
             api_key = request.POST['api_key']        
-            try:
-                user = User.get((User.api_key == api_key) & (User.is_enabled == True))
-            except User.DoesNotExist:
-                #@@TODO: raise HTTPUnauthorized ?
+            user = User.validate_api_key(api_key)
+            if not user: 
                 log.warn('unknown API key %s, unauthorized' % api_key)
                 return self.respond_with_json(result)  
         else:

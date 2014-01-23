@@ -291,6 +291,10 @@ $media-queries-supported : true;
                 border-radius: $borderradius;
 
                 .meta {
+                    opacity: 0;
+                    @include visuallyhidden;                
+                    @include transition(opacity .15s ease-out);
+
                     bottom: 0;
                     left: 0;
                     right: 0;
@@ -302,7 +306,14 @@ $media-queries-supported : true;
                     
                 }
             }
-
+            
+            .item-inner:hover {
+                .meta {
+                    opacity: 1;
+                    @include visible;                                        
+                    position: absolute;
+                }
+            }
         }
 
         
@@ -383,9 +394,6 @@ pre {
     background: $lightestneutralcolor;    
     border-radius: $borderradius;
     padding: 8px 4px;
-}
-
-code {
 }
 
 
@@ -510,6 +518,30 @@ article {
 #field-self-link {
     width: 100%;
 }
+
+
+#modal-feed-edit {
+
+    table {
+        margin-top: $baselineheight;
+    }
+
+
+    th, td {
+        border-top-color: $lighterneutralcolor; 
+    }
+
+    code {
+        background: $lightestneutralcolor;    
+        border-radius: $borderradius;
+        padding: 2px 4px;        
+    }    
+    
+    .favicon {
+        vertical-align: baseline;
+    }
+}
+
 
 
 .navigation {

@@ -242,6 +242,17 @@ class FrontendApp(WSGIApp):
         return self.respond_with_template('feeds.html', locals())  
 
 
+    @GET(r'^/feeds/edit/(\d+)$')
+    @login_required    
+    def feed(self, request, feed_id):        
+        message = ''        
+        try:
+            feed = Feed.get(Feed.id == feed_id) 
+        except Feed.DoesNotExist:
+            raise HTTPNotFound('No such feed %s' % feed_id)
+
+        return self.respond_with_template('_feed_edit.html', locals())
+        
     @GET(r'^/feeds/add$')
     @login_required    
     def feed_add(self, request):        

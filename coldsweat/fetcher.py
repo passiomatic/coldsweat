@@ -217,7 +217,7 @@ def fetch_feed(feed, add_entries=False):
         error_threshold = config.getint('fetcher', 'error_threshold')
         if error_threshold and (feed.error_count > error_threshold):
             feed.is_enabled = False
-            feed.last_status = ProblematicFeedError.code            
+            feed.last_status = status # Save status code for posterity           
             log.warn("%s has too many errors, disabled" % netloc)        
         feed.save()
 

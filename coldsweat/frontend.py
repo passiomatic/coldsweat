@@ -250,6 +250,9 @@ class FrontendApp(WSGIApp):
             feed = Feed.get(Feed.id == feed_id) 
         except Feed.DoesNotExist:
             raise HTTPNotFound('No such feed %s' % feed_id)
+            
+        q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))
+        groups = [s.group for s in q]
 
         return self.respond_with_template('_feed_edit.html', locals())
         
@@ -466,10 +469,7 @@ def render_template(filename, namespace):
 # Entries
 
 def get_unread_entries(user):         
-    '''
-    Get unread entries
-    '''
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & \
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) &
         ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive()))
     return q
 
@@ -478,15 +478,18 @@ def get_all_entries(user):
     return q    
 
 def get_saved_entries(user):   
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Entry.id << Saved.select(Saved.entry).where(Saved.user == user)))
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & 
+        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user)))
     return q
 
 def get_group_entries(user, group):     
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.group == group))
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) &
+        (Subscription.group == group))
     return q
 
 def get_feed_entries(user, feed):     
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & (Subscription.feed == feed))
+    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) &
+        (Subscription.feed == feed))
     return q
 
 # Feeds

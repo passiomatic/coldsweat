@@ -76,9 +76,9 @@ class FrontendApp(WSGIApp):
         
         if 'saved' in request.GET:
             q = get_saved_entries(user)
-            panel_title = '<span><i class="fa fa-star"></i></span>&ensp;Saved Entries'
+            panel_title = '<span><i class="fa fa-star"></i></span>&ensp;Saved'
             filter_class = filter_name = 'saved'
-            page_title = 'Saved Entries'
+            page_title = 'Saved'
         elif 'group' in request.GET:
             group_id = int(request.GET['group'])    
             group = Group.get(Group.id == group_id) 
@@ -96,14 +96,14 @@ class FrontendApp(WSGIApp):
             page_title = feed.title
         elif 'all' in request.GET:
             q = get_all_entries(user)
-            panel_title = '<span><i class="fa fa-archive"></i></span>&ensp;All Entries'                
+            panel_title = '<span><i class="fa fa-archive"></i></span>&ensp;All'                
             filter_class = filter_name = 'all'
-            page_title = 'All Entries'
+            page_title = 'All'
         else: # Default
             q = get_unread_entries(user)
-            panel_title = '<span><i class="fa fa-circle"></i></span>&ensp;Unread Entries'
+            panel_title = '<span><i class="fa fa-circle"></i></span>&ensp;Unread'
             filter_class = filter_name = 'unread'
-            page_title = 'Unread Entries'
+            page_title = 'Unread'
                     
         # Cleanup namespace
         del r, s, self

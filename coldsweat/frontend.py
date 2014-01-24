@@ -256,50 +256,42 @@ class FrontendApp(WSGIApp):
 
         return self.respond_with_template('_feed_edit.html', locals())
         
-    @GET(r'^/feeds/add$')
-    @login_required    
-    def feed_add(self, request):        
-        '''
-        1. Show input form
-        '''
-        message = ''
-        group_count, groups = get_groups(self.user)
-        return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
-    @POST(r'^/feeds/add$')
+    @form(r'^/feeds/add$')
     @login_required    
     def feed_add_post(self, request):        
-        '''
-        2. Check, fetch and finally add the feed
-        '''
-        self_link = request.POST['self_link'].strip()
-        if not is_valid_url(self_link):
-            message = render_message(u'ERROR Error, please specify a valid web address')
-            return self.respond_with_template('_feed_add_wizard_1.html', locals())
-        status = fetcher.check_url(self_link)
-        if status in (300, 404, 410, 500):
-            message = render_message(u'ERROR Error, feed host returned status code: %s' % get_status_title(status))
-            return self.respond_with_template('_feed_add_wizard_1.html', locals())
-
-        group = None
-        group_id = int(request.POST.get('group', 0))
-        if group_id:
-            group = Group.get(Group.id == group_id) 
-
-        feed = Feed()
-        feed.self_link = self_link
-        feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
-        subscription = fetcher.add_subscription(feed, self.user, group)
-        if subscription:
-            message = render_message('SUCCESS Feed has been added to your subscription')
+        message = ''
+        if request.method == 'POST':
+            self_link = request.POST['self_link'].strip()
+            if not is_valid_url(self_link):
+                message = render_message(u'ERROR Error, please specify a valid web address')
+                return self.respond_with_template('_feed_add_wizard_1.html', locals())
+            status = fetcher.check_url(self_link)
+            if status in (300, 404, 410, 500):
+                message = render_message(u'ERROR Error, feed host returned: %s' % get_status_title(status))
+                return self.respond_with_template('_feed_add_wizard_1.html', locals())
+    
+            group = None
+            group_id = int(request.POST.get('group', 0))
+            if group_id:
+                group = Group.get(Group.id == group_id) 
+    
+            feed = Feed()
+            feed.self_link = self_link
+            feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
+            subscription = fetcher.add_subscription(feed, self.user, group)
+            if subscription:
+                message = render_message(u'SUCCESS Feed has been added to %s group' % group.title)
+            else:
+                message = render_message(u'INFO Feed already in %s group' % group.title)
+    
+            return self.respond_with_modal(request.application_url, 
+                message=message,
+                button = 'View Feed Entries',
+                params=[('feed', feed.id)])                        
         else:
-            message = render_message('INFO Feed is already in your subscriptions')
-
-        return self.respond_with_modal(request.application_url, 
-            message=message,
-            button = 'View Feed Entries',
-            params=[('feed', feed.id)])
-                        
+            group_count, groups = get_groups(self.user)
+            return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
         
     @GET(r'^/fever/?$')

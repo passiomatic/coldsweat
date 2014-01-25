@@ -63,17 +63,14 @@ padding : $baselineheight / 2 $gutterwidth;
 border-bottom : $borderwidth $borderstyle $bordercolor; }
 
 .modal-header .close {
-float : right;
+@include zero;
+@include font-size($basefontsize);
 margin-top : 8px;
-/*
-background-color : $buttonbackgroundcolor;
-@include buttongrad;
-border : $buttonborderwidth $buttonborderstyle $buttonbordercolor;
-border-bottom-color : $buttonbottombordercolor;
-border-radius : $buttonborderradius;
-*/
+float : right;
+border : none;
+background : none;
 cursor : pointer;
-color : $buttoncolor; 
+color : $lightneutralcolor; 
 }
 
 .modal-header h3 {
@@ -92,7 +89,7 @@ margin-bottom : 0; }
 .modal-footer {
 padding : $baselineheight / 2 $gutterwidth;
 margin-bottom : 0;
-text-align : right;
+/* text-align : right; */
 border-top : $borderwidth $borderstyle $bordercolor;
 border-radius : 0 0 inherit inherit;
 *zoom : 1; }

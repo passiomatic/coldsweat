@@ -29,3 +29,7 @@
 .btn-primary {
     @include primarygrad;
 }
+
+.btn-error {
+    @include errorgrad;
+}

@@ -369,7 +369,7 @@ def feed_worker(feed):
     close()
     
  
-def fetch_feeds(force_all=False):
+def fetch_feeds():
     """
     Fetch all feeds, possibly parallelizing requests
     """
@@ -381,16 +381,14 @@ def fetch_feeds(force_all=False):
         log.debug("loaded blacklist: %s" % ', '.join(blacklist))
 
     # Attach feed.subscriptions counter
-    q = Feed.select(Feed, fn.Count(Subscription.user).alias('subscriptions')).join(Subscription, JOIN_LEFT_OUTER).group_by(Feed)        
-    if not force_all:
-        q = q.where(Feed.is_enabled==True)
+    q = Feed.select(Feed, fn.Count(Subscription.user).alias('subscriptions')).join(Subscription, JOIN_LEFT_OUTER).group_by(Feed).where(Feed.is_enabled==True)
     
     feeds = list(q)
     if not feeds:
         log.debug("no feeds found to refresh, halted")
         return
 
-    log.debug("starting fetcher (force_all is %s)" % ('on' if force_all else 'off'))
+    log.debug("starting fetcher")
         
     if config.getboolean('fetcher', 'multiprocessing'):
         from multiprocessing import Pool

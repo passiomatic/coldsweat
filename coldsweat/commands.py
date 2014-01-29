@@ -68,7 +68,7 @@ def command_serve(parser, options, ags):
 def command_refresh(parser, options, ags):
     '''Starts a feeds refresh procedure'''
 
-    counter = fetcher.fetch_feeds(options.force)    
+    counter = fetcher.fetch_feeds()    
     print 'Refresh completed. See log file for more information'
 
 @command('import')
@@ -170,8 +170,8 @@ def run():
     available_options = [
         make_option('-u', '--username', 
             dest='username', default=default_username, help="specifies a username (default is %s)" % default_username),
-        make_option('-f', '--force',
-            dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
+#         make_option('-f', '--force',
+#             dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
         make_option('-p', '--port', default='8080', 
             dest='port', type='int', help='the port to serve on (default 8080)'),
 #         make_option('-v', '--verbose',

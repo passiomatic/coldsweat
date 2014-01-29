@@ -221,6 +221,9 @@ def fetch_feed(feed, add_entries=False):
             log.warn("%s has too many errors, disabled" % netloc)        
         feed.save()
 
+    if not feed.subscriptions:
+        log.debug("feed %s has no subscribers, skipped" % feed.self_link)
+
     log.debug("fetching %s" % feed.self_link)
            
     schema, netloc, path, params, query, fragment = urlparse.urlparse(feed.self_link)
@@ -376,11 +379,11 @@ def fetch_feeds(force_all=False):
     if config.getboolean('fetcher', 'scrub'):
         load_blacklist(path.join(installation_dir, 'etc/blacklist'))
         log.debug("loaded blacklist: %s" % ', '.join(blacklist))
-        
-    if force_all:
-        q = Feed.select()
-    else:
-        q = Feed.select().where(Feed.is_enabled==True)
+
+    # Attach feed.subscriptions counter
+    q = Feed.select(Feed, fn.Count(Subscription.user).alias('subscriptions')).join(Subscription, JOIN_LEFT_OUTER).group_by(Feed)        
+    if not force_all:
+        q = q.where(Feed.is_enabled==True)
     
     feeds = list(q)
     if not feeds:
@@ -400,7 +403,7 @@ def fetch_feeds(force_all=False):
         for feed in feeds:
             fetch_feed(feed)
     
-    log.info("%d feeds checked in %fs" % (len(feeds), time.time() - start))
+    log.info("%d feeds checked in %.2fs" % (len(feeds), time.time() - start))
 
 
 

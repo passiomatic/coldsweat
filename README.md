@@ -27,6 +27,10 @@ There will be blood.
 
 See _[setup]_ page.
 
+## Upgrading from previous versions
+
+Coldsweat 0.9.1 works with newer versions of Requests, WebOb and Peewee packages so you need to update those too. As usual run again `pip install -r requirements.txt`. 
+
 ## Technical underpinnings
 
 * Uses the industry standard Mark Pilgrim's [Universal Feed Parser][fp]

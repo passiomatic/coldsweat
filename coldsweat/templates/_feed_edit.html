@@ -1,0 +1,52 @@
+<form action="{{application_url}}/feeds/edit/{{feed.id}}" method="POST">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>  
+    <h3><img class="favicon" src="{{feed.icon.data}}" width="16" height="16"  alt="*"> {{feed.title|html}}</h3>
+  </div>
+  <div class="modal-body">          
+        {{message}}
+        {{if not feed.is_enabled}}
+            <div class="alert alert--error"><i class="fa fa-warning"></i> This feed is disabled</div>
+        {{endif}}  
+
+        <label for="self-link-field"><i class="fa fa-rss fa-fw"></i> Web address (URL) for the feed</label> 
+        <input type="text" id="field-self-link" name="self_link" readonly  size="40" value="{{feed.self_link}}">
+
+        <table class="table">
+          <tbody>
+              {{if feed.alternate_link}}
+                  <tr>
+                      <th><i class="fa fa-globe fa-fw"></i> Web page</th>
+                      <td><a target="_blank" title="Visit feed web page" href="{{feed.alternate_link}}">{{feed.alternate_link|friendly_url}}</a></td>
+                  </tr>                        
+              {{endif}}
+              <tr>
+                  <th><i class="fa fa-folder fa-fw"></i> Groups</th>
+                  <td>{{for g in groups}}{{g.title|html}}&ensp;{{endfor}}</td>
+              </tr>                        
+              <tr>
+                  <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
+                  <td>{{feed.last_checked_on|since|capitalize}}</td>
+              </tr>                        
+
+              <tr>
+                <th><i class="fa fa-cog fa-fw"></i> Status</th>
+                <td><code>{{feed.last_status_title|capitalize}}</code></td>
+              </tr>                        
+
+            {{if feed.error_count}}
+                <tr>
+                    <th><i class="fa fa-warning fa-fw"></i> Total errors</th>
+                    <td>{{feed.error_count}}</td>
+                </tr>                        
+            {{endif}}
+
+          </tbody>        
+        </table>
+  </div>
+<!--
+  <div class="modal-footer">
+    <button type="submit" name="unsubscribe" class="btn btn-error">Unsubscribe</button>
+  </div>
+-->
+</form>

@@ -466,12 +466,12 @@ def _q(*select):
     
 def get_unread_entries(user, *select):         
     q = _q(*select).where((Subscription.user == user) &
-        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive())).distinct()
+        ~(Entry.id << Read.select(Read.entry).where(Read.user == user))).distinct()
     return q
 
 def get_saved_entries(user, *select):   
     q = _q(*select).where((Subscription.user == user) & 
-        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user).naive())).distinct()
+        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user))).distinct()
     return q
 
 def get_all_entries(user, *select):     
@@ -510,8 +510,6 @@ def get_stats():
     
     now = datetime.utcnow()
     
-    #last_entries = Entry.select().join(Feed).join(Icon).where(~(Entry.id << Read.select(Read.entry))).order_by(Entry.last_updated_on.desc()).limit(5).naive()
-        
     last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
     if last_checked_on:
         last_checked_on = format_datetime(last_checked_on)

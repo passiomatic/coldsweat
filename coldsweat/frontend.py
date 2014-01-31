@@ -65,42 +65,41 @@ class FrontendApp(WSGIApp):
 
     def _make_view_variables(self, user, request): 
         
-        group_id, feed_id, filter_name, filter_class, panel_title, page_title = 0, 0, '', '', '', ''
+        count, group_id, feed_id, filter_name, filter_class, panel_title, page_title = 0, 0, 0, '', '', '', ''
         
-        group_count, groups = get_groups(user)
-    
+        groups = get_groups(user)    
         r = Entry.select(Entry.id).join(Read).where((Read.user == user)).naive()
         s = Entry.select(Entry.id).join(Saved).where((Saved.user == user)).naive()
         read_ids    = dict((i.id, None) for i in r)
         saved_ids   = dict((i.id, None) for i in s)
         
         if 'saved' in request.GET:
-            q = get_saved_entries(user)
+            count, q = get_saved_entries(user, Entry.id).count(), get_saved_entries(user)
             panel_title = '<span><i class="fa fa-star"></i></span>&ensp;Saved'
             filter_class = filter_name = 'saved'
             page_title = 'Saved'
         elif 'group' in request.GET:
             group_id = int(request.GET['group'])    
             group = Group.get(Group.id == group_id) 
-            q = get_group_entries(user, group)
+            count, q = get_group_entries(user, group, Entry.id).count(), get_group_entries(user, group)
             panel_title = '<span><i class="fa fa-folder-open"></i></span>&ensp;%s' % group.title                
             filter_name = 'group=%s' % group_id
             page_title = group.title
         elif 'feed' in request.GET:
             feed_id = int(request.GET['feed'])
             feed = Feed.get(Feed.id == feed_id) 
-            q = get_feed_entries(user, feed)
+            count, q = get_feed_entries(user, feed, Entry.id).count(), get_feed_entries(user, feed)
             panel_title = '<span><i class="fa fa-rss"></i></span>&ensp;%s' % feed.title                
             filter_class = 'feeds'
             filter_name = 'feed=%s' % feed_id
             page_title = feed.title
         elif 'all' in request.GET:
-            q = get_all_entries(user)
+            count, q = get_all_entries(user, Entry.id).count(), get_all_entries(user)
             panel_title = '<span><i class="fa fa-archive"></i></span>&ensp;All'                
             filter_class = filter_name = 'all'
             page_title = 'All'
         else: # Default
-            q = get_unread_entries(user)
+            count, q = get_unread_entries(user, Entry.id).count(), get_unread_entries(user)
             panel_title = '<span><i class="fa fa-circle"></i></span>&ensp;Unread'
             filter_class = filter_name = 'unread'
             page_title = 'Unread'
@@ -173,13 +172,13 @@ class FrontendApp(WSGIApp):
         q, namespace = self._make_view_variables(self.user, request)
 
         offset = int(request.GET.get('offset', 0))            
-        count, entries = q.count(), q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
+        entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
         
         namespace.update({
             'entries'   : q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE),
             'offset'    : offset + ENTRIES_PER_PAGE,
             'prev_date' : request.GET.get('prev_date', None),
-            'count'     : count
+            #'count'     : count
         })
         
         return self.respond_with_template('entries.html', namespace)
@@ -231,12 +230,11 @@ class FrontendApp(WSGIApp):
         Show subscribed feeds for current user
         '''
         offset, group_id, filter_class, panel_title, page_title = 0, 0, 'feeds', '<span><i class="fa fa-rss"></i></span>&ensp;Feeds', 'Feeds'
-
-        group_count, groups = get_groups(self.user)  
-
+        
+        groups = get_groups(self.user)  
         offset = int(request.GET.get('offset', 0))
-        count, feeds_q = get_feeds(self.user)
-        feeds = feeds_q.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
+        count, q = get_feeds(self.user, Feed.id).count(), get_feeds(self.user)
+        feeds = q.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
         offset += FEEDS_PER_PAGE
         
         return self.respond_with_template('feeds.html', locals())  
@@ -290,7 +288,7 @@ class FrontendApp(WSGIApp):
                 button = 'View Feed Entries',
                 params=[('feed', feed.id)])                        
         else:
-            group_count, groups = get_groups(self.user)
+            groups = get_groups(self.user)
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
         
@@ -342,7 +340,8 @@ class FrontendApp(WSGIApp):
             'since_days'        : datetime_since_days(datetime.utcnow()),
             'epoch'             : datetime_as_epoch,                        
             'friendly_url'      : friendly_url,
-            'capitalize'        : capitalize
+            'capitalize'        : capitalize,
+            'length'            : length
         }
 
         message = self.request.cookies.get('alert_message', '')
@@ -460,42 +459,46 @@ def render_template(filename, namespace):
  
 # Entries
 
-def get_unread_entries(user):         
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) &
-        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive()))
+def _q(*select):
+    select = select or [Entry, Feed, Icon]
+    q = Entry.select(*select).join(Feed).join(Icon).switch(Feed).join(Subscription)
+    return q
+    
+def get_unread_entries(user, *select):         
+    q = _q(*select).where((Subscription.user == user) &
+        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive())).distinct()
     return q
 
-def get_all_entries(user):     
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user)
+def get_saved_entries(user, *select):   
+    q = _q(*select).where((Subscription.user == user) & 
+        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user).naive())).distinct()
+    return q
+
+def get_all_entries(user, *select):     
+    q = _q(*select).where(Subscription.user == user).distinct()
     return q    
 
-def get_saved_entries(user):   
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) & 
-        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user)))
+def get_group_entries(user, group, *select):     
+    q = _q(*select).where((Subscription.user == user) & (Subscription.group == group))
     return q
 
-def get_group_entries(user, group):     
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) &
-        (Subscription.group == group))
-    return q
-
-def get_feed_entries(user, feed):     
-    q = Entry.select(Entry, Feed, Icon).join(Feed).join(Icon).switch(Feed).join(Subscription).where((Subscription.user == user) &
-        (Subscription.feed == feed))
+def get_feed_entries(user, feed, *select):     
+    #@@FIXME: remove check if user is subscribed to the feed before blindly return q?
+    q = _q(*select).where((Subscription.user == user) & (Subscription.feed == feed)).distinct()
     return q
 
 # Feeds
 
-def get_feeds(user):     
-    #@@TODO: Add join(Entry, JOIN_LEFT_OUTER).annotate(Entry) # No. of entries in feed
-    q = Feed.select(Feed, Icon).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user)
-    return q.count(), q    
+def get_feeds(user, *select):  
+    select = select or [Feed, Icon]   
+    q = Feed.select(*select).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user).distinct()
+    return q    
 
 # Groups
 
 def get_groups(user):     
     q = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title) 
-    return q.count(), q    
+    return q    
 
 
 # Stats

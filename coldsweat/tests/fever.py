@@ -33,12 +33,12 @@ def run_tests(endpoint, suites=ALL):
             (False, 'feeds')
         ])
 
-    if 'unread_item_ids' in suites:
+    if 'unread' in suites:
         queries.extend([
             (False, 'unread_item_ids')
         ])
 
-    if 'saved_item_ids' in suites:
+    if 'saved' in suites:
         queries.extend([
             (False, 'saved_item_ids')
         ])
@@ -92,7 +92,7 @@ def run_tests(endpoint, suites=ALL):
             (True, 'mark=group&as=read&id=0&before=%d' % epoch),    # Mark all as read 
         ])         
 
-    if 'unread_recently_read' in suites:
+    if 'unread_read' in suites:
         queries.extend([
             (True, 'unread_recently_read=1')
         ])          
@@ -134,7 +134,7 @@ parser = optparse.OptionParser(
 parser.add_option(
     '-s', '--suite',
     dest='suite', 
-    help='the Fever API test suite to run. Available suites are: groups, feeds, unread_item_ids, saved_item_ids, favicons, items, links, unread_recently_read, mark_item, mark_feed mark_group, mark_all')
+    help='the Fever API test suite to run. Available suites are: groups, feeds, unread, saved, favicons, items, links, unread_read, mark_item, mark_feed mark_group, mark_all')
 
 
 if __name__ == '__main__':

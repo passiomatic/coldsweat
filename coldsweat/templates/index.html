@@ -27,7 +27,7 @@
                 <li class="filter-all"><a title="All entries (3 key)" href="{{application_url}}/entries/?all"><span><i class="fa fa-archive"></i></span>&ensp;All</a></li>
                 <li class="sep filter-feeds"><a title="Subscribed feeds (4 key)" href="{{application_url}}/feeds/"><span><i class="fa fa-rss"></i></span>&ensp;Feeds</a></li>                            
                 <li><a class="add-trigger" href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription"><span><i class="fa fa-plus-circle"></i></span>&ensp;Add subscription</a></li>                                    
-                {{if group_count > 1}}
+                {{if groups|length > 1}}
                     {{for loop, g in looper(groups)}}
                         <li class="{{if loop.first}}sep{{endif}} {{if g.id == group_id}}filter-group{{endif}}"><a href="{{application_url}}/entries/?group={{g.id}}"><span><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}}"></i></span>&ensp;{{g.title|html}}</a></li>            
                     {{endfor}}        

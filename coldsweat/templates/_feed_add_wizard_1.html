@@ -7,7 +7,7 @@
         {{message}}
         <label for="self-link-field">Web address (URL) for the feed</label> 
         <input type="text" id="field-self-link" autofocus name="self_link"  size="40" value="">
-        {{if group_count > 1}}
+        {{if groups|length > 1}}
             <label>Add to group <select name="group">
                 {{for g in groups}}
                     <option {{if g.title == g.DEFAULT_GROUP}}selected="selected"{{endif}} value="{{g.id}}">{{g.title}}</option> 

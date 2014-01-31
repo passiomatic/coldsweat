@@ -124,6 +124,9 @@ def friendly_url(value):
 def capitalize(value):
     return value.capitalize()
 
+def length(value):
+    return len(list(value))
+    
 def truncate(value, max_length):
     """
     Return a truncated string for value if value length is > max_length

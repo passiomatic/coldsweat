@@ -284,7 +284,7 @@ def get_groups(user):
     return result
 
 def get_feeds(user):
-    q = Feed.select(Subscription, Feed, Icon).join(Subscription).switch(Feed).join(Icon).where(Subscription.user == user).distinct()
+    q = Feed.select(Feed, Icon).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user).distinct()
     result = []
     for feed in q:
 
@@ -312,13 +312,13 @@ def get_feed_groups(user):
 def get_unread_entries(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).where(
         (Subscription.user == user), 
-        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive())).naive()
+        ~(Entry.id << Read.select(Read.entry).where(Read.user == user).naive())).distinct().naive()
     return [r.id for r in q]
 
 def get_saved_entries(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).where(
         (Subscription.user == user), 
-        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user).naive())).naive()
+        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user).naive())).distinct().naive()
     return [s.id for s in q]    
 
 

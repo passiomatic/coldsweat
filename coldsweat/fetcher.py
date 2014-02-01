@@ -221,8 +221,9 @@ def fetch_feed(feed, add_entries=False):
             log.warn("%s has too many errors, disabled" % netloc)        
         feed.save()
 
-    if not feed.subscriptions:
+    if hasattr(feed, 'subscriptions') and not feed.subscriptions:
         log.debug("feed %s has no subscribers, skipped" % feed.self_link)
+        return
 
     log.debug("fetching %s" % feed.self_link)
            

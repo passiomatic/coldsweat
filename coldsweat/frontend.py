@@ -14,10 +14,11 @@ from peewee import IntegrityError
 
 from app import *
 from models import *
-from session import SessionMiddleware
 from utilities import *
-from coldsweat import log, config, installation_dir, template_dir, VERSION_STRING
+from session import SessionMiddleware
 import fetcher
+import filters
+from coldsweat import log, config, installation_dir, template_dir, VERSION_STRING
 
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60
@@ -28,7 +29,7 @@ def login_required(handler):
         if self.user:
             return handler(self, request, *args)
         else:
-            raise self.redirect('%s/login?from=%s' % (request.application_url, escape_url(request.url)))
+            raise self.redirect('%s/login?from=%s' % (request.application_url, filters.escape_url(request.url)))
     return wrapper
     
 
@@ -36,6 +37,16 @@ class FrontendApp(WSGIApp):
 
     def __init__(self):
         self.alert_message = ''
+        self.app_namespace = {
+            'version_string'    : VERSION_STRING,
+            'static_url'        : STATIC_URL,
+            'alert_message'     : '',
+            'page_title'        : '',
+        }
+        # Install template filters
+        for name in filters.__all__:
+            filter = getattr(filters, name)
+            self.app_namespace[filter.name] = filter
 
     def _mark_entry(self, user, entry, status):
         if status == 'read':
@@ -266,7 +277,7 @@ class FrontendApp(WSGIApp):
                 return self.respond_with_template('_feed_add_wizard_1.html', locals())
             status = fetcher.check_url(self_link)
             if status in (300, 404, 410, 500):
-                message = render_message(u'ERROR Error, feed host returned: %s' % get_status_title(status))
+                message = render_message(u'ERROR Error, feed host returned: %s' % filters.status_title(status))
                 return self.respond_with_template('_feed_add_wizard_1.html', locals())
     
             group = None
@@ -308,7 +319,7 @@ class FrontendApp(WSGIApp):
         return self.respond_with_template('about.html', locals())
 
 
-    # Template
+    # Template methods
     
     def respond_with_modal(self, url, message, title='', button='Close', params=None):
         namespace = {
@@ -320,40 +331,26 @@ class FrontendApp(WSGIApp):
         }                    
         return self.respond_with_template('_modal_alert.html', namespace)
     
-    def respond_with_template(self, filename, namespace=None):
-
-        namespace = namespace or {}
-
-        site_namespace = {
-            # Global objects and settings 
-            'version_string'    : VERSION_STRING,
+    def respond_with_template(self, filename, view_namespace=None):
+        
+        namespace = self.app_namespace.copy()
+        namespace.update({
             'request'           : self.request,
-            'static_url'        : STATIC_URL,
             'application_url'   : self.request.application_url,
-            'alert_message'     : '',
-            'page_title'        : '',
-
-            # Filters 
-            'html'              : escape_html,
-            'url'               : escape_url,
-            'since'             : datetime_since(datetime.utcnow()),
-            'since_days'        : datetime_since_days(datetime.utcnow()),
-            'epoch'             : datetime_as_epoch,                        
-            'friendly_url'      : friendly_url,
-            'capitalize'        : capitalize,
-            'length'            : length
-        }
+        })
 
         message = self.request.cookies.get('alert_message', '')
         if message:
             namespace['alert_message'] = render_message(message)
 
+        namespace.update(view_namespace or {})
+        
         if 'self' in namespace:
-            del namespace['self'] # Avoid passing self to Tempita
+             # Avoid passing self or Tempita will complain
+            del namespace['self']
 
-        site_namespace.update(namespace or {})
         response = Response(
-            render_template(filename, site_namespace),
+            render_template(filename, namespace),
             content_type='text/html', charset='utf-8')
         
         # Delete alert_message cookie, if any
@@ -387,7 +384,7 @@ class FrontendApp(WSGIApp):
         '''
         return self._redirect(HTTPSeeOther, location)
 
-    # Session user and auth
+    # Session user and auth methods
 
     @property
     def user(self):
@@ -434,9 +431,6 @@ frontend_app = SessionMiddleware(FrontendApp())
 # ------------------------------------------------------
 # Template utilities
 # ------------------------------------------------------        
-# 
-# def set_message(response, message):
-#     response.set_cookie('alert_message', message)    
 
 def render_message(message):
     if not message:

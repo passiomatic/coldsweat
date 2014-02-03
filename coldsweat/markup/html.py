@@ -15,7 +15,7 @@ import urlparse
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
 HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
 
-from ..utilities import escape_html
+from ..filters import escape_html
 from coldsweat import log
 
 def _normalize_attrs(attrs):

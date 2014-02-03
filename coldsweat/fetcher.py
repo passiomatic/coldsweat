@@ -19,6 +19,7 @@ from requests.exceptions import *
 from markup import html
 from models import *
 from utilities import *
+from filters import escape_html
 from coldsweat import *
 
 MAX_TITLE_LENGTH = 255

@@ -49,36 +49,17 @@ def is_valid_url(value):
 # Date/time functions
 # --------------------
 
+def datetime_as_epoch(value):
+    return int(timegm(value.utctimetuple()))
+
+def tuple_as_datetime(value):
+    return datetime.utcfromtimestamp(timegm(value))
+
 # Weekday and month names for HTTP date/time formatting; always English!
 _weekdayname = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 _monthname = [None, # Dummy so we can use 1-based month numbers
               "Jan", "Feb", "Mar", "Apr", "May", "Jun",
               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-              
-def format_datetime(value, comparsion_value=None):
-
-    s = '%a, %b %d %H:%M'
-    
-    if comparsion_value:    
-        delta = comparsion_value - value
-        if delta.days == 0:       
-            s = 'today at %H:%M'
-        elif delta.days == 1: 
-            s = 'yesterday at %H:%M'
-
-    return value.strftime(s)
-
-def format_date(value, comparsion_value=None):
-
-    if comparsion_value:    
-        delta = comparsion_value - value    
-        if delta.days == 0:       
-            return 'today'
-        elif delta.days == 1: 
-            return 'yesterday'
-    
-    return value.strftime('%a, %b %d')
-
 
 def format_http_datetime(value):
     """
@@ -91,93 +72,70 @@ def format_http_datetime(value):
         _weekdayname[wd], day, _monthname[month], year, hh, mm, ss
     )
        
-def datetime_as_epoch(value):
-    return int(timegm(value.utctimetuple()))
+def format_datetime(value, format='%a, %b %d at %H:%M'):
+    return value.strftime(format)
 
-def tuple_as_datetime(value):
-    return datetime.utcfromtimestamp(timegm(value))
+def format_date(value):
+    return format_datetime(value, '%a, %b %d')
 
-
-# --------------------
-# Teplate filters and utilities
-# --------------------
-
-def escape_html(value):     
+def datetime_since(value, comparsion_value=None, default="just now"):
     """
-    Return value escaped as HTML string
-    """
-    return cgi.escape(value, quote=True)
-
-def escape_url(value):     
-    """
-    Return value escaped as URL string
-    """
-    return urllib.quote(value)
-
-def friendly_url(value):
-    if value:
-        u = urlparse.urlsplit(value)
-        return u.netloc 
-    else:
-        return ''
-
-def capitalize(value):
-    return value.capitalize()
-
-def length(value):
-    return len(list(value))
+    Returns string representing "time since" e.g.
+    3 days ago, 5 hours ago etc.
     
+    From http://flask.pocoo.org/snippets/33/
+    """
+
+    comparsion_value = comparsion_value or datetime.utcnow()
+    diff = comparsion_value - value
+    
+    periods = (
+        (diff.days / 365, "year", "years"),
+        (diff.days / 30, "month", "months"),
+        (diff.days / 7, "week", "weeks"),
+        (diff.days, "day", "days"),
+        (diff.seconds / 3600, "hour", "hours"),
+        (diff.seconds / 60, "minute", "minutes"),
+        (diff.seconds, "second", "seconds"),
+    )
+
+    for period, singular, plural in periods:        
+        if period:
+            return "%d %s ago" % (period, singular if period == 1 else plural)
+
+    return default
+
+def datetime_since_today(value, comparsion_value=None):
+    """
+    Returns string representing "date since" e.g.
+    today, yesterday and Wed, Jan 29
+    """
+
+    comparsion_value = comparsion_value or datetime.utcnow()    
+    delta = comparsion_value - value    
+    if delta.days == 0:       
+        return 'today'
+    elif delta.days == 1: 
+        return 'yesterday'
+    
+    # Earlier date
+    return format_date(value)
+    
+# --------------------
+# Misc. string utilities
+# --------------------
+
 def truncate(value, max_length):
     """
     Return a truncated string for value if value length is > max_length
     """
     if len(value) < max_length:
         return value
-    return value[:max_length-1] + u'…'    
-
-
-# def escape_javacript(value):     
-#     """
-#     Return value escaped as a Javascript string
-#     """
-#     return json.dumps(value)
-
-def datetime_since(utcnow):                                
-    def _(value):
-        if value:
-            return format_datetime(value, utcnow)
-        else:
-            return '—' 
-    return _
-
-def datetime_since_days(utcnow):                                
-    def _(value):
-        if value:
-            return format_date(value, utcnow)
-        else:
-            return '—' 
-    return _    
-
-# def get_excerpt(value, truncate=200):     
-#     """
-#     Escape and truncate an HTML string
-#     """
-#     if truncate:
-#         value = value[:truncate]
-#     
-#     return cgi.escape(value, quote=True)
+    return value[:max_length-1] + u'…'   
 
 def render_template(filename, namespace):                    
     return HTMLTemplate.from_filename(filename, namespace=namespace).substitute()
-
-def get_status_title(code):
-    title = 'Unknown (%s)' % code
-    try:
-        title = status_map[code].title
-    except KeyError:
-        pass 
-    return title
-
+    
 # --------------------
 # Misc.
 # --------------------
@@ -214,19 +172,19 @@ def run_tests():
     
     t = datetime.utcnow()        
     
-    v = datetime(2013, 6, 25, 12, 0, 0)
-    print format_datetime(v, t) # Jun 25   
-    v = t - timedelta(days=1)
-    print format_datetime(v, t) # Yesterday
-    v = datetime(t.year, t.month, t.day, 12, 0, 0)
-    print format_datetime(v, t) # Today
-
-    v = t
-    assert format_date(v, t) == 'today'
-    v = t - timedelta(days=1)
-    assert format_date(v, t) == 'yesterday'
-    v = datetime(2013, 6, 25, 12, 0, 0)
-    assert format_date(v, t) == 'Tue, Jun 25'
+#     v = datetime(2013, 6, 25, 12, 0, 0)
+#     print format_datetime(v, t) # Jun 25   
+#     v = t - timedelta(days=1)
+#     print format_datetime(v, t) # Yesterday
+#     v = datetime(t.year, t.month, t.day, 12, 0, 0)
+#     print format_datetime(v, t) # Today
+# 
+#     v = t
+#     assert format_date(v, t) == 'today'
+#     v = t - timedelta(days=1)
+#     assert format_date(v, t) == 'yesterday'
+#     v = datetime(2013, 6, 25, 12, 0, 0)
+#     assert format_date(v, t) == 'Tue, Jun 25'
         
     print format_http_datetime(t)
      
@@ -234,9 +192,6 @@ def run_tests():
     assert is_valid_url('http://example.org/feed.xml')  # OK
     assert not is_valid_url('example.com')              # Fail
 
-    assert friendly_url('http://example.org/feed.xml') == 'example.org'
-    assert friendly_url(None) == ''
-    
     assert truncate(u'Lorèm ipsum dolor sit ame', 10) == u'Lorèm ips…'
     
     #print get_excerpt('Some <script src="http://example.com/evil.js"></script> code.')

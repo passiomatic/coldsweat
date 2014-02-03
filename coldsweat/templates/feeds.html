@@ -7,7 +7,7 @@
                 </h3>
                 <div class="meta dim">
                     {{if f.is_enabled}}
-                        <i class="fa fa-clock-o"></i> <span class="help-text"  title="Last check">{{f.last_checked_on|since_days|capitalize}}</span>&emsp;
+                        <i class="fa fa-clock-o"></i> <span class="help-text"  title="Last check">{{f.last_checked_on|since|capitalize}}</span>&emsp;
                     {{else}}
                         <i class="fa fa-warning"></i> Disabled&emsp;
                     {{endif}}  

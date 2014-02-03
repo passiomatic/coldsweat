@@ -31,7 +31,7 @@
 
               <tr>
                 <th><i class="fa fa-cog fa-fw"></i> Status</th>
-                <td><code>{{feed.last_status_title|capitalize}}</code></td>
+                <td><code>{{feed.last_status|status_title|capitalize}}</code></td>
               </tr>                        
 
             {{if feed.error_count}}

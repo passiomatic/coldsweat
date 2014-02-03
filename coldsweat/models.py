@@ -150,13 +150,6 @@ class Feed(CustomModel):
             return datetime_as_epoch(self.last_updated_on)
         return 0 
 
-    @property
-    def last_status_title(self):
-        if self.last_status in status_map:   # Never updated?
-            return status_map[self.last_status].title.lower()
-        return '—'
-
-
 class Entry(CustomModel):
     """
     Atom/RSS entry

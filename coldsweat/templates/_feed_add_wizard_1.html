@@ -10,7 +10,7 @@
         {{if groups|length > 1}}
             <label>Add to group <select name="group">
                 {{for g in groups}}
-                    <option {{if g.title == g.DEFAULT_GROUP}}selected="selected"{{endif}} value="{{g.id}}">{{g.title}}</option> 
+                    <option {{if g.title == g.DEFAULT_GROUP}}selected{{endif}} value="{{g.id}}">{{g.title}}</option> 
                 {{endfor}}
             </select></label>             
         {{endif}}

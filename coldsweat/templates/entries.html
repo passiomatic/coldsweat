@@ -1,6 +1,6 @@
 {{def render_entries}}
     {{for loop, e in looper(entries)}}
-        {{py:date = since_days(e.last_updated_on)}}
+        {{py:date = since_today(e.last_updated_on)}}
         {{if prev_date != date}}
             <li class="heading">
                 <h2><time>{{date}}</time></h2>

@@ -12,15 +12,14 @@ from ..models import *
 TEST_FEEDS = (
     (503, 'http://www.aaa.bbb/'),                               # Does not exist
     (200, 'http://www.scripting.com/rss.xml'),                  # First redirect, then 200
-    (404, 'http://www.markboulton.co.uk/journal/rss_atom/'),
-    (200, 'http://feeds.feedburner.com/codinghorror'),
+    (404, 'http://example.com/wrong-rss.xml'),
 )
 
 
 def run_tests():    
     # check_url tests    
     for expected_status, url in TEST_FEEDS:
-        print 'Checking', url
+        print 'Checking', url, '...'
         assert check_url(url, timeout=5) == expected_status
     
 

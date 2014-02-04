@@ -8,6 +8,7 @@ License: MIT (see LICENSE.md for details)
 """
 
 from xml.etree import ElementTree
+from peewee import IntegrityError
 
 from ..models import *
 from coldsweat import log, favicon
@@ -39,27 +40,24 @@ def add_feeds_from_file(source, user):
         for event, element in ElementTree.iterparse(source, events=('start','end')):    
             if event == 'start':
                  if (element.tag == 'outline') and ('xmlUrl' not in element.attrib):                    
+                    # Entering a group
                     group = Group()
 
-                    #title = element.attrib['text']
                     for k, v in element.attrib.items():
                         if k in group_allowed_attribs:
                             setattr(group, group_allowed_attribs[k], v)
-                                
-                    #@@NOTE: we could catch an IntegrityError here, but title  
-                    #  uniqueness constraint has been added only recently so 
-                    #  it is better to avoid that with older installations
-                    try:
-                        group = Group.get(Group.title==group.title)                    
-                    except Group.DoesNotExist:
-                        #group = Group(title=title)
+                        
+                    try:                        
                         group.save()                                                                                            
-                        groups.append(group)
                         log.debug('added group %s to database' % group.title)
+                    except IntegrityError: 
+                        pass
+
+                    groups.append(group)
 
             elif event == 'end':
                 if (element.tag == 'outline') and ('xmlUrl' in element.attrib):
-                    # We are leaving a feed
+                    # Leaving a feed
                     feed = Feed()
                     
                     for k, v in element.attrib.items():
@@ -67,10 +65,10 @@ def add_feeds_from_file(source, user):
                             setattr(feed, feed_allowed_attribs[k], v)
     
                     feed = add_feed(feed, fetch_icon=True, add_entries=True)    
-                    add_subscription(feed, user, groups[len(groups)-1])
+                    add_subscription(feed, user, groups[-1])
                     feeds.append(feed)
                 elif element.tag == 'outline':
-                    # We are leaving a group
+                    # Leaving a group
                     groups.pop()
                         
                     

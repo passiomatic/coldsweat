@@ -3,7 +3,7 @@
 '''
 Description: bootstrap file for FastCGI environments
 
-Copyright (c) 2013— Andrea Peltrin
+Copyright (c) 2013—2014 Andrea Peltrin
 License: MIT (see LICENSE.md for details)
 '''
 

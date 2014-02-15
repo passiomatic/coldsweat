@@ -142,11 +142,11 @@ $linkcolorvisited   			: darken($linkcolor, 10);
 $linkcolorfocus 				: $linkcolorhover;
 
 // Now define another set of colours. These will be used to style alerts and buttons
-$alertcolor 					: darken(#e6eff5, 15%); //rgb(218,79,73);
-$errorcolor 					: $secondarycolor; //rgb(176,20,0);
-$infocolor 						: darken(#e6eff5, 15%); //rgb(216,220,162);
+$alertcolor 					: darken(#e6eff5, 15%); 
+$errorcolor 					: $secondarycolor; 
+$infocolor 						: darken(#e6eff5, 15%);
 $inversecolor 					: rgb(65,65,65);
-$successcolor 					: rgb(188,212,222);
+$successcolor 					: #5eb337;
 $warningcolor 					: $errorcolor;
 
 
@@ -639,7 +639,7 @@ $buttoncolorinverse				: $white;
 
 // Set the success button’s border and text colours
 $buttonbordercolorsuccess		: darken($successcolor, 10%);
-$buttoncolorsuccess				: darken($successcolor, 50%);
+$buttoncolorsuccess				: $white;
 
 
 // Set the warning button’s border and text colours
@@ -654,7 +654,7 @@ $buttoncolorwarning				: $white;
 
 // =tables ============
 
-$tablepadding 					: 8px 4px;
+$tablepadding 					: 8px 0;
 
 // Set table background colour
 $tablebackgroundcolor			: transparent;

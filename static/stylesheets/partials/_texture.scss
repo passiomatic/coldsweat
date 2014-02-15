@@ -33,3 +33,7 @@
 .btn-error {
     @include errorgrad;
 }
+
+.btn-success {
+    @include successgrad;
+}

@@ -251,7 +251,7 @@ class FrontendApp(WSGIApp):
         return self.respond_with_template('feeds.html', locals())  
 
 
-    @GET(r'^/feeds/edit/(\d+)$')
+    @form(r'^/feeds/edit/(\d+)$')
     @login_required    
     def feed(self, request, feed_id):        
         message = ''        
@@ -259,16 +259,27 @@ class FrontendApp(WSGIApp):
             feed = Feed.get(Feed.id == feed_id) 
         except Feed.DoesNotExist:
             raise HTTPNotFound('No such feed %s' % feed_id)
-            
-        q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))
-        groups = [s.group for s in q]
+
+        if request.method == 'POST':
+            unsubscribe = int(request.POST.get('unsubscribe', 0))
+            enable = int(request.POST.get('enable', 0))
+            if unsubscribe:
+                count = Subscription.delete().where((Subscription.user == self.user) & (Subscription.feed == feed)).execute()
+                log.debug('unsub %d' % count)
+                self.alert_message = u'INFO Feed <i>%s</i> has been removed from your subscriptions.' % feed.title            
+#             if enable:
+#                 pass
+            return self.redirect_after_post('%s/feeds/' % request.application_url)
+        else:
+            q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))
+            groups = [s.group for s in q]
 
         return self.respond_with_template('_feed_edit.html', locals())
         
 
     @form(r'^/feeds/add$')
     @login_required    
-    def feed_add_post(self, request):        
+    def feed_add(self, request):        
         message = ''
         if request.method == 'POST':
             self_link = request.POST['self_link'].strip()
@@ -290,14 +301,11 @@ class FrontendApp(WSGIApp):
             feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
             subscription = fetcher.add_subscription(feed, self.user, group)
             if subscription:
-                message = render_message(u'SUCCESS Feed has been added to %s group' % group.title)
+                self.alert_message = render_message(u'SUCCESS Feed has been added to <i>%s</i> group' % group.title)
             else:
-                message = render_message(u'INFO Feed already in %s group' % group.title)
+                self.alert_message = render_message(u'INFO Feed already in <i>%s</i> group' % group.title)
     
-            return self.respond_with_modal(request.application_url, 
-                message=message,
-                button = 'View Feed Entries',
-                params=[('feed', feed.id)])                        
+            return self.redirect_after_post('%s/?feed=%d' % (request.application_url, feed.id)) 
         else:
             groups = get_groups(self.user)
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
@@ -418,7 +426,7 @@ class FrontendApp(WSGIApp):
 
     @GET(r'^/logout/?$')
     def logout(self, request):
-        response = self.redirect('/')
+        response = self.redirect(request.application_url)
         response.delete_cookie('_SID_')
         return response 
         

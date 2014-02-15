@@ -22,15 +22,15 @@
               {{endif}}
               <tr>
                   <th><i class="fa fa-folder fa-fw"></i> Groups</th>
-                  <td>{{for g in groups}}{{g.title|html}}&ensp;{{endfor}}</td>
+                  <td>{{for loop, g in looper(groups)}}{{g.title|html}}{{if not loop.last}}, {{endif}}{{endfor}}</td>
               </tr>                        
               <tr>
-                  <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
+                  <th><i class="fa fa-clock-o fa-fw"></i> Last checked</th>
                   <td>{{feed.last_checked_on|since|capitalize}}</td>
               </tr>                        
 
               <tr>
-                <th><i class="fa fa-cog fa-fw"></i> Status</th>
+                <th><i class="fa fa-cog fa-fw"></i> Last status</th>
                 <td><code>{{feed.last_status|status_title|capitalize}}</code></td>
               </tr>                        
 
@@ -44,9 +44,12 @@
           </tbody>        
         </table>
   </div>
-<!--
   <div class="modal-footer">
-    <button type="submit" name="unsubscribe" class="btn btn-error">Unsubscribe</button>
-  </div>
+    <button type="submit" name="unsubscribe" value="1" class="btn btn-error">Unsubscribe</button>
+<!--
+    {{if  feed.is_enabled}}
+        <button type="submit" name="enable" value="1" class="btn btn-success">Enable Again</button>
+    {{endif}} 
 -->
+  </div>
 </form>

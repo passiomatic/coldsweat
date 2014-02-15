@@ -4,7 +4,7 @@ $(document).ready(function() {
     "use strict";
 
     var flash_fragment = $('<div class="flash"><i class="fa fa-3x"></i><div class="message">&nbsp;</div></div>')
-    var alert_fragment = $('<div class="alert alert--error style="display:none"></div>')
+    var alert_fragment = $('<div class="alert alert--error" style="display:none"></div>')
     var modal_fragment = $('<div role="dialog" class="modal fade hide"></div>')
     var loading_fragment = $('<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading&hellip;</div>')
     //var loading_favicon_fragment = $('<i class="favicon fa fa-spinner fa-spin"></i>')
@@ -141,14 +141,17 @@ $(document).ready(function() {
             });            
         })
 
-        $(document).on('submit', '.modal form[method=POST]', function(event) { 
+        $(document).on('submit', '.modal form[data-ajax-post]', function(event) { 
             event.preventDefault()
             var form = $(event.target)
             var serializedData = form.serialize()
             form.find('.modal-footer').hide()
             form.find('.modal-body').html(loading_fragment)
-            $.ajax(form.attr('action'), 
-                {dataType: 'html', type:form.attr('method'), data: serializedData}).done(function(data) {            
+            $.ajax(form.attr('action'), { 
+                dataType: 'html', 
+                type: form.attr('method'), 
+                data: serializedData}).done(function(data, textStatus, jqXHR) {                               
+                   //console.debug(jqXHR.status)
                    form.replaceWith(data)                   
             })       
         })

@@ -56,10 +56,12 @@ $media-queries-supported : true;
     @extend abbr[title];
 }
 
+/*
 .fa-circle,
 .fa-circle-o {
     font-size: 85%; // Adjust size
 }
+*/
 
 
 .panel  {
@@ -618,11 +620,13 @@ article {
                 }
                 
                 
+/*
                 span {
                     width: 1.4em;
                     text-align: center;
                     display: inline-block;                    
                 }
+*/
     
             }
     

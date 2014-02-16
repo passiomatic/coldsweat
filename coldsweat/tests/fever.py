@@ -77,6 +77,9 @@ def run_tests(endpoint, suites=ALL):
         queries.extend([
             (True, 'mark=feed&as=read&id=1&before=%d' % epoch), 
             (True, 'mark=feed&as=read&id=1&before=abc'),            # Malformed
+            (True, 'mark=blah&as=read&id=1&before=%d' % epoch),     # Malformed (3)
+            (True, 'mark=feed&as=read&id=foo&before=abc'),          # Malformed (4)
+            (True, 'mark=feed&as_=read&id=1&before=%d' % epoch),    # Malformed (5)
             (True, 'mark=feed&as=read&id=0&before=%d' % epoch),     # Does not exist
         ]) 
 

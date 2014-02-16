@@ -33,8 +33,6 @@ class FeverApp(WSGIApp):
             raise HTTPBadRequest()
     
         result = Struct({'api_version':API_VERSION, 'auth':0})   
-                
-        #@@TODO format = 'xml' if request.GET['api'] == 'xml' else 'json'
     
         if 'api_key' in request.POST:
             api_key = request.POST['api_key']        
@@ -43,18 +41,16 @@ class FeverApp(WSGIApp):
                 log.warn('unknown API key %s, unauthorized' % api_key)
                 return self.respond_with_json(result)  
         else:
-            #@@TODO: raise HTTPUnauthorized ?
             log.warn('missing API key, unauthorized')               
             return self.respond_with_json(result)
     
         # Authorized
         result.auth = 1
     
-        # Note: client *can* send multiple commands at time
+        # It looks like client *can* send multiple commands at time
         for command, handler in COMMANDS:
             if command in request.params:            
                 handler(request, user, result)
-                #break
     
         result.last_refreshed_on_time = get_last_refreshed_on_time()
     
@@ -148,22 +144,18 @@ def unread_recently_command(request, user, result):
 def mark_command(request, user, result):
 
     try:
-        mark, status, object_id = request.POST['mark'], request.POST['as'], request.POST['id']
-    except KeyError:
-        return              
+        mark, status, object_id = request.POST['mark'], request.POST['as'], int(request.POST['id'])
+    except (KeyError, ValueError), ex:
+        log.debug('missing or invalid parameter (%s), ignored' % ex)
+        return      
 
-    try:        
-        object_id = int(object_id)        
-    except ValueError:
-        return
-        
     if mark == 'item':
 
         try:
             # Sanity check
             entry = Entry.get(Entry.id == object_id)  
         except Entry.DoesNotExist:
-            log.debug('could not find requested entry %d, ignored' % object_id)
+            log.debug('could not find entry %d, ignored' % object_id)
             return
 
         if status == 'read':
@@ -172,7 +164,7 @@ def mark_command(request, user, result):
             except IntegrityError:
                 log.debug('entry %d already marked as read, ignored' % object_id)
                 return
-        #Note: strangely enough 'unread' is not mentioned in 
+        # Strangely enough 'unread' is not mentioned in 
         #  the Fever API, but Reeder app asks for it
         elif status == 'unread':
             count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
@@ -194,67 +186,91 @@ def mark_command(request, user, result):
         log.debug('marked entry %d as %s' % (object_id, status))
 
 
-    if mark == 'feed' and status == 'read':
+    elif mark == 'feed' and status == 'read':
 
         try:
             # Sanity check
             feed = Feed.get(Feed.id == object_id)  
         except Feed.DoesNotExist:
-            log.debug('could not find requested feed %d, ignored' % object_id)
+            log.debug('could not find feed %d, ignored' % object_id)
             return
 
         # Unix timestamp of the the local client’s last items API request
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
-        except (KeyError, ValueError):
+        except (KeyError, ValueError), ex:
+            log.debug('missing or invalid parameter (%s), ignored' % ex)
             return              
         
-        q = feed.entries.where(Entry.last_updated_on < before)            
+        q = Entry.select(Entry).join(Feed).join(Subscription).where(
+            (Subscription.user == user) &
+            (Subscription.feed == feed) & 
+            # Exclude entries already marked as read
+            ~(Entry.id << Read.select(Read.entry).where(Read.user == user)) &
+            # Exclude entries fetched after last sync
+            (Entry.last_updated_on < before)
+        ).distinct().naive()
+
         with transaction():
             for entry in q:
                 try:
                     Read.create(user=user, entry=entry)
                 except IntegrityError:
+                    # Should not happen, due to the query above, log as warning
+                    log.warn('entry %d already marked as read, ignored' % entry.id)
                     continue
         
         log.debug('marked feed %d as %s' % (object_id, status))
                 
 
-    if mark == 'group' and status == 'read':
+    elif mark == 'group' and status == 'read':
 
-        # Unix timestamp of the the local client’s last items API request
+        # Unix timestamp of the the local client’s 'last items' API request
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
-        except (KeyError, ValueError):
+        except (KeyError, ValueError), ex:
+            log.debug('missing or invalid parameter (%s), ignored' % ex)
             return              
 
         # Mark all as read?
         if object_id == 0:                                                
-            q = Entry.select().join(Feed).join(Subscription).where(
+            q = Entry.select(Entry).join(Feed).join(Subscription).where(
                 (Subscription.user == user) &
+                # Exclude entries already marked as read
+                ~(Entry.id << Read.select(Read.entry).where(Read.user == user)) &
+                # Exclude entries fetched after last sync
                 (Entry.last_updated_on < before)
-            ).naive()
+            ).distinct().naive()
         else:
             try:        
                 group = Group.get(Group.id == object_id)  
             except Group.DoesNotExist:
-                log.debug('could not find requested group %d, ignored' % object_id)
+                log.debug('could not find group %d, ignored' % object_id)
                 return
 
-            q = Entry.select().join(Feed).join(Subscription).where(
-                (Subscription.group == group) & 
+            q = Entry.select(Entry).join(Feed).join(Subscription).where(
                 (Subscription.user == user) &
+                (Subscription.group == group) & 
+                # Exclude entries already marked as read
+                ~(Entry.id << Read.select(Read.entry).where(Read.user == user)) &
+                # Exclude entries fetched after last sync
                 (Entry.last_updated_on < before)
-            ).naive()
+            ).distinct().naive()
 
         with transaction():
-            for entry in q:
+            for entry in q:                
                 try:
                     Read.create(user=user, entry=entry)
                 except IntegrityError:
+                    # Should not happen, due to the query above, log as warning
+                    log.warn('entry %d already marked as read, ignored' % entry.id)
                     continue
         
         log.debug('marked group %d as %s' % (object_id, status))
+
+    else:   
+        log.debug('malformed mark command (mark %s (%s) as %s ), ignored' % (mark, object_id, status))
+
 
 
 def links_command(request, user, result):
@@ -311,13 +327,13 @@ def get_feed_groups(user):
 
 def get_unread_entries(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).where(
-        (Subscription.user == user), 
+        (Subscription.user == user) &  
         ~(Entry.id << Read.select(Read.entry).where(Read.user == user))).distinct().naive()
     return [r.id for r in q]
 
 def get_saved_entries(user):
     q = Entry.select(Entry.id).join(Feed).join(Subscription).where(
-        (Subscription.user == user), 
+        (Subscription.user == user) &  
         (Entry.id << Saved.select(Saved.entry).where(Saved.user == user))).distinct().naive()
     return [s.id for s in q]    
 

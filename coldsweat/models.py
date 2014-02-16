@@ -157,7 +157,7 @@ class Entry(CustomModel):
 
     # It's called 'id' in Atom parlance
     guid            = CharField()     
-    feed            = ForeignKeyField(Feed)   #, related_name='entries'
+    feed            = ForeignKeyField(Feed)
     title           = CharField(default='Untitled')
     author          = CharField(null=True)
     content         = TextField(null=True)

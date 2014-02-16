@@ -211,21 +211,20 @@ class FrontendApp(WSGIApp):
         except (KeyError, ValueError):
             raise HTTPBadRequest('Missing parameter before=time')
         
-        q = Entry.select().join(Feed).join(Subscription).where(
+        q = Entry.select(Entry).join(Feed).join(Subscription).where(
             (Subscription.user == self.user) &            
             # Exclude entries already marked as read
             ~(Entry.id << Read.select(Read.entry).where(Read.user == self.user)) &
-            # Exclude entries parsed after the page load
+            # Exclude entries fetched after the page load
             (Feed.last_checked_on < before) 
-        )
+        ).distinct()
         
-        #@@TODO: use a single create Peewee 'create' statement
         with transaction():
             for entry in q:
                 try:
                     Read.create(user=self.user, entry=entry)
                 except IntegrityError:
-                    log.warn('entry %s already marked as read, ignored' % entry.id)
+                    log.debug('entry %d already marked as read, ignored' % entry.id)
                     continue                     
 
         return self.respond_with_modal(request.application_url, 

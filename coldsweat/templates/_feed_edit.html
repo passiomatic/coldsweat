@@ -25,13 +25,8 @@
                   <td>{{for loop, g in looper(groups)}}{{g.title|html}}{{if not loop.last}}, {{endif}}{{endfor}}</td>
               </tr>                        
               <tr>
-                  <th><i class="fa fa-clock-o fa-fw"></i> Last checked</th>
-                  <td>{{feed.last_checked_on|since|capitalize}}</td>
-              </tr>                        
-
-              <tr>
-                <th><i class="fa fa-cog fa-fw"></i> Last status</th>
-                <td><code>{{feed.last_status|status_title|capitalize}}</code></td>
+                  <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
+                  <td>{{feed.last_checked_on|since|capitalize}}&ensp;<code>{{feed.last_status|status_title|capitalize}}</code></td>
               </tr>                        
 
             {{if feed.error_count}}

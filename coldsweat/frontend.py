@@ -282,34 +282,36 @@ class FrontendApp(WSGIApp):
     @login_required    
     def feed_add(self, request):        
         message = ''
-        if request.method == 'POST':
-            self_link = request.POST['self_link'].strip()
-            if not is_valid_url(self_link):
-                message = render_message(u'ERROR Error, please specify a valid web address')
-                return self.respond_with_template('_feed_add_wizard_1.html', locals())
-            status = fetcher.check_url(self_link)
-            if status in (300, 404, 410, 500):
-                message = render_message(u'ERROR Error, feed host returned: %s' % filters.status_title(status))
-                return self.respond_with_template('_feed_add_wizard_1.html', locals())
-    
-            group = None
-            group_id = int(request.POST.get('group', 0))
-            if group_id:
-                group = Group.get(Group.id == group_id) 
-    
-            feed = Feed()
-            feed.self_link = self_link
-            feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
-            subscription = fetcher.add_subscription(feed, self.user, group)
-            if subscription:
-                self.alert_message = render_message(u'SUCCESS Feed has been added to <i>%s</i> group' % group.title)
-            else:
-                self.alert_message = render_message(u'INFO Feed already in <i>%s</i> group' % group.title)
-    
-            return self.redirect_after_post('%s/?feed=%d' % (request.application_url, feed.id)) 
-        else:
-            groups = get_groups(self.user)
+        groups = get_groups(self.user)
+        
+        if request.method == 'GET':
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
+
+        # Handle postback
+        self_link = request.POST['self_link'].strip()
+        if not is_valid_url(self_link):
+            message = render_message(u'ERROR Error, please specify a valid web address')
+            return self.respond_with_template('_feed_add_wizard_1.html', locals())
+        status = fetcher.check_url(self_link)
+        if status not in fetcher.GOOD_STATUS_CODES:
+            message = render_message(u'ERROR Error, feed host returned: %s' % filters.status_title(status))
+            return self.respond_with_template('_feed_add_wizard_1.html', locals())
+
+        group_id = int(request.POST.get('group', 0))
+        if group_id:
+            group = Group.get(Group.id == group_id) 
+        else:
+            group = Group.get(Group.title == Group.DEFAULT_GROUP)    
+
+        feed = Feed()
+        feed.self_link = self_link
+        feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
+        subscription = fetcher.add_subscription(feed, self.user, group)
+        if subscription:
+            self.alert_message = u'SUCCESS Feed has been added to <i>%s</i> group' % group.title
+        else:
+            self.alert_message = u'INFO Feed already in <i>%s</i> group' % group.title
+        return self.respond_with_script('_feed_add_wizard_done.js', {'url': '%s/?feed=%d' % (request.application_url, feed.id)}) 
 
         
     @GET(r'^/fever/?$')
@@ -340,7 +342,33 @@ class FrontendApp(WSGIApp):
         }                    
         return self.respond_with_template('_modal_alert.html', namespace)
     
-    def respond_with_template(self, filename, view_namespace=None):
+    # @@TODO: remove code duplication with respond_with_template
+    def respond_with_script(self, filename, view_namespace=None):
+        
+        namespace = self.app_namespace.copy()
+        namespace.update({
+            'request'           : self.request,
+            'application_url'   : self.request.application_url,
+        })
+
+        namespace.update(view_namespace or {})
+        
+        if 'self' in namespace:
+             # Avoid passing self or Tempita will complain
+            del namespace['self']
+
+        response = Response(
+            render_template(filename, namespace),
+            content_type='application/javascript', charset='utf-8')
+
+        # Pass along alert_message cookie in the case 
+        #   we force a redirect within the script
+        if self.alert_message:
+            response.set_cookie('alert_message', self.alert_message)
+                                
+        return response
+
+    def respond_with_template(self, filename, view_namespace=None, content_type='text/html'):
         
         namespace = self.app_namespace.copy()
         namespace.update({
@@ -360,7 +388,7 @@ class FrontendApp(WSGIApp):
 
         response = Response(
             render_template(filename, namespace),
-            content_type='text/html', charset='utf-8')
+            content_type=content_type, charset='utf-8')
         
         # Delete alert_message cookie, if any
         if message:

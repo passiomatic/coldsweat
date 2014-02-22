@@ -33,7 +33,9 @@ def add_feeds_from_file(source, user):
     Add feeds to database reading from a file containing OPML data. 
     """    
     feeds = []    
-    groups = [None] # Use default group
+    groups = [
+        Group.get(Group.title == Group.DEFAULT_GROUP)    
+    ]
     
     with transaction():
 

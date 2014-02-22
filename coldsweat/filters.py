@@ -11,6 +11,8 @@ import re, cgi, urllib, urlparse
 from webob.exc import status_map
 import utilities
 
+from coldsweat import log
+
 __all__ = []
 
 def filter(filtername):        

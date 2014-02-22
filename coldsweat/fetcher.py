@@ -23,6 +23,7 @@ from filters import escape_html
 from coldsweat import *
 
 MAX_TITLE_LENGTH = 255
+GOOD_STATUS_CODES = 200, 302, 304 # Other redirects are handled by Requests
 
 # ------------------------------------------------------
 # Blacklist
@@ -156,10 +157,7 @@ def add_feed(feed, fetch_icon=False, add_entries=False):
 
     return feed
     
-def add_subscription(feed, user, group=None):
-
-    if not group:
-        group = Group.get(Group.title == Group.DEFAULT_GROUP)    
+def add_subscription(feed, user, group):
 
     try:
         subscription = Subscription.create(user=user, feed=feed, group=group)
@@ -198,7 +196,7 @@ def check_url(url, timeout=None, etag=None, modified_since=None):
             response = r(url, timeout=timeout, headers=request_headers)
             status = response.status_code
             log.debug("got status %d" % status)
-            if status in (200, 302, 304):
+            if status in GOOD_STATUS_CODES:
                 break
         except (IOError, RequestException):
             # Interpret as 'Service Unavailable'

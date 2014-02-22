@@ -148,10 +148,9 @@ $(document).ready(function() {
             form.find('.modal-footer').hide()
             form.find('.modal-body').html(loading_fragment)
             $.ajax(form.attr('action'), { 
-                dataType: 'html', 
+                //dataType: 'html', 
                 type: form.attr('method'), 
                 data: serializedData}).done(function(data, textStatus, jqXHR) {                               
-                   //console.debug(jqXHR.status)
                    form.replaceWith(data)                   
             })       
         })

@@ -74,8 +74,12 @@ $media-queries-supported : true;
             @include zero;
             padding-left: $gutterwidth*1.5;
             text-transform: capitalize;        
-            span {
-                color: $lightneutralcolor;                    
+            // Icon
+            .fa {
+                color: $lightneutralcolor;
+            }            
+            span.status-disabled {
+                text-decoration: line-through;
             }
         }
     }
@@ -116,6 +120,7 @@ $media-queries-supported : true;
                 // Title
         
                 > h3 {
+                    text-transform: capitalize;        
                     a { display: block; }
                 }
     
@@ -159,7 +164,6 @@ $media-queries-supported : true;
         @include box-shadow(0 0 4px $lightneutralcolor);                
 
         > li {  
-
             &:not(.expanded) .actions {
                 opacity: 0;
                 @include visuallyhidden;                

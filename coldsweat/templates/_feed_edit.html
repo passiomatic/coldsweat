@@ -46,10 +46,8 @@
   </div>
   <div class="modal-footer">
     <button type="submit" name="unsubscribe" value="1" class="btn btn-error">Unsubscribe</button>
-<!--
-    {{if  feed.is_enabled}}
+    {{if not feed.is_enabled}}
         <button type="submit" name="enable" value="1" class="btn btn-success">Enable Again</button>
     {{endif}} 
--->
   </div>
 </form>

@@ -223,17 +223,21 @@ nav a:focus { color: white; }
 
 .swatch-info span:nth-child(4) { background-color: rgba(175, 204, 223, 0.6); }
 
-.swatch-success span:nth-child(1) { background-color: rgba(188, 212, 222, 0.9); }
+.swatch-success span:nth-child(1) { background-color: rgba(94, 179, 55, 0.9); }
 
-.swatch-success span:nth-child(2) { background-color: rgba(188, 212, 222, 0.8); }
+.swatch-success span:nth-child(2) { background-color: rgba(94, 179, 55, 0.8); }
 
-.swatch-success span:nth-child(3) { background-color: rgba(188, 212, 222, 0.7); }
+.swatch-success span:nth-child(3) { background-color: rgba(94, 179, 55, 0.7); }
 
-.swatch-success span:nth-child(4) { background-color: rgba(188, 212, 222, 0.6); }
+.swatch-success span:nth-child(4) { background-color: rgba(94, 179, 55, 0.6); }
 
 .btn { background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#e4e2e2), to(#cbc7c7)); background-image: -webkit-linear-gradient(top, #e4e2e2, #cbc7c7); background-color: #cbc7c7; background-image: -moz-linear-gradient(top, #e4e2e2, #cbc7c7); background-image: -ms-linear-gradient(top, #e4e2e2, #cbc7c7); background-image: -o-linear-gradient(top, #e4e2e2, #cbc7c7); background-image: linear, top, #e4e2e2, #cbc7c7; background-repeat: repeat-x; }
 
 .btn-primary { background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#175b82), to(#0f3d57)); background-image: -webkit-linear-gradient(top, #175b82, #0f3d57); background-color: #0f3d57; background-image: -moz-linear-gradient(top, #175b82, #0f3d57); background-image: -ms-linear-gradient(top, #175b82, #0f3d57); background-image: -o-linear-gradient(top, #175b82, #0f3d57); background-image: linear, top, #175b82, #0f3d57; background-repeat: repeat-x; }
+
+.btn-error { background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#9c1c1e), to(#711416)); background-image: -webkit-linear-gradient(top, #9c1c1e, #711416); background-color: #711416; background-image: -moz-linear-gradient(top, #9c1c1e, #711416); background-image: -ms-linear-gradient(top, #9c1c1e, #711416); background-image: -o-linear-gradient(top, #9c1c1e, #711416); background-image: linear, top, #9c1c1e, #711416; background-repeat: repeat-x; }
+
+.btn-success { background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5eb337), to(#4a8c2b)); background-image: -webkit-linear-gradient(top, #5eb337, #4a8c2b); background-color: #4a8c2b; background-image: -moz-linear-gradient(top, #5eb337, #4a8c2b); background-image: -ms-linear-gradient(top, #5eb337, #4a8c2b); background-image: -o-linear-gradient(top, #5eb337, #4a8c2b); background-image: linear, top, #5eb337, #4a8c2b; background-repeat: repeat-x; }
 
 /*
  *  Font Awesome 4.0.3 by @davegandy - http://fontawesome.io - @fontawesome
@@ -1286,8 +1290,8 @@ nav a:focus { color: white; }
 .alert > h4 { margin: 0; color: #05090b; }
 
 /*alert*/
-.alert--success { background-color: #bcd4de; border-color: #9abecd; color: #335868; }
-.alert--success > h4 { color: #335868; }
+.alert--success { background-color: #5eb337; border-color: #4a8c2b; color: black; }
+.alert--success > h4 { color: black; }
 
 /*alert--success*/
 .alert--danger, .alert--error { background-color: #9c1c1e; border-color: #711416; color: #fceeee; }
@@ -1345,13 +1349,7 @@ top : 20%; }
 
 .modal-header { padding: 0.75em 24px; border-bottom: 1px solid #c6c2c2; }
 
-.modal-header .close { float: right; margin-top: 8px; /*
-background-color : $buttonbackgroundcolor;
-@include buttongrad;
-border : $buttonborderwidth $buttonborderstyle $buttonbordercolor;
-border-bottom-color : $buttonbottombordercolor;
-border-radius : $buttonborderradius;
-*/ cursor: pointer; color: #474242; }
+.modal-header .close { margin: 0; padding: 0; font-size: 16px; font-size: 1.6rem; margin-top: 8px; float: right; border: none; background: none; cursor: pointer; color: #898080; }
 
 .modal-header h3 { margin: 0; line-height: 30px; }
 
@@ -1359,7 +1357,7 @@ border-radius : $buttonborderradius;
 
 .modal-form { margin-bottom: 0; }
 
-.modal-footer { padding: 0.75em 24px; margin-bottom: 0; text-align: right; border-top: 1px solid #c6c2c2; border-radius: 0 0 inherit inherit; *zoom: 1; }
+.modal-footer { padding: 0.75em 24px; margin-bottom: 0; /* text-align : right; */ border-top: 1px solid #c6c2c2; border-radius: 0 0 inherit inherit; *zoom: 1; }
 
 .modal-footer:before, .modal-footer:after { display: table; line-height: 0; content: ""; }
 
@@ -1452,7 +1450,7 @@ border-radius : $buttonborderradius;
 table { max-width: 100%; background-color: transparent; border-collapse: collapse; border-spacing: 0; font-family: Ubuntu, Segoe, "Segoe UI", "Helvetica Neue", Arial, Helvetica, sans-serif; }
 
 .table { width: 100%; max-width: 100%; /* margin-bottom : $baselineheight; */ }
-.table th, .table td { padding: 8px 4px; vertical-align: top; border-top: 1px solid #898080; /* @include font-size($basefontsize / 1.25); */ line-height: 1.5em; text-align: left; }
+.table th, .table td { padding: 8px 0; vertical-align: top; border-top: 1px solid #898080; /* @include font-size($basefontsize / 1.25); */ line-height: 1.5em; text-align: left; }
 .table th { font-weight: bold; }
 .table thead th { vertical-align: bottom; }
 .table colgroup + thead tr:first-child th, .table colgroup + thead tr:first-child td, .table thead:first-child tr:first-child th, .table thead:first-child tr:first-child td { border-top: 0; }
@@ -1633,8 +1631,6 @@ input.search-query { margin-bottom: 0; padding-right: 14px; padding-right: 4px \
 /*btn*/
 .btn:first-child { *margin-left: 0; }
 
-.btn-text { padding: 0; border: none; background: none; }
-
 .btn-disabled { opacity: .5; cursor: default; }
 
 .btn-error { background-color: #9c1c1e; border-color: #711416; border-bottom-color: #460c0d; color: white; }
@@ -1653,8 +1649,8 @@ input.search-query { margin-bottom: 0; padding-right: 14px; padding-right: 4px \
 .btn-primary:visited, .btn-primary:active, .btn-primary:hover { background-color: #155275; color: #f2f2f2; }
 
 /*btn-primary*/
-.btn-success { background-color: #bcd4de; border-color: #9abecd; border-bottom-color: #9abecd; color: #335868; }
-.btn-success:visited, .btn-success:active, .btn-success:hover { background-color: #abc9d6; color: #2b4a57; }
+.btn-success { background-color: #5eb337; border-color: #4a8c2b; border-bottom-color: #4a8c2b; color: white; }
+.btn-success:visited, .btn-success:active, .btn-success:hover { background-color: #549f31; color: #f2f2f2; }
 
 /*btn-success*/
 .btn-warning { background-color: #9c1c1e; border-color: #711416; border-bottom-color: #460c0d; color: white; }

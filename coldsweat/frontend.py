@@ -86,32 +86,32 @@ class FrontendApp(WSGIApp):
         
         if 'saved' in request.GET:
             count, q = get_saved_entries(user, Entry.id).count(), get_saved_entries(user)
-            panel_title = '<span><i class="fa fa-star"></i></span>&ensp;Saved'
+            panel_title = '<i class="fa fa-star"></i>&ensp;Saved'
             filter_class = filter_name = 'saved'
             page_title = 'Saved'
         elif 'group' in request.GET:
             group_id = int(request.GET['group'])    
             group = Group.get(Group.id == group_id) 
             count, q = get_group_entries(user, group, Entry.id).count(), get_group_entries(user, group)
-            panel_title = '<span><i class="fa fa-folder-open"></i></span>&ensp;%s' % group.title                
+            panel_title = '<i class="fa fa-folder-open"></i>&ensp;%s' % group.title                
             filter_name = 'group=%s' % group_id
             page_title = group.title
         elif 'feed' in request.GET:
             feed_id = int(request.GET['feed'])
             feed = Feed.get(Feed.id == feed_id) 
             count, q = get_feed_entries(user, feed, Entry.id).count(), get_feed_entries(user, feed)
-            panel_title = '<span><i class="fa fa-rss"></i></span>&ensp;%s' % feed.title                
+            panel_title = '<i class="fa fa-rss"></i>&ensp;<span class="%s">%s</span>' % ('' if feed.is_enabled else 'status-disabled', feed.title)
             filter_class = 'feeds'
             filter_name = 'feed=%s' % feed_id
             page_title = feed.title
         elif 'all' in request.GET:
             count, q = get_all_entries(user, Entry.id).count(), get_all_entries(user)
-            panel_title = '<span><i class="fa fa-archive"></i></span>&ensp;All'                
+            panel_title = '<i class="fa fa-archive"></i>&ensp;All'                
             filter_class = filter_name = 'all'
             page_title = 'All'
         else: # Default
             count, q = get_unread_entries(user, Entry.id).count(), get_unread_entries(user)
-            panel_title = '<span><i class="fa fa-circle"></i></span>&ensp;Unread'
+            panel_title = '<i class="fa fa-circle"></i>&ensp;Unread'
             filter_class = filter_name = 'unread'
             page_title = 'Unread'
                     
@@ -264,10 +264,12 @@ class FrontendApp(WSGIApp):
             enable = int(request.POST.get('enable', 0))
             if unsubscribe:
                 count = Subscription.delete().where((Subscription.user == self.user) & (Subscription.feed == feed)).execute()
-                log.debug('unsub %d' % count)
-                self.alert_message = u'INFO Feed <i>%s</i> has been removed from your subscriptions.' % feed.title            
-#             if enable:
-#                 pass
+                self.alert_message = u'INFO You are no longer subscribed to <i>%s</i>.' % feed.title            
+            if enable:
+                feed.is_enabled = True
+                feed.error_count = 0                
+                feed.save()
+                self.alert_message = u'INFO Feed <i>%s</i> is now enabled.' % feed.title            
             return self.redirect_after_post('%s/feeds/' % request.application_url)
         else:
             q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))

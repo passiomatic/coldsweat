@@ -38,7 +38,7 @@ def escape_html(value):
 @filter('url')
 def escape_url(value):     
     if value:
-        return urllib.quote(value)
+        return urllib.quote(utilities.encode(value))
     return ''
     
 # def filter_escape_javacript(value):     

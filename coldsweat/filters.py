@@ -104,6 +104,16 @@ def status_title(code):
     except KeyError:
         pass 
     return title
+
+@filter('alert')
+def alert(message):
+    if not message:
+        return ''        
+    try: 
+        klass, text = message.split(u' ', 1)
+    except ValueError:
+        return text
+    return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
  
 def run_tests():
     

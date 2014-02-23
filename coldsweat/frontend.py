@@ -194,18 +194,18 @@ class FrontendApp(WSGIApp):
         
         return self.respond_with_template('entries.html', namespace)
 
-    @GET(r'^/entries/mark$')
-    def entry_list_mark(self, request):  
-        now = datetime.utcnow()          
-        return self.respond_with_template('_entries_mark_all_read.html', locals())
-        
-    @POST(r'^/entries/mark$')
+
+    @form(r'^/entries/mark$')
     @login_required    
-    def entry_list_mark_post(self, request):
+    def entry_list_mark(self, request):
         '''
         Mark all entries as read
         '''
+        if request.method == 'GET':
+            now = datetime.utcnow()          
+            return self.respond_with_template('_entries_mark_all_read.html', locals())
 
+        # Handle postback
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
         except (KeyError, ValueError):
@@ -226,11 +226,10 @@ class FrontendApp(WSGIApp):
                 except IntegrityError:
                     log.debug('entry %d already marked as read, ignored' % entry.id)
                     continue                     
-
-        return self.respond_with_modal(request.application_url, 
-            message=render_message('SUCCESS All entries have been marked as read'), 
-            params=[('unread', '')])
-                                                        
+        
+        self.alert_message = 'SUCCESS All entries have been marked as read'
+        return self.respond_with_script('_modal_done.js', {'location': '%s/entries/?unread' % request.application_url})
+                                
     # Feeds
 
     @GET(r'^/feeds/?$')
@@ -290,11 +289,11 @@ class FrontendApp(WSGIApp):
         # Handle postback
         self_link = request.POST['self_link'].strip()
         if not is_valid_url(self_link):
-            message = render_message(u'ERROR Error, please specify a valid web address')
+            message = u'ERROR Error, please specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
         status = fetcher.check_url(self_link)
-        if status not in fetcher.GOOD_STATUS_CODES:
-            message = render_message(u'ERROR Error, feed host returned: %s' % filters.status_title(status))
+        if status not in fetcher.POSITIVE_STATUS_CODES:
+            message = u'ERROR Error, feed host returned: %s' % filters.status_title(status)
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
         group_id = int(request.POST.get('group', 0))
@@ -310,8 +309,8 @@ class FrontendApp(WSGIApp):
         if subscription:
             self.alert_message = u'SUCCESS Feed has been added to <i>%s</i> group' % group.title
         else:
-            self.alert_message = u'INFO Feed already in <i>%s</i> group' % group.title
-        return self.respond_with_script('_feed_add_wizard_done.js', {'url': '%s/?feed=%d' % (request.application_url, feed.id)}) 
+            self.alert_message = u'INFO Feed is already in <i>%s</i> group' % group.title
+        return self.respond_with_script('_modal_done.js', {'location': '%s/?feed=%d' % (request.application_url, feed.id)}) 
 
         
     @GET(r'^/fever/?$')
@@ -370,15 +369,14 @@ class FrontendApp(WSGIApp):
 
     def respond_with_template(self, filename, view_namespace=None, content_type='text/html'):
         
+        message = self.request.cookies.get('alert_message', '')
+        
         namespace = self.app_namespace.copy()
         namespace.update({
             'request'           : self.request,
             'application_url'   : self.request.application_url,
+            'alert_message'     : message
         })
-
-        message = self.request.cookies.get('alert_message', '')
-        if message:
-            namespace['alert_message'] = render_message(message)
 
         namespace.update(view_namespace or {})
         
@@ -468,17 +466,6 @@ frontend_app = SessionMiddleware(FrontendApp())
 # ------------------------------------------------------
 # Template utilities
 # ------------------------------------------------------        
-
-def render_message(message):
-    if not message:
-        return ''
-        
-    try: 
-        klass, text = message.split(u' ', 1)
-    except ValueError:
-        return text
-    return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
-
             
 #@@TODO: use utilities.render_template - see https://bitbucket.org/ianb/tempita/issue/8/htmltemplate-escapes-too-much-in-inherited
 def render_template(filename, namespace):                    

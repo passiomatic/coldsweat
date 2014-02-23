@@ -9,7 +9,7 @@ $(document).ready(function() {
     var loading_fragment = $('<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading&hellip;</div>')
     //var loading_favicon_fragment = $('<i class="favicon fa fa-spinner fa-spin"></i>')
 
-    $(document).ajaxError(function(event, jqxhr, settings, exception) {
+    $(document).ajaxError(function(event, jqXHR, settings, exception) {
         alert('Oops! An error occurred while processing your request: ' + exception)
     });
 
@@ -132,7 +132,7 @@ $(document).ready(function() {
             event.preventDefault()
             var fragment = modal_fragment.clone() 
             fragment.attr('id', $(this).data('remote-modal'))
-            fragment.load($(this).attr('href'), function(response, status, xhr) {
+            fragment.load($(this).attr('href'), function(response, status, jqXHR) {
                 fragment.html(response)
                 fragment.on('hidden', function(event) {
                     fragment.remove() // Remove from DOM
@@ -145,13 +145,15 @@ $(document).ready(function() {
             event.preventDefault()
             var form = $(event.target)
             var serializedData = form.serialize()
-            form.find('.modal-footer').hide()
-            form.find('.modal-body').html(loading_fragment)
+            form.find('.modal-footer').html(loading_fragment)
             $.ajax(form.attr('action'), { 
-                //dataType: 'html', 
                 type: form.attr('method'), 
                 data: serializedData}).done(function(data, textStatus, jqXHR) {                               
-                   form.replaceWith(data)                   
+                    // Replace form with response only if HTML (it could be script)
+                    var contentType = jqXHR.getResponseHeader('content-type') || '';
+                    if (contentType.indexOf('text/html') == 0) {
+                        form.replaceWith(data)                   
+                    }
             })       
         })
 

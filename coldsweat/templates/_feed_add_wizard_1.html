@@ -4,7 +4,7 @@
     <h3>Add Subscription</h3>
   </div>
   <div class="modal-body">          
-        {{message}}
+        {{message|alert}}
         <label for="self-link-field">Web address (URL) for the feed</label> 
         <input type="text" id="field-self-link" autofocus name="self_link"  size="40" value="">
         {{if length(groups) > 1}}

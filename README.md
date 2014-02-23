@@ -1,27 +1,20 @@
 # Coldsweat
 
-Coldsweat is a clean-room Python clone of the [Fever RSS aggregator][f], focusing on providing a compatible API and web feed reader. 
+Python web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
 
- ![Screenshot](screenshots/coldsweat-0.9.0.jpg)
+![Screenshot](screenshots/coldsweat-0.9.0.jpg)
 
 ## Motivation
 
-I'm fed up of online services that are here today and gone tomorrow. After the Google Reader shutdown is clear to me that the less we rely on external services the more the data we care about are preserved. With this in mind I'm writing Coldsweat. It will be my personal take at consuming feeds today. 
-
-There will be blood.
+I'm fed up of online services that are here today and gone tomorrow. After the Google Reader shutdown is clear to me that the less we rely on external services the more the data we care about are preserved. With this in mind I'm writing Coldsweat. It will be my personal take at consuming feeds today.
 
 ## Features
 
-* Multi-user support
-* Compatible with existing Fever desktop and mobile clients
-* Support for grouping of similar items
 * Web interface to read and add feeds
+* Compatible with existing Fever desktop and mobile clients
+* Multi-user support
+* Support for grouping of similar items
 * Multiprocessing for parallel feed fetching
-
-## Current status
-
-* Coldsweat correctly syncs read and saved items with [Reeder][r] for iOS and [ReadKit][rk] on OS X (see [issue #3][i3])
-* A command-line utility is provided to bulk import and export feeds as an OPML files, create users and more (run `python sweat.py -h`)
 
 ## Setup
 
@@ -29,7 +22,9 @@ See _[setup]_ page.
 
 ## Upgrading from previous versions
 
-Coldsweat 0.9.1 works with newer versions of Requests, WebOb and Peewee packages so you need to update those too. As usual run again `pip install -r requirements.txt`. 
+Coldsweat 0.9.1 works with newer versions of Requests, WebOb and Peewee packages. To update run: 
+
+    `pip install -r requirements.txt` 
 
 ## Technical underpinnings
 

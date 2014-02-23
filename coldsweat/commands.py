@@ -109,7 +109,7 @@ def command_export(parser, options, args):
     filename = args[0]
     
     timestamp = format_http_datetime(datetime.utcnow())
-    feeds = Feed.select().join(Subscription).where(Subscription.user == user).order_by(Feed.title)
+    feeds = Feed.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Feed.title)
     
     with open(filename, 'w') as f:
         f.write(render_template(path.join(template_dir, 'export.xml'), locals()))

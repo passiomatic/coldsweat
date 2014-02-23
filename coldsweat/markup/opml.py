@@ -32,10 +32,10 @@ def add_feeds_from_file(source, user):
     """
     Add feeds to database reading from a file containing OPML data. 
     """    
+    default_group = Group.get(Group.title == Group.DEFAULT_GROUP)    
+
     feeds = []    
-    groups = [
-        Group.get(Group.title == Group.DEFAULT_GROUP)    
-    ]
+    groups = [default_group]
     
     with transaction():
 
@@ -48,15 +48,15 @@ def add_feeds_from_file(source, user):
                     for k, v in element.attrib.items():
                         if k in group_allowed_attribs:
                             setattr(group, group_allowed_attribs[k], v)
-                        
-                    try:                        
+
+                    try:
+                        group = Group.get(Group.title==group.title)                    
+                    except Group.DoesNotExist:
                         group.save()                                                                                            
                         log.debug('added group %s to database' % group.title)
-                    except IntegrityError: 
-                        pass
-
+                    
                     groups.append(group)
-
+                                                
             elif event == 'end':
                 if (element.tag == 'outline') and ('xmlUrl' in element.attrib):
                     # Leaving a feed

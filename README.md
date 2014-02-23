@@ -31,6 +31,7 @@ Coldsweat 0.9.1 works with newer versions of Requests, WebOb and Peewee packages
 * Uses the industry standard Mark Pilgrim's [Universal Feed Parser][fp]
 * Is WSGI compatible - currently tested under CGI, FastCGI and Passenger environments
 * Uses SQLite, PostgreSQL and MySQL databases - PostgreSQL is still untested but should work (see [issue #37][i37])
+* Coldsweat web reader has been tested with Safari 5 and latest versions of Chrome and Firefox
 
 Coldsweat started in July 2013 as a fork of [Bottle Fever][b] by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds.
 

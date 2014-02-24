@@ -536,7 +536,8 @@ def get_stats():
 
     entry_count = Entry.select().count()        
     unread_entry_count = Entry.select().where(~(Entry.id << Read.select(Read.entry))).count()
-    feed_count = Feed.select().count()        
+    feed_count = Feed.select().count()
+    #@@TODO: count enabled feeds with at least one subscriber
     active_feed_count = Feed.select().where(Feed.is_enabled==True).count()
 
     return locals()

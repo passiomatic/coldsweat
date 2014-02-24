@@ -39,25 +39,19 @@
 
                 <table class="table">
                   <tbody>
-<!--
-                      <tr>
-                          <td>Overall health</td>
-                          <td class=""><i class="icon-heart"></i>&ensp;Good</td>
-                      </tr>   
--->                     
                       <tr>
                           <td>Last refresh</td>
-                          <td class="">{{last_checked_on}}</td>
+                          <td class="">{{last_checked_on}} <abbr title="Coordinated Universal Time">UTC</abbr></td>
                       </tr>                        
     
                       <tr>
                           <td>Active feeds</td>
-                          <td><b>{{active_feed_count}}</b> of <b>{{feed_count}}</b></td>
+                          <td><b>{{active_feed_count}}</b> of {{feed_count}}</td>
                       </tr>                        
     
                       <tr>
                           <td>Unread entries</td>
-                          <td><b>{{unread_entry_count}}</b> of <b>{{entry_count}}</b></td>
+                          <td><b>{{unread_entry_count}}</b> of {{entry_count}}</td>
                       </tr>                        
     
                   </tbody>        

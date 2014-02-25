@@ -120,7 +120,6 @@ $media-queries-supported : true;
                 // Title
         
                 > h3 {
-                    text-transform: capitalize;        
                     a { display: block; }
                 }
     
@@ -514,7 +513,7 @@ article {
 .boxed {
     
     .well {
-       min-height: $baselineheight*8;        
+       min-height: $baselineheight*6;        
     }
 }
 

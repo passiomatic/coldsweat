@@ -24,7 +24,7 @@ See _[setup]_ page.
 
 Coldsweat 0.9.1 works with newer versions of Requests, WebOb and Peewee packages. To update run: 
 
-    `pip install -r requirements.txt` 
+    pip install -r requirements.txt
 
 ## Technical underpinnings
 

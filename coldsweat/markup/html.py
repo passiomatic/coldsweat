@@ -257,11 +257,11 @@ def find_feed_link(data, base_url):
         return links[0]    
     return None    
 
-# def sniff_feed(data): 
-#     data = data.lower()
-#     if data.count('<html'):
-#         return 0
-#     return any((data.count('<rss'), data.count('<rdf'), data.count('<feed'))
+def sniff_feed(data): 
+    data = data.lower()
+    if data.count('<html'):
+        return False
+    return any((data.count('<rss'), data.count('<rdf'), data.count('<feed')))
 
 # Misc.
         

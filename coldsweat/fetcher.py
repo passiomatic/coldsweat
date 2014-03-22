@@ -172,38 +172,26 @@ def add_subscription(feed, user, group):
 # Feed fetching and parsing 
 # ------------------------------------------------------
 
-def check_url(url, timeout=None, etag=None, modified_since=None):
-    '''
-    Issue an HEAD - and if it fails a GET - to the given URL
-    '''
-    
-    schema, netloc, path, params, query, fragment = urlparse.urlparse(url)
-    
+def fetch_url(url, timeout=None, etag=None, modified_since=None):
+
     request_headers = {
         'User-Agent': user_agent
     }
 
-    # Conditional GET/HEAD headers
-    if etag and modified_on:
+    # Conditional GET headers
+    if etag and modified_since:
         request_headers['If-None-Match'] = etag
         request_headers['If-Modified-Since'] = format_http_datetime(modified_since)
         
     timeout = timeout if timeout else config.getint('fetcher', 'timeout')
     
-    for method, r in [('HEAD', requests.head), ('GET', requests.get)]:
-        try:
-            log.debug("checking %s with %s" % (netloc, method))
-            response = r(url, timeout=timeout, headers=request_headers)
-            status = response.status_code
-            log.debug("got status %d" % status)
-            if status in POSITIVE_STATUS_CODES:
-                break
-        except (IOError, RequestException):
-            # Interpret as 'Service Unavailable'
-            log.warn("a network error occured while checking %s" % netloc)
-            status = 503
+    try:
+        response = requests.get(url, timeout=timeout, headers=request_headers)
+        log.debug("got status %d" % response.status_code)
+    except (IOError, RequestException), ex:
+        return None
     
-    return status
+    return response
 
 
 def fetch_feed(feed, add_entries=False):
@@ -230,10 +218,6 @@ def fetch_feed(feed, add_entries=False):
 
     now = datetime.utcnow()
 
-    request_headers = {
-        'User-Agent': user_agent
-    }
-
     interval = config.getint('fetcher', 'min_interval')
 
     # Check freshness
@@ -241,27 +225,17 @@ def fetch_feed(feed, add_entries=False):
         value = getattr(feed, fieldname)
         if not value:
             continue
-
-        # No datetime.timedelta since we need to deal with large seconds values            
+        # No datetime.timedelta since we need to deal with large seconds values
         delta = datetime_as_epoch(now) - datetime_as_epoch(value)    
         if delta < interval:
             log.debug("%s for %s is below min_interval, skipped" % (fieldname, netloc))
             return            
                       
-    # Conditional GET headers
-    if feed.etag and feed.last_updated_on:
-        request_headers['If-None-Match'] = feed.etag
-        request_headers['If-Modified-Since'] = format_http_datetime(feed.last_updated_on)
-
-    timeout = config.getint('fetcher', 'timeout')
-                
-    try:
-        response = requests.get(feed.self_link, timeout=timeout, headers=request_headers)
-    except (IOError, RequestException):        
-        # Interpret as 'Service Unavailable'
-        #@@FIXME: catch ContentDecodingError? 
+    response = fetch_url(feed.self_link, etag=feed.etag, modified_since=feed.last_updated_on)
+    if not response:
+        # Record as "503 Service unavailable"
         post_fetch(503, error=True)
-        log.warn("a network error occured while fetching %s, skipped" % netloc)
+        log.warn("a network error occured while fetching %s" % netloc)
         return
 
     feed.last_checked_on = now
@@ -289,7 +263,7 @@ def fetch_feed(feed, add_entries=False):
         feed.is_enabled = False
         post_fetch(response.status_code)
         return
-    elif response.status_code not in (200, ):                           # No good
+    elif response.status_code not in POSITIVE_STATUS_CODES:             # No good
         log.warn("%s replied with status %d, aborted" % (netloc, response.status_code))
         post_fetch(response.status_code, error=True)
         return

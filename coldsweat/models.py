@@ -85,7 +85,8 @@ class User(CustomModel):
     @staticmethod
     def validate_api_key(api_key):
         try:
-            user = User.get((User.api_key == api_key) & 
+            #@@NOTE: Fever clients may sed api_key in uppercase, lower() it
+            user = User.get((User.api_key == api_key.lower()) & 
                 (User.is_enabled == True))        
         except User.DoesNotExist:
             return None

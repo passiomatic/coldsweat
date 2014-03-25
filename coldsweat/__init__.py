@@ -44,16 +44,17 @@ if config.has_option('fetcher', 'user_agent'):
 # Configure logger
 # ------------------------------------------------------
 
+log_level = config.get('log', 'level').upper()
 logging.basicConfig(
     filename    = config.get('log', 'filename'),
-    level       = getattr(logging, config.get('log', 'level')),
+    level       = getattr(logging, log_level),
     format      = config.get('log', 'format'),
     datefmt     = config.get('log', 'datefmt'),
 )
-                  
-logging.getLogger("peewee").setLevel(logging.WARN)
-logging.getLogger("requests").setLevel(logging.WARN)
 
+for module in 'peewee', 'requests':
+    logging.getLogger(module).setLevel(logging.CRITICAL if log_level != 'DEBUG' else logging.WARN)
+        
 # Shared logger instance
 log = logging.getLogger()
 

@@ -38,7 +38,7 @@ scrub: off
 
 [log]
 
-; Values are: DEBUG (more verbose), INFO, WARNING, ERROR (less verbose)
+; Values are: DEBUG (more verbose), INFO, WARNING, ERROR, CRITICAL (less verbose)
 level: INFO
 filename: coldsweat.log
 format : localhost - - [%(asctime)s] %(process)d %(levelname)s %(message)s

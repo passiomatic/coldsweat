@@ -8,7 +8,6 @@ License: MIT (see LICENSE.md for details)
 """
 
 from xml.etree import ElementTree
-from peewee import IntegrityError
 
 from ..models import *
 from coldsweat import log, favicon

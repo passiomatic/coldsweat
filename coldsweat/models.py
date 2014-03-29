@@ -24,7 +24,7 @@ if engine == 'sqlite':
 elif engine == 'mysql':
     _db = MySQLDatabase(None)
 elif engine == 'postgresql':
-    _db = PostgresqlDatabase(None)
+    _db = PostgresqlDatabase(None, autorollback=True)
 else:
     raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
 

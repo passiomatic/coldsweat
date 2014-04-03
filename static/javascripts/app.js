@@ -85,8 +85,8 @@ $(document).ready(function() {
     function moveTo(direction) {        
         return function (event) {            
             // Each() deals with empty set too
-            $(direction == 'next' ? '.view a[rel=next]' : '.view a[rel=prev]').each(function(index, link){                
-                window.location.assign(($(link).attr('href')))
+            $(direction == 'next' ? '.view a[rel=next]' : '.view a[rel=prev]').each(function(){                
+                window.location.assign(($(this).attr('href')))
             })
         }
     }
@@ -101,7 +101,8 @@ $(document).ready(function() {
             'm': function() { $('.entry.expanded .read-trigger').click() },
             's': function() { $('.entry.expanded .save-trigger').click() },
             //'j': moveTo('prev'),
-            'k': moveTo('next')
+            'k': moveTo('next'),
+            'v': function(event) { event.preventDefault(); $('.entry.expanded .meta a[rel=bookmark]').each(function(){ window.open($(this).attr('href'),'_blank') }) }
         }
     
         for (var key in events) {      

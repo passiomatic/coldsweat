@@ -291,10 +291,15 @@ class FrontendApp(WSGIApp):
         if not is_valid_url(self_link):
             message = u'ERROR Error, please specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
-        status = fetcher.check_url(self_link)
-        if status not in fetcher.POSITIVE_STATUS_CODES:
-            message = u'ERROR Error, feed host returned: %s' % filters.status_title(status)
+        response = fetcher.fetch_url(self_link)
+        if response:
+            if response.status_code not in fetcher.POSITIVE_STATUS_CODES:
+                message = u'ERROR Error, feed host returned: %s' % filters.status_title(response.status_code)
+                return self.respond_with_template('_feed_add_wizard_1.html', locals())
+        else:
+            message = u'ERROR Error, a network error occured'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
+
 
         group_id = int(request.POST.get('group', 0))
         if group_id:

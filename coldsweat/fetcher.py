@@ -16,30 +16,14 @@ import feedparser
 import requests
 from requests.exceptions import *
 
-from markup import html
 from models import *
 from utilities import *
 from filters import escape_html
 from coldsweat import *
+from markup import html
 
 MAX_TITLE_LENGTH = 255
 POSITIVE_STATUS_CODES = 200, 302, 304 # Other redirects are handled by Requests
-
-# ------------------------------------------------------
-# Blacklist
-# ------------------------------------------------------
-
-blacklist = []    
-def load_blacklist(filename):
-    try:
-        with open(filename) as f:
-            for line in f:
-                if line == '\n' or line.startswith('#') or line.startswith(';'):
-                    continue # Skip empty values and comments
-                
-                blacklist.append(line.rstrip('\n'))
-    except IOError:
-        log.warn("could not load %s" % filename)
 
 # ------------------------------------------------------
 # Entry data
@@ -121,7 +105,7 @@ def get_entry_content(entry):
             #   it will not be sanitized by Feedparser. This is to avoid data loss.
             return c.type, escape_html(c.value)
     log.debug('no content found for entry %s' % entry.link)    
-    return '', ''
+    return 'text/plain', ''
 
 # ------------------------------------------------------
 # Add feed and subscription
@@ -285,22 +269,25 @@ def fetch_feed(feed, add_entries=False):
 
     feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
     post_fetch(response.status_code)
-    
+
+    trigger_event('feed_saved', feed)
+            
     if not add_entries:    
         return
         
-    for entry in soup.entries:
+    for parsed_entry in soup.entries:
         
-        link        = get_entry_link(entry)
-        guid        = get_entry_id(entry, default=link)
+        link = get_entry_link(parsed_entry)
+        guid = get_entry_id(parsed_entry, default=link)
 
         if not guid:
             log.warn('could not find guid for entry from %s, skipped' % netloc)
             continue
 
-        title       = get_entry_title(entry)
-        timestamp   = get_entry_timestamp(entry, default=now)
-        author      = get_entry_author(entry, soup.feed)
+        title                = get_entry_title(parsed_entry)
+        mime_type, content   = get_entry_content(parsed_entry)
+        timestamp            = get_entry_timestamp(parsed_entry, default=now)
+        author               = get_entry_author(parsed_entry, soup.feed)
                 
         # Skip ancient feed items        
         max_history = config.getint('fetcher', 'max_history')
@@ -316,22 +303,21 @@ def fetch_feed(feed, add_entries=False):
         except Entry.DoesNotExist:
             pass
 
-        mime_type, content = get_entry_content(entry)
-        if blacklist and ('html' in mime_type):
-            content = html.scrub_html(content, blacklist)
-
-        d = {
-            'guid'              : guid,
-            'feed'              : feed,
-            'title'             : title,
-            'author'            : author,
-            'content'           : content,
-            'link'              : link,
-            'last_updated_on'   : timestamp,         
-        }
-
-        # Save to database
-        Entry.create(**d)
+        entry = Entry(
+            guid              = guid,
+            feed              = feed,
+            title             = title,
+            author            = author,
+            content           = content,
+            #@@TODO: add mime_type too
+            link              = link,
+            last_updated_on   = timestamp
+        )
+        #events('entry_parsed')(entry, parsed_entry)
+        trigger_event('entry_parsed', entry, parsed_entry)
+        entry.save()
+        #events('entry_saved')(entry)
+        trigger_event('entry_saved', entry)
 
         log.debug(u"added entry %s from %s" % (guid, netloc))
 
@@ -350,10 +336,6 @@ def fetch_feeds():
                        
     start = time.time()
 
-    if config.getboolean('fetcher', 'scrub'):
-        load_blacklist(path.join(installation_dir, 'etc/blacklist'))
-        log.debug("loaded blacklist: %s" % ', '.join(blacklist))
-
     # Attach feed.subscriptions counter
     q = Feed.select(Feed, fn.Count(Subscription.user).alias('subscriptions')).join(Subscription, JOIN_LEFT_OUTER).group_by(Feed).where(Feed.is_enabled==True)
     
@@ -363,6 +345,7 @@ def fetch_feeds():
         return
 
     log.debug("starting fetcher")
+    trigger_event('fetcher_started')
         
     if config.getboolean('fetcher', 'multiprocessing'):
         from multiprocessing import Pool

@@ -14,7 +14,6 @@ __license__ = 'MIT'
 from os import path
 from ConfigParser import RawConfigParser
 import logging
-import imp
 from webob.exc import status_map
 
 __all__ = [
@@ -31,6 +30,7 @@ __all__ = [
     # Plugins
     'event',
     'trigger_event',
+    # Misc
     'DuplicatedFeedError'
 ]
 
@@ -75,6 +75,7 @@ for module in 'peewee', 'requests':
     logging.getLogger(module).setLevel(logging.CRITICAL if log_level != 'DEBUG' else logging.WARN)
         
 # Shared logger instance
+#@@REMOVEME: use logger instead
 log = logging.getLogger()
 logger = logging.getLogger()
 
@@ -94,36 +95,21 @@ class DuplicatedFeedError(Exception):
 
 for klass in (DuplicatedFeedError,): 
     status_map[klass.code] = klass
-    
+
 # ------------------------------------------------------
 # Plugins machinery
 # ------------------------------------------------------
 
-PLUGIN_EVENTS = {}
+FETCHER_EVENTS = {}
+for name in 'entry_parsed fetch_started fetch_done'.split():
+    FETCHER_EVENTS[name] = []
 
 def event(name):
     def _(handler):
-        PLUGIN_EVENTS.setdefault(name, []).append(handler)
+        FETCHER_EVENTS[name].append(handler)
         return handler
     return _
 
 def trigger_event(name, *args):
-    handlers = PLUGIN_EVENTS.get(name, [])
-    for handler in handlers:
+    for handler in FETCHER_EVENTS[name]:
         handler(*args)
-
-if config.has_option('plugins', 'import'):
-    imports = config.get('plugins', 'import')
-    for name in imports.split(','):
-        try:
-            #@@NOTE: all module symbols imported by plugins with coldsweat.*  
-            #  must be already defined at this point
-            fp, pathname, description = imp.find_module(name.strip(), [plugin_dir])
-            imp.load_module(name, fp, pathname, description)
-        except ImportError, ex:
-            log.warn('could not load %s plugin (%s), ignored' % (name, ex))
-            continue
-        
-        log.debug('loaded %s plugin' % name.strip())
-        fp.close()
-    

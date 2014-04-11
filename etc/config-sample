@@ -30,9 +30,6 @@ timeout: 10
 ; Enable or disable parallel feed fetching 
 multiprocessing: on
 
-; Remove links and images from entries according to etc/blacklist
-scrub: off
-
 ; Overrides default Coldsweat user agent information
 ;user_agent:
 
@@ -50,5 +47,5 @@ datefmt: %d/%b/%Y:%H:%M:%S %z
 ;static_url: http://media.example.com/static
 
 [plugins]
-; Comma separated list of plugins to activate
-import : scrubber
+; Comma separated list of plugins to load
+;load : scrubber

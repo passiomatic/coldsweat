@@ -7,7 +7,7 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE.md for details)
 '''
 
-import sys, re, time, cgi, urlparse
+import sys, re, time, cgi, urlparse, imp
 from os import path
 from datetime import datetime
 from peewee import IntegrityError
@@ -156,6 +156,26 @@ def add_subscription(feed, user, group):
 # Feed fetching and parsing 
 # ------------------------------------------------------
 
+def load_plugins():
+    '''
+    Load plugins listed in config file
+    '''
+    if not config.has_option('plugins', 'load'):
+        return
+        
+    imports = config.get('plugins', 'load')
+    for name in imports.split(','):
+        name = name.strip()
+        try:
+            fp, pathname, description = imp.find_module(name, [plugin_dir])
+            imp.load_module(name, fp, pathname, description)
+        except ImportError, ex:
+            log.warn('could not load %s plugin (%s), ignored' % (name, ex))
+            continue
+        
+        log.debug('loaded %s plugin' % name)
+        fp.close()
+        
 def fetch_url(url, timeout=None, etag=None, modified_since=None):
 
     request_headers = {
@@ -270,8 +290,6 @@ def fetch_feed(feed, add_entries=False):
     feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
     post_fetch(response.status_code)
 
-    trigger_event('feed_saved', feed)
-            
     if not add_entries:    
         return
         
@@ -313,11 +331,9 @@ def fetch_feed(feed, add_entries=False):
             link              = link,
             last_updated_on   = timestamp
         )
-        #events('entry_parsed')(entry, parsed_entry)
         trigger_event('entry_parsed', entry, parsed_entry)
         entry.save()
-        #events('entry_saved')(entry)
-        trigger_event('entry_saved', entry)
+        #trigger_event('entry_saved', entry)
 
         log.debug(u"added entry %s from %s" % (guid, netloc))
 
@@ -333,7 +349,7 @@ def fetch_feeds():
     """
     Fetch all feeds, possibly parallelizing requests
     """
-                       
+
     start = time.time()
 
     # Attach feed.subscriptions counter
@@ -344,8 +360,10 @@ def fetch_feeds():
         log.debug("no feeds found to refresh, halted")
         return
 
+    load_plugins()
+
     log.debug("starting fetcher")
-    trigger_event('fetcher_started')
+    trigger_event('fetch_started')
         
     if config.getboolean('fetcher', 'multiprocessing'):
         from multiprocessing import Pool
@@ -358,8 +376,12 @@ def fetch_feeds():
         for feed in feeds:
             fetch_feed(feed)
     
+    #trigger_event('fetch_done')
+    
     log.info("%d feeds checked in %.2fs" % (len(feeds), time.time() - start))
 
 
 
+
+    
     

@@ -212,10 +212,6 @@ def fetch_feed(feed, add_entries=False):
             log.warn("%s has too many errors, disabled" % netloc)        
         feed.save()
 
-    if hasattr(feed, 'subscriptions') and not feed.subscriptions:
-        log.debug("feed %s has no subscribers, skipped" % feed.self_link)
-        return
-
     log.debug("fetching %s" % feed.self_link)
            
     schema, netloc, path, params, query, fragment = urlparse.urlparse(feed.self_link)
@@ -333,12 +329,16 @@ def fetch_feed(feed, add_entries=False):
         )
         trigger_event('entry_parsed', entry, parsed_entry)
         entry.save()
-        #trigger_event('entry_saved', entry)
 
         log.debug(u"added entry %s from %s" % (guid, netloc))
 
 
 def feed_worker(feed):
+
+    if not feed.subscriptions:
+        log.debug("feed %s has no subscribers, skipped" % feed.self_link)
+        return
+            
     # Allow each process to open and close its database connection    
     connect()
     fetch_feed(feed, add_entries=True)
@@ -374,9 +374,9 @@ def fetch_feeds():
     else:
         # Just sequence requests
         for feed in feeds:
-            fetch_feed(feed)
+            feed_worker(feed)
     
-    #trigger_event('fetch_done')
+    trigger_event('fetch_done', feeds)
     
     log.info("%d feeds checked in %.2fs" % (len(feeds), time.time() - start))
 

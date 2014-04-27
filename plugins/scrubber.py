@@ -35,5 +35,5 @@ def fetcher_started():
 def entry_parsed(entry, parsed_entry):
     #@@FIXME: suboptimal, in the future grab entry.mime_type instead
     mime_type, content = get_entry_content(parsed_entry)
-    if BLACKLISTED_DOMAINS and ('html' in mime_type):
+    if DOMAINS and ('html' in mime_type):
         entry.content = html.scrub_html(entry.content, DOMAINS)    

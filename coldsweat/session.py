@@ -38,7 +38,7 @@ from Cookie import SimpleCookie
 
 from utilities import make_sha1_hash
 from models import Session, connect, close
-from coldsweat import log
+from coldsweat import logger
 
 SESSION_TIMEOUT = 60*60*24*30 # 1 month
 
@@ -267,7 +267,7 @@ def get_session(sid, default=None):
     # Expired?
     if session.expires_on < datetime.utcnow().replace(microsecond=0):
         session.delete_instance()
-        log.debug("session %s is expired, deleted" % sid)
+        logger.debug("session %s is expired, deleted" % sid)
         return default
     
     return session

@@ -26,7 +26,6 @@ __all__ = [
     'user_agent',
     # Logging
     'logger',
-    'log',
     # Plugins
     'event',
     'trigger_event',

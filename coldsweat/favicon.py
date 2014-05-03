@@ -10,7 +10,7 @@ import base64, urlparse
 import requests
 from requests.exceptions import RequestException
 
-from coldsweat import log, config
+from coldsweat import logger, config
 
 DEFAULT_FAVICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUtJREFUeNqk089HBGEcx/G2SaeoS0RERJElusbSIUUmsfQHFOm8lyLaUpT+hSKt0l5K2bRESod0LVIs3Yuuy5J6f/nM+Japlh5enpl5Zj/z/PhuaiOfb/hPa1KfxTSecYMyXusJaFQ/jFHMYRcvOEOm3oArPH0bs8BLHKLjr4Ai+pDCGLZR09gkbpH+LcA3W/8M+nGiZ124TgqJAmztdzhAiAAVTGBB77SihPakgLRM4Vhr79bYuguxmWwlBRRwiqruhzSjrAs50nWo8S8BdvbjaMOiNrAFe+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeXa/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYuxDfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
@@ -32,7 +32,7 @@ def google_fetcher(url):
     try:
         result = requests.get(endpoint)
     except RequestException, exc:
-        log.warn("could not fetch favicon for %s (%s)" % (url, exc))
+        logger.warn("could not fetch favicon for %s (%s)" % (url, exc))
         return DEFAULT_FAVICON
 
     return make_data_uri(result.headers['Content-Type'], result.content)

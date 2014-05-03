@@ -6,12 +6,8 @@ Copyright (c) 2013—2014 Andrea Peltrin
 License: MIT (see LICENSE.md for details)
 """
 import re, cgi, urllib, urlparse
-#import json
-#from datetime import datetime
 from webob.exc import status_map
 import utilities
-
-from coldsweat import log
 
 __all__ = []
 

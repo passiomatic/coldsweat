@@ -18,7 +18,7 @@ from utilities import *
 from session import SessionMiddleware
 import fetcher
 import filters
-from coldsweat import log, config, installation_dir, template_dir, VERSION_STRING
+from coldsweat import logger, config, installation_dir, template_dir, VERSION_STRING
 
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60
@@ -53,26 +53,26 @@ class FrontendApp(WSGIApp):
             try:
                 Read.create(user=user, entry=entry)
             except IntegrityError:
-                log.debug('entry %s already marked as read, ignored' % entry.id)
+                logger.debug('entry %s already marked as read, ignored' % entry.id)
                 return
         elif status == 'unread':
             count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
             if not count:
-                log.debug('entry %s never marked as read, ignored' % entry.id)
+                logger.debug('entry %s never marked as read, ignored' % entry.id)
                 return
         elif status == 'saved':
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
-                log.debug('entry %s already saved, ignored' % entry.id)
+                logger.debug('entry %s already saved, ignored' % entry.id)
                 return
         elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
             if not count:
-                log.debug('entry %s never saved, ignored' % entry.id)
+                logger.debug('entry %s never saved, ignored' % entry.id)
                 return
         
-        log.debug('entry %s %s' % (entry.id, status))
+        logger.debug('entry %s %s' % (entry.id, status))
 
     def _make_view_variables(self, user, request): 
         
@@ -224,7 +224,7 @@ class FrontendApp(WSGIApp):
                 try:
                     Read.create(user=self.user, entry=entry)
                 except IntegrityError:
-                    log.debug('entry %d already marked as read, ignored' % entry.id)
+                    logger.debug('entry %d already marked as read, ignored' % entry.id)
                     continue                     
         
         self.alert_message = 'SUCCESS All entries have been marked as read'

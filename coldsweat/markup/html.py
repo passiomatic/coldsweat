@@ -16,7 +16,7 @@ HTML_RESERVED_CHARREFS = 38, 60, 62, 34
 HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
 
 from ..filters import escape_html
-from coldsweat import log
+from coldsweat import logger
 
 def _normalize_attrs(attrs):
     '''
@@ -196,7 +196,7 @@ class Scrubber(BaseProcessor):
         d = dict(_normalize_attrs(attrs))
         if 'href' in d:
             if self.is_blacklisted(d['href']):
-                log.debug('matched anchor with blacklisted href=%s' % d['href'])
+                logger.debug('matched anchor with blacklisted href=%s' % d['href'])
                 self.blacklisted += 1
                 return
                 
@@ -214,7 +214,7 @@ class Scrubber(BaseProcessor):
         if 'src' in d:        
             if self.is_blacklisted(d['src']):
                 self.pieces.append(d['alt'] if 'alt' in d else '')
-                log.debug('matched image with blacklisted src=%s' % d['src'])
+                logger.debug('matched image with blacklisted src=%s' % d['src'])
                 return
 
         # Proceed to default handling        
@@ -235,7 +235,7 @@ def _parse(parser, data):
         parser.feed(data)    
     except HTMLParseError, exc:
         # Log exception and raise it again
-        log.debug('could not parse markup (%s)' % exc.msg)
+        logger.debug('could not parse markup (%s)' % exc.msg)
         raise exc
 
 # Link discovery functions

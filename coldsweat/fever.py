@@ -17,7 +17,7 @@ from peewee import IntegrityError
 from utilities import *    
 from app import *
 from models import *
-from coldsweat import log
+from coldsweat import logger
 
 RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 10*60 # 10 minutes
@@ -27,7 +27,7 @@ class FeverApp(WSGIApp):
 
     @POST(r'^/fever/?$')
     def endpoint(self, request):
-        log.debug('client from %s requested: %s' % (request.remote_addr, request.params))
+        logger.debug('client from %s requested: %s' % (request.remote_addr, request.params))
         
         if 'api' not in request.GET:
             raise HTTPBadRequest()
@@ -38,10 +38,10 @@ class FeverApp(WSGIApp):
             api_key = request.POST['api_key']        
             user = User.validate_api_key(api_key)
             if not user: 
-                log.warn('unknown API key %s, unauthorized' % api_key)
+                logger.warn('unknown API key %s, unauthorized' % api_key)
                 return self.respond_with_json(result)  
         else:
-            log.warn('missing API key, unauthorized')               
+            logger.warn('missing API key, unauthorized')               
             return self.respond_with_json(result)
     
         # Authorized
@@ -137,7 +137,7 @@ def unread_recently_command(request, user, result):
     since = datetime.utcnow() - timedelta(seconds=RECENTLY_READ_DELTA)    
     q = Read.delete().where((Read.user==user) & (Read.read_on > since)) 
     count = q.execute()
-    log.debug('%d entries marked as unread' % count)
+    logger.debug('%d entries marked as unread' % count)
  
     
 
@@ -146,7 +146,7 @@ def mark_command(request, user, result):
     try:
         mark, status, object_id = request.POST['mark'], request.POST['as'], int(request.POST['id'])
     except (KeyError, ValueError), ex:
-        log.debug('missing or invalid parameter (%s), ignored' % ex)
+        logger.debug('missing or invalid parameter (%s), ignored' % ex)
         return      
 
     if mark == 'item':
@@ -155,35 +155,35 @@ def mark_command(request, user, result):
             # Sanity check
             entry = Entry.get(Entry.id == object_id)  
         except Entry.DoesNotExist:
-            log.debug('could not find entry %d, ignored' % object_id)
+            logger.debug('could not find entry %d, ignored' % object_id)
             return
 
         if status == 'read':
             try:
                 Read.create(user=user, entry=entry)
             except IntegrityError:
-                log.debug('entry %d already marked as read, ignored' % object_id)
+                logger.debug('entry %d already marked as read, ignored' % object_id)
                 return
         # Strangely enough 'unread' is not mentioned in 
         #  the Fever API, but Reeder app asks for it
         elif status == 'unread':
             count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
             if not count:
-                log.debug('entry %d never marked as read, ignored' % object_id)
+                logger.debug('entry %d never marked as read, ignored' % object_id)
                 return
         elif status == 'saved':
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
-                log.debug('entry %d already marked as saved, ignored' % object_id)
+                logger.debug('entry %d already marked as saved, ignored' % object_id)
                 return
         elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
             if not count:
-                log.debug('entry %d never marked as saved, ignored' % object_id)
+                logger.debug('entry %d never marked as saved, ignored' % object_id)
                 return
                   
-        log.debug('marked entry %d as %s' % (object_id, status))
+        logger.debug('marked entry %d as %s' % (object_id, status))
 
 
     elif mark == 'feed' and status == 'read':
@@ -192,14 +192,14 @@ def mark_command(request, user, result):
             # Sanity check
             feed = Feed.get(Feed.id == object_id)  
         except Feed.DoesNotExist:
-            log.debug('could not find feed %d, ignored' % object_id)
+            logger.debug('could not find feed %d, ignored' % object_id)
             return
 
         # Unix timestamp of the the local client’s last items API request
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
         except (KeyError, ValueError), ex:
-            log.debug('missing or invalid parameter (%s), ignored' % ex)
+            logger.debug('missing or invalid parameter (%s), ignored' % ex)
             return              
         
         q = Entry.select(Entry).join(Feed).join(Subscription).where(
@@ -217,10 +217,10 @@ def mark_command(request, user, result):
                     Read.create(user=user, entry=entry)
                 except IntegrityError:
                     # Should not happen, due to the query above, log as warning
-                    log.warn('entry %d already marked as read, ignored' % entry.id)
+                    logger.warn('entry %d already marked as read, ignored' % entry.id)
                     continue
         
-        log.debug('marked feed %d as %s' % (object_id, status))
+        logger.debug('marked feed %d as %s' % (object_id, status))
                 
 
     elif mark == 'group' and status == 'read':
@@ -229,7 +229,7 @@ def mark_command(request, user, result):
         try:
             before = datetime.utcfromtimestamp(int(request.POST['before']))
         except (KeyError, ValueError), ex:
-            log.debug('missing or invalid parameter (%s), ignored' % ex)
+            logger.debug('missing or invalid parameter (%s), ignored' % ex)
             return              
 
         # Mark all as read?
@@ -245,7 +245,7 @@ def mark_command(request, user, result):
             try:        
                 group = Group.get(Group.id == object_id)  
             except Group.DoesNotExist:
-                log.debug('could not find group %d, ignored' % object_id)
+                logger.debug('could not find group %d, ignored' % object_id)
                 return
 
             q = Entry.select(Entry).join(Feed).join(Subscription).where(
@@ -263,13 +263,13 @@ def mark_command(request, user, result):
                     Read.create(user=user, entry=entry)
                 except IntegrityError:
                     # Should not happen, due to the query above, log as warning
-                    log.warn('entry %d already marked as read, ignored' % entry.id)
+                    logger.warn('entry %d already marked as read, ignored' % entry.id)
                     continue
         
-        log.debug('marked group %d as %s' % (object_id, status))
+        logger.debug('marked group %d as %s' % (object_id, status))
 
     else:   
-        log.debug('malformed mark command (mark %s (%s) as %s ), ignored' % (mark, object_id, status))
+        logger.debug('malformed mark command (mark %s (%s) as %s ), ignored' % (mark, object_id, status))
 
 
 

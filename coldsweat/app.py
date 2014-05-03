@@ -14,7 +14,7 @@ from webob.exc import *
 
 from utilities import *
 from models import connect
-from coldsweat import log, config, installation_dir
+from coldsweat import logger, config, installation_dir
 
 # Figure out static dir, if given
 STATIC_URL = config.get('web', 'static_url') if config.has_option('web', 'static_url') else ''
@@ -128,7 +128,7 @@ class ExceptionMiddleware(object):
                 pass
             
             traceback = '\n'.join(traceback)            
-            log.error(traceback)
+            logger.error(traceback)
                         
             yield traceback
         

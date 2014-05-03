@@ -15,7 +15,7 @@ from webob.exc import status_map
 
 from utilities import *
 import favicon
-from coldsweat import config, log
+from coldsweat import config, logger
 
 # Defer database init, see connect() below
 engine = config.get('database', 'engine')
@@ -288,7 +288,7 @@ def close():
         # Attempt to close database connection 
         _db.close()
     except ProgrammingError, exc:
-        log.error('Caught exception while closing database connection: %s' % exc)
+        logger.error('Caught exception while closing database connection: %s' % exc)
 
 
 def migrate_schema():

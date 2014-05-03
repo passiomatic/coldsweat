@@ -10,7 +10,7 @@ License: MIT (see LICENSE.md for details)
 from xml.etree import ElementTree
 
 from ..models import *
-from coldsweat import log, favicon
+from coldsweat import logger
 from ..fetcher import add_subscription, add_feed
 
 # Map OPML attr keys to Feed model 
@@ -50,7 +50,7 @@ def add_feeds_from_file(source, user):
                     group = Group.get(Group.title==group.title)
                 except Group.DoesNotExist:
                     group.save()
-                    log.debug('added group %s to database' % group.title)
+                    logger.debug('added group %s to database' % group.title)
 
                 groups.append(group)
 

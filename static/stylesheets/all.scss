@@ -138,9 +138,16 @@ $media-queries-supported : true;
                     h3 {
                         text-decoration: line-through;
                     }
-                }                
-                
+                }                                
             }
+
+            &.status-sick {
+
+                .item-inner {
+                    background-color: #faf8c8;
+                }                                
+            }
+
 
         }
 

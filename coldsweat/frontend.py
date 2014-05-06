@@ -239,7 +239,8 @@ class FrontendApp(WSGIApp):
         Show subscribed feeds for current user
         '''
         offset, group_id, filter_class, panel_title, page_title = 0, 0, 'feeds', '<span><i class="fa fa-rss"></i></span>&ensp;Feeds', 'Feeds'
-        
+
+        error_threshold = config.getint('fetcher', 'error_threshold')
         groups = get_groups(self.user)  
         offset = int(request.GET.get('offset', 0))
         count, q = get_feeds(self.user, Feed.id).count(), get_feeds(self.user)

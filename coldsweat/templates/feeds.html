@@ -1,6 +1,16 @@
+{{py:
+def feed_status(feed, threshold):
+    if not feed.is_enabled:
+        return 'status-disabled'
+    if threshold and feed.error_count > (threshold * .80):
+        return 'status-sick'
+    return ''
+}}
+
+
 {{def render_feeds}}
     {{for loop, f in looper(feeds)}}
-        <li class="feed {{if loop.first}}current{{endif}} {{if not f.is_enabled}}status-disabled{{endif}}">
+        <li class="feed {{if loop.first}}current{{endif}} {{feed_status(f, error_threshold)}}">
             <div class="item-inner">
                 <h3 class="h4">
                     <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>

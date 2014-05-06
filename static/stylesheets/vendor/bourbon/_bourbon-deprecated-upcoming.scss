@@ -1,3 +1,8 @@
 //************************************************************************//
-// These mixins/functions will be deprecated in the next MAJOR version release
+// These mixins/functions are deprecated
+// They will be removed in the next MAJOR version release
 //************************************************************************//
+@mixin inline-block {
+  display: inline-block;
+  @warn "inline-block mixin is deprecated and will be removed in the next major version release";
+}

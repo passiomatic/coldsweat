@@ -1,27 +1,45 @@
 //************************************************************************//
 // Example: @include prefixer(border-radius, $radii, webkit ms spec);
 //************************************************************************//
+// Variables located in /settings/_prefixer.scss
+
 @mixin prefixer ($property, $value, $prefixes) {
-
   @each $prefix in $prefixes {
-
     @if $prefix == webkit {
-      -webkit-#{$property}: $value;
+      @if $prefix-for-webkit {
+        -webkit-#{$property}: $value;
+      }
     }
     @else if $prefix == moz {
-      -moz-#{$property}: $value;
+      @if $prefix-for-mozilla {
+        -moz-#{$property}: $value;
+      }
     }
     @else if $prefix == ms {
-      -ms-#{$property}: $value;
+      @if $prefix-for-microsoft {
+        -ms-#{$property}: $value;
+      }
     }
     @else if $prefix == o {
-      -o-#{$property}: $value;
+      @if $prefix-for-opera {
+        -o-#{$property}: $value;
+      }
     }
     @else if $prefix == spec {
-      #{$property}: $value;
+      @if $prefix-for-spec {
+        #{$property}: $value;
+      }
     }
     @else  {
       @warn "Unrecognized prefix: #{$prefix}";
     }
   }
+}
+
+@mixin disable-prefix-for-all() {
+  $prefix-for-webkit:    false !global;
+  $prefix-for-mozilla:   false !global;
+  $prefix-for-microsoft: false !global;
+  $prefix-for-opera:     false !global;
+  $prefix-for-spec:      false !global;
 }

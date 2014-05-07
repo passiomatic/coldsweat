@@ -1,8 +1,14 @@
 Feedparser==5.1.3
-Peewee>=2.1.7
+Peewee>=2.2.3
 Requests>=2.2.0
 WebOb==1.3.1
 Tempita==0.5.1
+
+# Run Coldsweat in FastCGI enviroments (optional)
 #Flup>1.0.2
+
+# Connect Coldsweat to a MySQL database (optional)
 #Mysql-python
+
+# Connect Coldsweat to a PostgreSQL database (optional)
 #psycopg2

@@ -3,11 +3,13 @@
 {{def container_block}}        
     <section  class="panel">
         <div class="panel-title">
-            {{if count and filter_class in ('unread',) }}
-                <div  style="float: right">
-                    <i class="fa fa-check-square-o"></i> <a href="{{application_url}}/entries/mark" data-remote-modal>Mark all as read</a>
-                </div>
-            {{endif}}
+            <div  style="float: right">
+                {{if count and filter_class in ('unread',) }}
+                    <i class="fa fa-check-square-o"></i> <a href="{{application_url}}/entries/mark?all" data-remote-modal>Mark all as read</a>
+                {{elif count and feed_id and filter_class in ('feeds',) }}
+                    <i class="fa fa-check-square-o"></i> <a href="{{application_url}}/entries/mark?feed={{feed_id}}" data-remote-modal>Mark feed as read</a>
+                {{endif}}
+            </div>
             <h2 class="h3">{{panel_title}}</h2>
         </div>
 

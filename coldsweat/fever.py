@@ -262,7 +262,7 @@ def mark_command(request, user, result):
                 try:
                     Read.create(user=user, entry=entry)
                 except IntegrityError:
-                    # Should not happen, due to the query above, log as warning
+                    # Should not happen thanks to the query above, log as warning
                     logger.warn('entry %d already marked as read, ignored' % entry.id)
                     continue
         

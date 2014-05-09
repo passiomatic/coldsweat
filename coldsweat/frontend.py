@@ -197,13 +197,15 @@ class FrontendApp(WSGIApp):
 
     @form(r'^/entries/mark$')
     @login_required    
-    def entry_list_mark(self, request):
+    def entry_list_post(self, request):
         '''
-        Mark all entries as read
+        Mark feed|all entries as read
         '''
+        feed_id = int(request.GET.get('feed', 0))
+
         if request.method == 'GET':
             now = datetime.utcnow()          
-            return self.respond_with_template('_entries_mark_all_read.html', locals())
+            return self.respond_with_template('_entries_mark_%s_read.html' % ('feed' if feed_id else 'all'), locals())
 
         # Handle postback
         try:
@@ -211,13 +213,33 @@ class FrontendApp(WSGIApp):
         except (KeyError, ValueError):
             raise HTTPBadRequest('Missing parameter before=time')
         
-        q = Entry.select(Entry).join(Feed).join(Subscription).where(
-            (Subscription.user == self.user) &            
-            # Exclude entries already marked as read
-            ~(Entry.id << Read.select(Read.entry).where(Read.user == self.user)) &
-            # Exclude entries fetched after the page load
-            (Feed.last_checked_on < before) 
-        ).distinct()
+        if feed_id:
+            try:
+                feed = Feed.get((Feed.id == feed_id)) 
+            except Feed.DoesNotExist:
+                raise HTTPNotFound('No such feed %s' % feed_id)
+            
+            q = Entry.select(Entry).join(Feed).join(Subscription).where(
+                (Subscription.user == self.user) &            
+                # Exclude entries already marked as read
+                ~(Entry.id << Read.select(Read.entry).where(Read.user == self.user)) &
+                # Filter by current feed
+                (Entry.feed == feed) &
+                # Exclude entries fetched after the page load                
+                (Feed.last_checked_on < before) 
+            ).distinct()
+            message = 'SUCCESS Feed has been marked as read'
+            redirect_url = '%s/entries/?feed=%s' % (request.application_url, feed_id)
+        else:
+            q = Entry.select(Entry).join(Feed).join(Subscription).where(
+                (Subscription.user == self.user) &            
+                # Exclude entries already marked as read
+                ~(Entry.id << Read.select(Read.entry).where(Read.user == self.user)) &
+                # Exclude entries fetched after the page load
+                (Feed.last_checked_on < before) 
+            ).distinct()
+            message = 'SUCCESS All entries have been marked as read'
+            redirect_url = '%s/entries/?unread' % request.application_url
         
         with transaction():
             for entry in q:
@@ -227,8 +249,8 @@ class FrontendApp(WSGIApp):
                     logger.debug('entry %d already marked as read, ignored' % entry.id)
                     continue                     
         
-        self.alert_message = 'SUCCESS All entries have been marked as read'
-        return self.respond_with_script('_modal_done.js', {'location': '%s/entries/?unread' % request.application_url})
+        self.alert_message = message        
+        return self.respond_with_script('_modal_done.js', {'location': redirect_url})
                                 
     # Feeds
 
@@ -238,7 +260,7 @@ class FrontendApp(WSGIApp):
         '''
         Show subscribed feeds for current user
         '''
-        offset, group_id, filter_class, panel_title, page_title = 0, 0, 'feeds', '<span><i class="fa fa-rss"></i></span>&ensp;Feeds', 'Feeds'
+        offset, group_id, feed_id, filter_class, panel_title, page_title = 0, 0, 0, 'feeds', '<span><i class="fa fa-rss"></i></span>&ensp;Feeds', 'Feeds'
 
         error_threshold = config.getint('fetcher', 'error_threshold')
         groups = get_groups(self.user)  

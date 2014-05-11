@@ -471,7 +471,7 @@ article {
     
         // Headings
 
-        // ???
+        h1 { border: none; }
         
         // Other block-level elements 
         
@@ -510,6 +510,12 @@ article {
         
         hr {
             margin: $baselineheight 0;        
+        }
+        
+        .continue {
+            text-align: center;
+            clear: both;
+            margin: $baselineheight 0 0 0;
         }
         
     }

@@ -102,7 +102,7 @@ $(document).ready(function() {
             's': function() { $('.entry.expanded .save-trigger').click() },
             //'j': moveTo('prev'),
             'k': moveTo('next'),
-            'v': function(event) { event.preventDefault(); $('.entry.expanded .meta a[rel=bookmark]').each(function(){ window.open($(this).attr('href'),'_blank') }) }
+            'v': function(event) { event.preventDefault(); $('.entry.expanded .content a[rel=bookmark]').each(function(){ window.open($(this).attr('href'),'_blank') }) }
         }
     
         for (var key in events) {      

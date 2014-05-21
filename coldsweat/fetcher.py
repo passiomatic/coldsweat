@@ -111,6 +111,26 @@ def get_entry_content(entry):
 # Add feed and subscription
 # ------------------------------------------------------
 
+def load_plugins():
+    '''
+    Load plugins listed in config file
+    '''
+    if not config.has_option('plugins', 'load'):
+        return
+        
+    imports = config.get('plugins', 'load')
+    for name in imports.split(','):
+        name = name.strip()
+        try:
+            fp, pathname, description = imp.find_module(name, [plugin_dir])
+            imp.load_module(name, fp, pathname, description)
+        except ImportError, ex:
+            logger.warn('could not load %s plugin (%s), ignored' % (name, ex))
+            continue
+        
+        logger.debug('loaded %s plugin' % name)
+        fp.close()
+        
 def add_feed(feed, fetch_icon=False, add_entries=False):
     '''
     Add a feed to database and optionally fetch icon and add entries
@@ -156,25 +176,6 @@ def add_subscription(feed, user, group):
 # Feed fetching and parsing 
 # ------------------------------------------------------
 
-def load_plugins():
-    '''
-    Load plugins listed in config file
-    '''
-    if not config.has_option('plugins', 'load'):
-        return
-        
-    imports = config.get('plugins', 'load')
-    for name in imports.split(','):
-        name = name.strip()
-        try:
-            fp, pathname, description = imp.find_module(name, [plugin_dir])
-            imp.load_module(name, fp, pathname, description)
-        except ImportError, ex:
-            logger.warn('could not load %s plugin (%s), ignored' % (name, ex))
-            continue
-        
-        logger.debug('loaded %s plugin' % name)
-        fp.close()
         
 def fetch_url(url, timeout=None, etag=None, modified_since=None):
 

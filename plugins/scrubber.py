@@ -17,6 +17,8 @@ DOMAINS = []
 
 @event('fetch_started')
 def fetcher_started():
+    if DOMAINS: return # Already initialized
+    
     backlist_path = path.join(installation_dir, 'etc/blacklist')
     try:
         with open(backlist_path) as f:

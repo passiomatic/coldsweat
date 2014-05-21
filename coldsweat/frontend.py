@@ -18,7 +18,7 @@ from utilities import *
 from session import SessionMiddleware
 import fetcher
 import filters
-from coldsweat import logger, config, installation_dir, template_dir, VERSION_STRING
+from coldsweat import *
 
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60
@@ -330,9 +330,12 @@ class FrontendApp(WSGIApp):
         else:
             group = Group.get(Group.title == Group.DEFAULT_GROUP)    
 
+        fetcher.load_plugins()
+        trigger_event('fetch_started')
         feed = Feed()
         feed.self_link = self_link
-        feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)        
+        feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)                
+        trigger_event('fetch_done', [feed])                
         subscription = fetcher.add_subscription(feed, self.user, group)
         if subscription:
             self.alert_message = u'SUCCESS Feed has been added to <i>%s</i> group' % group.title

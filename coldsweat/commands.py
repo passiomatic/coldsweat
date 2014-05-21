@@ -12,7 +12,7 @@ from getpass import getpass
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
 
-from coldsweat import fetcher, template_dir
+from coldsweat import fetcher, template_dir, trigger_event
 from coldsweat.markup import opml
 from coldsweat.models import *
 from coldsweat.app import ExceptionMiddleware
@@ -84,8 +84,11 @@ def command_import(parser, options, args):
         user = User.get(User.username == username)
     except User.DoesNotExist:
         parser.error("unable to find user %s. Use -u option to specify a different user" % username)
-    
+
+    fetcher.load_plugins()
+    trigger_event('fetch_started')
     feeds = opml.add_feeds_from_file(args[0], user)
+    trigger_event('fetch_done', [feeds])                
 
     print "%d feeds imported and fetched for user %s. See log file for more information." % (len(feeds), username)
 

@@ -63,6 +63,10 @@ $media-queries-supported : true;
 }
 */
 
+.module {
+    max-width: 42em; // Like article
+    margin: 0 auto $baselineheight auto;
+}
 
 .panel  {
     box-sizing: border-box;
@@ -523,14 +527,6 @@ article {
 }
         
  
-.boxed {
-    
-    .well {
-       min-height: $baselineheight*6;        
-    }
-}
-
-
 // Forms
 
 #field-self-link {

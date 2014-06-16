@@ -73,10 +73,6 @@ $bp6 							: 86.375em;
 
 $maxwidth						: 70em;
 
-// Other layout elements
-
-$navwidth                       : 14em;
-
 // What is the class name that the media query mixin should use to target 
 // browsers not supporting media queries?
 
@@ -684,7 +680,7 @@ $tablefontfamily 				: $altfontfamily;
 // MISC =============================================================================
 
 // Set a default duration for CSS transitions
-$transitionduration				: .25s;
+$transitionduration				: .2s;
 
 
 // =tooltip ============
@@ -699,7 +695,7 @@ $tooltipfontfamily				: $altfontfamily;
 $tooltipcolor					: $white;
 
 // Set tooltip font size
-$tooltipfontsize				: 11;
+$tooltipfontsize				: 13;
 
 // Set tooltip’s border radius. Default is $borderradius defined above
 $tooltipborderradius 			: $borderradius;

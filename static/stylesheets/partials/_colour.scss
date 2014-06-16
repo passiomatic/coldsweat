@@ -24,22 +24,6 @@ color : $linkcolorfocus; }
 outline : 0; }
 }
 
-nav a {
-    color : $navigationlinkcolor;    
-    
-    &:visited {
-    color : $navigationlinkcolor; }
-    
-    &:hover {
-    text-decoration : none;
-    color : $navigationlinkcolorhover; 
-    background: $neutralcolor }
-    
-    &:focus {
-    color : $navigationlinkcolorhover; }
-}
-
-
 ::-moz-selection {
 background-color : lighten($primarycolor, 65%);
 color : $primarycolor;

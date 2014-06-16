@@ -112,22 +112,18 @@ $(document).ready(function() {
     
     function setup() {               
         bindKeyboardShortcuts();
+        
+        // Setup tooltips with global options
+        $('a[data-toggle="tooltip"]').tooltip({delay: 500})
 
-        $('.nav-trigger').click(
-            function(event) { $('nav').addClass('open') } 
-        )
-
-        $('nav').hover(
-            // in
-            function(event) {}, 
-            // out
-            function(event) {
-                setTimeout(function() { 
-                    $('nav').removeClass('open')
-                }, 200)
-            }
-        )
-
+        // Setup nav dropdowns
+        $("nav li.dropdown").click(function (event) {
+            //event.preventDefault()
+            var dropdown = $(this).children("ul")
+            $('li > ul').not(dropdown).hide()
+            dropdown.toggle()
+        });                    
+        
         // Remote modals
         $(document).on('click', '[data-remote-modal]', function(event) { 
             event.preventDefault()

@@ -3,7 +3,16 @@
         {{py:date = since_today(e.last_updated_on)}}
         {{if prev_date != date}}
             <li class="heading">
-                <h2><time>{{date}}</time></h2>
+                {{if loop.first }}
+                <div class="dim" style="float: right">
+                    {{if count and filter_class in ('unread',) }}
+                        <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{application_url}}/entries/mark?all" data-remote-modal><i class="fa fa-check-square"></i></a>
+                    {{elif count and feed_id and filter_class in ('feeds',) }}
+                        <a title="Mark feed as read" data-toggle="tooltip" data-placement="bottom"  href="{{application_url}}/entries/mark?feed={{feed_id}}" data-remote-modal><i class="fa fa-check-square"></i></a>
+                    {{endif}}
+                </div>
+                {{endif}}
+                <h2>{{panel_title}} › <time>{{date}}</time></h2>
             </li>
         {{endif}}
         <li data-entry="{{e.id}}" class="entry {{if e.id in saved_ids}}status-saved{{endif}} {{if e.id in read_ids}}status-read{{endif}}">
@@ -23,7 +32,7 @@
     {{endfor}}
     {{if offset < count }}
         <li class="more">
-            <i class="fa fa-chevron-down"></i>&ensp;<a href="{{application_url}}/entries/?{{filter_name}}&amp;offset={{offset}}&amp;prev_date={{prev_date|url}}">More entries</a>
+            <a href="{{application_url}}/entries/?{{filter_name}}&amp;offset={{offset}}&amp;prev_date={{prev_date|url}}">More</a>
         </li>
     {{endif}}
 {{enddef}}

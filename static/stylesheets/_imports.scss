@@ -53,10 +53,9 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 @import "partials/bootstrap-modal";
 //@import "partials/bootstrap-navs";
 //@import "partials/bootstrap-navbar";
-@import "partials/bootstrap-pager";
-@import "partials/bootstrap-pagination";
-@import "partials/bootstrap-popover";
-//@import "partials/bootstrap-dropdowns";
+//@import "partials/bootstrap-pager";
+//@import "partials/bootstrap-pagination";
+//@import "partials/bootstrap-popover";
 @import "partials/bootstrap-tables";
 @import "partials/bootstrap-tooltip";
 @import "partials/bootstrap-wells";
@@ -66,14 +65,6 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 @import "partials/bootstrap-form-search";
 @import "partials/bootstrap-form-buttons";
 
-// Choose a responsive navigation pattern, or add a brand new one
-//@import "partials/navigation-toggle";
-//@import "partials/navigation-footer-anchor";
-//@import "partials/navigation-left-nav-flyout";
-//@import "partials/navigation-responsive-nav";
-
-// Styles for the Rock Hammer examples page
-//@import "partials/furniture";
 
 @media print {
 @import "partials/print"; }

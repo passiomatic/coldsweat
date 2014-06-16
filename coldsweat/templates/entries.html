@@ -3,16 +3,14 @@
         {{py:date = since_today(e.last_updated_on)}}
         {{if prev_date != date}}
             <li class="heading">
-                {{if loop.first }}
-                <div class="dim" style="float: right">
+                <div class="toolbar dim">
                     {{if count and filter_class in ('unread',) }}
                         <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{application_url}}/entries/mark?all" data-remote-modal><i class="fa fa-check-square"></i></a>
                     {{elif count and feed_id and filter_class in ('feeds',) }}
-                        <a title="Mark feed as read" data-toggle="tooltip" data-placement="bottom"  href="{{application_url}}/entries/mark?feed={{feed_id}}" data-remote-modal><i class="fa fa-check-square"></i></a>
+                        <a title="Mark feed as read" data-toggle="tooltip" data-placement="bottom"  href="{{application_url}}/entries/mark?feed={{feed_id}}" data-remote-modal><i class="fa fa-check-square"></i></a>&emsp;<a title="Feed status" data-toggle="tooltip" data-placement="bottom" href="{{application_url}}/feeds/edit/{{feed_id}}" data-remote-modal="modal-feed-edit"><i class="fa fa-cog"></i></a>
                     {{endif}}
                 </div>
-                {{endif}}
-                <h2>{{panel_title}} › <time>{{date}}</time></h2>
+                <h2><span>{{panel_title}} › </span><time>{{date}}</time></h2>
             </li>
         {{endif}}
         <li data-entry="{{e.id}}" class="entry {{if e.id in saved_ids}}status-saved{{endif}} {{if e.id in read_ids}}status-read{{endif}}">

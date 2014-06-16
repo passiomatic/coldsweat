@@ -100,8 +100,24 @@ $navwidth                : 52px;
                     @extend .h4;                    
                     text-transform: uppercase;
                     color: $lightneutralcolor;
-                    letter-spacing: 2px;
+                    letter-spacing: 1px;
+                    span { display: none; }
                 }                
+
+                // Show feed name on first heading only
+                &:first-child h2 span {
+                    display: inline; 
+                }
+                
+                .toolbar {
+                    float: right;
+                    display: none;
+                }
+                
+                // Show on first heading only
+                &:first-child .toolbar {
+                    display: block; 
+                }
             }
             
             .item-inner {

@@ -1,8 +1,8 @@
-# Coldsweat
+# About
 
-Python web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
+Coldsweat is a Python web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
 
-![Screenshot](screenshots/coldsweat-0.9.0.jpg)
+![Screenshot](screenshots/coldsweat-0.9.2.jpg)
 
 ## Motivation
 
@@ -22,7 +22,7 @@ See _[setup]_ page.
 
 ## Upgrading from previous versions
 
-Coldsweat 0.9.1 works with newer versions of Requests, WebOb and Peewee packages. To update run: 
+Coldsweat 0.9.2 works with a newer version of the Peewee package. To update run: 
 
     pip install -r requirements.txt
 

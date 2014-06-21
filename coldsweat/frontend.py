@@ -100,7 +100,7 @@ class FrontendApp(WSGIApp):
             feed_id = int(request.GET['feed'])
             feed = Feed.get(Feed.id == feed_id) 
             count, q = get_feed_entries(user, feed, Entry.id).count(), get_feed_entries(user, feed)
-            panel_title = '<span class="%s">%s</span>' % ('' if feed.is_enabled else 'status-disabled', feed.title)
+            panel_title = feed.title
             filter_class = 'feeds'
             filter_name = 'feed=%s' % feed_id
             page_title = feed.title
@@ -144,11 +144,8 @@ class FrontendApp(WSGIApp):
         namespace.update({
             'entry': entry,
             'page_title': entry.title,
-            #'panel_title':  '<a href="?%s">%s</a>' % (namespace['filter_name'], namespace['panel_title']),
-            #'previous_entries': p,
             'next_entries': n,            
             'count': 0 # Fake it
-
         })
 
         return self.respond_with_template('entry.html', namespace)   

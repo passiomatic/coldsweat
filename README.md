@@ -31,11 +31,12 @@ Coldsweat 0.9.2 works with a newer version of the Peewee package. To update run:
 * Uses the industry standard Mark Pilgrim's [Universal Feed Parser][fp]
 * Is WSGI compatible - currently tested under CGI, FastCGI and Passenger environments
 * Uses SQLite, PostgreSQL and MySQL databases
-* Coldsweat web reader has been tested with Safari 5 and latest versions of Chrome and Firefox
+* [HTTP-friendly fetcher][ff]
+* [Plugin system][plugin] to easily extend fetcher capabilities
+* The Web reader has been tested with Safari 5 and latest versions of Chrome and Firefox
 
 Coldsweat started in July 2013 as a fork of [Bottle Fever][b] by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds.
 
-For more information about the Coldsweat feed fetcher see the _[fetcher features][ff]_ page.
 
 
 [fp]: https://pypi.python.org/pypi/feedparser/
@@ -48,3 +49,4 @@ For more information about the Coldsweat feed fetcher see the _[fetcher features
 [setup]: https://github.com/passiomatic/coldsweat/wiki/Setup
 [i37]: https://github.com/passiomatic/coldsweat/issues/37
 [i3]: https://github.com/passiomatic/coldsweat/issues/3
+[plugin]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-Plugin-Interface

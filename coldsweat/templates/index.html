@@ -5,30 +5,28 @@
         {{self.panel_block}}
     </section>
 
-    <div class="navigation">
-        <nav role="navigation">
-            <ul class="{{filter_class}}">
-                <li class="branding">
-                    <i class="fa fa-tint fa-fw"></i>
+    <nav role="navigation">
+        <ul class="{{filter_class}}">
+            <li class="branding">
+                <i class="fa fa-tint fa-fw"></i>
+            </li>
+            <li class="filter-unread"><a data-toggle="tooltip" data-placement="right" title="Unread entries (1 key)" href="{{application_url}}/entries/?unread"><i class="fa fa-circle fa-fw"></i></a></li>
+            <li class="filter-saved"><a data-toggle="tooltip" data-placement="right" title="Saved entries (2 key)" href="{{application_url}}/entries/?saved"><i class="fa fa-star fa-fw"></i></a></li>
+            <li class="filter-all"><a data-toggle="tooltip" data-placement="right" title="All entries (3 key)" href="{{application_url}}/entries/?all"><i class="fa fa-archive fa-fw"></i></a></li>
+            {{if length(groups) > 1}}
+                <li class="dropdown {{if group_id}}filter-group{{endif}}"><a data-toggle="dropdown" href="#"><i class="fa {{if group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i></a>                    
+                        <ul class="dropdown-menu" role="menu">
+                            {{for loop, g in looper(groups)}}
+                                <li><a  href="{{application_url}}/entries/?group={{g.id}}"><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i> {{g.title|html}}</a></li>            
+                            {{endfor}}            
+                        </ul>
                 </li>
-                <li class="filter-unread"><a data-toggle="tooltip" data-placement="right" title="Unread entries (1 key)" href="{{application_url}}/entries/?unread"><i class="fa fa-circle fa-fw"></i></a></li>
-                <li class="filter-saved"><a data-toggle="tooltip" data-placement="right" title="Saved entries (2 key)" href="{{application_url}}/entries/?saved"><i class="fa fa-star fa-fw"></i></a></li>
-                <li class="filter-all"><a data-toggle="tooltip" data-placement="right" title="All entries (3 key)" href="{{application_url}}/entries/?all"><i class="fa fa-archive fa-fw"></i></a></li>
-                {{if length(groups) > 1}}
-                    <li class="dropdown {{if group_id}}filter-group{{endif}}"><a href="#"><i class="fa {{if group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i></a>                    
-                            <ul class="subnav">
-                                {{for loop, g in looper(groups)}}
-                                    <li><a  href="{{application_url}}/entries/?group={{g.id}}"><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i> {{g.title|html}}</a></li>            
-                                {{endfor}}            
-                            </ul>
-                    </li>
-                {{endif}}
-                <li class="sep filter-feeds"><a data-toggle="tooltip" data-placement="right" title="Subscribed feeds (4 key)" href="{{application_url}}/feeds/"><i class="fa fa-rss fa-fw"></i></a></li>                            
-                <li><a data-toggle="tooltip" class="add-trigger" href="{{application_url}}/feeds/add" data-placement="right" title="Add feed subscription" data-remote-modal="modal-add-subscription"><i class="fa fa-plus-square fa-fw"></i></a></li>                                    
-                <li class="sep"><a data-toggle="tooltip" data-placement="right" title="Log out" href="{{application_url}}/logout"><i class="fa fa-sign-out fa-fw"></i></a></li>
-            </ul>
-        </nav>  
-    </div>
+            {{endif}}
+            <li class="sep filter-feeds"><a data-toggle="tooltip" data-placement="right" title="Subscribed feeds (4 key)" href="{{application_url}}/feeds/"><i class="fa fa-rss fa-fw"></i></a></li>                            
+            <li><a data-toggle="tooltip" class="add-trigger" href="{{application_url}}/feeds/add" data-placement="right" title="Add feed subscription" data-remote-modal="modal-add-subscription"><i class="fa fa-plus-square fa-fw"></i></a></li>                                    
+            <li class="sep"><a data-toggle="tooltip" data-placement="right" title="Log out" href="{{application_url}}/logout"><i class="fa fa-sign-out fa-fw"></i></a></li>
+        </ul>
+    </nav>  
 {{enddef}}
 
 {{def page_script_block}}
@@ -49,7 +47,6 @@ head.js(
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
 "{{static_url}}/javascripts/vendor/bootstrap/bootstrap-transition.js",
-//"javascripts/vendor/bootstrap/bootstrap-carousel.js",
 "{{static_url}}/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
 
 // Popover has a dependency on tooltip, so make sure and include 
@@ -57,6 +54,7 @@ head.js(
 //"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-popover.js",
 "{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
 //"javascripts/vendor/bootstrap/bootstrap-collapse.js",
+"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-dropdown.js",
 
 // Plugins
 "{{static_url}}/javascripts/plugins.js",

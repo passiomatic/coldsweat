@@ -205,7 +205,7 @@ $basefontbackgroundcolor		: $lightestneutralcolor;
 // By default site navigation has a flat background colour
 // Add an optional gradient in __navigation-toggle.scss
 // Configure the gradient colours in _texture.scss
-$navigationbackgroundcolor 		: $lightneutralcolor;
+$navigationbackgroundcolor 		: lighten($lightneutralcolor, 13%);
 
 // Set navigation items’ bottom border width
 $navigationborderwidth			: $borderwidth;

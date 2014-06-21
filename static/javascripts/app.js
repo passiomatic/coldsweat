@@ -115,14 +115,6 @@ $(document).ready(function() {
         
         // Setup tooltips with global options
         $('a[data-toggle="tooltip"]').tooltip({delay: 500})
-
-        // Setup nav dropdowns
-        $("nav li.dropdown").click(function (event) {
-            //event.preventDefault()
-            var dropdown = $(this).children("ul")
-            $('li > ul').not(dropdown).hide()
-            dropdown.toggle()
-        });                    
         
         // Remote modals
         $(document).on('click', '[data-remote-modal]', function(event) { 

@@ -88,7 +88,7 @@ def command_import(parser, options, args):
     fetcher.load_plugins()
     trigger_event('fetch_started')
     feeds = opml.add_feeds_from_file(args[0], user)
-    trigger_event('fetch_done', [feeds])                
+    trigger_event('fetch_done', feeds)                
 
     print "%d feeds imported and fetched for user %s. See log file for more information." % (len(feeds), username)
 

@@ -14,15 +14,15 @@
                 <li class="filter-unread"><a data-toggle="tooltip" data-placement="right" title="Unread entries (1 key)" href="{{application_url}}/entries/?unread"><i class="fa fa-circle fa-fw"></i></a></li>
                 <li class="filter-saved"><a data-toggle="tooltip" data-placement="right" title="Saved entries (2 key)" href="{{application_url}}/entries/?saved"><i class="fa fa-star fa-fw"></i></a></li>
                 <li class="filter-all"><a data-toggle="tooltip" data-placement="right" title="All entries (3 key)" href="{{application_url}}/entries/?all"><i class="fa fa-archive fa-fw"></i></a></li>
-                <li class="dropdown {{if group_id}}filter-group{{endif}}"><a href="#"><i class="fa {{if group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i></a>                    
-                    {{if length(groups) > 1}}
-                        <ul class="subnav">
-                            {{for loop, g in looper(groups)}}
-                                <li><a  href="{{application_url}}/entries/?group={{g.id}}"><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i> {{g.title|html}}</a></li>            
-                            {{endfor}}            
-                        </ul>
-                    {{endif}}
-                </li>
+                {{if length(groups) > 1}}
+                    <li class="dropdown {{if group_id}}filter-group{{endif}}"><a href="#"><i class="fa {{if group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i></a>                    
+                            <ul class="subnav">
+                                {{for loop, g in looper(groups)}}
+                                    <li><a  href="{{application_url}}/entries/?group={{g.id}}"><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i> {{g.title|html}}</a></li>            
+                                {{endfor}}            
+                            </ul>
+                    </li>
+                {{endif}}
                 <li class="sep filter-feeds"><a data-toggle="tooltip" data-placement="right" title="Subscribed feeds (4 key)" href="{{application_url}}/feeds/"><i class="fa fa-rss fa-fw"></i></a></li>                            
                 <li><a data-toggle="tooltip" class="add-trigger" href="{{application_url}}/feeds/add" data-placement="right" title="Add feed subscription" data-remote-modal="modal-add-subscription"><i class="fa fa-plus-square fa-fw"></i></a></li>                                    
                 <li class="sep"><a data-toggle="tooltip" data-placement="right" title="Log out" href="{{application_url}}/logout"><i class="fa fa-sign-out fa-fw"></i></a></li>
@@ -30,7 +30,6 @@
         </nav>  
     </div>
 {{enddef}}
-
 
 {{def page_script_block}}
 <script>

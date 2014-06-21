@@ -61,7 +61,7 @@ def length(value):
     if value:
         return len(list(value))
     return 0
-
+    
 @filter('datetime')
 def datetime(value):
     if value:        

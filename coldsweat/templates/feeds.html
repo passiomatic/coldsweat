@@ -16,10 +16,15 @@ def feed_status(feed, threshold):
                     <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>
                 </h3>
                 <div class="meta dim">
-                    {{if not f.is_enabled}}
-                        <i class="fa fa-warning"></i> Disabled&emsp;
-                    {{endif}}  
-                    <i class="fa fa-info-circle"></i> <a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit">About</a>
+                    <span class="feed">
+                        {{if f.entries}}{{f.entries}}{{else}}No{{endif}} entries&emsp;
+                        {{if not f.is_enabled}}
+                            <i class="fa fa-warning"></i> Disabled
+                        {{endif}}  
+                    </span>
+                    <span class="actions">
+                        <a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit"><i class="fa fa-cog"></i> Feed status</a>
+                    </span>
                 </div>                                              
             </div>
         </li>
@@ -40,7 +45,7 @@ def feed_status(feed, threshold):
     {{def panel_block}}
     {{if count}}
         <div class="panel-content">
-            <ul class="view grid-view">                      
+            <ul class="view list-view">                      
                 {{render_feeds()}}
             </ul>
         </div>

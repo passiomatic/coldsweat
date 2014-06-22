@@ -346,15 +346,9 @@ class FrontendApp(WSGIApp):
         page_title = 'Fever Endpoint'
         return self.respond_with_template('fever.html')
 
-    @GET(r'^/guide/?$')
-    def guide(self, request):        
-        page_title = 'Configure Your Feed Reader'
-        return self.respond_with_template('guide.html', locals())
-
-    @GET(r'^/about/?$')
+    @GET(r'^/cheatsheet/?$')
     def about(self, request):        
-        page_title = 'About'
-        return self.respond_with_template('about.html', locals())
+        return self.respond_with_template('_cheatsheet.html', locals())
 
 
     # Template methods

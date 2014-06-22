@@ -22,12 +22,12 @@ opacity : .8; }
 
 .modal {
 position : fixed;
-top : 25%;
+top : 10%;
 left : 50%;
 z-index : 1050;
-width : 560px;
-margin-left : -280px;
-background-color : $white; //$bodycolor;
+width : 40em;
+margin-left : -20em;
+background-color : $white;
 border : $borderwidth $borderstyle $bordercolor;
 border-radius : $borderradius;
 outline : none;

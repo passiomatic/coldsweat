@@ -29,39 +29,3 @@
     </nav>  
 {{enddef}}
 
-{{def page_script_block}}
-<script>
-head.js(
-// Place scripts to be loaded here, in the order the need to be executed
-// Typically libraries are needed first, such as jQuery (as the plugins 
-// depend on jQuery to execute). The below configuration is what Rock 
-// Hammer uses, but customise this for your own needs.
-// Ensure all filenames you wish head.js to load are surrounded with 
-// quotes. Also, this is a list, so ensure that all but the last item 
-// are followed by a comma.
-
-// Libraries
-"{{static_url}}/javascripts/vendor/modernizr-min.js",
-"{{static_url}}/javascripts/vendor/jquery-min.js",
-
-// Load bootstrap-transition first so that nice glides/fades 
-// etc for the other bootstrap plugins work
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-transition.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
-
-// Popover has a dependency on tooltip, so make sure and include 
-// bootstrap-tooltip regardless in order for popovers to work
-//"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-popover.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
-//"javascripts/vendor/bootstrap/bootstrap-collapse.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-dropdown.js",
-
-// Plugins
-"{{static_url}}/javascripts/plugins.js",
-
-// App scripts
-"{{static_url}}/javascripts/app.js?{{version_string}}"
-);
-</script>
-{{enddef}}
-

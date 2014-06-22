@@ -378,8 +378,8 @@ footer[role="contentinfo"] {
     border-radius: $borderradius;            
 }
 
-dl {
-    //@include zero;
+dl.shortcuts {
+    @include zero;
     @include font-size(14);
 
     dt {
@@ -389,10 +389,9 @@ dl {
         color: $lightneutralcolor;
         font-weight: bold;
     }
-
+    
     dd {
-        display: inline;
-        margin: 0 $gutterwidth/2 0 0;
+        margin-bottom: $baselineheight/2 !important;
     }
 }
     
@@ -491,9 +490,6 @@ article {
                 margin-top: 0;
             }
         }
-
-        table {
-        }
         
         blockquote { 
             color: $secondarycolor;        
@@ -505,9 +501,9 @@ article {
     
         // List items 
         
-        li, dd, dt {
+        li, dd {
             @include zero;
-            margin: 0 0 $baselineheight/2 $gutterwidth;                
+            margin: 0 0 $baselineheight/4 $gutterwidth;                
         }
     
         // Images

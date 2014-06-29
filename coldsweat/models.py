@@ -4,7 +4,7 @@ Description: database models
 
 Copyright (c) 2013—2014 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
-License: MIT (see LICENSE.md for details)
+License: MIT (see LICENSE for details)
 """
 
 import pickle

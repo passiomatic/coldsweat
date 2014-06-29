@@ -4,7 +4,7 @@
 Description: (Cold)sweat command-line utility
 
 Copyright (c) 2013—2014 Andrea Peltrin
-License: MIT (see LICENSE.md for details)
+License: MIT (see LICENSE for details)
 """
 from coldsweat.commands import run
 

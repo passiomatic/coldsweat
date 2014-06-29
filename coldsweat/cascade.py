@@ -5,7 +5,7 @@ Description: Cascades through several applications,
 
 Copyright (c) 2013—2014 Andrea Peltrin
 Portions are copyright (c) 2005 Ian Bicking and contributors
-License: MIT (see LICENSE.md for details)
+License: MIT (see LICENSE for details)
 """
 #import tempfile
 from cStringIO import StringIO

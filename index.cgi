@@ -4,7 +4,7 @@
 Description: bootstrap file for CGI environments
 
 Copyright (c) 2013—2014 Andrea Peltrin
-License: MIT (see LICENSE.md for details)
+License: MIT (see LICENSE for details)
 '''
 
 from wsgiref.handlers import CGIHandler

@@ -3,7 +3,7 @@
 Description: Template filters
 
 Copyright (c) 2013—2014 Andrea Peltrin
-License: MIT (see LICENSE.md for details)
+License: MIT (see LICENSE for details)
 """
 import re, cgi, urllib, urlparse
 from webob.exc import status_map

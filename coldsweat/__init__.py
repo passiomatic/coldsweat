@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 '''
-Coldsweat - A Fever clone
+Coldsweat - Web RSS aggregator and reader compatible with the Fever API 
 
 Copyright (c) 2013—2014 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
-License: MIT (see LICENSE.md for details)
+License: MIT (see LICENSE for details)
 '''
 
 __author__ = 'Andrea Peltrin and Rui Carmo'

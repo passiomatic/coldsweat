@@ -3,7 +3,7 @@
 Description: sweat utility commands
 
 Copyright (c) 2013—2014 Andrea Peltrin
-License: MIT (see LICENSE.md for details)
+License: MIT (see LICENSE for details)
 """
 from optparse import OptionParser, make_option
 from os import path

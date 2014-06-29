@@ -31,6 +31,8 @@ def make_sha1_hash(s):
 # URL functions
 # --------------------
 
+BLACKLIST_QS = ["utm_source","utm_campaign","utm_medium","utm_content", "utm_term", "piwik_campaign","piwik_kwd"]
+     
 # Lifted from https://github.com/django/django/blob/master/django/core/validators.py
 RE_URL = re.compile(
     r'^https?://'  # http:// or https://
@@ -44,7 +46,17 @@ RE_URL = re.compile(
 
 def is_valid_url(value):
     return value and RE_URL.search(value)
-    
+
+
+def scrub_url(url):
+    '''
+    Clean query string arguments
+    '''
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+    d = urlparse.parse_qs(query)
+    d = dict((k, v) for k, v in d.items() if k not in BLACKLIST_QS)
+    return urlparse.urlunsplit((scheme, netloc, path, urllib.urlencode(d, doseq=True), fragment))
+        
 # --------------------
 # Date/time functions
 # --------------------
@@ -171,23 +183,11 @@ class Struct(dict):
 def run_tests():
     
     t = datetime.utcnow()        
-    
-#     v = datetime(2013, 6, 25, 12, 0, 0)
-#     print format_datetime(v, t) # Jun 25   
-#     v = t - timedelta(days=1)
-#     print format_datetime(v, t) # Yesterday
-#     v = datetime(t.year, t.month, t.day, 12, 0, 0)
-#     print format_datetime(v, t) # Today
-# 
-#     v = t
-#     assert format_date(v, t) == 'today'
-#     v = t - timedelta(days=1)
-#     assert format_date(v, t) == 'yesterday'
-#     v = datetime(2013, 6, 25, 12, 0, 0)
-#     assert format_date(v, t) == 'Tue, Jun 25'
         
     print format_http_datetime(t)
-     
+
+    assert scrub_url('http://example.org/feed.xml?utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml'     
+    assert scrub_url('http://example.org/feed.xml?a=1&a=2&b=1&utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml?a=1&a=2&b=1'
     assert is_valid_url('https://example.com')          # OK
     assert is_valid_url('http://example.org/feed.xml')  # OK
     assert not is_valid_url('example.com')              # Fail

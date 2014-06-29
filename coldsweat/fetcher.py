@@ -136,11 +136,12 @@ def add_feed(feed, fetch_icon=False, add_entries=False):
     Add a feed to database and optionally fetch icon and add entries
     '''
 
-    self_link, alternate_link, title = feed.self_link, feed.alternate_link, feed.title
+    # Normalize feed URL
+    feed.self_link = scrub_url(feed.self_link)
 
     try:
-        previous_feed = Feed.get(Feed.self_link == self_link)
-        logger.debug('feed %s has been already added to database, skipped' % self_link)
+        previous_feed = Feed.get(Feed.self_link == feed.self_link)
+        logger.debug('feed %s has been already added to database, skipped' % feed.self_link)
         return previous_feed
     except Feed.DoesNotExist:
         pass
@@ -148,14 +149,12 @@ def add_feed(feed, fetch_icon=False, add_entries=False):
     if fetch_icon:
         # Prefer alternate_link if available since self_link could 
         #   point to Feed Burner or similar services
-        icon_link = alternate_link if alternate_link else self_link    
-        (schema, netloc, path, params, query, fragment) = urlparse.urlparse(icon_link)
+        icon_link = feed.alternate_link or feed.self_link    
+        schema, netloc, path, query, fragment = urlparse.urlsplit(icon_link)
         icon = Icon.create(data=favicon.fetch(icon_link))
         feed.icon = icon
         logger.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
 
-    #feed.self_link = self_link    
-    #feed.title = title 
     feed.save()
     fetch_feed(feed, add_entries)
 

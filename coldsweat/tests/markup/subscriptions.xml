@@ -34,5 +34,8 @@
         <!-- This goes into default group -->
         <outline text="NYT &gt; International Home" title="NYT &gt; International Home"
             type="rss" xmlUrl="http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml" htmlUrl="http://www.nytimes.com/pages/international/"/>
+        <!-- A duplicate to test URL normalization -->
+        <outline text="NYT &gt; International Home" title="NYT &gt; International Home"
+            type="rss" xmlUrl="http://rss.nytimes.com/services/xml/rss/nyt/InternationalHome.xml?utm_source=foo&amp;utm_medium=bar&amp;utm_content=baz&amp;utm_campaign=qux" htmlUrl="http://www.nytimes.com/pages/international/"/>
     </body>
 </opml>

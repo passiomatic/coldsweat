@@ -32,7 +32,9 @@
                     {{if entry.content}} 
                         <div class="content">
                             {{entry.content}}
+                            {{if entry.link}}
                             <div class="continue"><a class="btn btn-small" rel="bookmark" title="View entry on {{entry.link|friendly_url}} (V key)" target="_blank" href="{{entry.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
+                            {{endif}}
                         </div>            
                         <hr class="halved">
                     {{endif}}

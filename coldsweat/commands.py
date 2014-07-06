@@ -142,8 +142,8 @@ def command_setup(parser, options, args):
         
     while True:        
         password = getpass("Enter password for user %s: " % username)
-        if len(password) < MIN_PASSWORD_LENGTH:
-            print 'Error: password should be at least %d characters long' % MIN_PASSWORD_LENGTH
+        if not User.validate_password(password):
+            print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
             continue        
         password_again = getpass("Enter password (again): ")
         

@@ -7,7 +7,7 @@
 .help-block,
 .help-inline {
 color : $formhelpcolor; 
-@include font-size($basefontsize / 1.25);
+@include font-size(14);
 line-height : 1.4; }
 
 .help-block {

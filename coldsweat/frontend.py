@@ -272,7 +272,7 @@ class FrontendApp(WSGIApp):
     @form(r'^/feeds/edit/(\d+)$')
     @login_required    
     def feed(self, request, feed_id):        
-        message = ''        
+        form_message = ''        
         try:
             feed = Feed.get(Feed.id == feed_id) 
         except Feed.DoesNotExist:
@@ -300,7 +300,7 @@ class FrontendApp(WSGIApp):
     @form(r'^/feeds/add$')
     @login_required    
     def feed_add(self, request):        
-        message = ''
+        form_message = ''
         groups = get_groups(self.user)
         
         if request.method == 'GET':
@@ -309,15 +309,15 @@ class FrontendApp(WSGIApp):
         # Handle postback
         self_link = request.POST['self_link'].strip()
         if not is_valid_url(self_link):
-            message = u'ERROR Error, please specify a valid web address'
+            form_message = u'ERROR Error, please specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
         response = fetcher.fetch_url(self_link)
         if response:
             if response.status_code not in fetcher.POSITIVE_STATUS_CODES:
-                message = u'ERROR Error, feed host returned: %s' % filters.status_title(response.status_code)
+                form_message = u'ERROR Error, feed host returned: %s' % filters.status_title(response.status_code)
                 return self.respond_with_template('_feed_add_wizard_1.html', locals())
         else:
-            message = u'ERROR Error, a network error occured'
+            form_message = u'ERROR Error, a network error occured'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
 
@@ -350,6 +350,29 @@ class FrontendApp(WSGIApp):
     def about(self, request):        
         return self.respond_with_template('_cheatsheet.html', locals())
 
+
+    @form(r'^/profile/?$')
+    @login_required    
+    def profile(self, request):        
+        user        = self.user
+        email       = user.email
+        password    = user.password
+        form_message = ''        
+        if request.method == 'POST':
+            email = request.POST.get('email', '')
+            password = request.POST.get('password', '')
+            
+            if User.validate_password(password):            
+                user.api_key = User.make_api_key(user.username, password)
+                user.email = email
+                user.password = password
+                user.save()            
+                return self.respond_with_script('_modal_done.js')
+            else:
+                form_message = u'ERROR Error, password is too short.'
+        
+        return self.respond_with_template('_user_edit.html', locals())
+        
 
     # Template methods
     

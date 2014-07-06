@@ -57,6 +57,7 @@ class User(CustomModel):
     Users - need at least one to store the api_key
     """    
     DEFAULT_CREDENTIALS = 'coldsweat', 'coldsweat'
+    MIN_PASSWORD_LENGTH = 8
 
     username            = CharField(unique=True)
     password            = CharField() #@@TODO: hashed & salted    
@@ -69,6 +70,7 @@ class User(CustomModel):
     
     @staticmethod
     def make_api_key(username, password):
+        #@@FIXME: use email inrsead of username as Fever API dictates
         return make_md5_hash('%s:%s' % (username, password))
 
     @staticmethod
@@ -85,14 +87,19 @@ class User(CustomModel):
     @staticmethod
     def validate_api_key(api_key):
         try:
-            #@@NOTE: Fever clients may sed api_key in uppercase, lower() it
+            #@@NOTE: Fever clients may send api_key in uppercase, lower() it
             user = User.get((User.api_key == api_key.lower()) & 
                 (User.is_enabled == True))        
         except User.DoesNotExist:
             return None
 
         return user
-        
+    
+    @staticmethod
+    def validate_password(password):
+        #@@TODO: Check for unacceptable chars
+        return len(password) >= User.MIN_PASSWORD_LENGTH
+                
 class Icon(CustomModel):
     """
     Feed (fav)icons, stored as data URIs

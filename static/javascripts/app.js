@@ -161,6 +161,19 @@ $(document).ready(function() {
         // Mark entry as read, saved etc.
         $(document).on('click', '.view .read-trigger', function(event) { toggleRead(event) })
         $(document).on('click', '.view .save-trigger', function(event) { toggleSaved(event) })
+
+        // Profile form 
+        $(document).on('click', '#show-password-trigger', function(event) {
+            event.preventDefault()
+            var $password = $('#password_')
+            if ($password.prop('type') == 'password') {
+                $(this).text('Hide')
+                $password.prop('type', 'text')    
+            } else {
+                $(this).text('Show')
+                $password.prop('type', 'password')
+            }
+        })
     }
     
     setup();

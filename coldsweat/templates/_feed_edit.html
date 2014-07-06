@@ -4,7 +4,7 @@
     <h3><img class="favicon" src="{{feed.icon.data}}" width="16" height="16"  alt="*"> {{feed.title|html}}</h3>
   </div>
   <div class="modal-body">          
-        {{message}}
+        {{form_message|alert}}
         {{if not feed.is_enabled}}
             <div class="alert alert--error"><i class="fa fa-warning"></i> This feed is disabled</div>
         {{endif}}  

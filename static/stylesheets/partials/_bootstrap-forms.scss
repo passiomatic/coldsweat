@@ -32,14 +32,15 @@ margin-bottom : 0; }
 legend {
 display : block;
 width : 100%;
-margin-bottom : $baselineheight * 2;
+margin : $baselineheight 0 0 0;
 *margin-left : -7px;
 padding : 0 0 $baselineheight / 2 0;
 border : 0;
-color : $textcolor;
-@include font-size($basefontsize * 1.5);
-font-weight : bold;
-line-height : $baselineheight;
+color : $lightneutralcolor;
+@include font-size($basefontsize);
+font-weight : normal;
+letter-spacing : 1px;
+text-transform : uppercase;
 white-space : normal; 
 
 small {

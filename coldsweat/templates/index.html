@@ -1,8 +1,12 @@
 {{inherit "site.html"}}
 
 {{def container_block}}        
-    <section  class="panel">
+    <section class="panel">
         {{self.panel_block}}
+        <footer role="contentinfo">    
+            <div class="dim">Coldsweat&ensp;<i title="Loves" class="fa fa-heart"></i>&ensp;Your Feeds&ensp;&middot;&ensp;<a data-remote-modal href="{{application_url}}/cheatsheet">Cheatsheet</a>
+            </div>
+        </footer>
     </section>
 
     <nav role="navigation">

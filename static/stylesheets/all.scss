@@ -352,20 +352,9 @@ $navwidth                : 52px;
 footer[role="contentinfo"] {
     @include zero;
     margin: $baselineheight*3 0 $baselineheight 0; 
-    text-align: center;
-    
-    .payoff {
-//        @include font-size(14);
-        margin: 0 0 $baselineheight/2 0;
-
-        .fa-heart {
-            color: $secondarycolor;
-            cursor: help;
-        }
-    }
-
-    .credits {
-        @include font-size(14);
+    text-align: center;    
+    .fa-heart {
+        cursor: help;
     }
 }
 
@@ -436,7 +425,7 @@ form {
 // Messages taking all panel height
 .notice {
     text-align: center;
-    margin: 20% 0 20% 0;    
+    margin: 25% 0 25% 0;    
     @extend .dim;    
     i {
         display: block;

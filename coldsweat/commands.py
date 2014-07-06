@@ -8,6 +8,7 @@ License: MIT (see LICENSE for details)
 from optparse import OptionParser, make_option
 from os import path
 from getpass import getpass
+import readline
 
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
@@ -128,17 +129,19 @@ def command_export(parser, options, args):
 @command('setup')
 def command_setup(parser, options, args):
     '''Sets up a working database'''
-    username, password, password_again = options.username, '', ''
+    username = options.username
 
     setup()
 
     # Check if username is already in use
     try:
         User.get(User.username == username)
-        print "Error: user %s already exists, please pick another username" % username     
+        print "Error: user %s already exists, please select another username with the -u option" % username     
         return 
     except User.DoesNotExist:
         pass
+
+    email = raw_input("Enter e-mail for user %s (hit enter to leave blank): " % username)
         
     while True:        
         password = getpass("Enter password for user %s: " % username)
@@ -152,7 +155,7 @@ def command_setup(parser, options, args):
         else:
             break
 
-    User.create(username=username, password=password, api_key=User.make_api_key(username, password))
+    User.create(username=username, email=email, password=password, api_key=User.make_api_key(username, password))
     print "Setup for user %s completed." % username
 
 

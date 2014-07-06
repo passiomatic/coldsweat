@@ -22,7 +22,7 @@ See _[setup]_ page.
 
 ## Upgrading from previous versions
 
-Coldsweat 0.9.2 works with a newer version of the Peewee package. To update run: 
+Always make sure required packages are up-to-date. To update run:
 
     pip install -r requirements.txt
 

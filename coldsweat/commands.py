@@ -120,12 +120,6 @@ def command_export(parser, options, args):
         
     print "%d feeds exported for user %s" % (feeds.count(), username)
 
-# @command('upgrade')
-# def command_refresh(parser, options, ags):
-#     '''Upgrade database from a previous version'''
-#     migrate_schema()
-#     print 'Upgrade completed. See log file for more information'
-    
 @command('setup')
 def command_setup(parser, options, args):
     '''Sets up a working database'''
@@ -158,6 +152,19 @@ def command_setup(parser, options, args):
     User.create(username=username, email=email, password=password, api_key=User.make_api_key(username, password))
     print "Setup for user %s completed." % username
 
+@command('update')
+def command_update(parser, options, args):
+    '''Update Coldsweat internals from a previous version'''
+
+    try:
+        if migrate_database_schema():
+            print 'Update completed.'
+        else:
+            print 'Database is already up-to-date.'
+    except OperationalError, ex:         
+        logger.error('caught exception updating database schema: (%s)' % ex)
+        print  'Error while running database update. See log file for more information.'
+            
 
 def pre_command(test_connection=False):  
     #try
@@ -170,7 +177,7 @@ def run():
 
     default_username, _ = User.DEFAULT_CREDENTIALS
 
-    epilog = "Available commands are: %s" % ', '.join([name for name in COMMANDS])
+    epilog = "Available commands are: %s" % ', '.join(sorted([name for name in COMMANDS]))
     usage='%prog command [options] [args]'
 
     available_options = [

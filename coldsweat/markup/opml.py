@@ -63,7 +63,7 @@ def add_feeds_from_file(source, user):
                     if k in feed_allowed_attribs:
                         setattr(feed, feed_allowed_attribs[k], v)
 
-                feed = add_feed(feed, fetch_icon=True, add_entries=True)
+                feed = add_feed(feed, fetch=True, fetch_icon=True)
                 add_subscription(feed, user, groups[-1])
                 feeds.append(feed)
             elif element.tag == 'outline':

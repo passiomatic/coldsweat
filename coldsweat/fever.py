@@ -14,6 +14,7 @@ from webob import Request, Response
 from webob.exc import HTTPBadRequest
 from peewee import IntegrityError
 
+import filters
 from utilities import *    
 from app import *
 from models import *
@@ -274,8 +275,39 @@ def mark_command(request, user, result):
 
 
 def links_command(request, user, result):
-    # Hot links (unsupported)
+
+    try:
+        page, days, offset = int(request.POST.get('page', 1)), int(request.POST.get(['range'], 7)), int(request.POST.get(['offset'], 0))
+    except (KeyError, ValueError), ex:
+        logger.debug('missing or invalid parameter (%s), ignored' % ex)
+        return     
+
+    q = get_references(user, page, days, offset)
+    
+    # Group entries for each link
+    entries = defaultdict(lambda: [])
+    links = {}
+    for r in q:
+        entries[r.link.id].append(r.entry)
+        links[r.link.id] = r.link
+    
     result.links = []     
+    for link_id, link in links.items():
+        reference_count = len(entries[link_id])
+        if reference_count < 2:
+            continue        
+        result.links.append({
+            'id': link_id,
+            'feed_id': 0,
+            'item_id': 0,
+            'temperature': 98.6 + reference_count,
+            'is_item': 0,
+            'is_local': 0, # is_local any(entries.is_local])
+            'is_saved': 0,
+            'title': link.title,
+            'url': link.expanded_url,
+            'item_ids': ','.join([str(entry.id) for entry in entries[link_id]])
+        })
 
 
 COMMANDS = [
@@ -303,7 +335,6 @@ def get_feeds(user):
     q = Feed.select(Feed, Icon).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user).distinct()
     result = []
     for feed in q:
-
         result.append({
             'id'                  : feed.id,
             'favicon_id'          : feed.icon.id, 
@@ -353,7 +384,7 @@ def _get_entries(user, q):
             'feed_id': entry.feed.id,
             'title': entry.title,
             'author': entry.author,
-            'html': entry.content,
+            'html': filters.escape_content_html(entry),
             'url': entry.link,
             'is_saved': 1 if entry.id in saved_ids else 0,
             'is_read': 1 if entry.id in read_ids else 0,
@@ -382,6 +413,10 @@ def get_entries_max(user, max_id, bound=50):
 def get_entry_count(user):
     return Entry.select().join(Feed).join(Subscription).where(Subscription.user == user).distinct().count()
 
+def get_references(user, page, days, offset):
+    when = datetime.utcnow() - timedelta(days=days)
+    q = Reference.select(Reference, Link, Entry, Feed).join(Link).switch(Reference).join(Entry).join(Feed).join(Subscription).where((Subscription.user == user) and (Link.created_on > when))
+    return q 
 
 def get_icons():
     """

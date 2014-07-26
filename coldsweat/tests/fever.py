@@ -58,7 +58,7 @@ def run_tests(endpoint, suites=ALL):
 
     if 'links' in suites:
         queries.extend([
-            (False, 'links')                                        # Unsupported
+            (False, 'links')                                         
         ])          
 
     if 'mark_item' in suites:

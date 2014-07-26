@@ -74,8 +74,6 @@ for module in 'peewee', 'requests':
     logging.getLogger(module).setLevel(logging.CRITICAL if log_level != 'DEBUG' else logging.WARN)
         
 # Shared logger instance
-#@@REMOVEME: use logger instead
-log = logging.getLogger()
 logger = logging.getLogger()
 
 # ------------------------------------------------------
@@ -100,7 +98,7 @@ for klass in (DuplicatedFeedError,):
 # ------------------------------------------------------
 
 FETCHER_EVENTS = {}
-for name in 'entry_parsed fetch_started fetch_done'.split():
+for name in 'entry_parsed entry_saved fetch_started fetch_done'.split():
     FETCHER_EVENTS[name] = []
 
 def event(name):

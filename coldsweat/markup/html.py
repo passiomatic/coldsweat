@@ -26,20 +26,35 @@ def _normalize_attrs(attrs):
 
 
 class BaseParser(HTMLParser):
+    
+    #@@TODO: add all HTMl 5 elements
+    recognized_elements = ['a', 'abbr', 'acronym', 'address', 'area', 'b', 'big',
+      'blockquote', 'br', 'button', 'caption', 'center', 'cite', 'code', 'col',
+      'colgroup', 'dd', 'del', 'dfn', 'dir', 'div', 'dl', 'dt', 'em', 'fieldset',
+      'font', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'img', 'input',
+      'ins', 'kbd', 'label', 'legend', 'li', 'map', 'menu', 'ol', 'optgroup',
+      'option', 'p', 'pre', 'q', 's', 'samp', 'select', 'small', 'span', 'strike',
+      'strong', 'sub', 'sup', 'title', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th',
+      'thead', 'tr', 'tt', 'u', 'ul', 'var']
+          
 
-    def handle_starttag(self, tag, attrs):
-        handler = getattr(self, 'start_%s' % tag, None)
-        if handler:
-            handler(attrs)
-        else:
-            self.unknown_starttag(tag, attrs)
+    def handle_starttag(self, tag, attrs):        
+        if tag in self.recognized_elements:
+            handler = getattr(self, 'start_%s' % tag, None)
+            if handler:
+                handler(attrs)
+                return
+                        
+        self.unknown_starttag(tag, attrs)
 
     def handle_endtag(self, tag):
-        handler = getattr(self, 'end_%s' % tag, None)
-        if handler:
-            handler()
-        else:
-            self.unknown_endtag(tag)
+        if tag in self.recognized_elements:
+            handler = getattr(self, 'end_%s' % tag, None)
+            if handler:
+                handler()
+                return
+        
+        self.unknown_endtag(tag)
 
     def unknown_starttag(self, tag, attrs):
         pass
@@ -141,7 +156,7 @@ class Stripper(BaseProcessor):
     def handle_entityref(self, ref):
         self.pieces.append(self.unescape("&%s;" % ref))
                     
-class FeedLinkFinder(BaseParser):
+class FeedFinder(BaseParser):
     '''
     Find the feeds for a web page. Code derived from Feedfinder, 
       see: http://bit.ly/6dBgUf
@@ -182,7 +197,24 @@ class FeedLinkFinder(BaseParser):
         #@@TODO: check if it's relative URL before join
         self.links.append(urlparse.urljoin(self.base_url, d['href']))
 
- 
+class LinkFinder(BaseParser):
+    '''
+    Find all the anchor links for the given HTML content
+    '''
+    
+    def __init__(self):
+        BaseParser.__init__(self)
+        self.links = []
+        
+    def start_a(self, attrs):            
+        d = dict(_normalize_attrs(attrs))
+        #@@NOTE: relative URL's should be resolved by Feedparser
+        if 'href' in d:
+            url = d['href']
+            schema, netloc, path, query, fragment = urlparse.urlsplit(url)
+            if schema in ['http','https']:          
+                self.links.append(url)
+                
 class Scrubber(BaseProcessor):
     '''
     Remove annoying ads in entry images and links.
@@ -196,7 +228,7 @@ class Scrubber(BaseProcessor):
         d = dict(_normalize_attrs(attrs))
         if 'href' in d:
             if self.is_blacklisted(d['href']):
-                logger.debug('matched anchor with blacklisted href=%s' % d['href'])
+                #logger.debug('matched anchor with blacklisted href=%s' % d['href'])
                 self.blacklisted += 1
                 return
                 
@@ -214,7 +246,7 @@ class Scrubber(BaseProcessor):
         if 'src' in d:        
             if self.is_blacklisted(d['src']):
                 self.pieces.append(d['alt'] if 'alt' in d else '')
-                logger.debug('matched image with blacklisted src=%s' % d['src'])
+                #logger.debug('matched image with blacklisted src=%s' % d['src'])
                 return
 
         # Proceed to default handling        
@@ -229,6 +261,22 @@ class Scrubber(BaseProcessor):
                 return True
         return False
 
+class TitleFinder(BaseParser):
+    
+    def __init__(self):
+        BaseParser.__init__(self)
+        self.title, self.in_title  = '', 0
+
+    def handle_data(self, text):
+        if self.in_title:
+            self.title += text
+                        
+    def start_title(self, attrs):     
+        self.in_title += 1
+
+    def end_title(self):            
+        self.in_title -= 1
+
 
 def _parse(parser, data):    
     try:
@@ -238,31 +286,38 @@ def _parse(parser, data):
         logger.debug('could not parse markup (%s)' % exc.msg)
         raise exc
 
-# Link discovery functions
+# Discovery functions
 
-def find_feed_links(data, base_url):
+def find_links(data):
+    '''
+    Return the <a>nchor links found for the page
+    '''
+    p = LinkFinder()
+    _parse(p, data)
+    return p.links
+    
+def find_feeds(data, base_url):
     '''
     Return the feed links found for the page
     '''
-    p = FeedLinkFinder(base_url)
+    p = FeedFinder(base_url)
     _parse(p, data)
     return p.links
-
-def find_feed_link(data, base_url):
-    '''
-    Return the first feed link found
-    '''
-    links = find_feed_links(data, base_url)
-    if links:        
-        return links[0]    
-    return None    
 
 def sniff_feed(data): 
     data = data.lower()
     if data.count('<html'):
         return False
     return any((data.count('<rss'), data.count('<rdf'), data.count('<feed')))
-
+        
+def find_title(data):
+    '''
+    Return the <title> of the page
+    '''
+    p = TitleFinder()
+    _parse(p, data)
+    return p.title.strip() # Remove extra spaces
+    
 # Misc.
         
 def strip_html(data):

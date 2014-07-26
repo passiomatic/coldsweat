@@ -12,6 +12,10 @@ from calendar import timegm
 from datetime import datetime, timedelta
 from tempita import HTMLTemplate
 from webob.exc import status_map
+import requests
+from requests.exceptions import *
+
+from coldsweat import *
 
 def encode(value):
     return value.encode('utf-8', 'replace')
@@ -31,7 +35,7 @@ def make_sha1_hash(s):
 # URL functions
 # --------------------
 
-BLACKLIST_QS = ["utm_source","utm_campaign","utm_medium","utm_content", "utm_term", "piwik_campaign","piwik_kwd"]
+BLACKLIST_QS = ["utm_source", "utm_campaign", "utm_medium", "utm_cid", "utm_content", "utm_term", "piwik_campaign", "piwik_kwd"]
      
 # Lifted from https://github.com/django/django/blob/master/django/core/validators.py
 RE_URL = re.compile(
@@ -48,14 +52,37 @@ def is_valid_url(value):
     return value and RE_URL.search(value)
 
 
-def scrub_url(url):
+def scrub_url(url, scrub_fragments=False):
     '''
     Clean query string arguments
     '''
-    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+    # Python 2.x urlencode() needs to handle strings, 
+    #   not unicode objects
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(encode(url))
     d = urlparse.parse_qs(query)
     d = dict((k, v) for k, v in d.items() if k not in BLACKLIST_QS)
-    return urlparse.urlunsplit((scheme, netloc, path, urllib.urlencode(d, doseq=True), fragment))
+    return urlparse.urlunsplit((scheme, netloc, path, urllib.urlencode(d, doseq=True), '' if scrub_fragments else fragment))
+        
+
+def fetch_url(url, timeout=10, etag=None, modified_since=None):
+
+    request_headers = {
+        'User-Agent': user_agent
+    }
+
+    # Conditional GET headers
+    if etag and modified_since:
+        request_headers['If-None-Match'] = etag
+        request_headers['If-Modified-Since'] = format_http_datetime(modified_since)
+        
+    try:
+        response = requests.get(url, timeout=timeout, headers=request_headers)
+    except (RequestException, ), ex:
+        logger.debug("tried to fetch %s but got %s" % (url, ex.__class__.__name__))
+        raise ex
+    
+    return response
+
         
 # --------------------
 # Date/time functions
@@ -137,7 +164,7 @@ def datetime_since_today(value, comparsion_value=None):
 # Misc. string utilities
 # --------------------
 
-def truncate(value, max_length):
+def truncate(value, max_length=255):
     """
     Return a truncated string for value if value length is > max_length
     """
@@ -186,8 +213,11 @@ def run_tests():
         
     print format_http_datetime(t)
 
-    assert scrub_url('http://example.org/feed.xml?utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml'     
-    assert scrub_url('http://example.org/feed.xml?a=1&a=2&b=1&utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml?a=1&a=2&b=1'
+    value = scrub_url('http://example.org/feed.xml?utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux#fragment', scrub_fragments=True)
+    assert value == 'http://example.org/feed.xml'     
+    value = scrub_url(u'http://example.org/feed.xml?a=1&a=2&b=1&utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux&èèè=ààà') 
+    assert value == 'http://example.org/feed.xml?a=1&a=2&b=1&%C3%A8%C3%A8%C3%A8=%C3%A0%C3%A0%C3%A0'
+
     assert is_valid_url('https://example.com')          # OK
     assert is_valid_url('http://example.org/feed.xml')  # OK
     assert not is_valid_url('example.com')              # Fail

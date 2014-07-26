@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html lang="en-us" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>    <html lang="en-us" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>    <html lang="en-us" class="no-js ie8 lt-ie9"> <![endif]-->
+<!--[if IE 9]>    <html lang="en-us" class="no-js ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en-us"> <!--<![endif]-->
+<head>
+<title>Android L’s app design—early looks at YouTube, Gmail, Maps, and more | Ars Technica</title>
+    <script type="text/javascript">
+    ars = {"ASSETS":"http:\/\/cdn.arstechnica.net\/wp-content\/themes\/arstechnica\/assets","HOME":"http:\/\/arstechnica.com","CIVIS":"\/civis","THEME":"light","VIEW":"grid","MOBILE":false,"PREMIER":false,"LOGGED":false,"ENV":"production","AD":{"kw":["gadgets","consumer"],"zone":"consumer","sync":true,"queue":[]},"TOTAL":63612,"UNREAD":0,"RECENT":[503989,503975,503943,503941,503703,503679,503765,503529,503541,503599,503533,503559,503507,503465,503463,503373,502767,503187,503331,503313,501781,503415,503395,503387,503251],"LOGINS":true,"COMMENTS":false,"hide_year":false,"READY":[],"SHOW_ADS":true};
+  </script>
+
+  <!-- Hello php apc, will you pick up this change? I'm skeptical! -->
+
+  <!--[if lte IE 8]><script type="text/javascript" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/js/modernizr/modernizr.js"></script><![endif]-->
+
+      <link rel="stylesheet" type="text/css" media="all" href="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/css/ars.min.9b52f60129e01b357e7e4b27c207470a.css" />
+      <link rel="alternate" type="application/rss+xml" href="http://feeds.arstechnica.com/arstechnica/index/" />
+  <!-- Favicons, etc -->
+  <link rel="apple-touch-icon" href="http://static.arstechnica.net/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="http://static.arstechnica.net/favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="http://static.arstechnica.net/favicon.ico" />
+
+  <!-- C-razy IE9 stuff -->
+  <meta name="application-name" content="Ars Technica"/>
+  <meta name="msapplication-starturl" content="http://arstechnica.com/"/>
+  <meta name="msapplication-tooltip" content="Ars Technica: Serving the technologist for 1.2 decades"/>
+  <meta name="msapplication-task" content="name=News;action-uri=http://arstechnica.com/;icon-uri=http://arstechnica.com/favicon.ico"/>
+  <meta name="msapplication-task" content="name=Features;action-uri=http://arstechnica.com/features/;icon-uri=http://static.arstechnica.net/ie-jump-menu/jump-features.ico"/>
+  <meta name="msapplication-task" content="name=OpenForum;action-uri=http://arstechnica.com/civis/;icon-uri=http://static.arstechnica.net/ie-jump-menu/jump-forum.ico"/>
+  <meta name="msapplication-task" content="name=Subscribe;action-uri=http://arstechnica.com/subscriptions/;icon-uri=http://static.arstechnica.net/ie-jump-menu/jump-subscribe.ico"/>
+
+  <!-- Begin Metadata -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="advertising" content="ask" />
+  <meta property="fb:admins" content="592156917" />
+  <!-- End Metadata -->
+
+  <meta name="format-detection" content="telephone=no" />
+
+    <meta name="viewport" content="width=1020" />
+
+    <!-- cache hit -->
+<meta name='parsely-page' content='{"title":"Android L\u2019s app design\u2014early looks at YouTube, Gmail, Maps, and more","link":"http:\/\/arstechnica.com\/gadgets\/2014\/07\/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more\/","type":"post","author":"Ron Amadeo","post_id":"503703","pub_date":"2014-07-14T20:33:13Z","section":"Gear &amp; Gadgets","tags":["android-l","gallery","material-design","type: report"],"image_url":"http:\/\/cdn.arstechnica.net\/wp-content\/uploads\/2014\/07\/music1-150x150.png"}'>
+<meta name='parsely-metadata' content='{"type":"report","title":"Android L\u2019s app design\u2014early looks at YouTube, Gmail, Maps, and more","post_id":"503703","lower_deck":"Gallery: We round up all the Material Design screenshots Google has been showing off.","image_url":"http:\/\/cdn.arstechnica.net\/wp-content\/uploads\/2014\/07\/music1-150x150.png"}'>
+
+<link rel="canonical" href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/" />
+
+<link rel="shorturl" href="http://ars.to/U9NW0j" />
+
+<meta name="description" content="Gallery: We round up all the Material Design screenshots Google has been showing off." />
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/">
+<meta name="twitter:title" content="Android L’s app design—early looks at YouTube, Gmail, Maps, and more">
+<meta name="twitter:description" content="Gallery: We round up all the Material Design screenshots Google has been showing off.">
+<meta name="twitter:site" content="@arstechnica">
+<meta name="twitter:domain" content="arstechnica.com">
+<meta name="twitter:image:src" content="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music1-640x377.png">
+<meta name="twitter:image:width" content="640">
+<meta name="twitter:image:height" content="377">
+
+<meta name="twitter:creator" content="@RonAmadeo">
+
+<meta property="og:url" content="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/" />
+<meta property="og:title" content="Android L’s app design—early looks at YouTube, Gmail, Maps, and more" />
+<meta property="og:image" content="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music1-640x377.png" />
+<meta property="og:description" content="Gallery: We round up all the Material Design screenshots Google has been showing off." />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Ars Technica" />
+      <link type="text/css" rel="stylesheet" href="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/features/generic/style.css" />
+  
+  <script type="text/javascript" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/js/omniture/mbox.js"></script>
+
+    <script type="text/javascript" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/js/v3/cn-jquery.all.min.js"></script>
+
+<script type="text/javascript">
+  CN.site.init({
+    code:  "ars",
+    title: "Ars",
+    name:  ars.MOBILE ? "ars.mobile" : "ars",
+    env:   ars.ENV == "production" ? "PROD" : "DEV",
+  });
+  CN.dart.init({
+    site: CN.site.name + '.dart',
+    zone: ars.AD.zone,
+    kws: ars.AD.kw,
+  });
+</script>
+  
+  </head>
+<body class="single single-post postid-503703 single-format-standard grid-view light fullwidth">
+  <div id="container">
+    <header id="masthead">
+              <aside id="ad-top">
+          
+<div id="topBanner728x90_frame"></div>
+<script type="text/javascript">
+CN.dart.call('topBanner', {sz: '728x90', kws: [], collapse: true});
+</script>
+
+        </aside>
+
+ 
+      <h1><a href="http://arstechnica.com"><em>Ars</em>Technica</a></h1>
+    </header>
+
+    <div id="profile">
+          <a href="/civis/ucp.php?mode=register" rel="nofollow">Register</a>
+      <a id="login" href="/civis/ucp.php?mode=login&return_to=http%3A%2F%2Farstechnica.com%2Fgadgets%2F2014%2F07%2Fandroid-ls-app-design-early-looks-at-youtube-gmail-maps-and-more%2F" rel="nofollow">Log in</a>
+        </div>
+
+    <nav id="primary">
+            <ul>
+        <li id="home-icon">
+          <a href="/"><span>Home</span></a>
+        </li>
+        <li class="has-children">
+          <a href="#">Main Menu</a>
+           <div id="main-menu" class="dropdown">
+  <div id="sections">
+    <ul class="cat-list">
+      <li class="top-row even">
+        <a class="cat-link" href="/information-technology">
+          <span class="cat-name">Information Technology</span>
+          <span class="subheading cat-desc">Technology Lab</span>
+        </a>
+      </li>
+      <li class="top-row odd">
+        <a class="cat-link" href="/gadgets">
+          <span class="cat-name">Product News &amp; Reviews</span>
+          <span class="subheading cat-desc">Gear &amp; Gadgets</span>
+        </a>
+      </li>
+      <li class="even">
+        <a class="cat-link" href="/business">
+          <span class="cat-name">Business of Technology</span>
+          <span class="subheading cat-desc">Ministry of Innovation</span>
+        </a>
+      </li>
+      <li class="odd">
+        <a class="cat-link" href="/security">
+          <span class="cat-name">Security &amp; Hacktivism</span>
+          <span class="subheading cat-desc">Risk Assessment</span>
+        </a>
+      </li>
+      <li class="even">
+        <a class="cat-link" href="/tech-policy">
+          <span class="cat-name">Civilization &amp; Discontents</span>
+          <span class="subheading cat-desc">Law &amp; Disorder</span>
+        </a>
+      </li>
+      <li class="odd">
+        <a class="cat-link" href="/apple">
+          <span class="cat-name">The Apple Ecosystem</span>
+          <span class="subheading cat-desc">Infinite Loop</span>
+        </a>
+      </li>
+      <li class="even">
+        <a class="cat-link" href="/gaming">
+          <span class="cat-name">Gaming &amp; Entertainment</span>
+          <span class="subheading cat-desc">Opposable Thumbs</span>
+        </a>
+      </li>
+      <li class="odd">
+        <a class="cat-link" href="/science">
+          <span class="cat-name">Science &amp; Exploration</span>
+          <span class="subheading cat-desc">The Scientific Method</span>
+        </a>
+      </li>
+      <li class="even">
+        <a class="cat-link" href="/cars">
+          <span class="cat-name">All Things Automotive</span>
+          <span class="subheading cat-desc">Cars Technica</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <aside class="drop-extras">
+        <style type="text/css">#layout-swap { margin-top: -6px; color: #808f95}</style>
+    <aside id="layout-swap">
+	<span class="subheading">Layout:</span>
+  <ul>
+    <li class="grid active">
+            <a href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/?view=grid"><span>Grid View</span></a>
+          </li>
+    <li class="article">
+            <a href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/?view=archive"><span>Article View</span></a>
+          </li>
+  </ul>
+</aside>
+
+
+    <h2 class="subheading notched">Site Theme</h2>
+    <ul id="theme-switch">
+            <li class="light active">
+                <a href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/?theme=light"><span class="subheading">Dark on light</span></a>
+              </li>
+      <li class="dark ">
+                <a href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/?theme=dark"><span class="subheading">Light on dark</span></a>
+              </li>
+    </ul>
+    <div id="explore-ars">
+      <h2 class="subheading notched">Explore Ars</h2>
+      <ul>
+        <li><a href="/reviews/">Reviews</a></li>
+        <li><a href="/video/">Video</a></li>
+        <li><a href="/staff/">Staff Blogs</a></li>
+        <li><a href="/features/">Feature Archive</a></li>
+        <li><a href="/staff-directory/">Staff Directory</a></li>
+        <li><a href="http://arstechnica.com/contact-us/">Contact Us</a></li>
+      </ul>
+    </div>
+    <div id="featured-disciplines">
+      <h2 class="subheading notched">Featured Disciplines</h2>
+      <ul>
+        <li><a href="/discipline/photography/">Photography</a></li>
+        <li><a href="/discipline/productivity/">Productivity</a></li>
+        <li><a href="/discipline/cloud-2/">Cloud</a></li>
+        <li><a href="/discipline/gadgets-3/">Gadgets</a></li>
+        <li><a href="/discipline/tablets-2/">Tablets</a></li>
+      </ul>
+    </div>
+  </aside>
+</div>
+        </li>
+        <li class="has-children" id="my-stories">
+          <a href="#">My Stories: <span class="unread-count">0</span></a>
+          <div class="dropdown">
+            <nav class="my-stories-nav first">
+              <h2 class="subheading notched">New Since Last Visit <span class="unread-count"></span></h2>
+              <ol class="new-stories with-numbers"></ol>
+              <footer><a class="subheading" href="#" id="more-unread-stories">See more news stories</a></footer>
+            </nav>
+            <nav class="my-stories-nav middle">
+              <h2 class="subheading notched">We Recommend</h2>
+              <ol class="recommendations"></ol>
+            </nav>
+            <nav class="my-stories-nav">
+              <h2 class="subheading notched">My Discussions</h2>
+                            <p class="discussions disabled">Log in to track your discussions.</p>
+                          </nav>
+          </div>
+        </li>
+        <li class="no-children"><a href="/civis/">Forums</a></li>
+                <li class="no-children subscribe">
+          <a href="/subscriptions/">Subscribe</a>
+        </li>
+                <li class="no-children"><a href="/jobs/">Jobs</a></li>
+        <li id="search-container" class="right inactive">
+          <a id="search-switch" href="/search/"></a>
+          <form action="/search/" method="GET">
+            <input type="text" name="query" id="hdr_search_input" value="">
+            <input type="submit" value="">
+          </form>
+        </li>
+      </ul>
+
+    </nav>
+
+    <div id="pushdown-wrap">
+        </div>
+
+    <section id="content" class="clearfix">
+<!-- cache hit -->
+<h1 id="archive-head" class="subheading thick-divide-bottom">
+	<a href="http://arstechnica.com/gadgets/">	<span class="archive-name">Gear &amp; Gadgets</span>
+		<span class="divider"> / </span>
+	<span class="archive-desc">Product News &amp; Reviews</span>
+		</a></h1>
+
+<script type="text/javascript">
+  ars.ARTICLE = {"url":"http:\/\/arstechnica.com\/gadgets\/2014\/07\/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more\/","short_url":"http:\/\/ars.to\/U9NW0j","title":"Android L\u2019s app design\u2014early looks at YouTube, Gmail, Maps, and more","author":391727,"id":503703,"topic":1249601,"promoted":[],"single_page":false,"comments":71,"fullwidth":true};
+</script>
+
+<article class="standalone">
+	<header>
+		<h1 class="heading">Android L’s app design—early looks at YouTube, Gmail, Maps, and more</h1>
+		<h2 class="standalone-deck">Gallery: We round up all the Material Design screenshots Google has been showing off.</h2>
+		<div class="post-meta">
+        <p class="byline">
+  by     <a href="http://arstechnica.com/author/ronamadeo/" rel="author">Ron Amadeo</a>
+  -    <span class="date" data-time="1405369993">Jul 14, 2014 8:33 pm UTC</span>
+  </p>
+
+			<div class="corner-info">
+				<ul class="tags subheading">
+        					<li><a href="/discipline/android">Android</a></li>
+        				</ul>
+          <a title="50 posters participating, including story author." class="comment-count" href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/?comments=1"><span>71</span></a>
+
+			</div>
+		</div>
+	</header>
+	<section id="article-guts">
+		<div class="article-content clearfix">
+     <!-- cache hit --><!-- empty -->   <div class="gallery">
+    <div class="gallery-main-image">
+      <div class="gallery-image-container">
+        <div class="gallery-image-wrap">
+        <a class="enlarge" href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/realgmailkeynote-2.png" data-width="1430" data-height="894">
+          <img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/realgmailkeynote-2-980x612.png">
+        </a>
+        </div>
+      </div>
+
+    <div class="gallery-image-description">
+          <p class="gallery-image-credit">
+              <a href="https://www.youtube.com/watch?v=wtLJPvx7-ys"><em>Google I/O 2014 Keynote</em></a>
+            </p>
+    
+          <p>The tablet version of Gmail (the phone version is pictured below).</p>
+        </div>
+
+    </div>
+
+        <div class="gallery-thumb-mask">
+      <ol class="gallery-thumbs">
+                <li class="selected">
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/realgmailkeynote-2-980x612.png" data-width="1430" data-height="894" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/realgmailkeynote-2.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/realgmailkeynote-2-980x612.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/realgmailkeynote-2-640x400.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/realgmailkeynote-2-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=wtLJPvx7-ys"><em>Google I/O 2014 Keynote</em></a>
+                      </p>
+          
+                      <p>The tablet version of Gmail (the phone version is pictured below).</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail2-980x577.png" data-width="1087" data-height="640" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail2.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail2-980x577.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail2-640x376.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail2-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="Google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>The generic e-mail design showing the navigation drawer, compose screen, and swipe-to-delete.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail-980x387.png" data-width="1656" data-height="654" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail-980x387.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail-640x252.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gmail-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>The generic e-mail app in various form factors.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps-3-980x576.png" data-width="1088" data-height="640" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps-3.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps-3-980x576.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps-3-640x376.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps-3-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>This could be anyone's map application, right? This is Google Maps showing a place page, navigation preview, and a turn in navigation mode.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps.png" data-width="879" data-height="662" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps-640x482.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>Tablet Google Maps showing a point of interest.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps2.png" data-width="879" data-height="662" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps2.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps2.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps2-640x482.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/maps2-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>Pulling the POI card up in Tablet Google Maps.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/searchtube.png" data-width="730" data-height="640" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/searchtube.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/searchtube.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/searchtube-640x561.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/searchtube-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>Early Google Search and what looks like a finished YouTube app showing a video page.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/chrome1-980x572.png" data-width="1477" data-height="863" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/chrome1.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/chrome1-980x572.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/chrome1-640x373.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/chrome1-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=FBD0VlcVS1E"><em>Google I/O 2014 - Material design: Motion</em></a>
+                      </p>
+          
+                      <p>This is definitely Chrome. These images show a webpage, the tab switcher, and the new tab page.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music1-980x577.png" data-width="1833" data-height="1080" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music1.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music1-980x577.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music1-640x377.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music1-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+          
+                      <p>A generic music player. Google Play Music will probably look just like this. A lot of the color here is programmatically pulled from the album art. These images show a home screen, album page, and "Now Playing" screen.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet-980x735.png" data-width="1438" data-height="1079" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet-980x735.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet-640x480.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=FBD0VlcVS1E"><em>Google I/O 2014 - Material design: Motion</em></a>
+                      </p>
+          
+                      <p>The music app's album screen on a tablet.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet2-980x735.png" data-width="1438" data-height="1079" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet2.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet2-980x735.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet2-640x480.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet2-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=FBD0VlcVS1E"><em>Google I/O 2014 - Material design: Motion</em></a>
+                      </p>
+          
+                      <p>Scrolling up on the album screen on a tablet.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet3-980x735.png" data-width="1438" data-height="1079" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet3.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet3-980x735.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet3-640x480.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/musictablet3-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=FBD0VlcVS1E"><em>Google I/O 2014 - Material design: Motion</em></a>
+                      </p>
+          
+                      <p>The music home screen on a tablet.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music2-980x398.png" data-width="1614" data-height="657" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music2.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music2-980x398.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music2-640x260.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/music2-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=dZqzz5lZFvo"><em>Google I/O 2014 - Material design in Google Play</em></a>
+                      </p>
+          
+                      <p>The "Now Playing" music design in various form factors.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/calendar.png" data-width="728" data-height="640" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/calendar.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/calendar.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/calendar-640x562.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/calendar-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="Google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>The calendar showing the day view and a new event screen. </p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/2014-07-14_13-39-51-980x384.png" data-width="1668" data-height="654" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/2014-07-14_13-39-51.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/2014-07-14_13-39-51-980x384.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/2014-07-14_13-39-51-640x250.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/2014-07-14_13-39-51-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=dZqzz5lZFvo"><em>Google I/O 2014 - Material design: Structure and components</em></a>
+                      </p>
+          
+                      <p>The calendar on various form factors.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts2-2.png" data-width="728" data-height="640" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts2-2.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts2-2.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts2-2-640x562.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts2-2-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>A contacts app showing an individual contact and the full list.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts-980x344.png" data-width="1725" data-height="606" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts-980x344.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts-640x224.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/contacts-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="Google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>The contacts app on various form factors.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gallery-2-980x576.png" data-width="1088" data-height="640" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gallery-2.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gallery-2-980x576.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gallery-2-640x376.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/gallery-2-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>A generic gallery app.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/keep.png" data-width="728" data-height="640" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/keep.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/keep.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/keep-640x562.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/keep-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="google.com/design"><em>Google Design</em></a>
+                      </p>
+          
+                      <p>A note app that looks a lot like Google Keep.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/google-play-libraries-980x680.png" data-width="1174" data-height="815" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/google-play-libraries.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/google-play-libraries-980x680.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/google-play-libraries-640x444.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/google-play-libraries-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=ZlY714W4uww&feature=youtu.be"><em>Google I/O 2014 - Material design in Google Play</em></a>
+                      </p>
+          
+                      <p>Early media libraries from Google Play.</p>
+          
+          </div>
+          
+        </li>
+                <li>
+          <a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/play-combo-980x513.png" data-width="1431" data-height="750" data-orig="http://cdn.arstechnica.net/wp-content/uploads/2014/07/play-combo.png" data-large="http://cdn.arstechnica.net/wp-content/uploads/2014/07/play-combo-980x513.png" data-small="http://cdn.arstechnica.net/wp-content/uploads/2014/07/play-combo-640x335.png"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/play-combo-150x150.png"></a>
+
+                    <div class="gallery-thumb-copy">
+
+                    <p class="gallery-image-credit">
+                        <a href="https://www.youtube.com/watch?v=ZlY714W4uww&feature=youtu.be"><em>Google I/O 2014 - Material design in Google Play</em></a>
+                      </p>
+          
+                      <p>The Play Store showing books, music, and a movie.</p>
+          
+          </div>
+          
+        </li>
+              </ol>
+    </div>
+       
+      </div>
+    <style type="text/css"> .related-stories { display: none !important; } </style>
+    
+<p>We've already gathered up a bunch of screenshots from the <a href="http://arstechnica.com/gadgets/2014/06/androids-l-release-beta-in-pictures/">Android L preview release</a>, but there will be way more to Android L than just the notification panel, settings, dialer, and calculator.</p>
+<p>To get a better idea of what's in store for us, we went on a screenshot hunt for Google-created Material Design apps. Between various Google I/O sessions and the <a href="http://www.google.com/design/spec/material-design/introduction.html">Material Design guidelines</a>, the company has been dropping a <em>ton</em> of hints about what L will look like. After scouring all the design docs and I/O sessions, we threw together a gallery of the more revealing design examples.</p>
+<figure class="image center large full-width" style="width:640px"><a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/howitowkrs.png" class="enlarge" data-height="640" data-width="744"><img src="http://cdn.arstechnica.net/wp-content/uploads/2014/07/howitowkrs-640x550.png" width="640" height="550" srcset="http://cdn.arstechnica.net/wp-content/uploads/2014/07/howitowkrs.png 2x"></a><figcaption class="caption"><div class="caption-text"><a href="http://cdn.arstechnica.net/wp-content/uploads/2014/07/howitowkrs.png" class="enlarge" data-height="640" data-width="744">Enlarge</a> <span class="sep">/</span> Left: The e-mail app from the Material Design docs. Right: Gmail</div> <div class="caption-credit"><a rel="nofollow" class="caption-link" href="Google.com/design">Google</a></div></figcaption></figure>
+<p>A lot of these mockups are from the <a href="http://www.google.com/design/spec/material-design/introduction.html">Material Design guidelines</a> and (mostly) don't represent Google-branded products. You can see an example of this above, where the example e-mail app (left) doesn't have the correct color theme or action button, items have an extra line of text, and the app is missing some minor UI elements like stars and a timestamp.</p>
+<p>The "generic" version of the app is still 90 percent of the way there, though, and this is the style of the majority of the screenshots we'll be looking at. Google is trying to show developers what it thinks an app should look like without spoiling its own designs, but as you can see above, Google apparently plans on sticking pretty close to these guidelines for its own designs. Do note that these apps are all works in progress, so things <em>could</em> change before release. Still, this screenshot collection is our best look at the wider Google app selection that is sure to come with Android L when it finally launches later this year.</p>
+<p>When you're done checking out the gallery, there's a good addendum over at <a href="http://www.androidpolice.com/2014/07/13/exclusive-google-prepping-play-store-update-thats-one-step-closer-to-material-with-beautiful-new-listing-ui/">Android Police</a>. The site just scored a few screenshots of the work-in-progress redesign of the Google Play Store.</p>
+    		</div>
+    <div class="article-expander">
+      <p><a href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/">Expand full story</a></p>
+    </div>
+			</section>
+
+    <aside class="manual-ad right thin-divide-top">
+    
+<div id="xrailBottom300x250_frame"></div>
+<script type="text/javascript">
+CN.dart.call('xrailBottom', {sz: '300x250', kws: ["bottom"], collapse: true});
+</script>
+
+  </aside>
+  
+  <div id="article-footer-wrap">
+
+	<section id="comments-area">
+		
+		<a name="comments-bar"></a>
+		<div class="comments-bar">
+      <a class="subheading comments-read-link" href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/?comments=1"><span class="text">Reader comments</span> <span class="comment-count"><span>71</span></span></a>
+		</div>
+        <div id="comments-container"></div>
+    <div id="comments-posting-container" class="thick-divide-bottom">
+      <p>You must <a href="/civis/ucp.php?mode=login" class="vote_login">login or create an account</a> to comment.</p>
+    </div>
+    	</section>
+	
+      <aside id="share-buttons" class="thin-divide-bottom"><ul></ul></aside>
+
+
+    <!-- cache hit -->  	<section class="article-author clearfix-redux">
+    				<a href="/author/ronamadeo"><img width="47" height="47" src="http://cdn.arstechnica.net/wp-content//uploads/authors/ron-amadeo-sq.jpg"></a>
+    		    
+		<p><a href="/author/ronamadeo" class="author-name">Ron Amadeo</a>  / Ron is the Reviews Editor at Ars Technica, where he specializes in Android OS and Google products. He is always on the hunt for a new gadget and loves to rip things apart to see how they work.</p>
+				<a href="https://twitter.com/RonAmadeo" class="twitter-follow-button" data-show-count="false">@RonAmadeo</a>
+    		<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    			</section>
+  
+  
+	<nav class="post-links thick-divide-top thin-divide-bottom clearfix-redux">
+		<div class="subheading older"><a href="http://arstechnica.com/tech-policy/2014/07/unofficial-hidden-surveillance-cam-catches-cop-fighting-cop/" rel="prev"><span class="arrow">&larr;</span> Older Story</a></div>
+		<div class="subheading newer"><a href="http://arstechnica.com/security/2014/07/beware-of-infected-hotel-pcs-stealing-guests-passwords-feds-warn/" rel="next">Newer Story <span class="arrow">&rarr;</span></a></div>	
+	</nav>
+
+  	<footer id="article-footer">
+
+        
+<div id="instream300x255_frame"></div>
+<script type="text/javascript">
+CN.dart.call('instream', {sz: '300x255', kws: ["blogvertorial","inStream"], collapse: true});
+</script>
+
+    
+		<h2 class="subheading notched">You May Also Like</h2>
+    <ul id="recommendations" class="clearfix-redux">
+        <!-- cache hit --><li class="sponsored-rec" data-display-ratio="0.125" data-impr="http://ad.doubleclick.net/ad/N7442.112389.ARSTECHNICA/B8079366.108256829;sz=1x1;ord=[timestamp]?">
+    <a href="http://ad.doubleclick.net/ddm/clk/281941473;108256829;p">
+      <p class="has-thumb">
+        <span class="overlay">
+          <img class="sponsored-ribbon" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/images/frs/cisco-sponsor-ribbn.png">
+          <img class="with-overlay" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/images/sponsor/cisco-cloud-thumb.png">
+        </span>
+        <p class="sponsored-rec-txt">
+          <span class="sponsored-heading">Sponsored: </span>
+          Measuring growth in the cloud        </p>
+      </p>
+    </a>
+  </li>
+
+<li class="sponsored-rec" data-display-ratio="1">
+    <a href="http://arstechnica.com/sponsored/how-to-prevent-sports-injuries-use-predictive-analytics/">
+      <p class="has-thumb">
+        <span class="overlay">
+          <img class="sponsored-ribbon" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/images/frs/ibm-sponsor-ribbn.png">
+          <img class="with-overlay" src="http://cdn.arstechnica.net/wp-content/uploads/2014/05/ibm-waratahs-300x150.jpg">
+        </span>
+        <p class="sponsored-rec-txt">
+          <span class="sponsored-heading">Sponsored: </span>
+          How to prevent sports injuries? Use predictive analytics        </p>
+      </p>
+    </a>
+  </li>
+
+        </ul>
+	</footer>
+
+
+  </div>
+</article>
+
+
+		</section>
+    		<footer id="page-footer">
+			<nav id="footer-nav" class="clearfix">
+				<div class="nav-section">
+					<h2 class="subheading">Site Links</h2>
+					<ul>
+						<li><a href="/about-us/">About Us</a></li>
+						<li><a href="/advertise-with-us/">Advertise with us</a></li>
+						<li><a href="/contact-us/">Contact Us</a></li>
+						<li><a href="/reprints/">Reprints</a></li>
+					</ul>
+					
+					<h2 class="subheading">Subscriptions</h2>
+					<ul>
+						<li><a href="/subscriptions/">Subscribe to Ars</a></li>
+					</ul>
+				</div>
+				<div class="nav-section">
+					<h2 class="subheading">More Reading</h2>
+					<ul>
+						<li><a href="/rss-feeds/">RSS Feeds</a></li>
+						<li><a href="/newsletters/">Newsletters</a></li>
+					</ul>
+				</div>
+				<div class="nav-section">
+					<h2 class="subheading">Conde Nast Sites</h2>
+					<ul class="conde-nast-sites">
+						<li><a href="http://www.reddit.com/">Reddit</a></li>
+						<li><a href="http://www.wired.com/">Wired</a></li>
+						<li><a href="http://www.vanityfair.com/">Vanity Fair</a></li>
+						<li><a href="http://www.style.com/">Style</a></li>
+						<li><a href="http://www.details.com/">Details</a></li>
+					</ul>
+					<form method="get" action="#">
+						<select id="mag_list" name="mag_list" onchange="(this.options[this.selectedIndex].value) ? (window.location = this.options[this.selectedIndex].value) : null">
+							<option value="" selected="selected">Visit our sister sites</option>
+							<option value="">- - - - - - - - - - - - - -</option>
+							<option value="http://www.gq.com">GQ</option>
+							<option value="http://www.concierge.com">Concierge</option>
+							<option value="http://www.epicurious.com">Epicurious</option>
+							<option value="http://men.style.com">Men.Style.com</option>
+							<option value="http://www.style.com">Style.com</option>
+							<option value="http://www.wired.com">Wired.com</option>
+							<option value="http://www.lipstick.com">Lipstick.com</option>
+							<option value="http://www.nutritiondata.com">NutritionData</option>
+							<option value="http://www.allure.com">Allure</option>
+							<option value="http://www.architecturaldigest.com">Architectural Digest</option>
+							<option value="http://www.bonappetit.com">Bon App&eacute;tit</option>
+							<option value="http://www.brides.com">Brides</option>
+							<option value="http://www.portfolio.com">Cond&eacute; Nast Portfolio</option>
+							<option value="http://www.glamour.com">Glamour</option>
+							<option value="http://www.golfdigest.com">Golf Digest</option>
+							<option value="http://www.golfworld.com">Golf World</option>
+							<option value="http://www.luckymag.com">Lucky</option>
+							<option value="http://www.self.com">Self</option>
+							<option value="http://www.teenvogue.com">Teen Vogue</option>
+							<option value="http://www.newyorker.com">The New Yorker</option>
+							<option value="http://www.vanityfair.com">Vanity Fair</option>
+							<option value="http://www.wmagazine.com">W</option>
+						</select>
+					</form>
+					<form method="get" action="#">
+						<select size="1" id="sub_list" name="sub_list" onchange="(this.options[this.selectedIndex].value) ? (window.location = this.options[this.selectedIndex].value) : null">
+							<option value="" selected="selected">Subscribe to a magazine</option>
+							<option value="http://www.magazinestoresubscriptions.com?source=univdropdown">View All Titles</option>
+							<option value="">- - - - - - - - - - - - - -</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Allure?source=SITEFOOTER">Allure</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_ArchitecturalDigest">Architectural Digest</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_BonAppetite?source=SITEFOOTER">Bon App&eacute;tit</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Brides?source=SITEFOOTER">Brides</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_CondeNastPortfolio?source=SITEFOOTER">Cond&eacute; Nast Portfolio</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_CondeNastTraveler?source=SITEFOOTER">Cond&eacute; Nast Traveler</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Details?source=SITEFOOTER">Details</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_ElegantBride?source=SITEFOOTER">Elegant Bride</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Glamour?source=SITEFOOTER">Glamour</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_GolfDigest?source=SITEFOOTER">Golf Digest</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_GolfWorld?source=SITEFOOTER">Golf World</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_GQ?source=SITEFOOTER">GQ</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Lucky?source=SITEFOOTER">Lucky</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_ModernBride?source=SITEFOOTER">Modern Bride</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Self?source=SITEFOOTER">Self</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_TeenVogue?source=SITEFOOTER">Teen Vogue</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_NewYorker?source=SITEFOOTER">The New Yorker</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_VanityFair?source=SITEFOOTER">Vanity Fair</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Vogue?source=SITEFOOTER">Vogue</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_W?source=SITEFOOTER">W</option>
+							<option value="https://www.magazinestoresubscriptions.com/webapp/wcs/stores/servlet/Subscriptions_Wired?source=SITEFOOTER">Wired</option>
+						</select>
+					</form>
+				</div>
+				<div class="nav-section" id="mobile-site">
+          <h2 class="subheading"><a href="http://arstechnica.com/gadgets/2014/07/android-ls-app-design-early-looks-at-youtube-gmail-maps-and-more/?view=mobile">View Mobile Site</a></h2>
+				</div>
+			</nav>
+	    			<div id="copyright-terms">
+			© 2014 Condé Nast. All rights reserved<br>
+			Use of this Site constitutes acceptance of our <a href="http://www.condenast.com/privacy-policy" target="_blank">User Agreement</a> (effective 1/2/14) and <a href="http://www.condenast.com/privacy-policy#privacypolicy" target="_blank">Privacy Policy</a> (effective 1/2/14), and <a href="/amendment-to-conde-nast-user-agreement-privacy-policy/">Ars Technica Addendum (effective 5/17/2012)</a><br>
+			<a href="http://www.condenast.com/privacy-policy#privacypolicy-california" target="_blank">Your California Privacy Rights</a><br>
+			The material on this site may not be reproduced, distributed, transmitted, cached or otherwise used, except with the prior written permission of Condé Nast.<br><br>
+			<a href="http://www.condenast.com/privacy-policy#privacypolicy-optout" target="_blank">Ad Choices</a><img width="10" height="10" border="0" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/images/ad_choices_arrow.png">
+			</div> 
+
+		</footer>
+	</div>
+
+            <div id="login-body">
+        <form id="login-form" action="https://arstechnica.com/civis/ucp.php?mode=login" method="post">
+          <div id="login-section">
+            <!--<input type="hidden" name="sid" value="64eba0288563acaf55dfbef2268d03f6" />-->
+            <input type="hidden" name="redirect" value="index.php" />
+            <input type="hidden" name="redirect" value="./ucp.php?mode=login&amp;autoredirect=1&amp;return_to=%2Fcivis%2F" />
+
+            <input type="hidden" name="return_to" value="/civis/" />
+      <h2 class="subheading notched login">Log In</h2>
+            <div class="section-body">
+        <div class="creds">
+        <label class="has-placeholder" for="username">Username or Email:</label>
+        <input onfocus="userfocus=true;return;" type="text" name="username" id="username" placeholder="Username or Email" />
+        <label class="has-placeholder" for="password">Password:</label>
+        <input onfocus="passfocus=true;return;" type="password" name="password" id="password"  placeholder="Password" />
+        </div>
+              <label id="remember-label"><input type="checkbox" name="autologin" id="autologin" /> Keep me logged in</label>
+        <input type="submit" value="Login" class="button" name="login" />
+              <div id="password-reset-link">
+                <a href="https://arstechnica.com/civis/ucp.php?mode=sendpassword">Forgot your password?</a>
+               | <a href="https://arstechnica.com/civis/ucp.php?mode=resend_act">Resend activation e-mail</a>
+              </div>
+
+        <div class="register-account">
+        <h2 class="subheading notched register">Register an Account</h2>
+        <p>Don't have an Ars account? It’s fast and easy to register for one.</p>
+        <input type="button" value="Sign Up" onclick="window.location.href='http://arstechnica.com/civis/./ucp.php?mode=register'">
+        </div>
+
+            </div>
+          </div>
+        </form>
+
+        <div id="register-section">
+          <h2>Need to register for a new account?</h2>
+          <div class="section-body">
+            <p>If you don't have an account yet it's free and easy.</p>
+            <a href="https://arstechnica.com/civis/ucp.php?mode=register" class="button">Register</a>
+          </div>
+        </div>
+
+      </div>
+  
+  
+		<script type="text/javascript" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/js/ars.min.fc3fb29fc4758d04a13c5201aa8535c5.js"></script>
+	
+  <script>
+(function(){
+
+
+  var compiledTemplate0 = '';
+
+
+window.NATIVEADS = window.NATIVEADS || {};
+window.NATIVEADS.injectedAt = new Date().getTime();
+window.NATIVEADS.onReady = function(ads) {
+
+  ads.setPropertyID("NA-ARSTECH-11236128");
+  ads.setSecondaryPageURL("/sponsored-content/");
+
+
+
+
+  ads.insertPreview({
+    label: "Article Right Rail",
+    unit: {"server":"dfp","id":"/7814368/NativeAdSamples","size":"1x1","targets":{"age":"20-30","gender":"female"}},
+    location: "body.single.postid-416897 ol.rail.latest-stories li:eq(2)",
+    infoText: "",
+    infoButtonText: null,
+    template: compiledTemplate0,
+    onRender: function($element) { },
+    onFill: function(data) { },
+    onError: function(error) { }
+  });
+
+  ads.injectCSS("", null);
+
+
+  ads.configureSecondaryPage({
+    binding: {
+      sponsor: {
+        link: "#sponsor-link",
+        logo: "#sponsor-logo",
+        name: "#sponsor-name"
+      },
+      title: "#title",
+      summary: "#summary",
+      content: "div.article-content .sponsored-content-holder",
+      author: "#author",
+      pubDate: "#pub-date",
+      image: {
+        href: "figure.intro-image>span",
+        caption: "figcaption.caption .caption-text",
+        credits: "figcaption.caption .caption-credit"
+      }
+    },
+    onFill: function(data) { },
+    onRender: function() { },
+    onError: function(error) { },
+    track: function() { }
+  });
+
+};
+
+
+
+  /*
+
+   This function represents a pre-compiled Handlebars template. Pre-compiled
+   templates are not pretty, but they provide a very significant performance
+   boost, especially on mobile devices. For more information, see
+   http://handlebarsjs.com/precompilation.html.
+
+   Note that this code has been generated from the following markup:
+
+<li>
+  <a href="{{link}}">
+    <h2 style="color:#00A3D3;">Sponsored by: <span style="text-transform:none;">{{sponsor.name}}</span></h2>
+    {{#if image.href}}
+      <span style="width:50px; height:50px; overflow:hidden; display:inline-block; float:left; margin:2px 10px 5px 0">
+        <img src="{{image.href}}" style="float:none; margin:0; height:50px; width:auto;" />
+      </span>
+    {{/if}}
+    <h1 class="heading">{{title}}</h1>
+  </a>
+</li>
+
+  */
+
+  compiledTemplate0 = function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, stack2, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n      <span style=\"width:50px; height:50px; overflow:hidden; display:inline-block; float:left; margin:2px 10px 5px 0\">\n        <img src=\""
+    + escapeExpression(((stack1 = ((stack1 = depth0.image),stack1 == null || stack1 === false ? stack1 : stack1.href)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\" style=\"float:none; margin:0; height:50px; width:auto;\" />\n      </span>\n    ";
+  return buffer;
+  }
+
+  buffer += "<li>\n  <a href=\"";
+  if (stack1 = helpers.link) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = depth0.link; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n    <h2 style=\"color:#00A3D3;\">Sponsored by: <span style=\"text-transform:none;\">"
+    + escapeExpression(((stack1 = ((stack1 = depth0.sponsor),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</span></h2>\n    ";
+  stack2 = helpers['if'].call(depth0, ((stack1 = depth0.image),stack1 == null || stack1 === false ? stack1 : stack1.href), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack2 || stack2 === 0) { buffer += stack2; }
+  buffer += "\n    <h1 class=\"heading\">";
+  if (stack2 = helpers.title) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = depth0.title; stack2 = typeof stack2 === functionType ? stack2.apply(depth0) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</h1>\n  </a>\n</li>";
+  return buffer;
+  };
+
+
+
+
+})();
+
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s);
+  js.id = id; js.type = "text/javascript"; js.async = true;
+  js.src = "http://plugin.mediavoice.com/plugin.js";
+  fjs.parentNode.insertBefore(js, fjs);
+})(document, "script", "nativeads-plugin");
+
+</script>
+
+  <noscript><a href="http://www.omniture.com" title="Web Analytics"><img src="http://condenast.112.2o7.net/b/ss/condenet-dev/1/H.15.1--NS/0" height="1" width="1" border="0" alt="" /></a></noscript>
+
+  
+      <script type="text/javascript">
+      ars.FEATURE = {"assets_path":"http:\/\/cdn.arstechnica.net\/wp-content\/themes\/arstechnica\/assets\/features\/generic"};
+    </script>
+    <script type="text/javascript" src="http://cdn.arstechnica.net/wp-content/themes/arstechnica/assets/features/generic/style.js"></script>
+
+    <!-- Google Analytics start -->
+	<script type="text/javascript">
+	var _gaq = _gaq || [];
+  _gaq.push(
+    ['_setAccount', 'UA-31997-1'],
+    ['_setCustomVar', 1, 'view', "grid"],
+    ['_setCustomVar', 2, 'theme', "light"],
+    ['_setCustomVar', 3, 'logged_in', "false"],
+    ['_setCustomVar', 4, 'show_comments', "false"],
+    ['_trackPageview']
+  );
+	(function() {
+	  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+	</script>
+  <!-- Google Analytics end -->
+
+  <!-- Parse.ly start -->
+	<script type="text/javascript">
+  (function(d) {
+    var site = "arstechnica.com",
+    b = d.body,
+    e = d.createElement("div");
+    e.innerHTML = '<span id="parsely-cfg" data-parsely-site="'+site+'"></span>';
+    e.id = "parsely-root";
+    e.style.display = "none";
+    b.appendChild(e);
+  })(document);
+
+  (function(s, p, d) {
+    var h=d.location.protocol, i=p+"-"+s,
+    e=d.getElementById(i), r=d.getElementById(p+"-root"),
+    u=h==="https:"?"d1z2jf7jlzjs58.cloudfront.net"
+      :"static."+p+".com";
+    if (e) return;
+    e = d.createElement(s); e.id = i; e.async = true;
+    e.src = h+"//"+u+"/p.js"; r.appendChild(e);
+  })("script", "parsely", document);
+	</script>
+  <!-- Parse.ly end -->
+  
+
+  
+  
+  </body>
+</html>

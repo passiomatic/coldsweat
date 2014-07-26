@@ -1,4 +1,4 @@
-{{inherit "index.html"}}
+{{inherit "list.html"}}
 
 {{def render_entries(entries)}}
     {{for loop, e in looper(entries)}}
@@ -31,7 +31,7 @@
                     <h1 class="">{{entry.title|html}}</h1>        
                     {{if entry.content}} 
                         <div class="content">
-                            {{entry.content}}
+                            {{entry|content_html}}
                             {{if entry.link}}
                             <div class="continue"><a class="btn btn-small" rel="bookmark" title="View entry on {{entry.link|friendly_url}} (V key)" target="_blank" href="{{entry.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
                             {{endif}}
@@ -39,7 +39,7 @@
                         <hr class="halved">
                     {{endif}}
                     <div class="meta dim">    
-                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on|datetime}} <abbr title="Coordinated Universal Time">UTC</abbr>{{if entry.author}} by {{entry.author|html}}{{endif}}            
+                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on|date}}{{if entry.author}} by {{entry.author|html}}{{endif}}            
                         {{if entry.link}}&emsp;<i class="fa fa-twitter"></i> <a title="Share on Twitter" target="_blank" href="http://twitter.com/home?status={{entry.title|url}}%20%E2%80%94%20{{entry.link|url}}">Twitter</a>{{endif}}                                                
                     </div>
                 </article>    

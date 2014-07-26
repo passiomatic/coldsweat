@@ -7,7 +7,10 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
 from os import path
+import time
 from datetime import datetime, timedelta
+from collections import defaultdict
+from multiprocessing import Process
 from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
 from tempita import Template #, HTMLTemplate 
 from peewee import IntegrityError
@@ -20,9 +23,9 @@ import fetcher
 import filters
 from coldsweat import *
 
-ENTRIES_PER_PAGE = 30
-FEEDS_PER_PAGE = 60
-USER_SESSION_KEY = 'FrontendApp.user'
+ENTRIES_PER_PAGE    = 30
+FEEDS_PER_PAGE      = 60
+USER_SESSION_KEY    = 'FrontendApp.user'
 
 def login_required(handler): 
     def wrapper(self, request, *args):
@@ -123,8 +126,10 @@ class FrontendApp(WSGIApp):
     # Views
 
     @GET()
-    def index(self, request):
+    @login_required 
+    def index(self, request):    
         return self.entry_list(request)
+
 
     # Entries
 
@@ -139,7 +144,10 @@ class FrontendApp(WSGIApp):
         self._mark_entry(self.user, entry, 'read')                                
 
         q, namespace = self._make_view_variables(self.user, request)
-        n = q.where(Entry.last_updated_on < entry.last_updated_on).order_by(Entry.last_updated_on.desc()).limit(1)
+        # Try to deal with multiple entries with the same timestamp:
+        #   sort by last_updated_on and then by id, where entries  
+        #   with larger id's have been added later
+        n = q.where(Entry.last_updated_on < entry.last_updated_on).order_by(Entry.last_updated_on.desc(), Entry.id.desc()).limit(1)
 
         namespace.update({
             'entry': entry,
@@ -248,6 +256,27 @@ class FrontendApp(WSGIApp):
         
         self.alert_message = message        
         return self.respond_with_script('_modal_done.js', {'location': redirect_url})
+
+    # Links
+
+    @GET(r'^/links/?$')
+    @login_required    
+    def link_list(self, request):
+        pass
+#@@TODO
+#         count, offset, group_id, feed_id, filter_name, filter_class, panel_title, page_title = 0, 0, 0, 0, 'links', '', 'Hot Links', 'Hot Links'
+# 
+#         groups = get_groups(self.user)  
+#         q = get_references(self.user)
+#         
+#         # Group entries for each link
+#         entries = defaultdict(lambda: [])
+#         links = {}
+#         for r in q:
+#             entries[r.link.id].append(r.entry.feed.title)
+#             links[r.link.id] = r.link
+#         
+#         return self.respond_with_template('links.html', locals())          
                                 
     # Feeds
 
@@ -311,34 +340,34 @@ class FrontendApp(WSGIApp):
         if not is_valid_url(self_link):
             form_message = u'ERROR Error, please specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
-        response = fetcher.fetch_url(self_link)
-        if response:
+        try:
+            response = fetcher.fetch_url(self_link)
             if response.status_code not in fetcher.POSITIVE_STATUS_CODES:
                 form_message = u'ERROR Error, feed host returned: %s' % filters.status_title(response.status_code)
                 return self.respond_with_template('_feed_add_wizard_1.html', locals())
-        else:
+        except Exception:
+            #@@TODO: catch more specific exceptions
             form_message = u'ERROR Error, a network error occured'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
-
-
+        
         group_id = int(request.POST.get('group', 0))
         if group_id:
             group = Group.get(Group.id == group_id) 
         else:
             group = Group.get(Group.title == Group.DEFAULT_GROUP)    
 
-        fetcher.load_plugins()
-        trigger_event('fetch_started')
-        feed = Feed()
-        feed.self_link = self_link
-        feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)                
-        trigger_event('fetch_done', [feed])                
+        feed = Feed(self_link=self_link)
+        feed = fetcher.add_feed(feed)
         subscription = fetcher.add_subscription(feed, self.user, group)
         if subscription:
-            self.alert_message = u'SUCCESS Feed has been added to <i>%s</i> group' % group.title
+            # Fetch feed in a separate process
+            p = Process(target=feed_worker, args=(feed, ))
+            p.start()
+            self.alert_message = u'SUCCESS Feed entries will appear in few moments'
         else:
             self.alert_message = u'INFO Feed is already in <i>%s</i> group' % group.title
-        return self.respond_with_script('_modal_done.js', {'location': '%s/?feed=%d' % (request.application_url, feed.id)}) 
+        
+        return self.respond_with_script('_modal_done.js', {'location': '%s/entries?feed=%d' % (request.application_url, feed.id)}) 
 
         
     @GET(r'^/fever/?$')
@@ -509,6 +538,25 @@ class FrontendApp(WSGIApp):
 frontend_app = SessionMiddleware(FrontendApp())
 
 # ------------------------------------------------------
+# Fetcher worker process
+# ------------------------------------------------------    
+
+def feed_worker(feed):
+    start = time.time()    
+    fetcher.load_plugins()
+
+    # Allow each process to open and close its database connection    
+    connect()
+    logger.debug("starting fetcher")
+    trigger_event('fetch_started')
+    fetcher.fetch_feed(feed)
+    trigger_event('fetch_done', [feed])
+    close()
+
+    logger.info("feed fetched in %.2fs" % (time.time() - start))
+
+
+# ------------------------------------------------------
 # Template utilities
 # ------------------------------------------------------        
             
@@ -564,7 +612,13 @@ def get_groups(user):
     q = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title) 
     return q    
 
+# Links
 
+def get_references(user, days=7):
+    when = datetime.utcnow() - timedelta(days=days)
+    q = Reference.select(Reference, Link, Entry, Feed).join(Link).switch(Reference).join(Entry).join(Feed).join(Subscription).where((Subscription.user == user) and (Link.created_on > when)).limit(10)
+    return q 
+    
 # Stats
 
 def get_stats():

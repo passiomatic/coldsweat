@@ -13,7 +13,7 @@ def feed_status(feed, threshold):
         <li class="feed {{if loop.first}}current{{endif}} {{feed_status(f, error_threshold)}}">
             <div class="item-inner">
                 <h3 class="h4">
-                    <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>
+                    <img class="favicon" src="{{f.icon.data}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/entries?feed={{f.id}}">{{f.title|html}}</a>
                 </h3>
                 <div class="meta dim">
                     <span class="feed">
@@ -40,7 +40,7 @@ def feed_status(feed, threshold):
 {{if request.is_xhr}}
     {{render_feeds()}}
 {{else}}
-    {{inherit "index.html"}}
+    {{inherit "list.html"}}
     
     {{def panel_block}}
     {{if count}}

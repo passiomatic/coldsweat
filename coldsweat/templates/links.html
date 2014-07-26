@@ -1,0 +1,33 @@
+{{def render_links}}
+    <li class="heading">
+        <h2>{{panel_title|html}}</h2>
+    </li>
+    {{for link_id, link in links.items()}}
+        <li data-entry="{{link_id}}" class="link">
+            <div class="item-inner">
+                <h3 class="h4">
+                    <img class="favicon" src="{{static_url}}/images/default-favicon.png" width="16" height="16"  alt="*"><a href="{{application_url}}/links/{{link_id}}">{{link.title|html}}</a>
+                </h3>
+                <div class="meta dim">
+                    <span class="feed">{{', '.join(entries[link_id])}}</span>
+                </div>                  
+            </div>
+        </li>
+    {{endfor}}
+{{enddef}}
+
+{{inherit "list.html"}} 
+{{def panel_block}}
+    {{if 1}}
+        <div class="panel-content">
+            <ul class="view list-view">                      
+                {{render_links()}}
+            </ul>
+        </div>
+    {{else}}
+        <div class="notice">
+            <i class="fa fa-tint fa-4x"></i>
+            No links found. Is the <i>hotlinks</i> plugin installed?
+        </div>
+    {{endif}}
+{{enddef}}

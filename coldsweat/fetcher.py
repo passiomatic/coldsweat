@@ -22,8 +22,7 @@ from coldsweat import *
 from markup import html
 
 ENTRY_TAG_URI           = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
-MAX_TITLE_LENGTH        = 255
-POSITIVE_STATUS_CODES   = 200, 302, 304 # Other redirects are handled by Requests
+POSITIVE_STATUS_CODES   = 200, 304 # All redirects are handled by Requests
 
 
 # ------------------------------------------------------
@@ -42,7 +41,15 @@ def get_feed_timestamp(soup_feed, default):
     logger.debug('no feed timestamp found, using default')    
     return default
 
-def get_entry_timestamp(entry, default=None):
+def get_entry_id(entry, default):
+    """
+    Get a useful id from a feed entry
+    """    
+    if ('id' in entry) and entry.id: 
+        return entry.id
+    return default
+
+def get_entry_timestamp(entry, default):
     """
     Select the best timestamp for an entry
     """
@@ -54,27 +61,40 @@ def get_entry_timestamp(entry, default=None):
     logger.debug('no entry timestamp found, using default')    
     return default
         
-def get_entry_title(entry):
+def get_entry_title(entry, default):
     if 'title' in entry:
-        return truncate(html.strip_html(entry.title), MAX_TITLE_LENGTH)
-    return 'Untitled'
+        return truncate(html.strip_html(entry.title))
+    return default
+
+def get_entry_content(entry, default):
+    """
+    Select the best content from an entry
+    """
+
+    candidates = entry.get('content', [])
+    if 'summary_detail' in entry:
+        #logger.debug('summary found for entry %s' % entry.link)    
+        candidates.append(entry.summary_detail)
+    for c in candidates:
+        # Match text/html, application/xhtml+xml
+        if 'html' in c.type:
+            return c.type, c.value
+    # Return first result, regardless of MIME type
+    if candidates:
+        return candidates[0].type, candidates[0].value
+
+    logger.debug('no content found for entry %s' % entry.link)    
+    return default
+    
+# Nullable fields
 
 def get_entry_link(entry):
-    # Special case for Feedburner entries, see: http://bit.ly/1gRAvJv
+    # Special case for FeedBurner entries, see: http://bit.ly/1gRAvJv
     if 'feedburner_origlink' in entry:
-        return entry.feedburner_origlink
+        return scrub_url(entry.feedburner_origlink)
     if 'link' in entry:
-        return entry.link
+        return scrub_url(entry.link)
     return None
-
-    
-def get_entry_id(entry, default=None):
-    """
-    Get a useful id from a feed entry
-    """    
-    if ('id' in entry) and entry.id: 
-        return entry.id
-    return default
     
 def get_entry_author(entry, feed):
     """
@@ -87,26 +107,6 @@ def get_entry_author(entry, feed):
         return feed.author_detail.name
     return None
 
-def get_entry_content(entry):
-    """
-    Select the best content from an entry
-    """
-
-    candidates = entry.get('content', [])
-    if candidates:
-        logger.debug('content found for entry %s' % entry.link)    
-    if 'summary_detail' in entry:
-        logger.debug('summary found for entry %s' % entry.link)    
-        candidates.append(entry.summary_detail)
-    for c in candidates:
-        if 'html' in c.type: # Match text/html, application/xhtml+xml
-            return c.type, c.value
-        else: 
-            # If the content is declared to be (or is determined to be) text/plain, 
-            #   it will not be sanitized by Feedparser. This is to avoid data loss.
-            return c.type, escape_html(c.value)
-    logger.debug('no content found for entry %s' % entry.link)    
-    return 'text/plain', ''
 
 # ------------------------------------------------------
 # Add feed and subscription
@@ -132,7 +132,7 @@ def load_plugins():
         logger.debug('loaded %s plugin' % name)
         fp.close()
         
-def add_feed(feed, fetch_icon=False, add_entries=False):
+def add_feed(feed, fetch=False, fetch_icon=False):
     '''
     Add a feed to database and optionally fetch icon and add entries
     '''
@@ -149,7 +149,7 @@ def add_feed(feed, fetch_icon=False, add_entries=False):
 
     if fetch_icon:
         # Prefer alternate_link if available since self_link could 
-        #   point to Feed Burner or similar services
+        #   point to FeedBurner or similar services
         icon_link = feed.alternate_link or feed.self_link    
         schema, netloc, path, query, fragment = urlparse.urlsplit(icon_link)
         icon = Icon.create(data=favicon.fetch(icon_link))
@@ -157,7 +157,7 @@ def add_feed(feed, fetch_icon=False, add_entries=False):
         logger.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
 
     feed.save()
-    fetch_feed(feed, add_entries)
+    if fetch: fetch_feed(feed)
 
     return feed
     
@@ -175,30 +175,6 @@ def add_subscription(feed, user, group):
 # ------------------------------------------------------
 # Feed fetching and parsing 
 # ------------------------------------------------------
-
-        
-def fetch_url(url, timeout=None, etag=None, modified_since=None):
-
-    request_headers = {
-        'User-Agent': user_agent
-    }
-
-    # Conditional GET headers
-    if etag and modified_since:
-        request_headers['If-None-Match'] = etag
-        request_headers['If-Modified-Since'] = format_http_datetime(modified_since)
-        
-    timeout = timeout if timeout else config.getint('fetcher', 'timeout')
-    
-    try:
-        response = requests.get(url, timeout=timeout, headers=request_headers)
-        logger.debug("got status %d" % response.status_code)
-    except (IOError, RequestException), ex:
-        return None
-    
-    return response
-
-
 
 def add_synthesized_entry(feed, title, content):
     '''
@@ -224,7 +200,6 @@ def add_synthesized_entry(feed, title, content):
         title             = title,
         author            = 'Coldsweat',
         content           = content,
-        #@@TODO: mime_type='text/html',
         last_updated_on   = now
     )
     entry.save()
@@ -232,7 +207,7 @@ def add_synthesized_entry(feed, title, content):
     return entry
 
 
-def fetch_feed(feed, add_entries=False):
+def fetch_feed(feed):
 
     def synthesize_entry(reason):    
         title, content = u'This feed has been disabled', render_template(os.path.join(template_dir, '_entry_feed_disabled.html'), {'reason': reason})
@@ -253,10 +228,12 @@ def fetch_feed(feed, add_entries=False):
 
     logger.debug("fetching %s" % feed.self_link)
            
-    schema, netloc, path, params, query, fragment = urlparse.urlparse(feed.self_link)
+    schema, netloc, path, query, fragment = urlparse.urlsplit(feed.self_link)
 
     now = datetime.utcnow()
 
+    max_history = config.getint('fetcher', 'max_history')
+    timeout = config.getint('fetcher', 'timeout')                                
     interval = config.getint('fetcher', 'min_interval')
 
     # Check freshness
@@ -269,9 +246,10 @@ def fetch_feed(feed, add_entries=False):
         if delta < interval:
             logger.debug("%s for %s is below min_interval, skipped" % (fieldname, netloc))
             return            
-                      
-    response = fetch_url(feed.self_link, etag=feed.etag, modified_since=feed.last_updated_on)
-    if not response:
+    
+    try:
+        response = fetch_url(feed.self_link, timeout=timeout, etag=feed.etag, modified_since=feed.last_updated_on)
+    except Exception:
         # Record as "503 Service unavailable"
         post_fetch(503, error=True)
         logger.warn("a network error occured while fetching %s" % netloc)
@@ -317,38 +295,40 @@ def fetch_feed(feed, add_entries=False):
 
     feed.etag = response.headers.get('ETag', None)    
     
-    if 'link' in soup.feed:
-        feed.alternate_link = soup.feed.link
-
     # Reset value only if not set before
     if ('title' in soup.feed) and not feed.title:
         feed.title = html.strip_html(soup.feed.title)
 
-    feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
+    feed.alternate_link     = soup.feed.link if 'link' in soup.feed else None
+    feed.last_updated_on    = get_feed_timestamp(soup.feed, now)
+    
     post_fetch(response.status_code)
+    
+    alternate_link_netloc = urlparse.urlsplit(feed.alternate_link or feed.self_link).netloc
 
-    if not add_entries:    
-        return
-        
     for parsed_entry in soup.entries:
         
         link = get_entry_link(parsed_entry)
+        is_local = False
+        # Check if it's a local link (to the feed)
+        if link:
+            is_local = (urlparse.urlsplit(link).netloc == alternate_link_netloc)
+
         guid = get_entry_id(parsed_entry, default=link)
 
         if not guid:
             logger.warn('could not find guid for entry from %s, skipped' % netloc)
             continue
 
-        title                = get_entry_title(parsed_entry)
-        mime_type, content   = get_entry_content(parsed_entry)
-        timestamp            = get_entry_timestamp(parsed_entry, default=now)
-        author               = get_entry_author(parsed_entry, soup.feed)
-                
         # Skip ancient feed items        
-        max_history = config.getint('fetcher', 'max_history')
+        timestamp = get_entry_timestamp(parsed_entry, default=now)
         if max_history and ((now - timestamp).days > max_history):  
-            logger.debug("entry %s from %s is over max_history, skipped" % (guid, netloc))
+            #logger.debug("entry %s from %s is over max_history, skipped" % (guid, netloc))
             continue
+
+        title                   = get_entry_title(parsed_entry, default='Untitled')
+        content_type, content   = get_entry_content(parsed_entry, default=('text/plain', ''))
+        author                  = get_entry_author(parsed_entry, soup.feed)
 
         try:
             # If entry is already in database with same id, then skip it
@@ -364,14 +344,16 @@ def fetch_feed(feed, add_entries=False):
             title             = title,
             author            = author,
             content           = content,
-            #@@TODO: add mime_type too
+            content_type      = content_type,
             link              = link,
+            is_local          = is_local,
             last_updated_on   = timestamp
         )
         trigger_event('entry_parsed', entry, parsed_entry)
         entry.save()
+        trigger_event('entry_saved', entry)
 
-        logger.debug(u"added entry %s from %s" % (guid, netloc))
+        #logger.debug(u"added entry %s from %s" % (guid, netloc))
 
 
 def feed_worker(feed):
@@ -382,7 +364,7 @@ def feed_worker(feed):
             
     # Allow each process to open and close its database connection    
     connect()
-    fetch_feed(feed, add_entries=True)
+    fetch_feed(feed)
     close()
     
  
@@ -398,7 +380,7 @@ def fetch_feeds():
     
     feeds = list(q)
     if not feeds:
-        logger.debug("no feeds found to refresh, halted")
+        logger.info("no feeds found to refresh, halted")
         return
 
     load_plugins()

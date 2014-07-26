@@ -31,6 +31,14 @@ def escape_html(value):
         return cgi.escape(value, quote=True)
     return ''
 
+@filter('content_html')
+def escape_content_html(entry):     
+    '''Return entry content and escape it if needed'''
+    # Check for text/html, application/xhtml+xml 
+    if 'html' in entry.content_type:           
+        return entry.content # Return as-is since it is sanitized    
+    return cgi.escape(entry.content, quote=True)
+
 @filter('url')
 def escape_url(value):     
     if value:
@@ -42,6 +50,7 @@ def escape_url(value):
 #     Return value escaped as a Javascript string
 #     """
 #     return json.dumps(value)
+
 
 @filter('friendly_url')
 def friendly_url(value):

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Description: Scrubber plugin. Remove links and images from 
-  feed entries according to etc/blacklist
+Description: remove links and images from feed entries according to etc/blacklist
 
 Copyright (c) 2013—2014 Andrea Peltrin
 License: MIT (see LICENSE for details)
@@ -10,13 +9,12 @@ License: MIT (see LICENSE for details)
 from os import path
 
 from coldsweat import *
-from coldsweat.fetcher import get_entry_content
 from coldsweat.markup import html
 
 DOMAINS = []    
 
 @event('fetch_started')
-def fetcher_started():
+def started():
     if DOMAINS: return # Already initialized
     
     backlist_path = path.join(installation_dir, 'etc/blacklist')
@@ -34,8 +32,6 @@ def fetcher_started():
     
     
 @event('entry_parsed')
-def entry_parsed(entry, parsed_entry):
-    #@@FIXME: suboptimal, in the future grab entry.mime_type instead
-    mime_type, content = get_entry_content(parsed_entry)
-    if DOMAINS and ('html' in mime_type):
+def parsed(entry, parsed_entry):
+    if DOMAINS and ('html' in entry.content_type):
         entry.content = html.scrub_html(entry.content, DOMAINS)    

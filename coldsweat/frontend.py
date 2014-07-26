@@ -554,9 +554,9 @@ def get_feed_entries(user, feed, *select):
 
 def get_feeds(user, *select):  
     select = select or [Feed, Icon, fn.Count(Entry.id).alias('entries')]
-    q = Feed.select(*select).join(Icon).switch(Feed).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == user).group_by(Feed)
-
-    return q    
+    q = Feed.select(*select).join(Icon).switch(Feed).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == user).group_by(Feed, Icon)
+    
+    return q  
 
 # Groups
 

@@ -10,21 +10,26 @@ License: MIT (see LICENSE for details)
 import pickle
 from datetime import datetime, timedelta
 from peewee import *
-from playhouse import migrate
+from playhouse.migrate import *
+from playhouse.signals import Model as BaseModel, pre_save
 from webob.exc import status_map
 
 from utilities import *
 import favicon
 from coldsweat import config, logger
 
+
 # Defer database init, see connect() below
 engine = config.get('database', 'engine')
 if engine == 'sqlite':
     _db = SqliteDatabase(None, threadlocals=True) 
+    migrator = SqliteMigrator(_db)
 elif engine == 'mysql':
     _db = MySQLDatabase(None)
+    migrator = MySQLMigrator(_db)
 elif engine == 'postgresql':
     _db = PostgresqlDatabase(None, autorollback=True)
+    migrator = PostgresqlMigrator(_db)
 else:
     raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
 
@@ -43,10 +48,15 @@ class PickleField(BlobField):
 # Coldsweat models
 # ------------------------------------------------------
 
-class CustomModel(Model):
+class CustomModel(BaseModel):
     """
-    Binds the database to all our models
+    Binds the database to all models
     """
+
+    @classmethod
+    def field_exists(klass, db_column):
+        c = klass._meta.database.execute_sql('SELECT * FROM %s;' % klass._meta.db_table)
+        return db_column in [d[0] for d in c.description]
 
     class Meta:
         database = _db
@@ -54,13 +64,13 @@ class CustomModel(Model):
 
 class User(CustomModel):
     """
-    Users - need at least one to store the api_key
+    Coldsweat user
     """    
     DEFAULT_CREDENTIALS = 'coldsweat', 'coldsweat'
     MIN_PASSWORD_LENGTH = 8
 
     username            = CharField(unique=True)
-    password            = CharField() #@@TODO: hashed & salted    
+    password            = CharField()  
     email               = CharField(null=True)
     api_key             = CharField(unique=True)
     is_enabled          = BooleanField(default=True) 
@@ -70,7 +80,7 @@ class User(CustomModel):
     
     @staticmethod
     def make_api_key(username, password):
-        #@@FIXME: use email inrsead of username as Fever API dictates
+        #@@FIXME: use email instead of username as Fever API dictates
         return make_md5_hash('%s:%s' % (username, password))
 
     @staticmethod
@@ -87,7 +97,7 @@ class User(CustomModel):
     @staticmethod
     def validate_api_key(api_key):
         try:
-            #@@NOTE: Fever clients may send api_key in uppercase, lower() it
+            # Clients may send api_key in uppercase, lower() it
             user = User.get((User.api_key == api_key.lower()) & 
                 (User.is_enabled == True))        
         except User.DoesNotExist:
@@ -99,6 +109,11 @@ class User(CustomModel):
     def validate_password(password):
         #@@TODO: Check for unacceptable chars
         return len(password) >= User.MIN_PASSWORD_LENGTH
+        
+#@@TODO: Recalculate API key
+# @pre_save(sender=User)
+# def on_save_handler(model, user, created):
+#     pass
                 
 class Icon(CustomModel):
     """
@@ -128,33 +143,31 @@ class Feed(CustomModel):
     Atom/RSS feed
     """
     
-    # Fetch?
-    is_enabled          = BooleanField(default=True)     
-    # A URL to a small icon representing the feed
-    icon                = ForeignKeyField(Icon, default=1)
-    title               = CharField(null=True)        
-    # The URL of the HTML page associated with the feed (rel=alternate)
-    alternate_link      = CharField(null=True)            
-    # The URL of the feed itself (rel=self)
-    self_link           = CharField()    
-    etag                = CharField(null=True)    
-    last_updated_on     = DateTimeField(null=True) # As UTC
-    last_checked_on     = DateTimeField(null=True) # As UTC 
-    last_status         = IntegerField(null=True) # Last HTTP code    
+    is_enabled          = BooleanField(default=True)        # Fetch feed?
+    icon                = ForeignKeyField(Icon, default=1)  # A URL to a small icon representing the feed
+    self_link           = CharField()                       # The URL of the feed itself (rel=self)
     error_count         = IntegerField(default=0)
+
+    # Nullable
+
+    title               = CharField(null=True)        
+    alternate_link      = CharField(null=True)              # The URL of the HTML page associated with the feed (rel=alternate)
+    etag                = CharField(null=True)              # HTTP E-tag
+    last_updated_on     = DateTimeField(null=True)          # As UTC
+    last_checked_on     = DateTimeField(null=True)          # As UTC 
+    last_status         = IntegerField(null=True)           # Last HTTP code    
 
     class Meta:
         indexes = (
             (('self_link',), True),
             (('last_checked_on',), False),
-            #(('last_updated_on',), False),
         )
-        #order_by = ('-last_updated_on',)
         db_table = 'feeds'
 
     @property
     def last_updated_on_as_epoch(self):
-        if self.last_updated_on:        # Never updated?
+        # Never updated?
+        if self.last_updated_on: 
             return datetime_as_epoch(self.last_updated_on)
         return 0 
 
@@ -163,70 +176,64 @@ class Entry(CustomModel):
     Atom/RSS entry
     """
 
-    # It's called 'id' in Atom parlance
-    guid            = CharField()     
-    feed            = ForeignKeyField(Feed)
-    title           = CharField(default='Untitled')
+    guid            = CharField()                               # 'id' in Atom parlance
+    feed            = ForeignKeyField(Feed, on_delete='CASCADE')
+    title           = CharField()    
+    content_type    = CharField(default='text/html')
+    content         = TextField()
+    last_updated_on = DateTimeField()                       # As UTC
+
+    # Nullable
     author          = CharField(null=True)
-    content         = TextField(null=True)
     link            = CharField(null=True)    
-    last_updated_on = DateTimeField() # As UTC
 
     class Meta:
         indexes = (
-            #(('last_updated_on',), False),
             (('guid',), False),
             (('link',), False),
         )
-        #order_by = ('-last_updated_on',)
         db_table = 'entries'
 
     @property
     def last_updated_on_as_epoch(self):
         return datetime_as_epoch(self.last_updated_on)
 
-#     @property
-#     def excerpt(self):
-#         return get_excerpt(self.content)
-
                 
 class Saved(CustomModel):
     """
-    Many-to-many relationship between Users and entries
+    Entries 'saved' status 
     """
-    user           = ForeignKeyField(User)
-    entry          = ForeignKeyField(Entry)    
-    saved_on       = DateTimeField(default=datetime.utcnow)  
+    user            = ForeignKeyField(User)
+    entry           = ForeignKeyField(Entry, on_delete='CASCADE')    
+    saved_on        = DateTimeField(default=datetime.utcnow)  
 
     class Meta:
         indexes = (
             (('user', 'entry'), True),
         )
-        #db_table = 'saved'        
 
 
 class Read(CustomModel):
     """
-    Many-to-many relationship between Users and entries
+    Entries 'read' status 
     """
     user           = ForeignKeyField(User)
-    entry          = ForeignKeyField(Entry)    
+    entry          = ForeignKeyField(Entry, on_delete='CASCADE')    
     read_on        = DateTimeField(default=datetime.utcnow) 
 
     class Meta:
         indexes = (
             (('user', 'entry'), True),
         )
-        #db_table = 'read'
 
 
 class Subscription(CustomModel):
     """
-    A user's feed subscriptions
+    A user's feed subscription
     """
     user           = ForeignKeyField(User)
-    group          = ForeignKeyField(Group)
-    feed           = ForeignKeyField(Feed)
+    group          = ForeignKeyField(Group, on_delete='CASCADE')
+    feed           = ForeignKeyField(Feed, on_delete='CASCADE')
 
     class Meta:
         indexes = (
@@ -236,10 +243,12 @@ class Subscription(CustomModel):
 
 
 class Session(CustomModel):
-    
-    key             = CharField(null=False)
-    value           = PickleField(null=False)     
-    expires_on      = DateTimeField(null=False)
+    """
+    Web session
+    """    
+    key             = CharField()
+    value           = PickleField()     
+    expires_on      = DateTimeField()
 
     class Meta:
         indexes = (
@@ -295,21 +304,37 @@ def close():
         # Attempt to close database connection 
         _db.close()
     except ProgrammingError, exc:
-        logger.error('Caught exception while closing database connection: %s' % exc)
+        logger.error('caught exception while closing database connection: %s' % exc)
 
 
-def migrate_schema():
+def migrate_database_schema():
     '''
-    Migrate database schema from previous versions (0.80 and up)
+    Migrate database schema from previous versions (0.9.4 and up)
     '''
+    table_migrations, column_migrations = [], []
+    
+    # Since 0.9.4 --------------------------------------------------------------
 
-    # Current Peewee's Migrator doesn't work with MySQL/SQLite
-    #   I keep the code here for future reference
-    migrator = migrate.Migrator(_db)
+    # Tables    
+    
+    # Columns
+        
+    if not Entry.field_exists('content_type'):
+        column_migrations.append(migrator.add_column('entries', 'content_type', Entry.content_type))
 
-    with _db.transaction():
-        migrator.rename_column(Session, 'expires', 'expires_on')
-        #@@TODO: migrator.set_unique(Group, Group.title, True)
+    # Run all table and column migrations
+
+    if table_migrations:
+        for model in table_migrations:
+            model.create_table(fail_silently=True)
+    
+    if column_migrations:
+        # Let caller to catch any OperationalError's
+        migrate(*column_migrations)        
+
+    # True if at least one is non-empty
+    return table_migrations or column_migrations
+
 
 def setup():
     """
@@ -318,7 +343,8 @@ def setup():
 
     models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription, Session
 
-    # WAL mode is persistent, so we can to setup it once - see http://www.sqlite.org/wal.html
+    # WAL mode is persistent, so we can to setup 
+    #   it once - see http://www.sqlite.org/wal.html
     if engine == 'sqlite':
         _db.execute_sql('PRAGMA journal_mode=WAL')
 

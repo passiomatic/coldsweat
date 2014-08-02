@@ -10,7 +10,6 @@ License: MIT (see LICENSE for details)
 from os import path
 
 from coldsweat import *
-from coldsweat.fetcher import get_entry_content
 from coldsweat.markup import html
 
 DOMAINS = []    
@@ -35,7 +34,5 @@ def fetcher_started():
     
 @event('entry_parsed')
 def entry_parsed(entry, parsed_entry):
-    #@@FIXME: suboptimal, in the future grab entry.mime_type instead
-    mime_type, content = get_entry_content(parsed_entry)
-    if DOMAINS and ('html' in mime_type):
+    if DOMAINS and ('html' in entry.content_type):
         entry.content = html.scrub_html(entry.content, DOMAINS)    

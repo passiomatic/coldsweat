@@ -66,6 +66,7 @@ $navwidth                : 52px;
 .module {
     max-width: $fullwidth; 
     margin: 0 auto $baselineheight auto;
+    h2 { margin-top: 0; } // Title
 }
 
 .panel  {

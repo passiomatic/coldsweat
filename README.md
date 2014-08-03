@@ -22,9 +22,14 @@ See _[setup]_ page.
 
 ## Upgrading from previous versions
 
-Always make sure required packages are up-to-date. To update run:
+First, always make sure required third-party packages are up-to-date:
 
-    pip install -r requirements.txt
+    $ pip install -r requirements.txt
+
+Second, make sure your database structure is up-to-date too: 
+
+    $ python sweat.py update
+
 
 ## Technical underpinnings
 

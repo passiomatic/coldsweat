@@ -33,7 +33,7 @@ def get_feed_timestamp(soup_feed, default):
     """
     Get the date a feed was last updated
     """
-    for header in ['updated_parsed', 'published_parsed']:
+    for header in ['published_parsed', 'updated_parsed']:
         value = soup_feed.get(header, None)
         if value:
             # Fix future dates
@@ -53,7 +53,7 @@ def get_entry_timestamp(entry, default):
     """
     Select the best timestamp for an entry
     """
-    for header in ['updated_parsed', 'published_parsed', 'created_parsed']:
+    for header in ['published_parsed', 'created_parsed', 'updated_parsed']:
         value = entry.get(header, None)
         if value:
             # Fix future dates

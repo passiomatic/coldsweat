@@ -114,7 +114,9 @@ class User(CustomModel):
 # @pre_save(sender=User)
 # def on_save_handler(model, user, created):
 #     pass
-                
+          
+
+#@@REMOVEME: We keep this only to make migrations work
 class Icon(CustomModel):
     """
     Feed (fav)icons, stored as data URIs
@@ -123,7 +125,7 @@ class Icon(CustomModel):
 
     class Meta:
         db_table = 'icons'
-
+      
 
 class Group(CustomModel):
     """
@@ -143,19 +145,22 @@ class Feed(CustomModel):
     Atom/RSS feed
     """
     
-    is_enabled          = BooleanField(default=True)        # Fetch feed?
-    icon                = ForeignKeyField(Icon, default=1)  # A URL to a small icon representing the feed
-    self_link           = CharField()                       # The URL of the feed itself (rel=self)
-    error_count         = IntegerField(default=0)
+    is_enabled           = BooleanField(default=True)        # Fetch feed?
+    self_link            = CharField()                       # The URL of the feed itself (rel=self)
+    error_count          = IntegerField(default=0)
 
     # Nullable
 
-    title               = CharField(null=True)        
-    alternate_link      = CharField(null=True)              # The URL of the HTML page associated with the feed (rel=alternate)
-    etag                = CharField(null=True)              # HTTP E-tag
-    last_updated_on     = DateTimeField(null=True)          # As UTC
-    last_checked_on     = DateTimeField(null=True)          # As UTC 
-    last_status         = IntegerField(null=True)           # Last HTTP code    
+    title                = CharField(null=True)        
+    alternate_link       = CharField(null=True)              # The URL of the HTML page associated with the feed (rel=alternate)
+    etag                 = CharField(null=True)              # HTTP E-tag
+    last_updated_on      = DateTimeField(null=True)          # As UTC
+    last_checked_on      = DateTimeField(null=True)          # As UTC 
+    last_status          = IntegerField(null=True)           # Last returned HTTP code    
+
+    icon                 = TextField(null=True)              # Stored as data URI
+    icon_last_updated_on = DateTimeField(null=True)          # As UTC
+
 
     class Meta:
         indexes = (
@@ -181,12 +186,13 @@ class Entry(CustomModel):
     title           = CharField()    
     content_type    = CharField(default='text/html')
     content         = TextField()
-    last_updated_on = DateTimeField()                       # As UTC
+    #@@TODO: rename to published_on
+    last_updated_on = DateTimeField()                           # As UTC
 
     # Nullable
     author          = CharField(null=True)
     link            = CharField(null=True)    
-
+    
     class Meta:
         indexes = (
             (('guid',), False),
@@ -311,29 +317,42 @@ def migrate_database_schema():
     '''
     Migrate database schema from previous versions (0.9.4 and up)
     '''
-    table_migrations, column_migrations = [], []
+    drop_table_migrations, column_migrations = [], []
     
-    # Since 0.9.4 --------------------------------------------------------------
+    # Version 0.9.4 --------------------------------------------------------------
 
-    # Tables    
-    
-    # Columns
+    # Change columns
+
+    if Feed.field_exists('icon_id') and engine != 'sqlite':
+        column_migrations.append(migrator.drop_column('feeds', 'icon_id'))
+
+    if not Feed.field_exists('icon'):
+        column_migrations.append(migrator.add_column('feeds', 'icon', Feed.icon))
+
+    if not Feed.field_exists('icon_last_updated_on'):
+        column_migrations.append(migrator.add_column('feeds', 'icon_last_updated_on', Feed.icon_last_updated_on))
         
     if not Entry.field_exists('content_type'):
         column_migrations.append(migrator.add_column('entries', 'content_type', Entry.content_type))
 
+    # Drop tables
+
+    if Icon.table_exists():
+        drop_table_migrations.append(Icon.drop_table)
+        
+    # ----------------------------------------------------------------------------
+
     # Run all table and column migrations
 
-    if table_migrations:
-        for model in table_migrations:
-            model.create_table(fail_silently=True)
-    
     if column_migrations:
         # Let caller to catch any OperationalError's
         migrate(*column_migrations)        
 
+    for drop in drop_table_migrations:
+        drop()
+
     # True if at least one is non-empty
-    return table_migrations or column_migrations
+    return drop_table_migrations or column_migrations
 
 
 def setup():
@@ -341,7 +360,7 @@ def setup():
     Create database and tables for all models and setup bootstrap data
     """
 
-    models = User, Icon, Feed, Entry, Group, Read, Saved, Subscription, Session
+    models = User, Feed, Entry, Group, Read, Saved, Subscription, Session
 
     # WAL mode is persistent, so we can to setup 
     #   it once - see http://www.sqlite.org/wal.html
@@ -354,10 +373,8 @@ def setup():
     # Create the bare minimum to boostrap system
     with transaction():
         
-        # Avoid duplicated default group and icon
+        # Avoid duplicated default group
         try:
             Group.create(title=Group.DEFAULT_GROUP)        
         except IntegrityError:
             return
-                        
-        Icon.create(data=favicon.DEFAULT_FAVICON)

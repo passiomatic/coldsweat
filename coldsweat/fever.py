@@ -17,6 +17,7 @@ from peewee import IntegrityError
 from utilities import *    
 from app import *
 from models import *
+import favicon
 from coldsweat import logger
 
 RE_DIGITS = re.compile('[0-9]+')
@@ -300,13 +301,13 @@ def get_groups(user):
     return result
 
 def get_feeds(user):
-    q = Feed.select(Feed, Icon).join(Icon).switch(Feed).join(Subscription).where(Subscription.user == user).distinct()
+    q = Feed.select(Feed).join(Subscription).where(Subscription.user == user).distinct()
     result = []
     for feed in q:
 
         result.append({
             'id'                  : feed.id,
-            'favicon_id'          : feed.icon.id, 
+            'favicon_id'          : feed.id, 
             'title'               : feed.title,
             'url'                 : feed.self_link,
             'site_url'            : feed.alternate_link,
@@ -385,15 +386,15 @@ def get_entry_count(user):
 
 def get_icons():
     """
-    Get all the icons
+    Get all the feed icons
     """
-    q = Icon.select()
+    q = Feed.select()
     
     result = []
-    for icon in q:
+    for feed in q:
         result.append({
-            'id': icon.id,
-            'data': icon.data,
+            'id': feed.id,
+            'data': feed.icon if feed.icon else favicon.DEFAULT_FAVICON,
         })
     
     return result

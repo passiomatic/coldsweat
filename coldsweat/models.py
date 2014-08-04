@@ -143,19 +143,22 @@ class Feed(CustomModel):
     Atom/RSS feed
     """
     
-    is_enabled          = BooleanField(default=True)        # Fetch feed?
-    icon                = ForeignKeyField(Icon, default=1)  # A URL to a small icon representing the feed
-    self_link           = CharField()                       # The URL of the feed itself (rel=self)
-    error_count         = IntegerField(default=0)
+    is_enabled           = BooleanField(default=True)        # Fetch feed?
+    self_link            = CharField()                       # The URL of the feed itself (rel=self)
+    error_count          = IntegerField(default=0)
 
     # Nullable
 
-    title               = CharField(null=True)        
-    alternate_link      = CharField(null=True)              # The URL of the HTML page associated with the feed (rel=alternate)
-    etag                = CharField(null=True)              # HTTP E-tag
-    last_updated_on     = DateTimeField(null=True)          # As UTC
-    last_checked_on     = DateTimeField(null=True)          # As UTC 
-    last_status         = IntegerField(null=True)           # Last HTTP code    
+    title                = CharField(null=True)        
+    alternate_link       = CharField(null=True)              # The URL of the HTML page associated with the feed (rel=alternate)
+    etag                 = CharField(null=True)              # HTTP E-tag
+    last_updated_on      = DateTimeField(null=True)          # As UTC
+    last_checked_on      = DateTimeField(null=True)          # As UTC 
+    last_status          = IntegerField(null=True)           # Last returned HTTP code    
+
+    icon                 = TextField(null=True)              # Stored as data URI
+    icon_last_updated_on = DateTimeField(null=True)          # As UTC
+
 
     class Meta:
         indexes = (
@@ -181,12 +184,13 @@ class Entry(CustomModel):
     title           = CharField()    
     content_type    = CharField(default='text/html')
     content         = TextField()
-    last_updated_on = DateTimeField()                       # As UTC
+    #@@TODO: rename to published_on
+    last_updated_on = DateTimeField()                           # As UTC
 
     # Nullable
     author          = CharField(null=True)
     link            = CharField(null=True)    
-
+    
     class Meta:
         indexes = (
             (('guid',), False),
@@ -318,10 +322,16 @@ def migrate_database_schema():
     # Tables    
     
     # Columns
+
+    if not Feed.field_exists('icon'):
+        column_migrations.append(migrator.add_column('feeds', 'icon', Feed.icon))
+
+    if not Feed.field_exists('icon_last_updated_on'):
+        column_migrations.append(migrator.add_column('feeds', 'icon_last_updated_on', Feed.icon_last_updated_on))
         
     if not Entry.field_exists('content_type'):
         column_migrations.append(migrator.add_column('entries', 'content_type', Entry.content_type))
-
+    
     # Run all table and column migrations
 
     if table_migrations:

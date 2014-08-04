@@ -523,8 +523,8 @@ def render_template(filename, namespace):
 # Entries
 
 def _q(*select):
-    select = select or [Entry, Feed, Icon]
-    q = Entry.select(*select).join(Feed).join(Icon).switch(Feed).join(Subscription)
+    select = select or [Entry, Feed]
+    q = Entry.select(*select).join(Feed).join(Subscription)
     return q
     
 def get_unread_entries(user, *select):         
@@ -553,8 +553,8 @@ def get_feed_entries(user, feed, *select):
 # Feeds
 
 def get_feeds(user, *select):  
-    select = select or [Feed, Icon, fn.Count(Entry.id).alias('entries')]
-    q = Feed.select(*select).join(Icon).switch(Feed).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == user).group_by(Feed, Icon)
+    select = select or [Feed, fn.Count(Entry.id).alias('entries')]
+    q = Feed.select(*select).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == user).group_by(Feed)
     
     return q  
 

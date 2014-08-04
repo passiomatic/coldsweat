@@ -1,7 +1,7 @@
 <form action="{{application_url}}/feeds/edit/{{feed.id}}" method="POST">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>  
-    <h3><img class="favicon" src="{{feed.icon.data}}" width="16" height="16"  alt="*"> {{feed.title|html}}</h3>
+    <h3><img class="favicon" src="{{feed.icon|icon}}" width="16" height="16"  alt="*"> {{feed.title|html}}</h3>
   </div>
   <div class="modal-body">          
         {{form_message|alert}}

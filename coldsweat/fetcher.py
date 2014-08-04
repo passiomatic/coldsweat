@@ -21,6 +21,7 @@ from filters import escape_html, status_title
 from coldsweat import *
 from markup import html
 
+FETCH_ICONS_DELTA       = 30 # Days
 ENTRY_TAG_URI           = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
 MAX_TITLE_LENGTH        = 255
 POSITIVE_STATUS_CODES   = 200, 302, 304 # Other redirects are handled by Requests
@@ -146,19 +147,7 @@ def add_feed(feed, fetch_icon=False, add_entries=False):
         return previous_feed
     except Feed.DoesNotExist:
         pass
-
-    if fetch_icon:
-        # Prefer alternate_link if available since self_link could 
-        #   point to Feed Burner or similar services
-        icon_link = feed.alternate_link or feed.self_link    
-        schema, netloc, path, query, fragment = urlparse.urlsplit(icon_link)
-        icon = Icon.create(data=favicon.fetch(icon_link))
-        feed.icon = icon
-        logger.debug("saved favicon for %s: %s..." % (netloc, icon.data[:70]))    
-
-    feed.save()
     fetch_feed(feed, add_entries)
-
     return feed
     
 def add_subscription(feed, user, group):
@@ -325,6 +314,15 @@ def fetch_feed(feed, add_entries=False):
         feed.title = html.strip_html(soup.feed.title)
 
     feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
+
+
+    if not feed.icon or not feed.icon_last_updated_on or (now - feed.icon_last_updated_on).days > FETCH_ICONS_DELTA:
+        # Prefer alternate_link if available since self_link could 
+        #   point to Feed Burner or similar services
+        feed.icon = favicon.fetch(feed.alternate_link or feed.self_link)
+        feed.icon_last_updated_on = now
+        logger.debug("saved favicon %s..." % (feed.icon[:70]))    
+
     post_fetch(response.status_code)
 
     if not add_entries:    

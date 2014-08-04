@@ -8,6 +8,7 @@ License: MIT (see LICENSE for details)
 import re, cgi, urllib, urlparse
 from webob.exc import status_map
 import utilities
+import favicon
 
 __all__ = []
 
@@ -101,6 +102,10 @@ def status_title(code):
         pass 
     return title
 
+@filter('icon')
+def icon(data):
+    return data if data else favicon.DEFAULT_FAVICON
+    
 @filter('alert')
 def alert(message):
     if not message:

@@ -74,8 +74,6 @@ for module in 'peewee', 'requests':
     logging.getLogger(module).setLevel(logging.CRITICAL if log_level != 'DEBUG' else logging.WARN)
         
 # Shared logger instance
-#@@REMOVEME: use logger instead
-log = logging.getLogger()
 logger = logging.getLogger()
 
 # ------------------------------------------------------

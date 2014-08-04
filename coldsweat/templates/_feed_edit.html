@@ -9,7 +9,10 @@
             <div class="alert alert--error"><i class="fa fa-warning"></i> This feed is disabled</div>
         {{endif}}  
 
-        <label for="self-link-field"><i class="fa fa-rss fa-fw"></i> Web address (URL) for the feed</label> 
+        <label for="field-title">Title</label> 
+        <input type="text" id="field-title" name="title"  size="40" value="{{feed.title}}">
+
+        <label for="field-self-link">Web address (URL)</label> 
         <input type="text" id="field-self-link" name="self_link" readonly  size="40" value="{{feed.self_link}}">
 
         <table class="table">
@@ -40,9 +43,10 @@
         </table>
   </div>
   <div class="modal-footer">
-    <button type="submit" name="unsubscribe" value="1" class="btn btn-error">Unsubscribe</button>
+    <button type="submit" name="button_save" value="1" class="btn btn-primary">Save Changes</button>
     {{if not feed.is_enabled}}
-        <button type="submit" name="enable" value="1" class="btn btn-success">Enable Again</button>
-    {{endif}} 
+        <button type="submit" name="button_enable" value="1" class="btn btn-success">Enable Again</button>
+    {{endif}}     
+    <button type="submit" name="button_unsubscribe" value="1" class="btn btn-error">Unsubscribe</button>
   </div>
 </form>

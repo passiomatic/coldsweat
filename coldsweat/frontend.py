@@ -279,16 +279,19 @@ class FrontendApp(WSGIApp):
             raise HTTPNotFound('No such feed %s' % feed_id)
 
         if request.method == 'POST':
-            unsubscribe = int(request.POST.get('unsubscribe', 0))
-            enable = int(request.POST.get('enable', 0))
-            if unsubscribe:
-                count = Subscription.delete().where((Subscription.user == self.user) & (Subscription.feed == feed)).execute()
-                self.alert_message = u'INFO You are no longer subscribed to <i>%s</i>.' % feed.title            
-            if enable:
-                feed.is_enabled = True
+            if 'button_unsubscribe' in request.POST:
+                Subscription.delete().where((Subscription.user == self.user) & (Subscription.feed == feed)).execute()
+                self.alert_message = u'SUCCESS You are no longer subscribed to <i>%s</i>.' % feed.title            
+            elif 'button_enable' in request.POST:
+                feed.is_enabled  = True
                 feed.error_count = 0                
                 feed.save()
-                self.alert_message = u'INFO Feed <i>%s</i> is now enabled.' % feed.title            
+                self.alert_message = u'SUCCESS Feed <i>%s</i> is enabled.' % feed.title            
+            elif 'button_save' in request.POST:
+                title            = request.POST.get('title', '').strip() #@@TODO: check if empty
+                feed.title       = title
+                feed.save()
+                self.alert_message = u'SUCCESS Changes have been saved.'
             return self.redirect_after_post('%s/feeds/' % request.application_url)
         else:
             q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))

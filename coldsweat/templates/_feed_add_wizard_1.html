@@ -29,10 +29,15 @@
     {{inherit "site.html"}}
      
     {{def container_block}}    
-        <div role="dialog" class="modal">
+        <div id="modal-add-subscription" role="dialog" class="modal fade hide">
             {{render_form()}}
         </div>
     {{enddef}}    
+    {{def page_script_block}}
+        $(document).ready(function() {
+            $('#modal-add-subscription').modal('show')
+        })
+    {{enddef}}
 {{endif}}
 
 

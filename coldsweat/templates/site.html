@@ -60,10 +60,14 @@ head.js(
 "{{static_url}}/javascripts/plugins.js",
 
 // App scripts
-"{{static_url}}/javascripts/app.js?{{version_string}}"
-);
+"{{static_url}}/javascripts/app.js?{{version_string}}",
+
+function() {    
+    // Do something when we are ready
+    {{self.get.page_script_block}}
+});
 </script>
-{{self.get.page_script_block}}
+
 </body>
 </html>
 

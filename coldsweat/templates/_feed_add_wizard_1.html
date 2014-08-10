@@ -1,3 +1,4 @@
+{{def render_form}}
 <form action="{{application_url}}/feeds/add" data-ajax-post method="POST">
   <div class="modal-header">
      <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>
@@ -6,7 +7,7 @@
   <div class="modal-body">          
         {{form_message|alert}}
         <label for="self-link-field">Web address (URL) for the feed</label> 
-        <input type="text" id="field-self-link" autofocus name="self_link"  size="40" value="">
+        <input type="text" id="field-self-link" autofocus name="self_link"  size="40" value="{{self_link}}">
         {{if length(groups) > 1}}
             <label>Add to group <select name="group">
                 {{for g in groups}}
@@ -19,3 +20,19 @@
     <button type="submit" class="btn btn-primary">Continue</button>
   </div>
 </form>
+{{enddef}}
+
+{{# Ajax request?}}
+{{if request.is_xhr}}
+    {{render_form()}}
+{{else}}
+    {{inherit "site.html"}}
+     
+    {{def container_block}}    
+        <div role="dialog" class="modal">
+            {{render_form()}}
+        </div>
+    {{enddef}}    
+{{endif}}
+
+

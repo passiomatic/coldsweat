@@ -305,12 +305,13 @@ class FrontendApp(WSGIApp):
     def feed_add(self, request):        
         form_message = ''
         groups = get_groups(self.user)
+
+        # URL could be passed via a GET (bookmarklet) or POST 
+        self_link = request.params.get('self_link', '').strip()
         
         if request.method == 'GET':
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
-        # Handle postback
-        self_link = request.POST['self_link'].strip()
         if not is_valid_url(self_link):
             form_message = u'ERROR Error, please specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
@@ -343,7 +344,7 @@ class FrontendApp(WSGIApp):
             self.alert_message = u'INFO Feed is already in <i>%s</i> group' % group.title
         return self.respond_with_script('_modal_done.js', {'location': '%s/?feed=%d' % (request.application_url, feed.id)}) 
 
-        
+
     @GET(r'^/fever/?$')
     def fever(self, request):        
         page_title = 'Fever Endpoint'

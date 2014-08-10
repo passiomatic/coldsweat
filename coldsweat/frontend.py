@@ -389,24 +389,9 @@ class FrontendApp(WSGIApp):
         }                    
         return self.respond_with_template('_modal_alert.html', namespace)
     
-    # @@TODO: remove code duplication with respond_with_template
     def respond_with_script(self, filename, view_namespace=None):
         
-        namespace = self.app_namespace.copy()
-        namespace.update({
-            'request'           : self.request,
-            'application_url'   : self.request.application_url,
-        })
-
-        namespace.update(view_namespace or {})
-        
-        if 'self' in namespace:
-             # Avoid passing self or Tempita will complain
-            del namespace['self']
-
-        response = Response(
-            render_template(filename, namespace),
-            content_type='application/javascript', charset='utf-8')
+        response = self._respond(filename, 'application/javascript', view_namespace) 
 
         # Pass along alert_message cookie in the case 
         #   we force a redirect within the script
@@ -415,15 +400,27 @@ class FrontendApp(WSGIApp):
                                 
         return response
 
-    def respond_with_template(self, filename, view_namespace=None, content_type='text/html'):
+    def respond_with_template(self, filename, view_namespace=None):
         
         message = self.request.cookies.get('alert_message', '')
+        
+        namespace = {'alert_message' : message}
+        namespace.update(view_namespace or {})
+        
+        response = self._respond(filename, 'text/html', namespace)
+        
+        # Delete alert_message cookie, if any
+        if message:
+            response.delete_cookie('alert_message')
+                                
+        return response
+
+    def _respond(self, filename, content_type, view_namespace=None):
         
         namespace = self.app_namespace.copy()
         namespace.update({
             'request'           : self.request,
             'application_url'   : self.request.application_url,
-            'alert_message'     : message
         })
 
         namespace.update(view_namespace or {})
@@ -435,13 +432,9 @@ class FrontendApp(WSGIApp):
         response = Response(
             render_template(filename, namespace),
             content_type=content_type, charset='utf-8')
-        
-        # Delete alert_message cookie, if any
-        if message:
-            response.delete_cookie('alert_message')
-                                
+                                        
         return response
-
+        
     def _redirect(self, klass, location):
         '''
         Return a temporary or permament redirect response object. 

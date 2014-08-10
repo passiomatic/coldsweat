@@ -146,14 +146,14 @@ $(document).ready(function() {
             })       
         })
 
-        // 'Load More...' link
+        // 'More...' link
         $(document).on('click', '.panel li.more a', function(event) { 
             event.preventDefault()            
             var parent = $(event.target).parents('li.more').first()
             parent.html(loading_fragment)
             $.ajax($(this).attr('href'), 
                 {dataType: 'html', type:'GET'}).done(function(data) {            
-                   $(document.body).animate({'scrollTop': parent.position().top}, 500)                   
+                   $(document.body).animate({'scrollTop': parent.position().top}, 500)
                    parent.replaceWith(data)
             })       
         })

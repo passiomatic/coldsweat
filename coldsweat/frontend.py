@@ -238,6 +238,7 @@ class FrontendApp(WSGIApp):
             message = 'SUCCESS All entries have been marked as read'
             redirect_url = '%s/entries/?unread' % request.application_url
         
+        #@@TODO: Use insert_many()
         with transaction():
             for entry in q:
                 try:

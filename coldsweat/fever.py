@@ -258,6 +258,7 @@ def mark_command(request, user, result):
                 (Entry.last_updated_on < before)
             ).distinct().naive()
 
+        #@@TODO: Use insert_many()
         with transaction():
             for entry in q:                
                 try:

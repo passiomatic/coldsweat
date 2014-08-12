@@ -88,7 +88,7 @@ def format_datetime(value, format='%a, %b %d at %H:%M'):
     return value.strftime(format)
 
 def format_date(value):
-    return format_datetime(value, '%a, %b %d')
+    return format_datetime(value, '%b %d, %Y')
 
 def datetime_since(value, comparsion_value=None, default="just now"):
     """

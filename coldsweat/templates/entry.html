@@ -39,7 +39,7 @@
                         <hr class="halved">
                     {{endif}}
                     <div class="meta dim">    
-                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on|datetime}} <abbr title="Coordinated Universal Time">UTC</abbr>{{if entry.author}} by {{entry.author|html}}{{endif}}            
+                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on|date}} {{if entry.author}} by {{entry.author|html}}{{endif}}            
                         {{if entry.link}}&emsp;<i class="fa fa-twitter"></i> <a title="Share on Twitter" target="_blank" href="http://twitter.com/home?status={{entry.title|url}}%20%E2%80%94%20{{entry.link|url}}">Twitter</a>{{endif}}                                                
                     </div>
                 </article>    

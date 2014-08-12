@@ -78,9 +78,9 @@ class User(CustomModel):
     class Meta:
         db_table = 'users'
     
+    #@@FIXME: we should use email instead as Fever API dictates
     @staticmethod
     def make_api_key(username, password):
-        #@@FIXME: use email instead of username as Fever API dictates
         return make_md5_hash('%s:%s' % (username, password))
 
     @staticmethod
@@ -110,10 +110,9 @@ class User(CustomModel):
         #@@TODO: Check for unacceptable chars
         return len(password) >= User.MIN_PASSWORD_LENGTH
         
-#@@TODO: Recalculate API key
-# @pre_save(sender=User)
-# def on_save_handler(model, user, created):
-#     pass
+@pre_save(sender=User)
+def on_save_handler(model, user, created):
+     user.api_key = User.make_api_key(user.username, user.password)
           
 
 #@@REMOVEME: We keep this only to make migrations work

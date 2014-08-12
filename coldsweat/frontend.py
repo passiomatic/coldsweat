@@ -368,7 +368,6 @@ class FrontendApp(WSGIApp):
             password = request.POST.get('password', '')
             
             if User.validate_password(password):            
-                user.api_key = User.make_api_key(user.username, password)
                 user.email = email
                 user.password = password
                 user.save()            

@@ -150,7 +150,7 @@ def command_setup(parser, options, args):
         else:
             break
 
-    User.create(username=username, email=email, password=password, api_key=User.make_api_key(username, password))
+    User.create(username=username, email=email, password=password)
     print "Setup for user %s completed." % username
 
 

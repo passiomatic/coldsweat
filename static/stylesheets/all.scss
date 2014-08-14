@@ -63,6 +63,11 @@ $navwidth                : 52px;
     &.bottom { margin-bottom: 7px; }
 }
 
+.popover-content {
+    .btn { display: block; margin: 0 0 $baselineheight / 3 0; }
+    .btn:last-child { margin-bottom: 0; }
+}
+
 .module {
     max-width: $fullwidth; 
     margin: 0 auto $baselineheight auto;
@@ -153,7 +158,7 @@ $navwidth                : 52px;
             &.status-sick {
 
                 .item-inner {
-                    background-color: #faf8c8;
+                    background-color: $warningcolor;
                 }                                
             }
 
@@ -412,26 +417,17 @@ pre {
 .alert {
     text-align: center;
     margin: 0;
-/*     border-bottom: 1px solid $lightestneutralcolor; */
 }
-
-form {
-    .alert {
-        margin: 0 0 $baselineheight 0;
-        border-bottom: none;
-    }    
-}
-
 
 // Messages taking all panel height
 .notice {
     text-align: center;
-    margin: 25% 0 25% 0;    
+    margin: 25% 0 20% 0;    
     @extend .dim;    
     i {
         display: block;
         opacity: .6;
-        margin:$baselineheight  0  0;        
+        margin: $baselineheight 0 0;        
     }
     
 }
@@ -530,6 +526,9 @@ article {
     th, td {
         border-top-color: $lighterneutralcolor; 
     }
+
+    .enabled { color: $successcolor; }
+    .disabled { color: $errorcolor; }
 
     code {
         background: $lightestneutralcolor;    

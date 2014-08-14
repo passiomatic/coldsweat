@@ -112,6 +112,26 @@ $(document).ready(function() {
     
     function setup() {               
         bindKeyboardShortcuts();
+
+        // Setup popovers content using HTML
+        //   from a given DOM element
+        $('.popover-trigger').one('click', function(event) {
+            event.preventDefault()
+            var $this = $(this)
+            var template = $this.attr('href')
+            $this.popover({
+                html: true, 
+                placement: 'bottom', 
+                content: $(template).html()
+            })               
+            $this.popover('show')
+        }).one('shown', function(event) {
+            var $this = $(this)
+            var $popover = $this.data('popover').$tip
+            $popover.delegate('a', 'click', function (event) {
+                $this.popover('hide');
+            });
+        })
         
         // Setup tooltips with global options
         $('a[data-toggle="tooltip"]').tooltip({delay: 500})
@@ -129,7 +149,7 @@ $(document).ready(function() {
                 fragment.modal('show')
             });            
         })
-
+      
         $(document).on('submit', '.modal form[data-ajax-post]', function(event) { 
             event.preventDefault()
             var form = $(event.target)

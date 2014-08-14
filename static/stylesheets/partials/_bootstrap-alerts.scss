@@ -28,7 +28,6 @@ color : $alertcolorsuccess;
 color : $alertcolorsuccess; }
 }/*alert--success*/
 
-.alert--danger,
 .alert--error {
 background-color : $errorcolor;
 border-color : $alertbordercolorerror;
@@ -37,6 +36,16 @@ color : $alertcolorerror;
 > h4 {
 color : $alertcolorerror; }
 }/*alert--error*/
+
+.alert--warning {
+background-color : $warningcolor;
+border-color : $alertbordercolorwarning;
+color : $alertcolorwarning; 
+
+> h4 {
+color : $alertcolorwarning; }
+}/*alert--warning*/
+
 
 .alert--info {
 background-color : $infocolor;

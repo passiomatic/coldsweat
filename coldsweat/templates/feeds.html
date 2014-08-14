@@ -17,13 +17,12 @@ def feed_status(feed, threshold):
                 </h3>
                 <div class="meta dim">
                     <span class="feed">
-                        {{if f.entries}}{{f.entries}}{{else}}No{{endif}} entries&emsp;
-                        {{if not f.is_enabled}}
-                            <i class="fa fa-warning"></i> Disabled
-                        {{endif}}  
+                        {{if f.entries}}{{f.entries}}{{else}}No{{endif}} entries
                     </span>
                     <span class="actions">
-                        <a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit"><i class="fa fa-cog"></i> Feed status</a>
+<a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit">About</a>&ensp;&middot;&ensp;
+<a href="{{application_url}}/feeds/remove/{{f.id}}" data-remote-modal>Remove</a>
+{{if not f.is_enabled}}&ensp;&middot;&ensp;<a href="{{application_url}}/feeds/enable/{{f.id}}" data-remote-modal>Enable Again</a>{{endif}}
                     </span>
                 </div>                                              
             </div>
@@ -51,8 +50,9 @@ def feed_status(feed, threshold):
         </div>
     {{else}}
         <div class="notice">
-            <i class="fa fa-tint fa-4x"></i>
-            No feeds found. <!-- <a href="#">Add some feeds now</a>. -->
+            <p><i class="fa fa-tint fa-4x"></i>
+            No feeds found.</p>
+            <a class="btn btn-small btn-default" href="{{application_url}}/feeds/add" data-remote-modal="modal-add-subscription">Add Feed Subscription</a>
         </div>
     {{endif}}
     {{enddef}}

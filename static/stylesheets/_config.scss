@@ -143,7 +143,7 @@ $errorcolor 					: $secondarycolor;
 $infocolor 						: darken(#e6eff5, 15%);
 $inversecolor 					: rgb(65,65,65);
 $successcolor 					: #5eb337;
-$warningcolor 					: $errorcolor;
+$warningcolor 					: #f7ea9c;
 
 
 
@@ -472,8 +472,8 @@ $alertbordercolorsuccess   		: darken($successcolor, 10%);
 $alertcolorsuccess				: darken($successcolor, 50%);
 
 // Set the warning alerts’ border and text colours
-$alertbordercolorwarning   		: lighten($warningcolor, 20%);
-$alertcolorwarning				: darken($warningcolor, 20%);
+$alertbordercolorwarning   		: darken($warningcolor, 20%);
+$alertcolorwarning				: darken($warningcolor, 55%);
 
 
 
@@ -604,7 +604,7 @@ $buttonfontsize 				: $basefontsize;
 // Set the default button’s text colour
 // Colours for :hover and :active  are derived automatically from $buttoncolor
 // Override colours for :hover and :active in _bootstrap-form-buttons.scss
-$buttoncolor 					: $neutralcolor;
+$buttoncolor 					: $darkneutralcolor;
 
 
 
@@ -727,7 +727,7 @@ $popovercolor					: $textcolor;
 $popoverborderwidth				: $borderwidth * 2;
 
 // Set popover border colour
-$popoverbordercolor 			: $lightneutralcolor;
+$popoverbordercolor 			: $popoverbackgroundcolor;
 
 // Set popover border style, Default is $borderstyle defined above
 $popoverborderstyle				: $borderstyle;

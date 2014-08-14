@@ -7,8 +7,8 @@
                     {{if count and filter_class in ('unread',) }}
                         <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{application_url}}/entries/mark?all" data-remote-modal><i class="fa fa-check-square"></i></a>
                     {{elif count and feed_id and filter_class in ('feeds',) }}
-                        <a title="Mark feed as read" data-toggle="tooltip" data-placement="bottom"  href="{{application_url}}/entries/mark?feed={{feed_id}}" data-remote-modal><i class="fa fa-check-square"></i></a>&emsp;<a title="Feed status" data-toggle="tooltip" data-placement="bottom" href="{{application_url}}/feeds/edit/{{feed_id}}" data-remote-modal="modal-feed-edit"><i class="fa fa-cog"></i></a>
-                    {{endif}}
+                        <a class="popover-trigger" data-container="body" href="#popover-content"><i class="fa fa-cog"></i> Manage</a>                        
+                    {{endif}}                    
                 </div>
                 <h2><span>{{panel_title|html}} › </span><time>{{date}}</time></h2>
             </li>
@@ -33,6 +33,15 @@
             <a href="{{application_url}}/entries/?{{filter_name}}&amp;offset={{offset}}&amp;prev_date={{prev_date|url}}">More</a>
         </li>
     {{endif}}
+<script id="popover-content" type="text/html">
+    <a class="btn btn-small btn-default" href="{{application_url}}/entries/mark?feed={{feed_id}}" data-remote-modal>Mark as Read</a>
+    <a class="btn btn-small btn-default" href="{{application_url}}/feeds/edit/{{feed_id}}" data-remote-modal="modal-feed-edit">About</a>
+    {{#@@HACK }}
+    {{if not e.feed.is_enabled}}
+        <a class="btn btn-small btn-default" href="{{application_url}}/feeds/enable/{{feed_id}}" data-remote-modal>Enable Again</a>
+    {{endif}}
+    <a class="btn btn-small btn-error" href="{{application_url}}/feeds/remove/{{feed_id}}" data-remote-modal>Remove</a>
+</script>
 {{enddef}}
 
 {{# Ajax request?}}
@@ -55,7 +64,7 @@
                 No entries found.
             </div>
         {{endif}}
-    {{enddef}}
+    {{enddef}}    
 {{endif}}
 
 

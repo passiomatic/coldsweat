@@ -278,28 +278,71 @@ class FrontendApp(WSGIApp):
             feed = Feed.get(Feed.id == feed_id) 
         except Feed.DoesNotExist:
             raise HTTPNotFound('No such feed %s' % feed_id)
-
-        if request.method == 'POST':
-            if 'button_unsubscribe' in request.POST:
-                Subscription.delete().where((Subscription.user == self.user) & (Subscription.feed == feed)).execute()
-                self.alert_message = u'SUCCESS You are no longer subscribed to <i>%s</i>.' % feed.title            
-            elif 'button_enable' in request.POST:
-                feed.is_enabled  = True
-                feed.error_count = 0                
-                feed.save()
-                self.alert_message = u'SUCCESS Feed <i>%s</i> is enabled.' % feed.title            
-            elif 'button_save' in request.POST:
-                title            = request.POST.get('title', '').strip() #@@TODO: check if empty
-                feed.title       = title
-                feed.save()
-                self.alert_message = u'SUCCESS Changes have been saved.'
-            return self.redirect_after_post('%s/feeds/' % request.application_url)
-        else:
-            q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))
-            groups = [s.group for s in q]
-
-        return self.respond_with_template('_feed_edit.html', locals())
         
+        # Collect editable fields 
+        title = feed.title
+
+        q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))
+        groups = [s.group for s in q]
+        
+        if request.method == 'GET':
+            return self.respond_with_template('_feed_edit.html', locals())
+
+        # Handle postback
+        title = request.POST.get('title', '').strip()
+        if not title:                
+            form_message = u'ERROR Error, feed title cannot be empty'
+            return self.respond_with_template('_feed_edit.html', locals())
+        feed.title = title
+        feed.save()
+        self.alert_message = u'SUCCESS Changes have been saved.'
+        return self.respond_with_script('_modal_done.js', {'location': '%s/feeds/' % request.application_url}) 
+
+        
+    @form(r'^/feeds/remove/(\d+)$')
+    @login_required    
+    def feed_remove(self, request, feed_id):
+
+        try:
+            feed = Feed.get(Feed.id == feed_id) 
+        except Feed.DoesNotExist:
+            raise HTTPNotFound('No such feed %s' % feed_id)
+
+        if request.method == 'GET':
+            return self.respond_with_modal('%s/feeds/remove/%d' % (request.application_url, feed.id), 
+                title=u'Remove <i>%s</i> from your subscriptions?' % feed.title, button='Remove')
+
+        # Handle postback
+        Subscription.delete().where((Subscription.user == self.user) & (Subscription.feed == feed)).execute()
+        self.alert_message = u'SUCCESS You are no longer subscribed to <i>%s</i>.' % feed.title  
+
+        return self.redirect_after_post('%s/feeds/' % request.application_url)
+
+
+    @form(r'^/feeds/enable/(\d+)$')
+    @login_required    
+    def feed_enable(self, request, feed_id):
+
+        #@@TODO: Track in which view user triggers command
+        
+        try:
+            feed = Feed.get(Feed.id == feed_id) 
+        except Feed.DoesNotExist:
+            raise HTTPNotFound('No such feed %s' % feed_id)
+
+        if request.method == 'GET':
+            return self.respond_with_modal('%s/feeds/enable/%d' % (request.application_url, feed.id), 
+                title=u'Enable <i>%s</i> again?' % feed.title, 
+                body='Coldsweat will attempt to fetch it again during the next feeds refresh.', 
+                button='Enable')
+        
+        # Handle postback
+        feed.is_enabled, feed.error_count  = True, 0
+        feed.save()
+        self.alert_message = u'SUCCESS Feed <i>%s</i> is now enabled.' % feed.title  
+
+        return self.redirect_after_post('%s/feeds/' % request.application_url)
+
 
     @form(r'^/feeds/add$')
     @login_required    
@@ -314,7 +357,7 @@ class FrontendApp(WSGIApp):
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
         if not is_valid_url(self_link):
-            form_message = u'ERROR Error, please specify a valid web address'
+            form_message = u'ERROR Error, specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
         response = fetcher.fetch_url(self_link)
         if response:
@@ -359,10 +402,14 @@ class FrontendApp(WSGIApp):
     @form(r'^/profile/?$')
     @login_required    
     def profile(self, request):        
-        user        = self.user
-        email       = user.email
-        password    = user.password
-        form_message = ''        
+        
+        form_message = ''
+        user         = self.user
+
+        # Collect editable fields 
+        email        = user.email
+        password     = user.password
+        
         if request.method == 'POST':
             email = request.POST.get('email', '')
             password = request.POST.get('password', '')
@@ -380,11 +427,11 @@ class FrontendApp(WSGIApp):
 
     # Template methods
     
-    def respond_with_modal(self, url, message, title='', button='Close', params=None):
+    def respond_with_modal(self, url, title='', body='', button='Close', params=None):
         namespace = {
             'url': url,
             'title': title,
-            'message': message,
+            'body': body,
             'params': params if params else [],
             'button_text': button
         }                    
@@ -484,7 +531,7 @@ class FrontendApp(WSGIApp):
                 self.user = user
                 return self.redirect_after_post(from_url)
             else:
-                self.alert_message = 'ERROR Unable to log in. Please check your username and password.'            
+                self.alert_message = 'ERROR Unable to log in. Check your username and password.'            
                 return self.redirect_after_post(request.url)
         
         page_title = 'Log In'

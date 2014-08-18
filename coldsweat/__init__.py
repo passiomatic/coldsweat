@@ -11,9 +11,10 @@ __author__ = 'Andrea Peltrin and Rui Carmo'
 __version__ = (0, 9, 3, '')
 __license__ = 'MIT'
 
-from os import path
-from ConfigParser import RawConfigParser
+import os
 import logging
+from ConfigParser import SafeConfigParser
+from utilities import Struct
 from webob.exc import status_map
 
 __all__ = [
@@ -23,7 +24,6 @@ __all__ = [
     'template_dir',
     'plugin_dir',
     'config',
-    'user_agent',
     # Logging
     'logger',
     # Plugins
@@ -34,47 +34,81 @@ __all__ = [
 ]
 
 VERSION_STRING = '%d.%d.%d%s' % __version__
+
          
 # Figure out installation directory. This has 
 #  to work for the fetcher script too
-installation_dir, _ = path.split(path.dirname(path.abspath(__file__))) 
-template_dir        = path.join(installation_dir, 'coldsweat/templates')
-plugin_dir          = path.join(installation_dir, 'plugins')
+installation_dir, _ = os.path.split(os.path.dirname(os.path.abspath(__file__))) 
+template_dir        = os.path.join(installation_dir, 'coldsweat/templates')
+plugin_dir          = os.path.join(installation_dir, 'plugins')
+
+
+# ------------------------------------------------------
+# Configuration settings
+# ------------------------------------------------------
+
+defaults = {
+    'min_interval'      : '900',
+    'error_threshold'   : '50',
+    'max_history'       : '7',
+    'timeout'           : '10',
+    'multiprocessing'   : 'on',
+    'user_agent'        : 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING,
+    
+    'level'             : 'INFO',
+    'filename'          : '',       # Don't log
+    
+    'static_url'        : '',
+    
+    'load'              : ''
+}
 
 # Set up configuration settings
-config = RawConfigParser()
+parser = SafeConfigParser(defaults)
 
-config_path = path.join(installation_dir, 'etc/config')
-if path.exists(config_path):
-    config.read(config_path)
+converters = {
+    'min_interval'      : parser.getint,
+    'error_threshold'   : parser.getint,
+    'max_history'       : parser.getint,
+    'timeout'           : parser.getint,
+    'multiprocessing'   : parser.getboolean,
+}
+
+config_path = os.path.join(installation_dir, 'etc/config')
+if os.path.exists(config_path):
+    parser.read(config_path)
 else:
     raise RuntimeError('Could not find configuration file %s' % config_path)
 
-# ------------------------------------------------------
-# User agent string
-# ------------------------------------------------------
-
-user_agent = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING
-if config.has_option('fetcher', 'user_agent'):  
-    user_agent = config.get('fetcher', 'user_agent')     
+config = Struct()
+for section in parser.sections():
+    d = { k : 
+        converters[k](section, k) if k in converters else v 
+        for k, v in parser.items(section)
+    }    
+    config[section] = Struct(d)
+    
+del parser
 
 # ------------------------------------------------------
 # Configure logger
 # ------------------------------------------------------
 
-log_level = config.get('log', 'level').upper()
-logging.basicConfig(
-    filename    = config.get('log', 'filename'),
-    level       = getattr(logging, log_level),
-    format      = config.get('log', 'format'),
-    datefmt     = config.get('log', 'datefmt'),
-)
-
-for module in 'peewee', 'requests':
-    logging.getLogger(module).setLevel(logging.CRITICAL if log_level != 'DEBUG' else logging.WARN)
-        
 # Shared logger instance
 logger = logging.getLogger()
+
+if config.log.filename:
+    logging.basicConfig(
+        filename    = config.log.filename,
+        level       = getattr(logging, config.log.level),
+        format      = '[%(asctime)s] %(process)d %(levelname)s %(message)s',
+    )
+    # Silence is golden
+    for module in 'peewee', 'requests':        
+        logging.getLogger(module).setLevel(logging.WARN)
+else: 
+    logger.addHandler(logging.NullHandler())
+
 
 # ------------------------------------------------------
 # Custom error codes 9xx & exceptions 
@@ -92,6 +126,7 @@ class DuplicatedFeedError(Exception):
 
 for klass in (DuplicatedFeedError,): 
     status_map[klass.code] = klass
+
 
 # ------------------------------------------------------
 # Plugins machinery

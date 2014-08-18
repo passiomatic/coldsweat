@@ -20,7 +20,7 @@ from coldsweat import config, logger
 
 
 # Defer database init, see connect() below
-engine = config.get('database', 'engine')
+engine = config.database.engine
 if engine == 'sqlite':
     _db = SqliteDatabase(None, threadlocals=True) 
     migrator = SqliteMigrator(_db)
@@ -267,26 +267,23 @@ class Session(CustomModel):
 # ------------------------------------------------------
 
 def _init_sqlite():
-    filename = config.get('database', 'filename')
-    _db.init(filename)    
+    _db.init(config.database.database)    
 
 def _init_mysql():
-    database = config.get('database', 'database')
     kwargs = dict(
-        host        = config.get('database', 'hostname'),
-        user        = config.get('database', 'username'),
-        passwd      = config.get('database', 'password')        
+        host        = config.database.hostname,
+        user        = config.database.username,
+        passwd      = config.database.password        
     )
-    _db.init(database, **kwargs)
+    _db.init(config.database.database, **kwargs)
 
 def _init_postgresql():
-    database = config.get('database', 'database')
     kwargs = dict(
         host        = config.get('database', 'hostname'),
         user        = config.get('database', 'username'),
         password    = config.get('database', 'password')        
     )
-    _db.init(database, **kwargs)
+    _db.init(config.database.database, **kwargs)
 
 def connect():
     """

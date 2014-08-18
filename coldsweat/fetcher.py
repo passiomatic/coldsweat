@@ -117,11 +117,10 @@ def load_plugins():
     '''
     Load plugins listed in config file
     '''
-    if not config.has_option('plugins', 'load'):
+    if not config.plugins.load:
         return
         
-    imports = config.get('plugins', 'load')
-    for name in imports.split(','):
+    for name in config.plugins.load.split(','):
         name = name.strip()
         try:
             fp, pathname, description = imp.find_module(name, [plugin_dir])
@@ -169,7 +168,7 @@ def add_subscription(feed, user, group):
 def fetch_url(url, timeout=None, etag=None, modified_since=None):
 
     request_headers = {
-        'User-Agent': user_agent
+        'User-Agent': config.fetcher.user_agent
     }
 
     # Conditional GET headers
@@ -230,7 +229,7 @@ def fetch_feed(feed, add_entries=False):
             feed.last_status = status
         if error:
             feed.error_count = feed.error_count + 1        
-        error_threshold = config.getint('fetcher', 'error_threshold')
+        error_threshold = config.fetcher.error_threshold
         if error_threshold and (feed.error_count > error_threshold):
             feed.is_enabled = False
             feed.last_status = status # Save status code for posterity           
@@ -238,9 +237,9 @@ def fetch_feed(feed, add_entries=False):
             synthesize_entry('Feed has accomulated too many errors (last was %s).' % status_title(status))
         feed.save()
 
-    max_history = config.getint('fetcher', 'max_history')
-    interval    = config.getint('fetcher', 'min_interval')
-    timeout     = config.getint('fetcher', 'timeout')
+    max_history = config.fetcher.max_history
+    interval    = config.fetcher.min_interval
+    timeout     = config.fetcher.timeout
     
     logger.debug("fetching %s" % feed.self_link)
            
@@ -404,7 +403,7 @@ def fetch_feeds():
     logger.debug("starting fetcher")
     trigger_event('fetch_started')
         
-    if config.getboolean('fetcher', 'multiprocessing'):
+    if config.fetcher.multiprocessing:
         from multiprocessing import Pool
 
         p = Pool(processes=None) # Uses cpu_count()        

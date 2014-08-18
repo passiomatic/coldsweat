@@ -27,7 +27,7 @@ def google_fetcher(url):
     endpoint = "http://www.google.com/s2/favicons?domain=%s" % urlparse.urlparse(url).hostname
 
 #     headers = {
-#         'User-Agent': config.get('fetcher', 'user_agent')
+#         'User-Agent': config.fetcher.user_agent
 #     }
     try:
         result = requests.get(endpoint)

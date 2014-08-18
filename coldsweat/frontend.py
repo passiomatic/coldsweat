@@ -39,7 +39,7 @@ class FrontendApp(WSGIApp):
         self.alert_message = ''
         self.app_namespace = {
             'version_string'    : VERSION_STRING,
-            'static_url'        : STATIC_URL,
+            'static_url'        : config.web.static_url,
             'alert_message'     : '',
             'page_title'        : '',
         }
@@ -260,7 +260,7 @@ class FrontendApp(WSGIApp):
         '''
         offset, group_id, feed_id, filter_class, panel_title, page_title = 0, 0, 0, 'feeds', 'Feeds', 'Feeds'
 
-        error_threshold = config.getint('fetcher', 'error_threshold')
+        error_threshold = config.fetcher.error_threshold
         groups = get_groups(self.user)  
         offset = int(request.GET.get('offset', 0))
         count, q = get_feeds(self.user, Feed.id).count(), get_feeds(self.user)

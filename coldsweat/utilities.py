@@ -158,9 +158,10 @@ class Struct(dict):
     and allows easy access to attributes
     """
 
-    def __init__(self, obj):
-        dict.__init__(self, obj)
-        for k, v in obj.iteritems():
+    def __init__(self, d=None):
+        d = d or {}
+        super(Struct, self).__init__(d)
+        for k, v in d.items():
             if isinstance(v, dict):
                 self.__dict__[k] = Struct(v)
             else:

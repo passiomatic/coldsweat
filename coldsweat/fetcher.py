@@ -39,7 +39,7 @@ def get_feed_timestamp(soup_feed, default):
         if value:
             # Fix future dates
             return min(tuple_as_datetime(value), default)
-    logger.debug('no feed timestamp found, using default')    
+    logger.debug(u'no feed timestamp found, using default')    
     return default
 
 def get_entry_id(entry, default):
@@ -59,7 +59,7 @@ def get_entry_timestamp(entry, default):
         if value:
             # Fix future dates
             return min(tuple_as_datetime(value), default)
-    logger.debug('no entry timestamp found, using default')    
+    logger.debug(u'no entry timestamp found, using default')    
     return default
         
 def get_entry_title(entry, default):
@@ -74,7 +74,7 @@ def get_entry_content(entry, default):
 
     candidates = entry.get('content', [])
     if 'summary_detail' in entry:
-        #logger.debug('summary found for entry %s' % entry.link)    
+        #logger.debug(u'summary found for entry %s' % entry.link)    
         candidates.append(entry.summary_detail)
     for c in candidates:
         # Match text/html, application/xhtml+xml
@@ -84,7 +84,7 @@ def get_entry_content(entry, default):
     if candidates:
         return candidates[0].type, candidates[0].value
 
-    logger.debug('no content found for entry %s' % entry.link)    
+    logger.debug(u'no content found for entry %s' % entry.link)    
     return default
     
 # Nullable fields
@@ -127,10 +127,10 @@ def load_plugins():
             fp, pathname, description = imp.find_module(name, [plugin_dir])
             imp.load_module(name, fp, pathname, description)
         except ImportError, ex:
-            logger.warn('could not load %s plugin (%s), ignored' % (name, ex))
+            logger.warn(u'could not load %s plugin (%s), ignored' % (name, ex))
             continue
         
-        logger.debug('loaded %s plugin' % name)
+        logger.debug(u'loaded %s plugin' % name)
         fp.close()
         
 def add_feed(feed, fetch_icon=False, add_entries=False):
@@ -143,7 +143,7 @@ def add_feed(feed, fetch_icon=False, add_entries=False):
 
     try:
         previous_feed = Feed.get(Feed.self_link == feed.self_link)
-        logger.debug('feed %s has been already added to database, skipped' % feed.self_link)
+        logger.debug(u'feed %s has been already added to database, skipped' % feed.self_link)
         return previous_feed
     except Feed.DoesNotExist:
         pass
@@ -155,10 +155,10 @@ def add_subscription(feed, user, group):
     try:
         subscription = Subscription.create(user=user, feed=feed, group=group)
     except IntegrityError:
-        logger.debug('user %s has already feed %s in her subscriptions' % (user.username, feed.self_link))    
+        logger.debug(u'user %s has already feed %s in her subscriptions' % (user.username, feed.self_link))    
         return None
 
-    logger.debug('added feed %s for user %s' % (feed.self_link, user.username))                
+    logger.debug(u'added feed %s for user %s' % (feed.self_link, user.username))                
     return subscription
     
 # ------------------------------------------------------
@@ -179,7 +179,7 @@ def fetch_url(url, timeout=None, etag=None, modified_since=None):
         
     try:
         response = requests.get(url, timeout=timeout, headers=request_headers)
-        logger.debug("got status %d" % response.status_code)
+        logger.debug(u"got status %d" % response.status_code)
     except (IOError, RequestException), ex:
         return None
     
@@ -215,7 +215,7 @@ def add_synthesized_entry(feed, title, content_type, content):
         last_updated_on   = now
     )
     entry.save()
-    logger.debug("synthesized entry %s" % guid)    
+    logger.debug(u"synthesized entry %s" % guid)    
     return entry
 
 
@@ -234,7 +234,7 @@ def fetch_feed(feed, add_entries=False):
         if error_threshold and (feed.error_count > error_threshold):
             feed.is_enabled = False
             feed.last_status = status # Save status code for posterity           
-            logger.warn("%s has too many errors, disabled" % netloc)        
+            logger.warn(u"%s has too many errors, disabled" % netloc)        
             synthesize_entry('Feed has accomulated too many errors (last was %s).' % status_title(status))
         feed.save()
 
@@ -242,7 +242,7 @@ def fetch_feed(feed, add_entries=False):
     interval    = config.getint('fetcher', 'min_interval')
     timeout     = config.getint('fetcher', 'timeout')
     
-    logger.debug("fetching %s" % feed.self_link)
+    logger.debug(u"fetching %s" % feed.self_link)
            
     schema, netloc, path, params, query, fragment = urlparse.urlparse(feed.self_link)
 
@@ -256,14 +256,14 @@ def fetch_feed(feed, add_entries=False):
         # No datetime.timedelta since we need to deal with large seconds values
         delta = datetime_as_epoch(now) - datetime_as_epoch(value)    
         if delta < interval:
-            logger.debug("%s for %s is below min_interval, skipped" % (fieldname, netloc))
+            logger.debug(u"%s for %s is below min_interval, skipped" % (fieldname, netloc))
             return            
                       
     response = fetch_url(feed.self_link, timeout=timeout, etag=feed.etag, modified_since=feed.last_updated_on)
     if not response:
         # Record as "503 Service unavailable"
         post_fetch(503, error=True)
-        logger.warn("a network error occured while fetching %s" % netloc)
+        logger.warn(u"a network error occured while fetching %s" % netloc)
         return
 
     feed.last_checked_on = now
@@ -275,33 +275,33 @@ def fetch_feed(feed, add_entries=False):
             Feed.get(self_link=self_link)
         except Feed.DoesNotExist:
             feed.self_link = self_link                               
-            logger.info("%s has changed its location, updated to %s" % (netloc, self_link))
+            logger.info(u"%s has changed its location, updated to %s" % (netloc, self_link))
         else:
             feed.is_enabled = False
-            logger.warn("new %s location %s is duplicated, disabled" % (netloc, self_link))                
+            logger.warn(u"new %s location %s is duplicated, disabled" % (netloc, self_link))                
             synthesize_entry('Feed has a duplicated web address.')
             post_fetch(DuplicatedFeedError.code, error=True)
             return
 
     if response.status_code == 304:                                     # Not modified
-        logger.debug("%s hasn't been modified, skipped" % netloc)
+        logger.debug(u"%s hasn't been modified, skipped" % netloc)
         post_fetch(response.status_code)
         return
     elif response.status_code == 410:                                   # Gone
         feed.is_enabled = False
-        logger.warn("%s is gone, disabled" % netloc)
+        logger.warn(u"%s is gone, disabled" % netloc)
         synthesize_entry('Feed has been removed from the origin server.')
         post_fetch(response.status_code, error=True)
         return
     elif response.status_code not in POSITIVE_STATUS_CODES:             # No good
-        logger.warn("%s replied with status %d, aborted" % (netloc, response.status_code))
+        logger.warn(u"%s replied with status %d, aborted" % (netloc, response.status_code))
         post_fetch(response.status_code, error=True)
         return
 
     soup = feedparser.parse(response.text) 
     # Got parsing error? Log error but do not increment the error counter
     if hasattr(soup, 'bozo') and soup.bozo:
-        logger.info("%s caused a parser error (%s), tried to parse it anyway" % (netloc, soup.bozo_exception))
+        logger.info(u"%s caused a parser error (%s), tried to parse it anyway" % (netloc, soup.bozo_exception))
         post_fetch(response.status_code)
 
     feed.etag = response.headers.get('ETag', None)    
@@ -321,7 +321,7 @@ def fetch_feed(feed, add_entries=False):
         #   point to Feed Burner or similar services
         feed.icon = favicon.fetch(feed.alternate_link or feed.self_link)
         feed.icon_last_updated_on = now
-        logger.debug("saved favicon %s..." % (feed.icon[:70]))    
+        logger.debug(u"saved favicon %s..." % (feed.icon[:70]))    
 
     post_fetch(response.status_code)
 
@@ -334,7 +334,7 @@ def fetch_feed(feed, add_entries=False):
         guid = get_entry_id(parsed_entry, default=link)
 
         if not guid:
-            logger.warn('could not find guid for entry from %s, skipped' % netloc)
+            logger.warn(u'could not find guid for entry from %s, skipped' % netloc)
             continue
 
         author                  = get_entry_author(parsed_entry, soup.feed)
@@ -345,13 +345,13 @@ def fetch_feed(feed, add_entries=False):
                 
         # Skip ancient feed items        
         if max_history and ((now - timestamp).days > max_history):  
-            logger.debug("entry %s from %s is over max_history, skipped" % (guid, netloc))
+            logger.debug(u"entry %s from %s is over max_history, skipped" % (guid, netloc))
             continue
 
         try:
             # If entry is already in database with same id, then skip it
             Entry.get(guid=guid)
-            logger.debug("duplicated entry %s, skipped" % guid)
+            logger.debug(u"duplicated entry %s, skipped" % guid)
             continue
         except Entry.DoesNotExist:
             pass
@@ -375,7 +375,7 @@ def fetch_feed(feed, add_entries=False):
 def feed_worker(feed):
 
     if not feed.subscriptions:
-        logger.debug("feed %s has no subscribers, skipped" % feed.self_link)
+        logger.debug(u"feed %s has no subscribers, skipped" % feed.self_link)
         return
             
     # Allow each process to open and close its database connection    
@@ -396,12 +396,12 @@ def fetch_feeds():
     
     feeds = list(q)
     if not feeds:
-        logger.debug("no feeds found to refresh, halted")
+        logger.debug(u"no feeds found to refresh, halted")
         return
 
     load_plugins()
 
-    logger.debug("starting fetcher")
+    logger.debug(u"starting fetcher")
     trigger_event('fetch_started')
         
     if config.getboolean('fetcher', 'multiprocessing'):
@@ -417,7 +417,7 @@ def fetch_feeds():
     
     trigger_event('fetch_done', feeds)
     
-    logger.info("%d feeds checked in %.2fs" % (len(feeds), time.time() - start))
+    logger.info(u"%d feeds checked in %.2fs" % (len(feeds), time.time() - start))
 
 
 

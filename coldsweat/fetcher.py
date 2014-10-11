@@ -7,168 +7,435 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 '''
 
-import sys, os, re, time, cgi, urlparse, imp
+import sys, os, re, time, urlparse
 from datetime import datetime
-from peewee import IntegrityError
 
+from peewee import IntegrityError
 import feedparser
 import requests
 from requests.exceptions import *
+from webob.exc import *
+
+from coldsweat import *
+
+from plugins import trigger_event
 
 from models import *
 from utilities import *
-from filters import escape_html, status_title
-from coldsweat import *
-from markup import html
 
-FETCH_ICONS_DELTA       = 30 # Days
-ENTRY_TAG_URI           = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
-MAX_TITLE_LENGTH        = 255
-POSITIVE_STATUS_CODES   = 200, 302, 304 # Other redirects are handled by Requests
+from markup import html #@@TODO: Consolidate into a single module
+import filters
 
-# ------------------------------------------------------
-# Entry data
-# ------------------------------------------------------
+__all__ = [
+    'Fetcher',
+    'validate_url',
+    'scrub_url',
+    'fetch_url'
+]
 
-def get_feed_timestamp(soup_feed, default):
-    """
-    Get the date a feed was last updated
-    """
-    for header in ['published_parsed', 'updated_parsed']:
-        value = soup_feed.get(header, None)
-        if value:
-            # Fix future dates
-            return min(tuple_as_datetime(value), default)
-    logger.debug('no feed timestamp found, using default')    
-    return default
+FETCH_ICONS_DELTA = 30 # Days
 
-def get_entry_id(entry, default):
-    """
-    Get a useful id from a feed entry
-    """    
-    if ('id' in entry) and entry.id: 
-        return entry.id
-    return default
-
-def get_entry_timestamp(entry, default):
-    """
-    Select the best timestamp for an entry
-    """
-    for header in ['published_parsed', 'created_parsed', 'updated_parsed']:
-        value = entry.get(header, None)
-        if value:
-            # Fix future dates
-            return min(tuple_as_datetime(value), default)
-    logger.debug('no entry timestamp found, using default')    
-    return default
-        
-def get_entry_title(entry, default):
-    if 'title' in entry:
-        return truncate(html.strip_html(entry.title), MAX_TITLE_LENGTH)
-    return default
-
-def get_entry_content(entry, default):
-    """
-    Select the best content from an entry
-    """
-
-    candidates = entry.get('content', [])
-    if 'summary_detail' in entry:
-        #logger.debug('summary found for entry %s' % entry.link)    
-        candidates.append(entry.summary_detail)
-    for c in candidates:
-        # Match text/html, application/xhtml+xml
-        if 'html' in c.type:
-            return c.type, c.value
-    # Return first result, regardless of MIME type
-    if candidates:
-        return candidates[0].type, candidates[0].value
-
-    logger.debug('no content found for entry %s' % entry.link)    
-    return default
-    
-# Nullable fields
-
-def get_entry_link(entry):
-    # Special case for FeedBurner entries, see: http://bit.ly/1gRAvJv
-    if 'feedburner_origlink' in entry:
-        return scrub_url(entry.feedburner_origlink)
-    if 'link' in entry:
-        return scrub_url(entry.link)
-    return None
-    
-def get_entry_author(entry, feed):
-    """
-    Divine authorship
-    """
-
-    if 'name' in entry.get('author_detail',[]):
-        return entry.author_detail.name     
-    elif 'name' in feed.get('author_detail', []):
-        return feed.author_detail.name
-    return None
-
-
-# ------------------------------------------------------
-# Add feed and subscription
-# ------------------------------------------------------
-
-def load_plugins():
+class Fetcher(object):
     '''
-    Load plugins listed in config file
-    '''
-    if not config.plugins.load:
-        return
+    Fetch a single given feed
+    '''   
+
+    def __init__(self, feed): 
+        # Save timestamp for current fetch operation
+        self.instant = datetime.utcnow()
+        # Extract netloc
+        _, self.netloc, _, _, _ = urlparse.urlsplit(feed.self_link)
+ 
+        self.feed = feed
         
-    for name in config.plugins.load.split(','):
-        name = name.strip()
+
+#     def post_fetch(self, status, error=False):
+#         if status:
+#             self.feed.last_status = status
+#         if error:
+#             self.feed.error_count += 1        
+#         error_threshold = config.getint('fetcher', 'error_threshold')
+#         if error_threshold and (self.feed.error_count > config.fetcher.max_errors):
+#             self.feed.is_enabled = False
+#             self.feed.last_status = status # Save status code for posterity           
+#             logger.warn("%s has too many errors, disabled" % netloc)        
+#             self._synthesize_entry('Feed has accomulated too many errors (last was %s).' % filters.status_title(status))
+#         self.feed.save()
+
+         
+    def handle_304(self, response):
+        '''
+        Not modified
+        '''
+        logger.debug("%s hasn't been modified, skipped" % self.netloc)        
+        
+        raise HTTPNotModified
+
+    def handle_410(self, response):
+        '''
+        Gone
+        '''
+        self.feed.is_enabled    = False
+        self.feed.error_count   += 1        
+
+        logger.warn("%s is gone, disabled" % self.netloc)
+        self._synthesize_entry('Feed has been removed from the origin server.')
+        
+        raise HTTPGone
+
+    def handle_301(self, response):
+        '''
+        Moved permanently
+        '''
+        self_link = response.url
+            
         try:
-            fp, pathname, description = imp.find_module(name, [plugin_dir])
-            imp.load_module(name, fp, pathname, description)
-        except ImportError, ex:
-            logger.warn('could not load %s plugin (%s), ignored' % (name, ex))
-            continue
-        
-        logger.debug('loaded %s plugin' % name)
-        fp.close()
-        
-def add_feed(feed, fetch_icon=False, add_entries=False):
-    '''
-    Add a feed to database and optionally fetch icon and add entries
-    '''
+            Feed.get(self_link=self_link)
+        except Feed.DoesNotExist:
+            self.feed.self_link = self_link                               
+            logger.info("%s has changed its location, updated to %s" % (self.netloc, self_link))
+        else:
+            self.feed.is_enabled    = False
+            self.last_status        = DuplicatedFeedError.code
+            self.feed.error_count   += 1 
+            
+            self._synthesize_entry('Feed has a duplicated web address.')
+            logger.warn("new %s location %s is duplicated, disabled" % (self.netloc, self_link))                
 
-    # Normalize feed URL
-    feed.self_link = scrub_url(feed.self_link)
+            raise DuplicatedFeedError #HTTPMovedPermanently
 
-    try:
-        previous_feed = Feed.get(Feed.self_link == feed.self_link)
-        logger.debug('feed %s has been already added to database, skipped' % feed.self_link)
-        return previous_feed
-    except Feed.DoesNotExist:
-        pass
-    fetch_feed(feed, add_entries)
-    return feed
+    def handle_200(self, response):
+        '''
+        OK plus redirects
+        '''
+        self.feed.etag   = response.headers.get('ETag', None)
+        self.last_status = response.status_code
+        
+        # Save final status code discarding redirects
+        self.feed.last_status = response.status_code
+
+    handle_307 = handle_200 # Alias
+    handle_302 = handle_200 # Alias
+
+
+    def fetch_feed(self):
+                
+        logger.debug("fetching %s" % self.netloc)
+               
+        # Check freshness
+        for value in [self.feed.last_checked_on, self.feed.last_updated_on]:
+            if not value:
+                continue
+            
+            # No datetime.timedelta since we need to
+            #   deal with large seconds values
+            delta = datetime_as_epoch(self.instant) - datetime_as_epoch(value)    
+            if delta < config.fetcher.min_interval:
+                logger.debug("%s is below fetcher:delta, skipped" % (format_datetime(value), self.netloc))
+                return                                      
+        
+        try:
+            response = fetch_url(self.feed.self_link, 
+                timeout=config.fetcher.timeout, 
+                etag=self.feed.etag, 
+                modified_since=self.feed.last_updated_on)
+        except RequestException: 
+            # Record any network error as 'Service Unavailable'
+            self.last_status        =  HTTPServiceUnavailable.code
+            self.feed.error_count   += 1   
+            logger.warn("a network error occured while fetching %s, skipped" % self.netloc)
+            return
     
-def add_subscription(feed, user, group):
+        self.feed.last_checked_on = self.instant
+    
+        # Check if we got a redirect first
+        if response.history:
+            status = response.history[0].status_code
+        else:
+            status = response.status_code
+        
+        try:
+            handler = getattr(self, 'handle_%d' % status)
+            handler(response)
+        except (HTTPError, HTTPNotModified, DuplicatedFeedError): #HTTPRedirection
+            return # Bail out
+        except AttributeError:
+            logger.warn("%s replied with status %d, aborted" % (self.netloc, response.status_code))
+            return
+        finally:
+            #logger.debug('Saving feed')
+            self.feed.save()
 
-    try:
-        subscription = Subscription.create(user=user, feed=feed, group=group)
-    except IntegrityError:
-        logger.debug('user %s has already feed %s in her subscriptions' % (user.username, feed.self_link))    
+        entries = self.parse_feed(response.text)
+ 
+        #@@TODO: Use Peewee insert_many?
+
+        #@@TODO: self.fetch_icon()
+
+        
+
+    def parse_feed(self, data):
+
+        #feed = self.feed
+
+        soup = feedparser.parse(data)         
+        # Got parsing error?
+        if hasattr(soup, 'bozo') and soup.bozo:
+            logger.debug("%s caused a parser error (%s), tried to parse it anyway" % (self.netloc, soup.bozo_exception))
+
+        ft = FeedTranslator(soup.feed)
+        
+        self.feed.last_updated_on    = ft.get_timestamp(self.instant)        
+        self.feed.alternate_link     = ft.get_alternate_link()        
+        self.feed.title              = self.feed.title or ft.get_title() # Do not set again if already set
+
+        self.feed.save()
+
+        entries = []
+        feed_author = ft.get_author()
+
+        for entry_dict in soup.entries:
+    
+            t = EntryTranslator(entry_dict)
+            
+            link = t.get_link()
+            guid = t.get_guid(default=link)
+    
+            if not guid:
+                logger.warn('could not find GUID for entry from %s, skipped' % self.netloc)
+                continue
+
+            timestamp               = t.get_timestamp(self.instant)
+            content_type, content   = t.get_content(('text/plain', ''))
+        
+            # Skip ancient entries        
+            if (self.instant - timestamp).days > config.fetcher.max_history:
+                logger.debug("entry %s from %s is over fetcher:entry_delta, skipped" % (guid, self.netloc))
+                continue
+    
+            try:
+                # If entry is already in database with same GUID, then skip it
+                Entry.get(guid=guid)
+                logger.debug("duplicated entry %s, skipped" % guid)
+                continue
+            except Entry.DoesNotExist:
+                pass
+    
+            entry = Entry(
+                feed              = self.feed,                
+                guid              = guid,
+                link              = link,
+                title             = t.get_title(default='Untitled'),
+                author            = t.get_author() or feed_author,
+                content           = content,
+                content_type      = content_type,
+                last_updated_on   = timestamp
+            )
+            trigger_event('entry_parsed', entry, entry_dict)
+            entry.save()
+            #@@ entries.append(entry)
+
+    
+            logger.debug(u"parsed entry %s from %s" % (guid, self.netloc))  
+        
+        return entries
+        
+
+    def fetch_icon(self):
+    
+        if not self.feed.icon or not self.feed.icon_last_updated_on or (self.instant - self.feed.icon_last_updated_on).days > FETCH_ICONS_DELTA:
+            # Prefer alternate_link if available since self_link could 
+            #   point to Feed Burner or similar services
+            self.feed.icon = self._google_favicon_fetcher(self.feed.alternate_link or self.feed.self_link)
+            self.feed.icon_last_updated_on = self.instant
+            logger.debug("saved favicon %s..." % (self.feed.icon[:70]))    
+
+    
+    def _google_favicon_fetcher(url):
+        '''
+        Fetch a site favicon via Google service
+        '''
+        endpoint = "http://www.google.com/s2/favicons?domain=%s" % urlparse.urlslit(url).hostname
+    
+        try:
+            #@@TODO: Use fetch_url
+            result = requests.get(endpoint)
+        except RequestException, exc:
+            logger.warn("could not fetch favicon for %s (%s)" % (url, exc))
+            return Feed.DEFAULT_ICON
+    
+        return make_data_uri(result.headers['Content-Type'], result.content)
+
+
+    def add_synthesized_entry(self, title, content_type, content):
+        '''
+        Create an HTML entry for this feed 
+        '''
+    
+        # Since we don't know the mechanism the feed used to build a GUID for its entries 
+        #   synthesize an tag URI from the link and a random string. This makes
+        #   entries internally generated by Coldsweat reasonably globally unique
+        
+        try:
+            nonce = os.urandom(16).encode('base64')
+        except NotImplementedError: # urandom might not be available on certain platforms
+            nonce = now.isoformat()
+            
+        guid = ENTRY_TAG_URI % (now.year, make_sha1_hash(self.feed.self_link + nonce))
+        
+        entry = Entry(
+            feed              = self.feed,
+            guid              = guid,
+            title             = title,
+            author            = 'Coldsweat',
+            content           = content,
+            content_type      = content_type,
+            last_updated_on   = self.instant
+        )
+        entry.save()
+        logger.debug("synthesized entry %s" % guid)    
+        return entry
+    
+
+    def _synthesize_entry(self, reason):    
+        title   = u'This feed has been disabled'
+        content = render_template(os.path.join(template_dir, '_entry_feed_disabled.html'), {'reason': reason})
+        return self.add_synthesized_entry(self.feed, title, 'text/html', content)                     
+        
+        
+        
+ 
+class FeedTranslator(object):
+
+    def __init__(self, feed_dict):
+        self.feed_dict = feed_dict
+        
+    def get_timestamp(self, default):
+        for header in ['published_parsed', 'updated_parsed']:
+            value = self.feed_dict.get(header, None)
+            if value:
+                # Fix future dates
+                return min(tuple_as_datetime(value), default)
+        logger.debug('no feed timestamp found, using default')    
+        return default
+
+    # Nullable fields
+    
+    def get_author(self):
+        if 'name' in self.feed_dict.get('author_detail', []):
+            return self.feed_dict.author_detail.name
+        return None
+    
+    def get_alternate_link(self):        
+        return self.feed_dict.get('link', None)
+        
+    def get_title(self):
+        if 'title' in self.feed_dict:
+            return truncate(html.strip_html(self.feed_dict.title), Feed.MAX_TITLE_LENGTH)
         return None
 
-    logger.debug('added feed %s for user %s' % (feed.self_link, user.username))                
-    return subscription
-    
-# ------------------------------------------------------
-# Feed fetching and parsing 
-# ------------------------------------------------------
 
+class EntryTranslator(object):
+
+    def __init__(self, entry_dict):
+        self.entry_dict = entry_dict
+    
+    def get_guid(self, default):
+        """
+        Get a useful GUID from a feed entry
+        """    
+        value = getattr(self.entry_dict, 'id', None)
+        return value or default
+
+    def get_timestamp(self, default):
+        """
+        Select the best timestamp for an entry
+        """
+        for header in ['published_parsed', 'created_parsed', 'updated_parsed']:
+            value = self.entry_dict.get(header, None)
+            if value:
+                # Fix future dates
+                return min(tuple_as_datetime(value), default)
+        logger.debug('no entry timestamp found, using default')    
+        return default
+            
+    def get_title(self, default):
+        if 'title' in self.entry_dict:
+            return truncate(html.strip_html(self.entry_dict.title), Entry.MAX_TITLE_LENGTH)
+        return default
+    
+    def get_content(self, default):
+        """
+        Select the best content from an entry
+        """    
+        candidates = self.entry_dict.get('content', [])
+        if 'summary_detail' in self.entry_dict:
+            candidates.append(self.entry_dict.summary_detail)
+        for c in candidates:
+            # Match text/html, application/xhtml+xml
+            if 'html' in c.type:
+                return c.type, c.value
+        # Return first result, regardless of MIME type
+        if candidates:
+            return candidates[0].type, candidates[0].value
+    
+        logger.debug('no entry content found, using default')    
+        return default
         
-def fetch_url(url, timeout=None, etag=None, modified_since=None):
+    # Nullable fields
+    
+    def get_link(self):
+        # Special case for FeedBurner entries, see: http://bit.ly/1gRAvJv
+        if 'feedburner_origlink' in self.entry_dict:
+            return scrub_url(self.entry_dict.feedburner_origlink)
+        if 'link' in self.entry_dict:
+            return scrub_url(self.entry_dict.link)
+        return None
+        
+    def get_author(self):  
+        if 'name' in self.entry_dict.get('author_detail',[]):
+            return self.entry_dict.author_detail.name     
+        return None
+
+
+# --------------------
+# URL utilities
+# --------------------
+
+BLACKLIST_QS = ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term", "piwik_campaign","piwik_kwd"]
+     
+# Lifted from https://github.com/django/django/blob/master/django/core/validators.py
+RE_URL = re.compile(
+    r'^https?://'  # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+    r'localhost|'  # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+    r'(?::\d+)?'  # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)    
+    #@@TODO: Add IPv6
+    
+
+def validate_url(value):
+    return value and RE_URL.search(value)
+
+
+def scrub_url(url):
+    '''
+    Clean query string arguments
+    '''
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+    d = urlparse.parse_qs(query)
+    d = dict((k, v) for k, v in d.items() if k not in BLACKLIST_QS)
+    return urlparse.urlunsplit((scheme, netloc, path, urllib.urlencode(d, doseq=True), fragment))
+
+
+def fetch_url(url, timeout=10, etag=None, modified_since=None):
+    '''
+    Fecth a given URL optionally issuing a 'Conditional GET' request
+    '''
 
     request_headers = {
-        'User-Agent': config.fetcher.user_agent
+        'User-Agent': USER_AGENT
     }
 
     # Conditional GET headers
@@ -178,248 +445,33 @@ def fetch_url(url, timeout=None, etag=None, modified_since=None):
         
     try:
         response = requests.get(url, timeout=timeout, headers=request_headers)
-        logger.debug("got status %d" % response.status_code)
-    except (IOError, RequestException), ex:
-        return None
+    except (RequestException, ), ex:
+        logger.debug("tried to fetch %s but got %s" % (url, ex.__class__.__name__))
+        raise ex
     
     return response
 
+# ------------------------------------------------------
+# Custom error codes 9xx & exceptions 
+# ------------------------------------------------------
 
+class DuplicatedFeedError(Exception):
+    code        = 900
+    title       = 'Duplicated feed'
+    explanation = 'Feed address matches another already present in the database.'
 
-def add_synthesized_entry(feed, title, content_type, content):
-    '''
-    Create an HTML entry for the given feed. 
-    '''
-
-    now = datetime.utcnow()
-
-    # Since we don't know the mechanism the feed used to build a GUID for its entries 
-    #   synthesize an tag URI from the link and a random string. This makes
-    #   entries internally generated by Coldsweat reasonably globally unique
-    
-    try:
-        nonce = os.urandom(16).encode('base64')
-    except NotImplementedError: # urandom might not be available on certain platforms
-        nonce = now.isoformat()
-        
-    guid = ENTRY_TAG_URI % (now.year, make_sha1_hash(feed.self_link + nonce))
-    
-    entry = Entry(
-        guid              = guid,
-        feed              = feed,
-        title             = title,
-        author            = 'Coldsweat',
-        content           = content,
-        content_type      = content_type,
-        last_updated_on   = now
-    )
-    entry.save()
-    logger.debug("synthesized entry %s" % guid)    
-    return entry
-
-
-def fetch_feed(feed, add_entries=False):
-
-    def synthesize_entry(reason):    
-        title, content = u'This feed has been disabled', render_template(os.path.join(template_dir, '_entry_feed_disabled.html'), {'reason': reason})
-        return add_synthesized_entry(feed, title, 'text/html', content)
-
-    def post_fetch(status, error=False):
-        if status:
-            feed.last_status = status
-        if error:
-            feed.error_count = feed.error_count + 1        
-        error_threshold = config.fetcher.error_threshold
-        if error_threshold and (feed.error_count > error_threshold):
-            feed.is_enabled = False
-            feed.last_status = status # Save status code for posterity           
-            logger.warn("%s has too many errors, disabled" % netloc)        
-            synthesize_entry('Feed has accomulated too many errors (last was %s).' % status_title(status))
-        feed.save()
-
-    max_history = config.fetcher.max_history
-    interval    = config.fetcher.min_interval
-    timeout     = config.fetcher.timeout
-    
-    logger.debug("fetching %s" % feed.self_link)
-           
-    schema, netloc, path, params, query, fragment = urlparse.urlparse(feed.self_link)
-
-    now = datetime.utcnow()
-    
-    # Check freshness
-    for fieldname in ['last_checked_on', 'last_updated_on']:
-        value = getattr(feed, fieldname)
-        if not value:
-            continue
-        # No datetime.timedelta since we need to deal with large seconds values
-        delta = datetime_as_epoch(now) - datetime_as_epoch(value)    
-        if delta < interval:
-            logger.debug("%s for %s is below min_interval, skipped" % (fieldname, netloc))
-            return            
-                      
-    response = fetch_url(feed.self_link, timeout=timeout, etag=feed.etag, modified_since=feed.last_updated_on)
-    if not response:
-        # Record as "503 Service unavailable"
-        post_fetch(503, error=True)
-        logger.warn("a network error occured while fetching %s" % netloc)
-        return
-
-    feed.last_checked_on = now
-
-    if response.history and response.history[0].status_code == 301:     # Moved permanently        
-        self_link = response.url
-        
-        try:
-            Feed.get(self_link=self_link)
-        except Feed.DoesNotExist:
-            feed.self_link = self_link                               
-            logger.info("%s has changed its location, updated to %s" % (netloc, self_link))
-        else:
-            feed.is_enabled = False
-            logger.warn("new %s location %s is duplicated, disabled" % (netloc, self_link))                
-            synthesize_entry('Feed has a duplicated web address.')
-            post_fetch(DuplicatedFeedError.code, error=True)
-            return
-
-    if response.status_code == 304:                                     # Not modified
-        logger.debug("%s hasn't been modified, skipped" % netloc)
-        post_fetch(response.status_code)
-        return
-    elif response.status_code == 410:                                   # Gone
-        feed.is_enabled = False
-        logger.warn("%s is gone, disabled" % netloc)
-        synthesize_entry('Feed has been removed from the origin server.')
-        post_fetch(response.status_code, error=True)
-        return
-    elif response.status_code not in POSITIVE_STATUS_CODES:             # No good
-        logger.warn("%s replied with status %d, aborted" % (netloc, response.status_code))
-        post_fetch(response.status_code, error=True)
-        return
-
-    soup = feedparser.parse(response.text) 
-    # Got parsing error? Log error but do not increment the error counter
-    if hasattr(soup, 'bozo') and soup.bozo:
-        logger.info("%s caused a parser error (%s), tried to parse it anyway" % (netloc, soup.bozo_exception))
-        post_fetch(response.status_code)
-
-    feed.etag = response.headers.get('ETag', None)    
-    
-    if 'link' in soup.feed:
-        feed.alternate_link = soup.feed.link
-
-    # Reset value only if not set before
-    if ('title' in soup.feed) and not feed.title:
-        feed.title = html.strip_html(soup.feed.title)
-
-    feed.last_updated_on = get_feed_timestamp(soup.feed, now)        
-
-
-    if not feed.icon or not feed.icon_last_updated_on or (now - feed.icon_last_updated_on).days > FETCH_ICONS_DELTA:
-        # Prefer alternate_link if available since self_link could 
-        #   point to Feed Burner or similar services
-        feed.icon = favicon.fetch(feed.alternate_link or feed.self_link)
-        feed.icon_last_updated_on = now
-        logger.debug("saved favicon %s..." % (feed.icon[:70]))    
-
-    post_fetch(response.status_code)
-
-    if not add_entries:    
-        return
-        
-    for parsed_entry in soup.entries:
-        
-        link = get_entry_link(parsed_entry)
-        guid = get_entry_id(parsed_entry, default=link)
-
-        if not guid:
-            logger.warn('could not find guid for entry from %s, skipped' % netloc)
-            continue
-
-        author                  = get_entry_author(parsed_entry, soup.feed)
-        
-        title                   = get_entry_title(parsed_entry, default='Untitled')
-        content_type, content   = get_entry_content(parsed_entry, default=('text/plain', ''))
-        timestamp               = get_entry_timestamp(parsed_entry, default=now)
-                
-        # Skip ancient feed items        
-        if max_history and ((now - timestamp).days > max_history):  
-            logger.debug("entry %s from %s is over max_history, skipped" % (guid, netloc))
-            continue
-
-        try:
-            # If entry is already in database with same id, then skip it
-            Entry.get(guid=guid)
-            logger.debug("duplicated entry %s, skipped" % guid)
-            continue
-        except Entry.DoesNotExist:
-            pass
-
-        entry = Entry(
-            guid              = guid,
-            feed              = feed,
-            title             = title,
-            author            = author,
-            content           = content,
-            content_type      = content_type,
-            link              = link,
-            last_updated_on   = timestamp
-        )
-        trigger_event('entry_parsed', entry, parsed_entry)
-        entry.save()
-
-        logger.debug(u"added entry %s from %s" % (guid, netloc))
-
-
-def feed_worker(feed):
-
-    if not feed.subscriptions:
-        logger.debug("feed %s has no subscribers, skipped" % feed.self_link)
-        return
-            
-    # Allow each process to open and close its database connection    
-    connect()
-    fetch_feed(feed, add_entries=True)
-    close()
-    
- 
-def fetch_feeds():
-    """
-    Fetch all feeds, possibly parallelizing requests
-    """
-
-    start = time.time()
-
-    # Attach feed.subscriptions counter
-    q = Feed.select(Feed, fn.Count(Subscription.user).alias('subscriptions')).join(Subscription, JOIN_LEFT_OUTER).group_by(Feed).where(Feed.is_enabled==True)
-    
-    feeds = list(q)
-    if not feeds:
-        logger.debug("no feeds found to refresh, halted")
-        return
-
-    load_plugins()
-
-    logger.debug("starting fetcher")
-    trigger_event('fetch_started')
-        
-    if config.fetcher.multiprocessing:
-        from multiprocessing import Pool
-
-        p = Pool(processes=None) # Uses cpu_count()        
-        p.map(feed_worker, feeds)
-
-    else:
-        # Just sequence requests
-        for feed in feeds:
-            feed_worker(feed)
-    
-    trigger_event('fetch_done', feeds)
-    
-    logger.info("%d feeds checked in %.2fs" % (len(feeds), time.time() - start))
-
-
-
-
+# Update WebOb status codes map
+for klass in (DuplicatedFeedError,): 
+    status_map[klass.code] = klass
     
     
+def run_tests():
+    
+    assert scrub_url('http://example.org/feed.xml?utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml'     
+    assert scrub_url('http://example.org/feed.xml?a=1&a=2&b=1&utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml?a=1&a=2&b=1'
+    assert validate_url('https://example.com')          # OK
+    assert validate_url('http://example.org/feed.xml')  # OK
+    assert not validate_url('example.com')              # Fail
+
+if __name__ == '__main__':
+    run_tests()

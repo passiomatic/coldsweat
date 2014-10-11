@@ -8,7 +8,6 @@ License: MIT (see LICENSE for details)
 import re, cgi, urllib, urlparse
 from webob.exc import status_map
 import utilities
-import favicon
 
 __all__ = []
 
@@ -37,12 +36,6 @@ def escape_url(value):
     if value:
         return urllib.quote(utilities.encode(value))
     return ''
-    
-# def filter_escape_javacript(value):     
-#     """
-#     Return value escaped as a Javascript string
-#     """
-#     return json.dumps(value)
 
 @filter('friendly_url')
 def friendly_url(value):
@@ -104,7 +97,7 @@ def status_title(code):
 
 @filter('icon')
 def icon(data):
-    return data if data else favicon.DEFAULT_FAVICON
+    return data if data else Feed.DEFAULT_ICON
     
 @filter('alert')
 def alert(message):

@@ -5,24 +5,27 @@ Description: sweat utility commands
 Copyright (c) 2013—2014 Andrea Peltrin
 License: MIT (see LICENSE for details)
 """
+import os
 from optparse import OptionParser, make_option
-from os import path
 from getpass import getpass
 import readline
 
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
 
-from coldsweat import fetcher, template_dir, trigger_event
-from coldsweat.markup import opml
-from coldsweat.models import *
-from coldsweat.app import ExceptionMiddleware
-from coldsweat.fever import fever_app
-from coldsweat.frontend import frontend_app
-from coldsweat.cascade import Cascade
-from coldsweat.utilities import render_template
+from coldsweat import *
+from models import *
+from controllers import *
+from app import *
 
-MIN_PASSWORD_LENGTH = 8
+from fever import FeverApp
+from frontend import FrontendApp
+import cascade
+
+from utilities import render_template
+from plugins import trigger_event, load_plugins
+from markup import opml
+
 
 COMMANDS = {}
 
@@ -56,7 +59,7 @@ def command_serve(parser, options, ags):
     
     # Create a cascade that looks for static files first, 
     #  then tries the other apps
-    cascade_app = ExceptionMiddleware(Cascade([static_app, fever_app, frontend_app]))
+    cascade_app = ExceptionMiddleware(cascade.Cascade([static_app, FeverApp.setup(), FrontendApp.setup()]))
     
     httpd = make_server('localhost', options.port, cascade_app)
     print 'Serving on http://localhost:%s' % options.port
@@ -69,7 +72,9 @@ def command_serve(parser, options, ags):
 def command_refresh(parser, options, ags):
     '''Starts a feeds refresh procedure'''
 
-    counter = fetcher.fetch_feeds()    
+    fc = FeedController()
+    fc.fetch_all_feeds()
+
     print 'Refresh completed. See log file for more information'
 
 @command('import')
@@ -86,7 +91,7 @@ def command_import(parser, options, args):
     except User.DoesNotExist:
         parser.error("unable to find user %s. Use -u option to specify a different user" % username)
 
-    fetcher.load_plugins()
+    load_plugins()
     trigger_event('fetch_started')
     feeds = opml.add_feeds_from_file(args[0], user)
     trigger_event('fetch_done', feeds)                
@@ -116,7 +121,7 @@ def command_export(parser, options, args):
     feeds = Feed.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Feed.title)
     
     with open(filename, 'w') as f:
-        f.write(render_template(path.join(template_dir, 'export.xml'), locals()))
+        f.write(render_template(os.path.join(template_dir, 'export.xml'), locals()))
         
     print "%d feeds exported for user %s" % (feeds.count(), username)
     
@@ -126,7 +131,7 @@ def command_setup(parser, options, args):
     '''Sets up a working database'''
     username = options.username
 
-    setup()
+    setup_database_schema()
 
     # Check if username is already in use
     try:
@@ -168,13 +173,6 @@ def command_update(parser, options, args):
         print  'Error while running database update. See log file for more information.'
 
 
-def pre_command(test_connection=False):  
-    #try
-    connect()
-    #except ...
-    
-    return True
-
 def run():
 
     default_username, _ = User.DEFAULT_CREDENTIALS
@@ -203,8 +201,7 @@ def run():
     
     if command_name in COMMANDS:
         handler = COMMANDS[command_name]
-        pre_command()
+        connect()
         handler(parser, options, command_args)        
     else:
-        parser.error("unrecognized command %s, use the -h option for a list of available commands" % command_name)
-        
+        parser.error("unrecognized command %s, use the -h option for a list of available commands" % command_name)        

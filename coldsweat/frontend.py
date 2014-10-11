@@ -6,36 +6,46 @@ Copyright (c) 2013—2014 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-from os import path
+import os
 from datetime import datetime, timedelta
-from webob.exc import HTTPSeeOther, HTTPNotFound, HTTPBadRequest, HTTPTemporaryRedirect
-from tempita import Template #, HTMLTemplate 
-from peewee import IntegrityError
+from functools import wraps
+from webob import Request, Response
+from webob.exc import *
+from tempita import Template
+from peewee import fn, IntegrityError
 
+from coldsweat import *
 from app import *
 from models import *
+from controllers import *
 from utilities import *
-from session import SessionMiddleware
-import fetcher
-import filters
-from coldsweat import *
+from fetcher import *
 
-ENTRIES_PER_PAGE = 30
-FEEDS_PER_PAGE = 60
-USER_SESSION_KEY = 'FrontendApp.user'
+from session import SessionMiddleware
+
+import filters
+
+from plugins import trigger_event, load_plugins
+
+ENTRIES_PER_PAGE    = 30
+FEEDS_PER_PAGE      = 60
+USER_SESSION_KEY    = 'FrontendApp.user'
 
 def login_required(handler): 
-    def wrapper(self, request, *args):
+    @wraps(handler)
+    def wrapper(self, *args):
         if self.user:
-            return handler(self, request, *args)
+            return handler(self, *args)
         else:
-            raise self.redirect('%s/login?from=%s' % (request.application_url, filters.escape_url(request.url)))
+            raise self.redirect('%s/login?from=%s' % (self.application_url, filters.escape_url(self.request.url)))    
     return wrapper
     
 
-class FrontendApp(WSGIApp):
+class FrontendApp(WSGIApp, FeedController, UserController):
 
     def __init__(self):
+        super(FrontendApp, self).__init__()
+    
         self.alert_message = ''
         self.app_namespace = {
             'version_string'    : VERSION_STRING,
@@ -48,69 +58,43 @@ class FrontendApp(WSGIApp):
             filter = getattr(filters, name)
             self.app_namespace[filter.name] = filter
 
-    def _mark_entry(self, user, entry, status):
-        if status == 'read':
-            try:
-                Read.create(user=user, entry=entry)
-            except IntegrityError:
-                logger.debug('entry %s already marked as read, ignored' % entry.id)
-                return
-        elif status == 'unread':
-            count = Read.delete().where((Read.user==user) & (Read.entry==entry)).execute()
-            if not count:
-                logger.debug('entry %s never marked as read, ignored' % entry.id)
-                return
-        elif status == 'saved':
-            try:
-                Saved.create(user=user, entry=entry)
-            except IntegrityError:
-                logger.debug('entry %s already saved, ignored' % entry.id)
-                return
-        elif status == 'unsaved':
-            count = Saved.delete().where((Saved.user==user) & (Saved.entry==entry)).execute()
-            if not count:
-                logger.debug('entry %s never saved, ignored' % entry.id)
-                return
-        
-        logger.debug('entry %s %s' % (entry.id, status))
-
-    def _make_view_variables(self, user, request): 
+    def _make_view_variables(self): 
         
         count, group_id, feed_id, filter_name, filter_class, panel_title, page_title = 0, 0, 0, '', '', '', ''
         
-        groups = get_groups(user)    
-        r = Entry.select(Entry.id).join(Read).where((Read.user == user)).naive()
-        s = Entry.select(Entry.id).join(Saved).where((Saved.user == user)).naive()
+        groups = self.get_groups()    
+        r = Entry.select(Entry.id).join(Read).where((Read.user == self.user)).naive()
+        s = Entry.select(Entry.id).join(Saved).where((Saved.user == self.user)).naive()
         read_ids    = dict((i.id, None) for i in r)
         saved_ids   = dict((i.id, None) for i in s)
         
-        if 'saved' in request.GET:
-            count, q = get_saved_entries(user, Entry.id).count(), get_saved_entries(user)
+        if 'saved' in self.request.GET:
+            count, q = self.get_saved_entries(Entry.id).count(), self.get_saved_entries()
             panel_title = 'Saved'
             filter_class = filter_name = 'saved'
             page_title = 'Saved'
-        elif 'group' in request.GET:
-            group_id = int(request.GET['group'])    
+        elif 'group' in self.request.GET:
+            group_id = int(self.request.GET['group'])    
             group = Group.get(Group.id == group_id) 
-            count, q = get_group_entries(user, group, Entry.id).count(), get_group_entries(user, group)
+            count, q = self.get_group_entries(group, Entry.id).count(), self.get_group_entries(group)
             panel_title = group.title                
             filter_name = 'group=%s' % group_id
             page_title = group.title
-        elif 'feed' in request.GET:
-            feed_id = int(request.GET['feed'])
+        elif 'feed' in self.request.GET:
+            feed_id = int(self.request.GET['feed'])
             feed = Feed.get(Feed.id == feed_id) 
-            count, q = get_feed_entries(user, feed, Entry.id).count(), get_feed_entries(user, feed)
+            count, q = self.get_feed_entries(feed, Entry.id).count(), self.get_feed_entries(feed)
             panel_title = feed.title
             filter_class = 'feeds'
             filter_name = 'feed=%s' % feed_id
             page_title = feed.title
-        elif 'all' in request.GET:
-            count, q = get_all_entries(user, Entry.id).count(), get_all_entries(user)
+        elif 'all' in self.request.GET:
+            count, q = self.get_all_entries(Entry.id).count(), self.get_all_entries()
             panel_title = 'All'                
             filter_class = filter_name = 'all'
             page_title = 'All'
         else: # Default
-            count, q = get_unread_entries(user, Entry.id).count(), get_unread_entries(user)
+            count, q = self.get_unread_entries(Entry.id).count(), self.get_unread_entries()
             panel_title = 'Unread'
             filter_class = filter_name = 'unread'
             page_title = 'Unread'
@@ -122,23 +106,24 @@ class FrontendApp(WSGIApp):
                         
     # Views
 
-    @GET()
-    def index(self, request):
-        return self.entry_list(request)
+    @GET(r'^/$')
+    @login_required         
+    def index(self):
+        return self.entry_list()
 
     # Entries
 
     @GET(r'^/entries/(\d+)$')
     @login_required        
-    def entry(self, request, entry_id):
+    def entry(self, entry_id):
         try:
             entry = Entry.get((Entry.id == entry_id)) 
         except Entry.DoesNotExist:
             raise HTTPNotFound('No such entry %s' % entry_id)
 
-        self._mark_entry(self.user, entry, 'read')                                
+        self.mark_entry(entry, 'read')                                
 
-        q, namespace = self._make_view_variables(self.user, request)
+        q, namespace = self._make_view_variables()
         n = q.where(Entry.last_updated_on < entry.last_updated_on).order_by(Entry.last_updated_on.desc()).limit(1)
 
         namespace.update({
@@ -152,12 +137,12 @@ class FrontendApp(WSGIApp):
         
     @POST(r'^/entries/(\d+)$')
     @login_required    
-    def entry_post(self, request, entry_id):
+    def entry_post(self, entry_id):
         '''
         Mark an entry as read, unread, saved and unsaved
         '''
         try:
-            status = request.POST['as']
+            status = self.request.POST['as']
         except KeyError:
             raise HTTPBadRequest('Missing parameter as=read|unread|saved|unsaved')
 
@@ -166,26 +151,26 @@ class FrontendApp(WSGIApp):
         except Entry.DoesNotExist:
             raise HTTPNotFound('No such entry %s' % entry_id)
     
-        if 'mark' in request.POST:
-            self._mark_entry(self.user, entry, status)                        
+        if 'mark' in self.request.POST:
+            self.mark_entry(entry, status)                        
 
 
     @GET(r'^/entries/?$')
     @login_required    
-    def entry_list(self, request):
+    def entry_list(self):
         '''
         Show entries filtered and possibly paginated by: 
             unread, saved, group or feed
         '''
-        q, namespace = self._make_view_variables(self.user, request)
+        q, namespace = self._make_view_variables()
 
-        offset = int(request.GET.get('offset', 0))            
+        offset = int(self.request.GET.get('offset', 0))            
         entries = q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE)
         
         namespace.update({
             'entries'   : q.order_by(Entry.last_updated_on.desc()).offset(offset).limit(ENTRIES_PER_PAGE),
             'offset'    : offset + ENTRIES_PER_PAGE,
-            'prev_date' : request.GET.get('prev_date', None),
+            'prev_date' : self.request.GET.get('prev_date', None),
             #'count'     : count
         })
         
@@ -194,19 +179,19 @@ class FrontendApp(WSGIApp):
 
     @form(r'^/entries/mark$')
     @login_required    
-    def entry_list_post(self, request):
+    def entry_list_post(self):
         '''
         Mark feed|all entries as read
         '''
-        feed_id = int(request.GET.get('feed', 0))
+        feed_id = int(self.request.GET.get('feed', 0))
 
-        if request.method == 'GET':
+        if self.request.method == 'GET':
             now = datetime.utcnow()          
             return self.respond_with_template('_entries_mark_%s_read.html' % ('feed' if feed_id else 'all'), locals())
 
         # Handle postback
         try:
-            before = datetime.utcfromtimestamp(int(request.POST['before']))
+            before = datetime.utcfromtimestamp(int(self.request.POST['before']))
         except (KeyError, ValueError):
             raise HTTPBadRequest('Missing parameter before=time')
         
@@ -226,7 +211,7 @@ class FrontendApp(WSGIApp):
                 (Feed.last_checked_on < before) 
             ).distinct()
             message = 'SUCCESS Feed has been marked as read'
-            redirect_url = '%s/entries/?feed=%s' % (request.application_url, feed_id)
+            redirect_url = '%s/entries/?feed=%s' % (self.application_url, feed_id)
         else:
             q = Entry.select(Entry).join(Feed).join(Subscription).where(
                 (Subscription.user == self.user) &            
@@ -236,7 +221,7 @@ class FrontendApp(WSGIApp):
                 (Feed.last_checked_on < before) 
             ).distinct()
             message = 'SUCCESS All entries have been marked as read'
-            redirect_url = '%s/entries/?unread' % request.application_url
+            redirect_url = '%s/entries/?unread' % self.application_url
         
         #@@TODO: Use insert_many()
         with transaction():
@@ -254,16 +239,16 @@ class FrontendApp(WSGIApp):
 
     @GET(r'^/feeds/?$')
     @login_required    
-    def feed_list(self, request):
+    def feed_list(self):
         '''
         Show subscribed feeds for current user
         '''
         offset, group_id, feed_id, filter_class, panel_title, page_title = 0, 0, 0, 'feeds', 'Feeds', 'Feeds'
 
         error_threshold = config.fetcher.error_threshold
-        groups = get_groups(self.user)  
-        offset = int(request.GET.get('offset', 0))
-        count, q = get_feeds(self.user, Feed.id).count(), get_feeds(self.user)
+        groups = self.get_groups()  
+        offset = int(self.request.GET.get('offset', 0))
+        count, q = self.get_feeds(Feed.id).count(), self.get_feeds()
         feeds = q.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
         offset += FEEDS_PER_PAGE
         
@@ -272,7 +257,7 @@ class FrontendApp(WSGIApp):
 
     @form(r'^/feeds/edit/(\d+)$')
     @login_required    
-    def feed(self, request, feed_id):        
+    def feed(self, feed_id):        
         form_message = ''        
         try:
             feed = Feed.get(Feed.id == feed_id) 
@@ -285,43 +270,45 @@ class FrontendApp(WSGIApp):
         q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))
         groups = [s.group for s in q]
         
-        if request.method == 'GET':
+        if self.request.method == 'GET':
             return self.respond_with_template('_feed_edit.html', locals())
 
         # Handle postback
-        title = request.POST.get('title', '').strip()
+        form = self.request.POST
+        
+        title = form.get('title', '').strip()
         if not title:                
             form_message = u'ERROR Error, feed title cannot be empty'
             return self.respond_with_template('_feed_edit.html', locals())
         feed.title = title
         feed.save()
         self.alert_message = u'SUCCESS Changes have been saved.'
-        return self.respond_with_script('_modal_done.js', {'location': '%s/feeds/' % request.application_url}) 
+        return self.respond_with_script('_modal_done.js', {'location': '%s/feeds/' % self.application_url}) 
 
         
     @form(r'^/feeds/remove/(\d+)$')
     @login_required    
-    def feed_remove(self, request, feed_id):
+    def feed_remove(self, feed_id):
 
         try:
             feed = Feed.get(Feed.id == feed_id) 
         except Feed.DoesNotExist:
             raise HTTPNotFound('No such feed %s' % feed_id)
 
-        if request.method == 'GET':
-            return self.respond_with_modal('%s/feeds/remove/%d' % (request.application_url, feed.id), 
+        if self.request.method == 'GET':
+            return self.respond_with_modal('%s/feeds/remove/%d' % (self.application_url, feed.id), 
                 title=u'Remove <i>%s</i> from your subscriptions?' % feed.title, button='Remove')
 
         # Handle postback
         Subscription.delete().where((Subscription.user == self.user) & (Subscription.feed == feed)).execute()
         self.alert_message = u'SUCCESS You are no longer subscribed to <i>%s</i>.' % feed.title  
 
-        return self.redirect_after_post('%s/feeds/' % request.application_url)
+        return self.redirect_after_post('%s/feeds/' % self.application_url)
 
 
     @form(r'^/feeds/enable/(\d+)$')
     @login_required    
-    def feed_enable(self, request, feed_id):
+    def feed_enable(self, feed_id):
 
         #@@TODO: Track in which view user triggers command
         
@@ -330,8 +317,8 @@ class FrontendApp(WSGIApp):
         except Feed.DoesNotExist:
             raise HTTPNotFound('No such feed %s' % feed_id)
 
-        if request.method == 'GET':
-            return self.respond_with_modal('%s/feeds/enable/%d' % (request.application_url, feed.id), 
+        if self.request.method == 'GET':
+            return self.respond_with_modal('%s/feeds/enable/%d' % (self.application_url, feed.id), 
                 title=u'Enable <i>%s</i> again?' % feed.title, 
                 body='Coldsweat will attempt to fetch it again during the next feeds refresh.', 
                 button='Enable')
@@ -341,25 +328,25 @@ class FrontendApp(WSGIApp):
         feed.save()
         self.alert_message = u'SUCCESS Feed <i>%s</i> is now enabled.' % feed.title  
 
-        return self.redirect_after_post('%s/feeds/' % request.application_url)
+        return self.redirect_after_post('%s/feeds/' % self.application_url)
 
 
     @form(r'^/feeds/add$')
     @login_required    
-    def feed_add(self, request):        
+    def feed_add(self):        
         form_message = ''
-        groups = get_groups(self.user)
+        groups = self.get_groups()
 
         # URL could be passed via a GET (bookmarklet) or POST 
-        self_link = request.params.get('self_link', '').strip()
+        self_link = self.request.params.get('self_link', '').strip()
         
-        if request.method == 'GET':
+        if self.request.method == 'GET':
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
-        if not is_valid_url(self_link):
+        if not validate_url(self_link):
             form_message = u'ERROR Error, specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
-        response = fetcher.fetch_url(self_link)
+        response = fetch_url(self_link)
         if response:
             if response.status_code not in fetcher.POSITIVE_STATUS_CODES:
                 form_message = u'ERROR Error, feed host returned: %s' % filters.status_title(response.status_code)
@@ -369,39 +356,37 @@ class FrontendApp(WSGIApp):
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
 
-        group_id = int(request.POST.get('group', 0))
+        group_id = int(self.request.POST.get('group', 0))
         if group_id:
             group = Group.get(Group.id == group_id) 
         else:
             group = Group.get(Group.title == Group.DEFAULT_GROUP)    
 
-        fetcher.load_plugins()
+        load_plugins()
         trigger_event('fetch_started')
-        feed = Feed()
-        feed.self_link = self_link
-        feed = fetcher.add_feed(feed, fetch_icon=True, add_entries=True)                
+        feed = self.add_feed_from_url(self_link, fetch_data=True)
         trigger_event('fetch_done', [feed])                
-        subscription = fetcher.add_subscription(feed, self.user, group)
+        subscription = self.add_subscription(feed, group)
         if subscription:
             self.alert_message = u'SUCCESS Feed has been added to <i>%s</i> group' % group.title
         else:
             self.alert_message = u'INFO Feed is already in <i>%s</i> group' % group.title
-        return self.respond_with_script('_modal_done.js', {'location': '%s/?feed=%d' % (request.application_url, feed.id)}) 
+        return self.respond_with_script('_modal_done.js', {'location': '%s/?feed=%d' % (self.application_url, feed.id)}) 
 
 
     @GET(r'^/fever/?$')
-    def fever(self, request):        
+    def fever(self):        
         page_title = 'Fever Endpoint'
         return self.respond_with_template('fever.html')
 
     @GET(r'^/cheatsheet/?$')
-    def about(self, request):        
+    def about(self):        
         return self.respond_with_template('_cheatsheet.html', locals())
 
 
     @form(r'^/profile/?$')
     @login_required    
-    def profile(self, request):        
+    def profile(self):        
         
         form_message = ''
         user         = self.user
@@ -410,9 +395,11 @@ class FrontendApp(WSGIApp):
         email        = user.email
         password     = user.password
         
-        if request.method == 'POST':
-            email = request.POST.get('email', '')
-            password = request.POST.get('password', '')
+        if self.request.method == 'POST':
+            form = self.request.POST
+
+            email = form.get('email', '')
+            password = form.get('password', '')
             
             if User.validate_password(password):            
                 user.email = email
@@ -468,7 +455,7 @@ class FrontendApp(WSGIApp):
         namespace = self.app_namespace.copy()
         namespace.update({
             'request'           : self.request,
-            'application_url'   : self.request.application_url,
+            'application_url'   : self.application_url,
         })
 
         namespace.update(view_namespace or {})
@@ -478,7 +465,7 @@ class FrontendApp(WSGIApp):
             del namespace['self']
 
         response = Response(
-            render_template(filename, namespace),
+            _render_template(filename, namespace),
             content_type=content_type, charset='utf-8')
                                         
         return response
@@ -519,20 +506,22 @@ class FrontendApp(WSGIApp):
         self.session[USER_SESSION_KEY] = user
                 
     @form(r'^/login/?$')
-    def login(self, request):
+    def login(self):
 
-        username = request.params.get('username', '')        
-        password = request.params.get('password', '')
-        from_url = request.params.get('from', request.application_url)   
+        form = self.request.params
+
+        username = form.get('username', '')        
+        password = form.get('password', '')
+        from_url = form.get('from', self.application_url)   
                     
-        if request.method == 'POST':
+        if self.request.method == 'POST':
             user = User.validate_credentials(username, password)
             if user:
                 self.user = user
                 return self.redirect_after_post(from_url)
             else:
                 self.alert_message = 'ERROR Unable to log in. Check your username and password.'            
-                return self.redirect_after_post(request.url)
+                return self.redirect_after_post(self.request.url)
         
         page_title = 'Log In'
         d = locals()
@@ -541,73 +530,23 @@ class FrontendApp(WSGIApp):
         return self.respond_with_template('login.html', d)
 
     @GET(r'^/logout/?$')
-    def logout(self, request):
-        response = self.redirect(request.application_url)
+    def logout(self):
+        response = self.redirect(self.application_url)
         response.delete_cookie('_SID_')
         return response 
         
+    @staticmethod
+    def setup():
+        return SessionMiddleware(FrontendApp())
 
+#@@TODO: Use me
+def setup_app():
+    return SessionMiddleware(FrontendApp())
 
-
-# Install session support
-frontend_app = SessionMiddleware(FrontendApp())
-
-# ------------------------------------------------------
-# Template utilities
-# ------------------------------------------------------        
-            
-#@@TODO: use utilities.render_template - see https://bitbucket.org/ianb/tempita/issue/8/htmltemplate-escapes-too-much-in-inherited
-def render_template(filename, namespace):                    
-    return Template.from_filename(path.join(template_dir, filename), namespace=namespace).substitute()
-
-# ------------------------------------------------------
-# Queries
-# ------------------------------------------------------        
- 
-# Entries
-
-def _q(*select):
-    select = select or [Entry, Feed]
-    q = Entry.select(*select).join(Feed).join(Subscription)
-    return q
-    
-def get_unread_entries(user, *select):         
-    q = _q(*select).where((Subscription.user == user) &
-        ~(Entry.id << Read.select(Read.entry).where(Read.user == user))).distinct()
-    return q
-
-def get_saved_entries(user, *select):   
-    q = _q(*select).where((Subscription.user == user) & 
-        (Entry.id << Saved.select(Saved.entry).where(Saved.user == user))).distinct()
-    return q
-
-def get_all_entries(user, *select):     
-    q = _q(*select).where(Subscription.user == user).distinct()
-    return q    
-
-def get_group_entries(user, group, *select):     
-    q = _q(*select).where((Subscription.user == user) & (Subscription.group == group))
-    return q
-
-def get_feed_entries(user, feed, *select):     
-    #@@FIXME: remove check if user is subscribed to the feed before blindly return q?
-    q = _q(*select).where((Subscription.user == user) & (Subscription.feed == feed)).distinct()
-    return q
-
-# Feeds
-
-def get_feeds(user, *select):  
-    select = select or [Feed, fn.Count(Entry.id).alias('entries')]
-    q = Feed.select(*select).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == user).group_by(Feed)
-    
-    return q  
-
-# Groups
-
-def get_groups(user):     
-    q = Group.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Group.title) 
-    return q    
-
+              
+#@@TODO: use utilities.render_template - see http://bit.ly/P5Hh5m
+def _render_template(filename, namespace):                    
+    return Template.from_filename(os.path.join(template_dir, filename), namespace=namespace).substitute()
 
 # Stats
 

@@ -10,8 +10,9 @@ License: MIT (see LICENSE for details)
 from xml.etree import ElementTree
 
 from ..models import *
+from ..controllers import *
 from coldsweat import logger
-from ..fetcher import add_subscription, add_feed
+
 
 # Map OPML attr keys to Feed model 
 feed_allowed_attribs = {
@@ -63,7 +64,7 @@ def add_feeds_from_file(source, user):
                     if k in feed_allowed_attribs:
                         setattr(feed, feed_allowed_attribs[k], v)
 
-                feed = add_feed(feed, fetch_icon=True, add_entries=True)
+                feed = add_feed(feed, fetch_data=True)
                 add_subscription(feed, user, groups[-1])
                 feeds.append(feed)
             elif element.tag == 'outline':

@@ -10,7 +10,7 @@ engine: sqlite
 ;password: secret
 
 ;database: coldsweat
-; For SQLite specify a file name instead
+; For SQLite specify a file name instead 
 database: data/coldsweat.db
 
 ; Configuration settings below are all optional, default values are shown
@@ -28,20 +28,17 @@ filename: coldsweat.log
 ; Minimun number of seconds allowed between each feed fetch
 ;min_interval: 900
 
-; Number of errors before disabling feed, with 0 the setting is ignored
-;error_threshold: 50
+; Number of errors before disabling the feed, with 0 the setting is ignored
+;max_errors: 50
 
-; Do not retrieve entries older than given days, with 0 the setting is ignored
+; Do not retrieve feed entries older than given days, with 0 the setting is ignored
 ;max_history: 7
 
 ; Number of seconds before timeout a web request 
 ;timeout: 10
 
-; Enable or disable parallel feed fetching
-;multiprocessing: on
-
-; Overrides default Coldsweat user agent information
-;user_agent:
+; Number of processes to spawn during the feed fetching, 0 disables multiprocessing
+;processes: 4
 
 [web]
 

@@ -40,6 +40,10 @@ from utilities import make_sha1_hash
 from models import Session, connect, close
 from coldsweat import logger
 
+__all__ = [
+    'SessionMiddleware',
+]
+
 SESSION_TIMEOUT = 60*60*24*30 # 1 month
 
 def synchronized(func):

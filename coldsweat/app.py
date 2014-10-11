@@ -13,29 +13,41 @@ from webob import Request, Response
 from webob.exc import *
 
 from utilities import *
-from models import connect
-from coldsweat import logger, config, installation_dir
+from coldsweat import *
+
+__all__ = [
+    'GET',
+    'POST',
+    'form',
+    'WSGIApp',
+    'ExceptionMiddleware',
+    'setup_app'
+]
 
 # ------------------------------------------------------
 # Decorators
 # ------------------------------------------------------
 
+ROUTES = []
+
 def on(pattern, http_methods):    
     def wrapper(handler):         
-        handler.pattern = re.compile(pattern, re.U)
-        handler.http_methods = [m.upper() for m in http_methods]
+        route = re.compile(pattern, re.U), http_methods, handler.__name__
+        ROUTES.append(route)
         return handler         
-    return wrapper  
+    return wrapper
+        
+def GET(pattern):    
+    return on(pattern, ('GET', ))  
 
-def GET(pattern='^/$'):    
-    return on(pattern, ('get', ))  
-
-def POST(pattern='^/$'):    
-    return on(pattern, ('post', ))  
+def POST(pattern):    
+    return on(pattern, ('POST', ))  
 
 # Handler for both GET and POST requests
-def form(pattern='^/$'):    
-    return on(pattern, ('get', 'post'))  
+def form(pattern):    
+    return on(pattern, ('GET', 'POST'))  
+
+
 
 # ------------------------------------------------------
 # Base WSGI app
@@ -46,39 +58,41 @@ class WSGIApp(object):
 
     def __call__(self, environ, start_response):
         
-        self.request = Request(environ)
+        request = Request(environ)
         
-        handler, args = self.find_handler()
+        handler, args = self._find_handler(request)
         if not handler:
-            raise HTTPNotFound('No handler defined for %s (%s)' % (self.request.path_info, self.request.method))  
+            raise HTTPNotFound('No handler defined for %s (%s)' % (request.path_info, request.method))  
         if not args:
             args = ()        
-
-        # Prepare database connection
-        connect()
+                            
+        # Save request object for handlers
+        self.request            = request
+        self.application_url    = request.application_url
         
-        response = handler(self, self.request, *args)
+        response = handler(*args)
         if not response:
             response = Response() # Provide an empty response
 
         return response(environ, start_response)
     
-    def find_handler(self):
-    
+    def _find_handler(self, request):
+
         # Sanity check
         try:
-            self.request.path_info
+            request.path_info
         except KeyError:
-            self.request.path_info = ''
-                       
-        for name, handler in self.__class__.__dict__.items():        
-            if not hasattr(handler, 'pattern'):
-                continue
+            request.path_info = '' #@@TODO add / ? 
 
-            match = handler.pattern.match(self.request.path_info)            
-            if match and self.request.method in handler.http_methods:                    
-                return handler, match.groups()
-    
+        for pattern, http_methods, name in ROUTES:
+            match = pattern.match(request.path_info)        
+            if match and request.method in http_methods:                    
+                try:
+                    return getattr(self, name), match.groups()
+                except AttributeError:
+                    break # path_info matches, but app does not
+
+        # No match found
         return None, None
 
  
@@ -141,10 +155,10 @@ class ExceptionMiddleware(object):
 # Set up WSGI app
 # ------------------------------------------------------
 
-from fever import fever_app
-from frontend import frontend_app
-from cascade import Cascade
+def setup_app():    
+    # Postpone import to avoid circular dependencies
+    from fever import FeverApp
+    from frontend import FrontendApp
+    import cascade
 
-def setup_app():
-    return ExceptionMiddleware(Cascade([fever_app, frontend_app]))
-
+    return ExceptionMiddleware(cascade.Cascade([FeverApp.setup(), FrontendApp.setup()]))

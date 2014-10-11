@@ -14,10 +14,35 @@ from playhouse.migrate import *
 from playhouse.signals import Model as BaseModel, pre_save
 from webob.exc import status_map
 
+from coldsweat import *
 from utilities import *
-import favicon
-from coldsweat import config, logger
 
+__all__ = [
+    'User',
+    'Group',
+    'Feed',
+    'Entry',
+    'Read',
+    'Saved',
+    'Subscription',
+    'Session',
+    'connect',
+    'close',
+    'transaction',
+    'setup_database_schema',
+    'migrate_database_schema',
+]
+
+# Feed default icon
+_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAA"
+"f8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUtJREFUeNqk"
+"089HBGEcx/G2SaeoS0RERJElusbSIUUmsfQHFOm8lyLaUpT+hSKt0l5K2bRESod0LVIs3"
+"Yuuy5J6f/nM+Japlh5enpl5Zj/z/PhuaiOfb/hPa1KfxTSecYMyXusJaFQ/jFHMYRcvOE"
+"Om3oArPH0bs8BLHKLjr4Ai+pDCGLZR09gkbpH+LcA3W/8M+nGiZ124TgqJAmztdzhAiAA"
+"VTGBB77SihPakgLRM4Vhr79bYuguxmWwlBRRwiqruhzSjrAs50nWo8S8BdvbjaMOiNrAF"
+"e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX"
+"a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux"
+"DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
 # Defer database init, see connect() below
 engine = config.database.engine
@@ -143,6 +168,9 @@ class Feed(CustomModel):
     """
     Atom/RSS feed
     """
+
+    DEFAULT_ICON         = _ICON
+    MAX_TITLE_LENGTH     = 255
     
     is_enabled           = BooleanField(default=True)        # Fetch feed?
     self_link            = CharField()                       # The URL of the feed itself (rel=self)
@@ -180,17 +208,19 @@ class Entry(CustomModel):
     Atom/RSS entry
     """
 
-    guid            = CharField()                               # 'id' in Atom parlance
-    feed            = ForeignKeyField(Feed, on_delete='CASCADE')
-    title           = CharField()    
-    content_type    = CharField(default='text/html')
-    content         = TextField()
+    MAX_TITLE_LENGTH    = 255
+
+    guid                = CharField()                               # 'id' in Atom parlance
+    feed                = ForeignKeyField(Feed, on_delete='CASCADE')
+    title               = CharField()    
+    content_type        = CharField(default='text/html')
+    content             = TextField()
     #@@TODO: rename to published_on
-    last_updated_on = DateTimeField()                           # As UTC
+    last_updated_on     = DateTimeField()                           # As UTC
 
     # Nullable
-    author          = CharField(null=True)
-    link            = CharField(null=True)    
+    author              = CharField(null=True)
+    link                = CharField(null=True)    
     
     class Meta:
         indexes = (
@@ -285,17 +315,17 @@ def _init_postgresql():
     )
     _db.init(config.database.database, **kwargs)
 
+ENGINES = {
+    'sqlite'    : _init_sqlite,
+    'mysql'     : _init_mysql,
+    'postgresql': _init_postgresql,        
+}
+
 def connect():
     """
     Shortcut to init and connect to database
     """
-    
-    engines = {
-        'sqlite'    : _init_sqlite,
-        'mysql'     : _init_mysql,
-        'postgresql': _init_postgresql,        
-    }
-    engines[engine]()
+    ENGINES[engine]()
     _db.connect()
 
 def transaction():
@@ -320,6 +350,7 @@ def migrate_database_schema():
     # Change columns
 
     if Feed.field_exists('icon_id') and engine != 'sqlite':
+        #@@TODO: add a logger.info when engine is sqlite
         column_migrations.append(migrator.drop_column('feeds', 'icon_id'))
 
     if not Feed.field_exists('icon'):
@@ -351,7 +382,7 @@ def migrate_database_schema():
     return drop_table_migrations or column_migrations
 
 
-def setup():
+def setup_database_schema():
     """
     Create database and tables for all models and setup bootstrap data
     """

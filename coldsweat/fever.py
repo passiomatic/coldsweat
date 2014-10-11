@@ -6,37 +6,36 @@ Copyright (c) 2013—2014 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-import time, re, json
+import re, json
 from collections import defaultdict
 from datetime import datetime, timedelta
-from calendar import timegm
-from webob import Request, Response
-from webob.exc import HTTPBadRequest
-from peewee import IntegrityError
 
+from webob import Request, Response
+from webob.exc import *
+from peewee import fn, IntegrityError
+
+from coldsweat import *
 from utilities import *    
 from app import *
 from models import *
-import favicon
-from coldsweat import logger
 
-RE_DIGITS = re.compile('[0-9]+')
+RE_DIGITS           = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 10*60 # 10 minutes
-API_VERSION = 3
+API_VERSION         = 3
     
 class FeverApp(WSGIApp):
 
     @POST(r'^/fever/?$')
-    def endpoint(self, request):
-        logger.debug('client from %s requested: %s' % (request.remote_addr, request.params))
+    def endpoint(self):
+        logger.debug('client from %s requested: %s' % (self.request.remote_addr, self.request.params))
         
-        if 'api' not in request.GET:
+        if 'api' not in self.request.GET:
             raise HTTPBadRequest()
     
         result = Struct({'api_version':API_VERSION, 'auth':0})   
     
-        if 'api_key' in request.POST:
-            api_key = request.POST['api_key']        
+        if 'api_key' in self.request.POST:
+            api_key = self.request.POST['api_key']        
             user = User.validate_api_key(api_key)
             if not user: 
                 logger.warn('unknown API key %s, unauthorized' % api_key)
@@ -50,8 +49,8 @@ class FeverApp(WSGIApp):
     
         # It looks like client *can* send multiple commands at time
         for command, handler in COMMANDS:
-            if command in request.params:            
-                handler(request, user, result)
+            if command in self.request.params:            
+                handler(self.request, user, result)
     
         result.last_refreshed_on_time = get_last_refreshed_on_time()
     
@@ -65,7 +64,9 @@ class FeverApp(WSGIApp):
             charset='utf-8')        
         return response
 
-fever_app = FeverApp()
+    @staticmethod
+    def setup():
+        return FeverApp()
 
 # ------------------------------------------------------
 # Fever API commands
@@ -395,7 +396,7 @@ def get_icons():
     for feed in q:
         result.append({
             'id': feed.id,
-            'data': feed.icon if feed.icon else favicon.DEFAULT_FAVICON,
+            'data': feed.icon if feed.icon else Feed.DEFAULT_ICON,
         })
     
     return result

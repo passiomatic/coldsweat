@@ -9,6 +9,7 @@ from optparse import OptionParser, make_option
 from os import path
 from getpass import getpass
 import readline
+import sys
 
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
@@ -92,7 +93,6 @@ def command_import(parser, options, args):
     trigger_event('fetch_done', feeds)                
 
     print "%d feeds imported and fetched for user %s. See log file for more information." % (len(feeds), username)
-
     
 @command('export')
 def command_export(parser, options, args):
@@ -119,7 +119,6 @@ def command_export(parser, options, args):
         f.write(render_template(path.join(template_dir, 'export.xml'), locals()))
         
     print "%d feeds exported for user %s" % (feeds.count(), username)
-    
 
 @command('setup')
 def command_setup(parser, options, args):
@@ -138,12 +137,12 @@ def command_setup(parser, options, args):
 
     email = raw_input("Enter e-mail for user %s (hit enter to leave blank): " % username)
         
-    while True:        
-        password = getpass("Enter password for user %s: " % username)
+    while True:
+        password = read_password("Enter password for user %s: " % username)
         if not User.validate_password(password):
             print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
             continue        
-        password_again = getpass("Enter password (again): ")
+        password_again = read_password("Enter password (again): ")
         
         if password != password_again:
             print "Error: passwords do not match, please try again"
@@ -152,7 +151,6 @@ def command_setup(parser, options, args):
 
     User.create(username=username, email=email, password=password)
     print "Setup for user %s completed." % username
-
 
 @command('update')
 def command_update(parser, options, args):
@@ -167,6 +165,14 @@ def command_update(parser, options, args):
         logger.error('caught exception updating database schema: (%s)' % ex)
         print  'Error while running database update. See log file for more information.'
 
+def read_password(prompt_label="Enter password: "):
+    if sys.stdin.isatty():
+        password = getpass(prompt_label)
+    else:
+        print prompt_label
+        password = sys.stdin.readline().rstrip()
+
+    return password
 
 def pre_command(test_connection=False):  
     #try

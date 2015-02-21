@@ -48,20 +48,6 @@ class Fetcher(object):
  
         self.feed = feed
         
-
-#     def post_fetch(self, status, error=False):
-#         if status:
-#             self.feed.last_status = status
-#         if error:
-#             self.feed.error_count += 1        
-#         error_threshold = config.getint('fetcher', 'error_threshold')
-#         if error_threshold and (self.feed.error_count > config.fetcher.max_errors):
-#             self.feed.is_enabled = False
-#             self.feed.last_status = status # Save status code for posterity           
-#             logger.warn("%s has too many errors, disabled" % netloc)        
-#             self._synthesize_entry('Feed has accomulated too many errors (last was %s).' % filters.status_title(status))
-#         self.feed.save()
-
          
     def handle_304(self, response):
         '''
@@ -131,7 +117,7 @@ class Fetcher(object):
             #   deal with large seconds values
             delta = datetime_as_epoch(self.instant) - datetime_as_epoch(value)    
             if delta < config.fetcher.min_interval:
-                logger.debug("%s is below fetcher:delta, skipped" % (format_datetime(value), self.netloc))
+                logger.debug("%s is below minimun fetch interval, skipped" % self.netloc)
                 return                                      
         
         try:
@@ -157,21 +143,19 @@ class Fetcher(object):
         try:
             handler = getattr(self, 'handle_%d' % status)
             handler(response)
-        except (HTTPError, HTTPNotModified, DuplicatedFeedError): #HTTPRedirection
+        except (HTTPError, HTTPNotModified, DuplicatedFeedError):
             return # Bail out
         except AttributeError:
             logger.warn("%s replied with status %d, aborted" % (self.netloc, response.status_code))
             return
         finally:
-            #logger.debug('Saving feed')
             self.feed.save()
 
         entries = self.parse_feed(response.text)
  
         #@@TODO: Use Peewee insert_many?
 
-        #@@TODO: self.fetch_icon()
-
+        self.fetch_icon()
         
 
     def parse_feed(self, data):
@@ -210,7 +194,7 @@ class Fetcher(object):
         
             # Skip ancient entries        
             if (self.instant - timestamp).days > config.fetcher.max_history:
-                logger.debug("entry %s from %s is over fetcher:entry_delta, skipped" % (guid, self.netloc))
+                logger.debug("entry %s from %s is over maximum history, skipped" % (guid, self.netloc))
                 continue
     
             try:
@@ -233,8 +217,7 @@ class Fetcher(object):
             )
             trigger_event('entry_parsed', entry, entry_dict)
             entry.save()
-            #@@ entries.append(entry)
-
+            #@@TODO: entries.append(entry)
     
             logger.debug(u"parsed entry %s from %s" % (guid, self.netloc))  
         
@@ -246,25 +229,26 @@ class Fetcher(object):
         if not self.feed.icon or not self.feed.icon_last_updated_on or (self.instant - self.feed.icon_last_updated_on).days > FETCH_ICONS_DELTA:
             # Prefer alternate_link if available since self_link could 
             #   point to Feed Burner or similar services
-            self.feed.icon = self._google_favicon_fetcher(self.feed.alternate_link or self.feed.self_link)
-            self.feed.icon_last_updated_on = self.instant
+            self.feed.icon                  = self._google_favicon_fetcher(self.feed.alternate_link or self.feed.self_link)
+            self.feed.icon_last_updated_on  = self.instant
+
             logger.debug("saved favicon %s..." % (self.feed.icon[:70]))    
+            self.feed.save()
 
     
-    def _google_favicon_fetcher(url):
+    def _google_favicon_fetcher(self, url):
         '''
         Fetch a site favicon via Google service
         '''
-        endpoint = "http://www.google.com/s2/favicons?domain=%s" % urlparse.urlslit(url).hostname
+        endpoint = "http://www.google.com/s2/favicons?domain=%s" % urlparse.urlsplit(url).hostname
     
         try:
-            #@@TODO: Use fetch_url
-            result = requests.get(endpoint)
+            response = fetch_url(endpoint)
         except RequestException, exc:
             logger.warn("could not fetch favicon for %s (%s)" % (url, exc))
-            return filters.icon(None)
+            return filters.icon(None) # Default icon
     
-        return make_data_uri(result.headers['Content-Type'], result.content)
+        return make_data_uri(response.headers['Content-Type'], response.content)
 
 
     def add_synthesized_entry(self, title, content_type, content):
@@ -445,9 +429,9 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
         
     try:
         response = requests.get(url, timeout=timeout, headers=request_headers)
-    except (RequestException, ), ex:
-        logger.debug("tried to fetch %s but got %s" % (url, ex.__class__.__name__))
-        raise ex
+    except (RequestException, ), exc:
+        logger.debug("tried to fetch %s but got %s" % (url, exc.__class__.__name__))
+        raise exc
     
     return response
 

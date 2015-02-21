@@ -18,6 +18,7 @@ from coldsweat import *
 from utilities import *    
 from app import *
 from models import *
+import filters
 
 RE_DIGITS           = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 10*60 # 10 minutes
@@ -396,7 +397,7 @@ def get_icons():
     for feed in q:
         result.append({
             'id': feed.id,
-            'data': feed.icon if feed.icon else Feed.DEFAULT_ICON,
+            'data': filters.icon(feed.icon),
         })
     
     return result

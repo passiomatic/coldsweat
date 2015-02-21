@@ -10,7 +10,7 @@ def feed_status(feed, threshold):
 
 {{def render_feeds}}
     {{for loop, f in looper(feeds)}}
-        <li class="feed {{if loop.first}}current{{endif}} {{feed_status(f, error_threshold)}}">
+        <li class="feed {{if loop.first}}current{{endif}} {{feed_status(f, max_errors)}}">
             <div class="item-inner">
                 <h3 class="h4">
                     <img class="favicon" src="{{f.icon|icon}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>

@@ -9,7 +9,6 @@ License: MIT (see LICENSE for details)
 
 import sys, os, re, time, urlparse
 from datetime import datetime
-from abc import ABCMeta, abstractproperty
 
 from peewee import JOIN_LEFT_OUTER, fn, IntegrityError
 import feedparser
@@ -32,7 +31,6 @@ ENTRY_TAG_URI           = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
 class BaseController(object):
 
     def __init__(self):
-        #print '*** Connect to db ***'
         connect()
         
     def __del__(self):
@@ -40,20 +38,16 @@ class BaseController(object):
 
 class UserController(BaseController):
     '''
-    User controller class. Derived classes must implement the user property
+    Base user controller class. Derived classes must implement the user property
     '''
     
-    __metaclass__ = ABCMeta
-    
     @property
-    @abstractproperty    
     def user(self):
-        pass
+        raise NotImplementedError
 
     @user.setter
-    @abstractproperty    
     def user(self, user):
-        pass
+        raise NotImplementedError
         
     def add_subscription(self, feed, group):
         '''
@@ -187,8 +181,8 @@ class FeedController(BaseController):
             pass
 
         feed.save()        
-#         if fetch_data:
-#             self.fetch_feeds([feed])
+        if fetch_data:
+            self.fetch_feeds([feed])
         return feed
 
 #     #@@TODO:  delete feed if there are no subscribers
@@ -249,7 +243,6 @@ def feed_worker(feed):
         logger.debug("feed %s has no subscribers, skipped" % feed.self_link)
         return
 
-    #connect()
     fetcher = Fetcher(feed)
     fetcher.fetch_feed()
                         

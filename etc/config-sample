@@ -46,5 +46,6 @@ filename: coldsweat.log
 ;static_url: http://media.example.com/static
 
 [plugins]
+
 ; Comma separated list of plugins to load
 ;load : scrubber

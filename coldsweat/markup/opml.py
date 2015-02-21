@@ -28,7 +28,7 @@ group_allowed_attribs = {
     'text': 'title', # Alias for title
 }
 
-def add_feeds_from_file(source, user):
+def add_feeds_from_file(source):
     """
     Add feeds to database reading from a file containing OPML data. 
     """    
@@ -36,7 +36,9 @@ def add_feeds_from_file(source, user):
 
     feeds = []    
     groups = [default_group]
-    
+
+    fc = FeedController()
+
     for event, element in ElementTree.iterparse(source, events=('start','end')):
         if event == 'start':
              if (element.tag == 'outline') and ('xmlUrl' not in element.attrib):
@@ -57,6 +59,7 @@ def add_feeds_from_file(source, user):
 
         elif event == 'end':
             if (element.tag == 'outline') and ('xmlUrl' in element.attrib):
+
                 # Leaving a feed
                 feed = Feed()
 
@@ -64,9 +67,9 @@ def add_feeds_from_file(source, user):
                     if k in feed_allowed_attribs:
                         setattr(feed, feed_allowed_attribs[k], v)
 
-                feed = add_feed(feed, fetch_data=True)
-                add_subscription(feed, user, groups[-1])
-                feeds.append(feed)
+                
+                feed = fc.add_feed(feed)  
+                feeds.append((feed, groups[-1]))
             elif element.tag == 'outline':
                 # Leaving a group
                 groups.pop()

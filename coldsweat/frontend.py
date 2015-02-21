@@ -245,7 +245,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         '''
         offset, group_id, feed_id, filter_class, panel_title, page_title = 0, 0, 0, 'feeds', 'Feeds', 'Feeds'
 
-        error_threshold = config.fetcher.error_threshold
+        max_errors = config.fetcher.max_errors
         groups = self.get_groups()  
         offset = int(self.request.GET.get('offset', 0))
         count, q = self.get_feeds(Feed.id).count(), self.get_feeds()

@@ -302,9 +302,10 @@ def feed_worker(feed):
         logger.debug("feed %s has no subscribers, skipped" % feed.self_link)
         return
 
+    # Each worker has its own connection
+    connect()
     fetcher = Fetcher(feed)
     fetcher.fetch_feed()
-                        
 
         
         

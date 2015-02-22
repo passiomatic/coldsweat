@@ -10,7 +10,7 @@ License: MIT (see LICENSE for details)
 import feedparser    
 
 from os import path
-from ..markup.html import scrub_html
+from ..markup import scrub_html
 
 def run_tests():
 

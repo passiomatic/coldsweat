@@ -11,7 +11,7 @@ import os
 
 from coldsweat import *
 from coldsweat.plugins import *
-from coldsweat.markup import html
+from coldsweat import markup
 
 DOMAINS = []    
 
@@ -36,4 +36,4 @@ def fetcher_started():
 @event('entry_parsed')
 def entry_parsed(entry, parsed_entry):
     if DOMAINS and ('html' in entry.content_type):
-        entry.content = html.scrub_html(entry.content, DOMAINS)    
+        entry.content = markup.scrub_html(entry.content, DOMAINS)    

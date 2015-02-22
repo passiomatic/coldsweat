@@ -8,7 +8,7 @@ License: MIT (see LICENSE for details)
 '''
 
 from os import path
-from ..markup.html import find_feed_link
+from ..markup import find_feed_link
 
 def run_tests():
 

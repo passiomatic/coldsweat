@@ -10,7 +10,7 @@ License: MIT (see LICENSE for details)
 import feedparser    
 
 from os import path
-from ..markup.html import BaseProcessor
+from ..markup import BaseProcessor
 
 def run_tests():
 

@@ -22,12 +22,7 @@ from utilities import *
 from plugins import trigger_event, load_plugins
 from filters import escape_html, status_title
 from coldsweat import *
-from markup import html
 from fetcher import *
-
-
-FETCH_ICONS_DELTA       = 30 # Days
-ENTRY_TAG_URI           = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
 
 
 class BaseController(object):

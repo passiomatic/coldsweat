@@ -23,7 +23,7 @@ from plugins import trigger_event
 from models import *
 from utilities import *
 
-from markup import html #@@TODO: Consolidate into a single module
+import markup
 import filters
 
 __all__ = [
@@ -34,6 +34,7 @@ __all__ = [
 ]
 
 FETCH_ICONS_DELTA = 30 # Days
+ENTRY_TAG_URI     = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
 
 class Fetcher(object):
     '''
@@ -265,7 +266,7 @@ class Fetcher(object):
         except NotImplementedError: # urandom might not be available on certain platforms
             nonce = now.isoformat()
             
-        guid = ENTRY_TAG_URI % (now.year, make_sha1_hash(self.feed.self_link + nonce))
+        guid = ENTRY_TAG_URI % (self.instant.year, make_sha1_hash(self.feed.self_link + nonce))
         
         entry = Entry(
             feed              = self.feed,
@@ -284,7 +285,7 @@ class Fetcher(object):
     def _synthesize_entry(self, reason):    
         title   = u'This feed has been disabled'
         content = render_template(os.path.join(template_dir, '_entry_feed_disabled.html'), {'reason': reason})
-        return self.add_synthesized_entry(self.feed, title, 'text/html', content)                     
+        return self.add_synthesized_entry(title, 'text/html', content)                     
         
         
         
@@ -315,7 +316,7 @@ class FeedTranslator(object):
         
     def get_title(self):
         if 'title' in self.feed_dict:
-            return truncate(html.strip_html(self.feed_dict.title), Feed.MAX_TITLE_LENGTH)
+            return truncate(markup.strip_html(self.feed_dict.title), Feed.MAX_TITLE_LENGTH)
         return None
 
 
@@ -345,7 +346,7 @@ class EntryTranslator(object):
             
     def get_title(self, default):
         if 'title' in self.entry_dict:
-            return truncate(html.strip_html(self.entry_dict.title), Entry.MAX_TITLE_LENGTH)
+            return truncate(markup.strip_html(self.entry_dict.title), Entry.MAX_TITLE_LENGTH)
         return default
     
     def get_content(self, default):

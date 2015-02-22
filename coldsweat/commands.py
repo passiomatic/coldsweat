@@ -24,7 +24,7 @@ import cascade
 
 from utilities import render_template
 from plugins import trigger_event, load_plugins
-from markup import opml
+
 
 class CommandError(Exception):
     pass
@@ -65,7 +65,7 @@ class CommandController(FeedController, UserController):
     
         self.user = self._get_user(options.username)
     
-        feeds = opml.add_feeds_from_file(args[0])
+        feeds = self.add_feeds_from_file(args[0])
         for feed, group in feeds:
             self.add_subscription(feed, group)
     

@@ -429,7 +429,7 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
         
     try:
         response = requests.get(url, timeout=timeout, headers=request_headers)
-    except (RequestException, ), exc:
+    except RequestException, exc:
         logger.debug("tried to fetch %s but got %s" % (url, exc.__class__.__name__))
         raise exc
     

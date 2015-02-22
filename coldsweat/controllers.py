@@ -298,9 +298,9 @@ class FeedController(BaseController):
 def feed_worker(feed):
 
     #@@REMOVEME: just delete feed if there are no subscribers
-    if not feed.subscriptions:
-        logger.debug("feed %s has no subscribers, skipped" % feed.self_link)
-        return
+#     if not feed.subscriptions:
+#         logger.debug("feed %s has no subscribers, skipped" % feed.self_link)
+#         return
 
     # Each worker has its own connection
     connect()

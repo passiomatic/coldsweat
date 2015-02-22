@@ -346,14 +346,14 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         if not validate_url(self_link):
             form_message = u'ERROR Error, specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
-        response = fetch_url(self_link)
-        if response:
-            if response.status_code not in fetcher.POSITIVE_STATUS_CODES:
-                form_message = u'ERROR Error, feed host returned: %s' % filters.status_title(response.status_code)
-                return self.respond_with_template('_feed_add_wizard_1.html', locals())
-        else:
-            form_message = u'ERROR Error, a network error occured'
+        try:
+            response = fetch_url(self_link)
+        except RequestException, exc:
+            form_message = u'ERROR Error, feed address is incorrect or host is unreachable.'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
+        #else:
+            #form_message = u'ERROR Error, a network error occured'
+            #return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
 
         group_id = int(self.request.POST.get('group', 0))
@@ -362,10 +362,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         else:
             group = Group.get(Group.title == Group.DEFAULT_GROUP)    
 
-        load_plugins()
-        trigger_event('fetch_started')
         feed = self.add_feed_from_url(self_link, fetch_data=True)
-        trigger_event('fetch_done', [feed])                
         subscription = self.add_subscription(feed, group)
         if subscription:
             self.alert_message = u'SUCCESS Feed has been added to <i>%s</i> group' % group.title

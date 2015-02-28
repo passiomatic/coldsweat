@@ -7,7 +7,7 @@
   <div class="modal-body">          
         {{form_message|alert}}
         <label for="self-link-field">Web address (URL) for the feed</label> 
-        <input type="text" id="field-self-link" autofocus name="self_link"  size="40" value="{{self_link}}">
+        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}">
         {{if length(groups) > 1}}
             <label>Add to group <select name="group">
                 {{for g in groups}}

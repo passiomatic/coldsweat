@@ -391,11 +391,12 @@ BLACKLIST_QS = ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_
      
 # Lifted from https://github.com/django/django/blob/master/django/core/validators.py
 RE_URL = re.compile(
-    r'^https?://'  # http:// or https://
+    r'^https?://'                           # http:// or https://
+    r'(?:[^:@/]+:[^:@/]+@)?'                # credentials
     r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
-    r'localhost|'  # localhost...
-    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-    r'(?::\d+)?'  # optional port
+    r'localhost|'                           # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+    r'(?::\d+)?'                            # optional port
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)    
     #@@TODO: Add IPv6
     
@@ -454,9 +455,10 @@ def run_tests():
     
     assert scrub_url('http://example.org/feed.xml?utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml'     
     assert scrub_url('http://example.org/feed.xml?a=1&a=2&b=1&utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml?a=1&a=2&b=1'
-    assert validate_url('https://example.com')          # OK
-    assert validate_url('http://example.org/feed.xml')  # OK
-    assert not validate_url('example.com')              # Fail
+    assert validate_url('https://user.name:password123@example.com/feed.xml')   # OK
+    assert validate_url('https://example.com')                                  # OK
+    assert validate_url('http://example.org/feed.xml')                          # OK
+    assert not validate_url('example.com')                                      # Fail
 
 if __name__ == '__main__':
     run_tests()

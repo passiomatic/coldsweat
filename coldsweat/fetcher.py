@@ -247,7 +247,7 @@ class Fetcher(object):
             response = fetch_url(endpoint)
         except RequestException, exc:
             logger.warn("could not fetch favicon for %s (%s)" % (url, exc))
-            return filters.icon(None) # Default icon
+            return Feed.DEFAULT_ICON
     
         return make_data_uri(response.headers['Content-Type'], response.content)
 

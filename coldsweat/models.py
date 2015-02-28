@@ -33,6 +33,17 @@ __all__ = [
     'migrate_database_schema',
 ]
 
+# Feed default icon
+_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAA\
+f8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAUtJREFUeNqk\
+089HBGEcx/G2SaeoS0RERJElusbSIUUmsfQHFOm8lyLaUpT+hSKt0l5K2bRESod0LVIs3\
+Yuuy5J6f/nM+Japlh5enpl5Zj/z/PhuaiOfb/hPa1KfxTSecYMyXusJaFQ/jFHMYRcvOE\
+Om3oArPH0bs8BLHKLjr4Ai+pDCGLZR09gkbpH+LcA3W/8M+nGiZ124TgqJAmztdzhAiAA\
+VTGBB77SihPakgLRM4Vhr79bYuguxmWwlBRRwiqruhzSjrAs50nWo8S8BdvbjaMOiNrAF\
+e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
+a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
+DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
+
 # Defer database init, see connect() below
 engine = config.database.engine
 if engine == 'sqlite':
@@ -158,6 +169,7 @@ class Feed(CustomModel):
     Atom/RSS feed
     """
 
+    DEFAULT_ICON         = _ICON
     MAX_TITLE_LENGTH     = 255
     
     is_enabled           = BooleanField(default=True)        # Fetch feed?
@@ -191,6 +203,11 @@ class Feed(CustomModel):
             return datetime_as_epoch(self.last_updated_on)
         return 0 
 
+    @property
+    def icon_or_default(self):
+        return self.icon if self.icon else Feed.DEFAULT_ICON
+        
+        
 class Entry(CustomModel):
     """
     Atom/RSS entry

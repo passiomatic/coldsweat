@@ -397,7 +397,7 @@ def get_icons():
     for feed in q:
         result.append({
             'id': feed.id,
-            'data': filters.icon(feed.icon),
+            'data': feed.icon_or_default
         })
     
     return result

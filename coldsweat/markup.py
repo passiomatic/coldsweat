@@ -11,12 +11,12 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 from HTMLParser import HTMLParser, HTMLParseError
 import urlparse
 
+from filters import escape_html
+from coldsweat import logger
 
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
 HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
 
-from ..filters import escape_html
-from coldsweat import logger
 
 def _normalize_attrs(attrs):
     '''

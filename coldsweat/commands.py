@@ -5,181 +5,156 @@ Description: sweat utility commands
 Copyright (c) 2013—2014 Andrea Peltrin
 License: MIT (see LICENSE for details)
 """
+import os
 from optparse import OptionParser, make_option
-from os import path
 from getpass import getpass
 import readline
 
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
 
-from coldsweat import fetcher, template_dir, trigger_event
-from coldsweat.markup import opml
-from coldsweat.models import *
-from coldsweat.app import ExceptionMiddleware
-from coldsweat.fever import fever_app
-from coldsweat.frontend import frontend_app
-from coldsweat.cascade import Cascade
-from coldsweat.utilities import render_template
+from coldsweat import *
+from models import *
+from controllers import *
+from app import *
 
-MIN_PASSWORD_LENGTH = 8
+import cascade, fever, frontend
+from utilities import render_template
+from plugins import trigger_event, load_plugins
 
-COMMANDS = {}
 
-def command(name):        
-    '''
-    Decorator to define a command
-    '''
-    def _(handler):
-        COMMANDS[name] = handler
-        return handler                
-    return _
+class CommandError(Exception):
+    pass
+
+class CommandController(FeedController, UserController):
     
-# ---------------------------------
-# Commands 
-# ---------------------------------
-
-# @command('help')
-# def command_help(parser, options, args):
-#     if not args:
-#         parser.error("no command name given")
-# 
-#     handler = COMMANDS[args[0]]
-#     #parser.print_usage()
-#     print '%s: %s' % (args[0], handler.__doc__)
-
-@command('serve')
-def command_serve(parser, options, ags):
-    '''Starts a local server'''
-
-    static_app = DirectoryApp("static", index_page=None)
+    def _get_user(self, username):
+        try:
+            user = User.get(User.username == username)
+        except User.DoesNotExist:
+            raise CommandError('unable to find user %s. Use -u option to specify a different user' % username)
     
-    # Create a cascade that looks for static files first, 
-    #  then tries the other apps
-    cascade_app = ExceptionMiddleware(Cascade([static_app, fever_app, frontend_app]))
-    
-    httpd = make_server('localhost', options.port, cascade_app)
-    print 'Serving on http://localhost:%s' % options.port
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print 'Interrupted by user'    
-    
-@command('refresh')
-def command_refresh(parser, options, ags):
-    '''Starts a feeds refresh procedure'''
+        return user
 
-    counter = fetcher.fetch_feeds()    
-    print 'Refresh completed. See log file for more information'
 
-@command('import')
-def command_import(parser, options, args):
-    '''Imports feeds from OPML file'''
+    def run_command(self, name, options, args):    
+        try:
+            handler = getattr(self, 'command_%s' % name)
+        except AttributeError:
+            raise CommandError('unrecognized command %s, use the -h option for a list of available commands' % name)
 
-    if not args:
-        parser.error("no OPML file given")
-
-    username = options.username
-
-    try:
-        user = User.get(User.username == username)
-    except User.DoesNotExist:
-        parser.error("unable to find user %s. Use -u option to specify a different user" % username)
-
-    fetcher.load_plugins()
-    trigger_event('fetch_started')
-    feeds = opml.add_feeds_from_file(args[0], user)
-    trigger_event('fetch_done', feeds)                
-
-    print "%d feeds imported and fetched for user %s. See log file for more information." % (len(feeds), username)
-
-    
-@command('export')
-def command_export(parser, options, args):
-    '''Exports feeds to OPML file'''
-
-    if not args:
-        parser.error("no OPML file given")
-
-    username = options.username
-
-    try:
-        user = User.get(User.username == username)
-    except User.DoesNotExist:
-        parser.error("unable to find user %s. Use -u option to specify a different user" % username)
-    
-    #default_group = Group.get(Group.title == Group.DEFAULT_GROUP)
-    
-    filename = args[0]
-    
-    timestamp = format_http_datetime(datetime.utcnow())
-    feeds = Feed.select().join(Subscription).where(Subscription.user == user).distinct().order_by(Feed.title)
-    
-    with open(filename, 'w') as f:
-        f.write(render_template(path.join(template_dir, 'export.xml'), locals()))
+        handler(options, args)        
         
-    print "%d feeds exported for user %s" % (feeds.count(), username)
+    # Feeds
+     
+    def command_import(self, options, args):
+        '''Imports feeds from OPML file'''
     
-
-@command('setup')
-def command_setup(parser, options, args):
-    '''Sets up a working database'''
-    username = options.username
-
-    setup()
-
-    # Check if username is already in use
-    try:
-        User.get(User.username == username)
-        print "Error: user %s already exists, please select another username with the -u option" % username     
-        return 
-    except User.DoesNotExist:
-        pass
-
-    email = raw_input("Enter e-mail for user %s (hit enter to leave blank): " % username)
-        
-    while True:        
-        password = getpass("Enter password for user %s: " % username)
-        if not User.validate_password(password):
-            print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
-            continue        
-        password_again = getpass("Enter password (again): ")
-        
-        if password != password_again:
-            print "Error: passwords do not match, please try again"
-        else:
-            break
-
-    User.create(username=username, email=email, password=password)
-    print "Setup for user %s completed." % username
-
-
-@command('update')
-def command_update(parser, options, args):
-    '''Update Coldsweat internals from a previous version'''
-
-    try:
-        if migrate_database_schema():
-            print 'Update completed.'
-        else:
-            print 'Database is already up-to-date.'
-    except OperationalError, ex:         
-        logger.error('caught exception updating database schema: (%s)' % ex)
-        print  'Error while running database update. See log file for more information.'
-
-
-def pre_command(test_connection=False):  
-    #try
-    connect()
-    #except ...
+        if not args:
+            raise CommandError('no OPML file given')
     
-    return True
+        self.user = self._get_user(options.username)
+    
+        feeds = self.add_feeds_from_file(args[0])
+        for feed, group in feeds:
+            self.add_subscription(feed, group)
+    
+        print "%d feeds imported for user %s. See log file for more information." % (len(feeds), self.user.username)
+
+
+    def command_export(self, options, args):
+        '''Exports feeds to OPML file'''
+    
+        if not args:
+            raise CommandError('no OPML file given')
+    
+        self.user = self._get_user(options.username)
+    
+        filename = args[0]
+        
+        timestamp = format_http_datetime(datetime.utcnow())
+        feeds = Feed.select().join(Subscription).where(Subscription.user == self.user).distinct().order_by(Feed.title)
+        
+        with open(filename, 'w') as f:
+            f.write(render_template(os.path.join(template_dir, 'export.xml'), locals()))
+            
+        print "%d feeds exported for user %s" % (feeds.count(), self.user.username)    
+
+
+    def command_refresh(self, options, args):
+        '''Starts a feeds refresh procedure'''
+    
+        self.fetch_all_feeds()
+        print 'Refresh completed. See log file for more information'
+
+    # Local server
+
+    def command_serve(self, options, args):
+        '''Starts a local server'''
+    
+        static_app = DirectoryApp("static", index_page=None)
+        
+        # Create a cascade that looks for static files first, 
+        #  then tries the other apps
+        cascade_app = ExceptionMiddleware(cascade.Cascade([static_app, fever.setup_app(), frontend.setup_app()]))
+        
+        address = '0.0.0.0' if options.allow_remote_access else 'localhost'        
+        httpd = make_server(address, options.port, cascade_app)
+        print 'Serving on http://%s:%s' % (address, options.port)
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print 'Interrupted by user'            
+    
+    # Setup and update
+ 
+    def command_setup(self, options, args):
+        '''Sets up a working database'''
+        username = options.username
+    
+        setup_database_schema()
+    
+        # Check if username is already in use
+        try:
+            User.get(User.username == username)
+            raise CommandError('user %s already exists, please select another username with the -u option' % username)
+        except User.DoesNotExist:
+            pass
+    
+        email = raw_input('Enter e-mail for user %s (hit enter to leave blank): ' % username)
+            
+        while True:        
+            password = getpass('Enter password for user %s: ' % username)
+            if not User.validate_password(password):
+                print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
+                continue        
+            password_again = getpass('Enter password (again): ')
+            
+            if password != password_again:
+                print 'Error: passwords do not match, please try again'
+            else:
+                break
+    
+        User.create(username=username, email=email, password=password)
+        print "Setup for user %s completed." % username
+
+    def command_update(self, options, args):
+        '''Update Coldsweat internals from a previous version'''
+        
+        try:
+            if migrate_database_schema():
+                print 'Update completed.'
+            else:
+                print 'Database is already up-to-date.'
+        except OperationalError, ex:         
+            logger.error('caught exception updating database schema: (%s)' % ex)
+            print  'Error while running database update. See log file for more information.'
 
 def run():
 
     default_username, _ = User.DEFAULT_CREDENTIALS
 
-    epilog = "Available commands are: %s" % ', '.join(sorted([name for name in COMMANDS]))
+    epilog = "Available commands are: %s" % ', '.join(sorted('import export serve setup upgrade refresh'.split()))
     usage='%prog command [options] [args]'
 
     available_options = [
@@ -189,22 +164,20 @@ def run():
 #             dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
         make_option('-p', '--port', default='8080', 
             dest='port', type='int', help='the port to serve on (default 8080)'),
-#         make_option('-v', '--verbose',
-#             dest='verbose', action='store_true', help=''),
+        make_option('-r', '--allow-remote-access', action='store_true', dest='allow_remote_access', help='binds to 0.0.0.0 instead of localhost'),
     ]
         
     parser = OptionParser(option_list=available_options, usage=usage, epilog=epilog)
- 
-    options, args = parser.parse_args()
+     
+    command_options, args = parser.parse_args()
     if not args:
         parser.error('no command given, use the -h option for a list of available commands')
         
     command_name, command_args = args[0].lower(), args[1:]
+
+    cc = CommandController()
+    try:
+        cc.run_command(command_name, command_options, command_args)
+    except CommandError, ex:
+        parser.error(ex)
     
-    if command_name in COMMANDS:
-        handler = COMMANDS[command_name]
-        pre_command()
-        handler(parser, options, command_args)        
-    else:
-        parser.error("unrecognized command %s, use the -h option for a list of available commands" % command_name)
-        

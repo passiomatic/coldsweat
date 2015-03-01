@@ -40,6 +40,10 @@ from utilities import make_sha1_hash
 from models import Session, connect, close
 from coldsweat import logger
 
+__all__ = [
+    'SessionMiddleware',
+]
+
 SESSION_TIMEOUT = 60*60*24*30 # 1 month
 
 def synchronized(func):
@@ -90,7 +94,7 @@ class SessionMiddleware(object):
 
 class SessionManager(object):
  
-    def __init__(self, environ, fieldname='_SID_', path='/'):   
+    def __init__(self, environ, fieldname, path='/'):   
         self._cache = SessionCache()
         self._fieldname = fieldname
         self._path = path
@@ -279,14 +283,12 @@ def delete_session(sid):
 
 def set_session(sid, value, timeout=SESSION_TIMEOUT):
 
-    # Calculate expiration time
-    expires_on = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
-
     session = get_session(sid)
     if not session:
         # New session if sid not present
         session = Session(key=sid)
+        logger.debug("session %s created" % sid)
 
-    session.expires_on = expires_on
+    session.expires_on = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
     session.value = value
     session.save()

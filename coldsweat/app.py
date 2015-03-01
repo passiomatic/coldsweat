@@ -157,8 +157,5 @@ class ExceptionMiddleware(object):
 
 def setup_app():    
     # Postpone import to avoid circular dependencies
-    from fever import FeverApp
-    from frontend import FrontendApp
-    import cascade
-
-    return ExceptionMiddleware(cascade.Cascade([FeverApp.setup(), FrontendApp.setup()]))
+    import fever, frontend, cascade
+    return ExceptionMiddleware(cascade.Cascade([fever.setup_app(), frontend.setup_app()]))

@@ -18,10 +18,7 @@ from models import *
 from controllers import *
 from app import *
 
-from fever import FeverApp
-from frontend import FrontendApp
-import cascade
-
+import cascade, fever, frontend
 from utilities import render_template
 from plugins import trigger_event, load_plugins
 
@@ -99,7 +96,7 @@ class CommandController(FeedController, UserController):
         
         # Create a cascade that looks for static files first, 
         #  then tries the other apps
-        cascade_app = ExceptionMiddleware(cascade.Cascade([static_app, FeverApp.setup(), FrontendApp.setup()]))
+        cascade_app = ExceptionMiddleware(cascade.Cascade([static_app, fever.setup_app(), frontend.setup_app()]))
         
         address = '0.0.0.0' if options.allow_remote_access else 'localhost'        
         httpd = make_server(address, options.port, cascade_app)

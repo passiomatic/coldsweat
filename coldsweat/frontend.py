@@ -30,6 +30,7 @@ from plugins import trigger_event, load_plugins
 ENTRIES_PER_PAGE    = 30
 FEEDS_PER_PAGE      = 60
 USER_SESSION_KEY    = 'FrontendApp.user'
+COOKIE_SESSION_KEY  = '_SID_'
 
 def login_required(handler): 
     @wraps(handler)
@@ -529,16 +530,12 @@ class FrontendApp(WSGIApp, FeedController, UserController):
     @GET(r'^/logout/?$')
     def logout(self):
         response = self.redirect(self.application_url)
-        response.delete_cookie('_SID_')
+        response.delete_cookie(COOKIE_SESSION_KEY)
         return response 
-        
-    @staticmethod
-    def setup():
-        return SessionMiddleware(FrontendApp())
 
-#@@TODO: Use me
+
 def setup_app():
-    return SessionMiddleware(FrontendApp())
+    return SessionMiddleware(FrontendApp(), fieldname=COOKIE_SESSION_KEY)
 
               
 #@@TODO: use utilities.render_template - see http://bit.ly/P5Hh5m

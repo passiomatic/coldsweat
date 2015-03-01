@@ -72,10 +72,6 @@ class FeverApp(WSGIApp, FeedController, UserController):
             charset='utf-8')        
         return response
 
-    @staticmethod
-    def setup():
-        return FeverApp()
-
     # ------------------------------------------------------
     # Fever API commands
     # ------------------------------------------------------    
@@ -301,6 +297,9 @@ class FeverApp(WSGIApp, FeedController, UserController):
     def links_command(self, result):
         # Hot links (unsupported)
         result.links = []     
+
+def setup_app():
+    return FeverApp()
 
 # ------------------------------------------------------
 # Specific Fever queries

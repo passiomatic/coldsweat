@@ -271,7 +271,7 @@ def get_session(sid, default=None):
     # Expired?
     if session.expires_on < datetime.utcnow().replace(microsecond=0):
         session.delete_instance()
-        logger.debug("session %s is expired, deleted" % sid)
+        logger.debug(u"session %s is expired, deleted" % sid)
         return default
     
     return session
@@ -287,7 +287,7 @@ def set_session(sid, value, timeout=SESSION_TIMEOUT):
     if not session:
         # New session if sid not present
         session = Session(key=sid)
-        logger.debug("session %s created" % sid)
+        logger.debug(u"session %s created" % sid)
 
     session.expires_on = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
     session.value = value

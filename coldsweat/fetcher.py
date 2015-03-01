@@ -54,7 +54,7 @@ class Fetcher(object):
         '''
         Not modified
         '''
-        logger.debug("%s hasn't been modified, skipped" % self.netloc)        
+        logger.debug(u"%s hasn't been modified, skipped" % self.netloc)        
         
         raise HTTPNotModified
 
@@ -65,7 +65,7 @@ class Fetcher(object):
         self.feed.is_enabled    = False
         self.feed.error_count   += 1        
 
-        logger.warn("%s is gone, disabled" % self.netloc)
+        logger.warn(u"%s is gone, disabled" % self.netloc)
         self._synthesize_entry('Feed has been removed from the origin server.')
         
         raise HTTPGone
@@ -80,14 +80,14 @@ class Fetcher(object):
             Feed.get(self_link=self_link)
         except Feed.DoesNotExist:
             self.feed.self_link = self_link                               
-            logger.info("%s has changed its location, updated to %s" % (self.netloc, self_link))
+            logger.info(u"%s has changed its location, updated to %s" % (self.netloc, self_link))
         else:
             self.feed.is_enabled    = False
             self.last_status        = DuplicatedFeedError.code
             self.feed.error_count   += 1 
             
             self._synthesize_entry('Feed has a duplicated web address.')
-            logger.warn("new %s location %s is duplicated, disabled" % (self.netloc, self_link))                
+            logger.warn(u"new %s location %s is duplicated, disabled" % (self.netloc, self_link))                
 
             raise DuplicatedFeedError #HTTPMovedPermanently
 
@@ -107,7 +107,7 @@ class Fetcher(object):
 
     def fetch_feed(self):
                 
-        logger.debug("fetching %s" % self.netloc)
+        logger.debug(u"fetching %s" % self.netloc)
                
         # Check freshness
         for value in [self.feed.last_checked_on, self.feed.last_updated_on]:
@@ -118,7 +118,7 @@ class Fetcher(object):
             #   deal with large seconds values
             delta = datetime_as_epoch(self.instant) - datetime_as_epoch(value)    
             if delta < config.fetcher.min_interval:
-                logger.debug("%s is below minimun fetch interval, skipped" % self.netloc)
+                logger.debug(u"%s is below minimun fetch interval, skipped" % self.netloc)
                 return                                      
         
         try:
@@ -130,7 +130,7 @@ class Fetcher(object):
             # Record any network error as 'Service Unavailable'
             self.last_status        =  HTTPServiceUnavailable.code
             self.feed.error_count   += 1   
-            logger.warn("a network error occured while fetching %s, skipped" % self.netloc)
+            logger.warn(u"a network error occured while fetching %s, skipped" % self.netloc)
             return
     
         self.feed.last_checked_on = self.instant
@@ -147,7 +147,7 @@ class Fetcher(object):
         except (HTTPError, HTTPNotModified, DuplicatedFeedError):
             return # Bail out
         except AttributeError:
-            logger.warn("%s replied with status %d, aborted" % (self.netloc, response.status_code))
+            logger.warn(u"%s replied with status %d, aborted" % (self.netloc, response.status_code))
             return
         finally:
             self.feed.save()
@@ -166,7 +166,7 @@ class Fetcher(object):
         soup = feedparser.parse(data)         
         # Got parsing error?
         if hasattr(soup, 'bozo') and soup.bozo:
-            logger.debug("%s caused a parser error (%s), tried to parse it anyway" % (self.netloc, soup.bozo_exception))
+            logger.debug(u"%s caused a parser error (%s), tried to parse it anyway" % (self.netloc, soup.bozo_exception))
 
         ft = FeedTranslator(soup.feed)
         
@@ -187,7 +187,7 @@ class Fetcher(object):
             guid = t.get_guid(default=link)
     
             if not guid:
-                logger.warn('could not find GUID for entry from %s, skipped' % self.netloc)
+                logger.warn(u'could not find GUID for entry from %s, skipped' % self.netloc)
                 continue
 
             timestamp               = t.get_timestamp(self.instant)
@@ -195,13 +195,13 @@ class Fetcher(object):
         
             # Skip ancient entries        
             if (self.instant - timestamp).days > config.fetcher.max_history:
-                logger.debug("entry %s from %s is over maximum history, skipped" % (guid, self.netloc))
+                logger.debug(u"entry %s from %s is over maximum history, skipped" % (guid, self.netloc))
                 continue
     
             try:
                 # If entry is already in database with same GUID, then skip it
                 Entry.get(guid=guid)
-                logger.debug("duplicated entry %s, skipped" % guid)
+                logger.debug(u"duplicated entry %s, skipped" % guid)
                 continue
             except Entry.DoesNotExist:
                 pass
@@ -233,7 +233,7 @@ class Fetcher(object):
             self.feed.icon                  = self._google_favicon_fetcher(self.feed.alternate_link or self.feed.self_link)
             self.feed.icon_last_updated_on  = self.instant
 
-            logger.debug("saved favicon %s..." % (self.feed.icon[:70]))    
+            logger.debug(u"saved favicon %s..." % (self.feed.icon[:70]))    
             self.feed.save()
 
     
@@ -246,7 +246,7 @@ class Fetcher(object):
         try:
             response = fetch_url(endpoint)
         except RequestException, exc:
-            logger.warn("could not fetch favicon for %s (%s)" % (url, exc))
+            logger.warn(u"could not fetch favicon for %s (%s)" % (url, exc))
             return Feed.DEFAULT_ICON
     
         return make_data_uri(response.headers['Content-Type'], response.content)
@@ -278,7 +278,7 @@ class Fetcher(object):
             last_updated_on   = self.instant
         )
         entry.save()
-        logger.debug("synthesized entry %s" % guid)    
+        logger.debug(u"synthesized entry %s" % guid)    
         return entry
     
 
@@ -301,7 +301,7 @@ class FeedTranslator(object):
             if value:
                 # Fix future dates
                 return min(tuple_as_datetime(value), default)
-        logger.debug('no feed timestamp found, using default')    
+        logger.debug(u'no feed timestamp found, using default')    
         return default
 
     # Nullable fields
@@ -341,7 +341,7 @@ class EntryTranslator(object):
             if value:
                 # Fix future dates
                 return min(tuple_as_datetime(value), default)
-        logger.debug('no entry timestamp found, using default')    
+        logger.debug(u'no entry timestamp found, using default')    
         return default
             
     def get_title(self, default):
@@ -364,7 +364,7 @@ class EntryTranslator(object):
         if candidates:
             return candidates[0].type, candidates[0].value
     
-        logger.debug('no entry content found, using default')    
+        logger.debug(u'no entry content found, using default')    
         return default
         
     # Nullable fields
@@ -432,7 +432,7 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
     try:
         response = requests.get(url, timeout=timeout, headers=request_headers)
     except RequestException, exc:
-        logger.debug("tried to fetch %s but got %s" % (url, exc.__class__.__name__))
+        logger.debug(u"tried to fetch %s but got %s" % (url, exc.__class__.__name__))
         raise exc
     
     return response

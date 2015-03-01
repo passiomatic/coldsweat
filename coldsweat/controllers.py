@@ -53,10 +53,10 @@ class UserController(BaseController):
         try:
             subscription = Subscription.create(user=self.user, feed=feed, group=group)
         except IntegrityError:
-            logger.debug('user %s has already feed %s in her subscriptions' % (self.user.username, feed.self_link))    
+            logger.debug(u'user %s has already feed %s in her subscriptions' % (self.user.username, feed.self_link))    
             return None
     
-        logger.debug('added feed %s for user %s' % (feed.self_link, self.user.username))                
+        logger.debug(u'added feed %s for user %s' % (feed.self_link, self.user.username))                
         return subscription    
 
     def remove_subscription(self, feed):
@@ -80,26 +80,26 @@ class UserController(BaseController):
             try:
                 Read.create(user=self.user, entry=entry)
             except IntegrityError:
-                logger.debug('entry %s already marked as read, ignored' % entry.id)
+                logger.debug(u'entry %s already marked as read, ignored' % entry.id)
                 return
         elif status == 'unread':
             count = Read.delete().where((Read.user==self.user) & (Read.entry==entry)).execute()
             if not count:
-                logger.debug('entry %s never marked as read, ignored' % entry.id)
+                logger.debug(u'entry %s never marked as read, ignored' % entry.id)
                 return
         elif status == 'saved':
             try:
                 Saved.create(user=self.user, entry=entry)
             except IntegrityError:
-                logger.debug('entry %s already saved, ignored' % entry.id)
+                logger.debug(u'entry %s already saved, ignored' % entry.id)
                 return
         elif status == 'unsaved':
             count = Saved.delete().where((Saved.user==self.user) & (Saved.entry==entry)).execute()
             if not count:
-                logger.debug('entry %s never saved, ignored' % entry.id)
+                logger.debug(u'entry %s never saved, ignored' % entry.id)
                 return
         
-        logger.debug('entry %s %s' % (entry.id, status))
+        logger.debug(u'entry %s %s' % (entry.id, status))
      
     def get_unread_entries(self, *select):         
         #@@TODO: include saved information too
@@ -172,7 +172,7 @@ class FeedController(BaseController):
 
         try:
             previous_feed = Feed.get(Feed.self_link == feed.self_link)
-            logger.debug('feed %s has been already added to database, skipped' % feed.self_link)
+            logger.debug(u'feed %s has been already added to database, skipped' % feed.self_link)
             return previous_feed
         except Feed.DoesNotExist:
             pass
@@ -226,7 +226,7 @@ class FeedController(BaseController):
                         group = Group.get(Group.title==group.title)
                     except Group.DoesNotExist:
                         group.save()
-                        logger.debug('added group %s to database' % group.title)
+                        logger.debug(u'added group %s to database' % group.title)
     
                     groups.append(group)
     
@@ -262,7 +262,7 @@ class FeedController(BaseController):
         
         load_plugins()
     
-        logger.debug("starting fetcher")
+        logger.debug(u"starting fetcher")
         trigger_event('fetch_started')
             
         if config.fetcher.processes:
@@ -276,7 +276,7 @@ class FeedController(BaseController):
         
         trigger_event('fetch_done', feeds)
         
-        logger.info("%d feeds checked in %.2fs" % (len(feeds), time.time() - start))        
+        logger.info(u"%d feeds checked in %.2fs" % (len(feeds), time.time() - start))        
         
 
     def fetch_all_feeds(self):
@@ -289,7 +289,7 @@ class FeedController(BaseController):
         
         feeds = list(q)
         if not feeds:
-            logger.debug("no feeds found to refresh, halted")
+            logger.debug(u"no feeds found to refresh, halted")
             return
     
         self.fetch_feeds(feeds)
@@ -299,7 +299,7 @@ def feed_worker(feed):
 
     #@@REMOVEME: just delete feed if there are no subscribers
 #     if not feed.subscriptions:
-#         logger.debug("feed %s has no subscribers, skipped" % feed.self_link)
+#         logger.debug(u"feed %s has no subscribers, skipped" % feed.self_link)
 #         return
 
     # Each worker has its own connection

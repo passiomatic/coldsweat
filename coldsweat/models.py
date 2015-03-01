@@ -341,7 +341,7 @@ def close():
         # Attempt to close database connection 
         _db.close()
     except ProgrammingError, exc:
-        logger.error('caught exception while closing database connection: %s' % exc)
+        logger.error(u'caught exception while closing database connection: %s' % exc)
 
 
 def migrate_database_schema():

@@ -27,10 +27,10 @@ def fetcher_started():
                     continue # Skip empty values and comments                
                 DOMAINS.append(line.rstrip('\n'))    
     except IOError:
-        logger.warn("could not load %s" % backlist_path)    
+        logger.warn(u"could not load %s" % backlist_path)    
         return    
 
-    logger.debug("loaded blacklist: %s" % ', '.join(DOMAINS))
+    logger.debug(u"loaded blacklist: %s" % ', '.join(DOMAINS))
     
     
 @event('entry_parsed')

@@ -230,7 +230,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
                 try:
                     Read.create(user=self.user, entry=entry)
                 except IntegrityError:
-                    logger.debug('entry %d already marked as read, ignored' % entry.id)
+                    logger.debug(u'entry %d already marked as read, ignored' % entry.id)
                     continue                     
         
         self.alert_message = message        

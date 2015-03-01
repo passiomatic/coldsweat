@@ -147,7 +147,7 @@ class CommandController(FeedController, UserController):
             else:
                 print 'Database is already up-to-date.'
         except OperationalError, ex:         
-            logger.error('caught exception updating database schema: (%s)' % ex)
+            logger.error(u'caught exception updating database schema: (%s)' % ex)
             print  'Error while running database update. See log file for more information.'
 
 def run():

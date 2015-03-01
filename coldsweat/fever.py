@@ -29,7 +29,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
 
     @POST(r'^/fever/?$')
     def endpoint(self):
-        logger.debug('client from %s requested: %s' % (self.request.remote_addr, self.request.params))
+        logger.debug(u'client from %s requested: %s' % (self.request.remote_addr, self.request.params))
         
         if 'api' not in self.request.GET:
             raise HTTPBadRequest()
@@ -40,10 +40,10 @@ class FeverApp(WSGIApp, FeedController, UserController):
             api_key = self.request.POST['api_key']        
             user = User.validate_api_key(api_key)
             if not user: 
-                logger.warn('unknown API key %s, unauthorized' % api_key)
+                logger.warn(u'unknown API key %s, unauthorized' % api_key)
                 return self.respond_with_json(result)  
         else:
-            logger.warn('missing API key, unauthorized')               
+            logger.warn(u'missing API key, unauthorized')               
             return self.respond_with_json(result)
 
         # Authorized
@@ -56,7 +56,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
                 try:
                     handler = getattr(self, '%s_command' % name)
                 except AttributeError:
-                    logger.debug('unrecognized command %s, skipped' % name) 
+                    logger.debug(u'unrecognized command %s, skipped' % name) 
                     continue        
                 handler(result)        
     
@@ -158,7 +158,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
         since = datetime.utcnow() - timedelta(seconds=RECENTLY_READ_DELTA)    
         q = Read.delete().where((Read.user==self.user) & (Read.read_on > since)) 
         count = q.execute()
-        logger.debug('%d entries marked as unread' % count)
+        logger.debug(u'%d entries marked as unread' % count)
      
         
     
@@ -167,7 +167,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
         try:
             mark, status, object_id = self.request.POST['mark'], self.request.POST['as'], int(self.request.POST['id'])
         except (KeyError, ValueError), ex:
-            logger.debug('missing or invalid parameter (%s), ignored' % ex)
+            logger.debug(u'missing or invalid parameter (%s), ignored' % ex)
             return      
     
         if mark == 'item':
@@ -176,35 +176,35 @@ class FeverApp(WSGIApp, FeedController, UserController):
                 # Sanity check
                 entry = Entry.get(Entry.id == object_id)  
             except Entry.DoesNotExist:
-                logger.debug('could not find entry %d, ignored' % object_id)
+                logger.debug(u'could not find entry %d, ignored' % object_id)
                 return
     
             if status == 'read':
                 try:
                     Read.create(user=self.user, entry=entry)
                 except IntegrityError:
-                    logger.debug('entry %d already marked as read, ignored' % object_id)
+                    logger.debug(u'entry %d already marked as read, ignored' % object_id)
                     return
             # Strangely enough 'unread' is not mentioned in 
             #  the Fever API, but Reeder app asks for it
             elif status == 'unread':
                 count = Read.delete().where((Read.user==self.user) & (Read.entry==entry)).execute()
                 if not count:
-                    logger.debug('entry %d never marked as read, ignored' % object_id)
+                    logger.debug(u'entry %d never marked as read, ignored' % object_id)
                     return
             elif status == 'saved':
                 try:
                     Saved.create(user=self.user, entry=entry)
                 except IntegrityError:
-                    logger.debug('entry %d already marked as saved, ignored' % object_id)
+                    logger.debug(u'entry %d already marked as saved, ignored' % object_id)
                     return
             elif status == 'unsaved':
                 count = Saved.delete().where((Saved.user==self.user) & (Saved.entry==entry)).execute()
                 if not count:
-                    logger.debug('entry %d never marked as saved, ignored' % object_id)
+                    logger.debug(u'entry %d never marked as saved, ignored' % object_id)
                     return
                       
-            logger.debug('marked entry %d as %s' % (object_id, status))
+            logger.debug(u'marked entry %d as %s' % (object_id, status))
     
     
         elif mark == 'feed' and status == 'read':
@@ -213,14 +213,14 @@ class FeverApp(WSGIApp, FeedController, UserController):
                 # Sanity check
                 feed = Feed.get(Feed.id == object_id)  
             except Feed.DoesNotExist:
-                logger.debug('could not find feed %d, ignored' % object_id)
+                logger.debug(u'could not find feed %d, ignored' % object_id)
                 return
     
             # Unix timestamp of the the local client’s last items API request
             try:
                 before = datetime.utcfromtimestamp(int(self.request.POST['before']))
             except (KeyError, ValueError), ex:
-                logger.debug('missing or invalid parameter (%s), ignored' % ex)
+                logger.debug(u'missing or invalid parameter (%s), ignored' % ex)
                 return              
             
             q = Entry.select(Entry).join(Feed).join(Subscription).where(
@@ -238,10 +238,10 @@ class FeverApp(WSGIApp, FeedController, UserController):
                         Read.create(user=self.user, entry=entry)
                     except IntegrityError:
                         # Should not happen, due to the query above, log as warning
-                        logger.warn('entry %d already marked as read, ignored' % entry.id)
+                        logger.warn(u'entry %d already marked as read, ignored' % entry.id)
                         continue
             
-            logger.debug('marked feed %d as %s' % (object_id, status))
+            logger.debug(u'marked feed %d as %s' % (object_id, status))
                     
     
         elif mark == 'group' and status == 'read':
@@ -250,7 +250,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
             try:
                 before = datetime.utcfromtimestamp(int(self.request.POST['before']))
             except (KeyError, ValueError), ex:
-                logger.debug('missing or invalid parameter (%s), ignored' % ex)
+                logger.debug(u'missing or invalid parameter (%s), ignored' % ex)
                 return              
     
             # Mark all as read?
@@ -266,7 +266,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
                 try:        
                     group = Group.get(Group.id == object_id)  
                 except Group.DoesNotExist:
-                    logger.debug('could not find group %d, ignored' % object_id)
+                    logger.debug(u'could not find group %d, ignored' % object_id)
                     return
     
                 q = Entry.select(Entry).join(Feed).join(Subscription).where(
@@ -284,13 +284,13 @@ class FeverApp(WSGIApp, FeedController, UserController):
                         Read.create(user=self.user, entry=entry)
                     except IntegrityError:
                         # Should not happen thanks to the query above, log as warning
-                        logger.warn('entry %d already marked as read, ignored' % entry.id)
+                        logger.warn(u'entry %d already marked as read, ignored' % entry.id)
                         continue
             
-            logger.debug('marked group %d as %s' % (object_id, status))
+            logger.debug(u'marked group %d as %s' % (object_id, status))
     
         else:   
-            logger.debug('malformed mark command (mark %s (%s) as %s ), ignored' % (mark, object_id, status))
+            logger.debug(u'malformed mark command (mark %s (%s) as %s ), ignored' % (mark, object_id, status))
     
     
     

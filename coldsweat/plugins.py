@@ -46,7 +46,7 @@ def load_plugins():
             fp, pathname, description = imp.find_module(name, [plugin_dir])
             imp.load_module(name, fp, pathname, description)
         except ImportError, ex:
-            logger.warn('could not load %s plugin (%s), ignored' % (name, ex))
+            logger.warn(u'could not load %s plugin (%s), ignored' % (name, ex))
             continue
         
         logger.debug('loaded %s plugin' % name)

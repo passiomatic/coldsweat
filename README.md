@@ -2,7 +2,7 @@
 
 Coldsweat is a Python web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
 
-![Screenshot](screenshots/coldsweat-0.9.2.jpg)
+![Screenshot](screenshots/coldsweat-0.9.5.jpg)
 
 ## Motivation
 

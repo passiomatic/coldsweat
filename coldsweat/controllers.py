@@ -35,16 +35,16 @@ class BaseController(object):
 
 class UserController(BaseController):
     '''
-    Base user controller class. Derived classes must implement the user property
+    Base user controller class. Derived classes may need to override the user property
     '''
     
     @property
     def user(self):
-        raise NotImplementedError
-
+        return self._current_user
+    
     @user.setter
     def user(self, user):
-        raise NotImplementedError
+        self._current_user = user    
         
     def add_subscription(self, feed, group):
         '''
@@ -131,7 +131,7 @@ class UserController(BaseController):
     # Feeds
     
     def get_feeds(self, *select):  
-        select = select or [Feed, fn.Count(Entry.id).alias('entries')] ##@@FIX: rename into something like entry_count
+        select = select or [Feed, fn.Count(Entry.id).alias('entry_count')]
         q = Feed.select(*select).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == self.user).group_by(Feed)        
         return q  
     

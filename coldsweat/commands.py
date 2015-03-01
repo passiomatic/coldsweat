@@ -39,13 +39,6 @@ class CommandController(FeedController, UserController):
     
         return user
 
-    @property
-    def user(self):
-        return self._user
-    
-    @user.setter
-    def user(self, user):
-        self._user = user    
 
     def run_command(self, name, options, args):    
         try:

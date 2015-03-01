@@ -17,7 +17,7 @@ def feed_status(feed, threshold):
                 </h3>
                 <div class="meta dim">
                     <span class="feed">
-                        {{if f.entries}}{{f.entries}}{{else}}No{{endif}} entries
+                        {{if f.entry_count}}{{f.entry_count}}{{else}}No{{endif}} entries
                     </span>
                     <span class="actions">
 <a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit">About</a>&ensp;&middot;&ensp;

@@ -180,7 +180,8 @@ class FeedLinkFinder(BaseParser):
             return
 
         #@@TODO: check if it's relative URL before join
-        self.links.append(urlparse.urljoin(self.base_url, d['href']))
+        url, title = urlparse.urljoin(self.base_url, d['href']), d['title'] if 'title' in d else u''
+        self.links.append((url, title))
 
  
 class Scrubber(BaseProcessor):
@@ -240,22 +241,13 @@ def _parse(parser, data):
 
 # Link discovery functions
 
-def find_feed_links(data, base_url):
+def find_feed_links(data, base_url=''):
     '''
     Return the feed links found for the page
     '''
     p = FeedLinkFinder(base_url)
     _parse(p, data)
     return p.links
-
-def find_feed_link(data, base_url):
-    '''
-    Return the first feed link found
-    '''
-    links = find_feed_links(data, base_url)
-    if links:        
-        return links[0]    
-    return None    
 
 def sniff_feed(data): 
     data = data.lower()

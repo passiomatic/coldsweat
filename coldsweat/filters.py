@@ -104,7 +104,7 @@ def alert(message):
     except ValueError:
         return text
     return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
- 
+    
 def run_tests():
     
     #t = datetime.utcnow()        

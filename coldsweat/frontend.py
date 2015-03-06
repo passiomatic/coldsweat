@@ -20,11 +20,9 @@ from models import *
 from controllers import *
 from utilities import *
 from fetcher import *
-
+from markup import *
 from session import SessionMiddleware
-
 import filters
-
 from plugins import trigger_event, load_plugins
 
 ENTRIES_PER_PAGE    = 30
@@ -332,21 +330,28 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         return self.redirect_after_post('%s/feeds/' % self.application_url)
 
 
-    @form(r'^/feeds/add$')
+    @form(r'^/feeds/add/1$')
     @login_required    
-    def feed_add(self):        
+    def feed_add_1(self):        
         form_message = ''
         groups = self.get_groups()
 
         # URL could be passed via a GET (bookmarklet) or POST 
         self_link = self.request.params.get('self_link', '').strip()
         
+        #@@TODO: Allow specify domain.com w/out scheme
+        
         if self.request.method == 'GET':
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
+        # Handle POST
+
+        group_id = int(self.request.POST.get('group', 0))
+        
         if not validate_url(self_link):
             form_message = u'ERROR Error, specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
+                
         try:
             response = fetch_url(self_link)
         except RequestException, exc:
@@ -356,21 +361,49 @@ class FrontendApp(WSGIApp, FeedController, UserController):
             #form_message = u'ERROR Error, a network error occured'
             #return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
+        if not sniff_feed(response.text):
+            links = find_feed_links(response.text)
+            return self.respond_with_template('_feed_add_wizard_2.html', locals())
 
+        # It's a feed
+        
+        #@@TODO: add plugin events
+        feed = self.add_feed_from_url(self_link, fetch_data=False)
+        ff = Fetcher(feed)
+        ff.parse_feed(response.text)
+        
+        return self._add_subscription(feed, group_id)
+        
+
+    @POST(r'^/feeds/add/2$')
+    @login_required 
+    def feed_add_2(self):  
+
+        self_link = self.request.POST.get('self_link', '')
         group_id = int(self.request.POST.get('group', 0))
+
+#@@TODO: handle multiple feed subscription
+#         urls = self.request.POST.getall('feeds')
+#         for url in urls:
+#             pass
+
+        feed = self.add_feed_from_url(self_link, fetch_data=True)
+        return self._add_subscription(feed, group_id)
+                
+                
+    def _add_subscription(self, feed, group_id):
         if group_id:
             group = Group.get(Group.id == group_id) 
         else:
-            group = Group.get(Group.title == Group.DEFAULT_GROUP)    
+            group = Group.get(Group.title == Group.DEFAULT_GROUP)
 
-        feed = self.add_feed_from_url(self_link, fetch_data=True)
         subscription = self.add_subscription(feed, group)
         if subscription:
             self.alert_message = u'SUCCESS Feed has been added to <i>%s</i> group' % group.title
         else:
             self.alert_message = u'INFO Feed is already in <i>%s</i> group' % group.title
-        return self.respond_with_script('_modal_done.js', {'location': '%s/?feed=%d' % (self.application_url, feed.id)}) 
-
+        return self.respond_with_script('_modal_done.js', {'location': '%s/?feed=%d' % (self.application_url, feed.id)})     
+    
 
     @GET(r'^/fever/?$')
     def fever(self):        

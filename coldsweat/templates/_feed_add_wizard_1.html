@@ -1,13 +1,13 @@
 {{def render_form}}
-<form action="{{application_url}}/feeds/add" data-ajax-post method="POST">
+<form action="{{application_url}}/feeds/add/1" data-ajax-post method="POST">
   <div class="modal-header">
      <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>
     <h3>Add Feed Subscription</h3>
   </div>
   <div class="modal-body">          
         {{form_message|alert}}
-        <label for="self-link-field">Web address (URL) for the feed</label> 
-        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}">
+        <label for="self-link-field">Web address (URL) for the site or feed</label> 
+        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="http://">
         {{if length(groups) > 1}}
             <label>Add to group <select name="group">
                 {{for g in groups}}

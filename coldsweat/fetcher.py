@@ -161,8 +161,6 @@ class Fetcher(object):
 
     def parse_feed(self, data):
 
-        #feed = self.feed
-
         soup = feedparser.parse(data)         
         # Got parsing error?
         if hasattr(soup, 'bozo') and soup.bozo:

@@ -321,7 +321,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         if self.request.method == 'GET':
             return self.respond_with_modal('%s/feeds/enable/%d' % (self.application_url, feed.id), 
                 title=u'Enable <i>%s</i> again?' % feed.title, 
-                body='Coldsweat will attempt to fetch it again during the next feeds refresh.', 
+                body='Coldsweat will attempt to update it again during the next feeds fetch.', 
                 button='Enable')
         
         # Handle postback

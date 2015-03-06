@@ -85,7 +85,9 @@ class CommandController(FeedController, UserController):
         '''Starts a feeds refresh procedure'''
     
         self.fetch_all_feeds()
-        print 'Refresh completed. See log file for more information'
+        print 'Fetch completed. See log file for more information'
+    
+    command_fetch = command_refresh # Alias
 
     # Local server
 
@@ -154,7 +156,7 @@ def run():
 
     default_username, _ = User.DEFAULT_CREDENTIALS
 
-    epilog = "Available commands are: %s" % ', '.join(sorted('import export serve setup upgrade refresh'.split()))
+    epilog = "Available commands are: %s" % ', '.join(sorted('import export serve setup upgrade fetch'.split()))
     usage='%prog command [options] [args]'
 
     available_options = [

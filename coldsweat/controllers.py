@@ -289,7 +289,7 @@ class FeedController(BaseController):
         
         feeds = list(q)
         if not feeds:
-            logger.debug(u"no feeds found to refresh, halted")
+            logger.debug(u"no feeds found to fetch, halted")
             return
     
         self.fetch_feeds(feeds)

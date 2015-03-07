@@ -5,7 +5,7 @@ Description: sweat utility commands
 Copyright (c) 2013—2014 Andrea Peltrin
 License: MIT (see LICENSE for details)
 """
-import os
+import os, sys
 from optparse import OptionParser, make_option
 from getpass import getpass
 import readline
@@ -125,15 +125,15 @@ class CommandController(FeedController, UserController):
     
         email = raw_input('Enter e-mail for user %s (hit enter to leave blank): ' % username)
             
-        while True:        
-            password = getpass('Enter password for user %s: ' % username)
+        while True:
+            password = read_password("Enter password for user %s: " % username)
             if not User.validate_password(password):
                 print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
                 continue        
-            password_again = getpass('Enter password (again): ')
+            password_again = read_password("Enter password (again): ")
             
             if password != password_again:
-                print 'Error: passwords do not match, please try again'
+                print "Error: passwords do not match, please try again"
             else:
                 break
     
@@ -152,6 +152,16 @@ class CommandController(FeedController, UserController):
             logger.error(u'caught exception updating database schema: (%s)' % ex)
             print  'Error while running database update. See log file for more information.'
 
+def read_password(prompt_label="Enter password: "):
+    if sys.stdin.isatty():
+        password = getpass(prompt_label)
+    else:
+        # Make script be scriptable by reading password from stdin
+        print prompt_label
+        password = sys.stdin.readline().rstrip()
+
+    return password
+    
 def run():
 
     default_username, _ = User.DEFAULT_CREDENTIALS

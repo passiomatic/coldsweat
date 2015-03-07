@@ -9,7 +9,7 @@ License: MIT (see LICENSE for details)
 import sys, subprocess, optparse
 from datetime import datetime
 
-from ..utilities import make_md5_hash, datetime_as_epoch
+from ..utilities import datetime_as_epoch
 from ..models import User
 
 ALL = 'groups feeds unread_item_ids saved_item_ids favicons items links unread_recently_read mark_item mark_feed mark_group mark_all'.split()

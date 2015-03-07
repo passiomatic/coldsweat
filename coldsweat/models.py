@@ -106,7 +106,7 @@ class User(CustomModel):
     #@@FIXME: we should use email instead as Fever API dictates
     @staticmethod
     def make_api_key(username, password):
-        return make_md5_hash('%s:%s' % (username, password))
+        return make_md5_hash(u'%s:%s' % (username, password))
 
     @staticmethod
     def validate_credentials(username, password):

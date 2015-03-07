@@ -6,6 +6,7 @@
   </div>
   <div class="modal-body">          
         {{form_message|alert}}
+
         <label for="self-link-field">Web address (URL) for the site or feed</label> 
         <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="http://">
         {{if length(groups) > 1}}
@@ -15,6 +16,12 @@
                 {{endfor}}
             </select></label>             
         {{endif}}
+        
+        <hr class="quarter">
+        <div>
+            <a href="javascript:window.open('{{application_url}}/feeds/add/1?self_link='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title))"><i class="fa fa-bookmark-o"></i> Subscribe Feed</a><br>
+            <span class="help-block">Drag bookmarklet to your browser toolbar and quickly subscribe to any feed.</span>
+        </div>
   </div>
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary">Continue</button>

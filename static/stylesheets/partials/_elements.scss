@@ -14,7 +14,10 @@ height : 1px;
 border : 0;
 border-top : 1px solid $bordercolor; 
 &.halved { margin : $baselineheight 0; }
+&.quarter { margin : $baselineheight/2 0; }
+&.invisible { @include invisible; }
 }
+
 
 // img
 

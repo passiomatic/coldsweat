@@ -560,10 +560,10 @@ $formplaceholdercolor 			: $lightneutralcolor;
 // =help ============
 
 // Set the colour for help text
-$formhelpcolor 					: lighten($textcolor, 10%);
+$formhelpcolor 					: $lightneutralcolor;
 
 // And small text inside forms
-$formsmallcolor 				: lighten($textcolor, 10%);
+$formsmallcolor 				: $formhelpcolor;
 
 
 

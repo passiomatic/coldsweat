@@ -386,10 +386,21 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 #         urls = self.request.POST.getall('feeds')
 #         for url in urls:
 #             pass
-
+#@@TODO: validate feed
+#         try:
+#             response = fetch_url(self_link)
+#         except RequestException, exc:
+#             form_message = u'ERROR Error, feed address is incorrect or host is unreachable.'
+#             return self.respond_with_template('_feed_add_wizard_1.html', locals())
+            
         feed = self.add_feed_from_url(self_link, fetch_data=True)
         return self._add_subscription(feed, group_id)
                 
+#     def _parse_feed(self, self_link):
+#         feed = self.add_feed_from_url(self_link, fetch_data=False)
+#         ff = Fetcher(feed)
+#         ff.parse_feed(response.text)
+
                 
     def _add_subscription(self, feed, group_id):
         if group_id:

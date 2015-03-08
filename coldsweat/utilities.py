@@ -2,7 +2,7 @@
 """
 Description: misc. utilities
 
-Copyright (c) 2013—2014 Andrea Peltrin
+Copyright (c) 2013—2015 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """

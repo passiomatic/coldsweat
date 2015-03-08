@@ -5,9 +5,13 @@
 		<dateCreated>{{timestamp}}</dateCreated>
     </head>
     <body>        
-        {{for feed in feeds}}
+        {{for title, feeds in groups}}
+        <outline title="{{title}}" text="{{title}}">
+            {{for feed in feeds}}
             <outline text="{{feed.title}}" title="{{feed.title}}"
                 type="rss" xmlUrl="{{feed.self_link}}" {{if feed.alternate_link}}htmlUrl="{{feed.alternate_link}}"{{endif}}/>
+            {{endfor}}
+        </outline>
         {{endfor}}
     </body>
 </opml>

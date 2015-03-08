@@ -59,7 +59,7 @@ class CommandController(FeedController, UserController):
         for feed, group in feeds:
             self.add_subscription(feed, group)
     
-        print "%d feeds imported for user %s. See log file for more information." % (len(feeds), self.user.username)
+        print "Import finished for user %s. See log file for more information" % self.user.username
 
 
     def command_export(self, options, args):
@@ -71,14 +71,14 @@ class CommandController(FeedController, UserController):
         self.user = self._get_user(options.username)
     
         filename = args[0]
-        
         timestamp = format_http_datetime(datetime.utcnow())
-        feeds = Feed.select().join(Subscription).where(Subscription.user == self.user).distinct().order_by(Feed.title)
+        
+        groups = [ (group.title, self.get_group_feeds(group)) for group in self.get_groups() ]
         
         with open(filename, 'w') as f:
             f.write(render_template(os.path.join(template_dir, 'export.xml'), locals()))
             
-        print "%d feeds exported for user %s" % (feeds.count(), self.user.username)    
+        print "Export finished for user %s." % self.user.username
 
 
     def command_refresh(self, options, args):

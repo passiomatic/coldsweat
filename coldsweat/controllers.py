@@ -122,7 +122,7 @@ class UserController(BaseController):
         #@@TODO: include read and saved information too
         q = _q(*select).where((Subscription.user == self.user) & (Subscription.group == group))
         return q
-    
+        
     def get_feed_entries(self, feed, *select):     
         #@@TODO: include read and saved information too
         q = _q(*select).where((Subscription.user == self.user) & (Subscription.feed == feed)).distinct()
@@ -132,8 +132,12 @@ class UserController(BaseController):
     
     def get_feeds(self, *select):  
         select = select or [Feed, fn.Count(Entry.id).alias('entry_count')]
-        q = Feed.select(*select).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == self.user).group_by(Feed)        
+        q = Feed.select(*select).join(Entry, JOIN_LEFT_OUTER).switch(Feed).join(Subscription).where(Subscription.user == self.user).group_by(Feed)
         return q  
+
+    def get_group_feeds(self, group):
+        q = Feed.select().join(Subscription).where((Subscription.user == self.user) & (Subscription.group == group))
+        return q
     
     # Groups
     

@@ -151,6 +151,7 @@ class Fetcher(object):
         except (HTTPError, HTTPNotModified, DuplicatedFeedError):
             return # Bail out
         except AttributeError:
+            self.feed.last_status = status
             logger.warn(u"%s replied with status %d, aborted" % (self.netloc, status))
             return
         finally:

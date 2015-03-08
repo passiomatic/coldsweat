@@ -49,26 +49,33 @@ class Fetcher(object):
  
         self.feed = feed
         
-         
-    def handle_304(self, response):
+    def handle_404(self, response):
         '''
-        Not modified
+        Not Found
         '''
-        logger.debug(u"%s hasn't been modified, skipped" % self.netloc)        
+        self.feed.error_count   += 1        
+        self.feed.last_status   = response.status_code
+        logger.warn(u"%s has been not found, skipped" % self.netloc)        
+        raise HTTPNotFound
         
-        raise HTTPNotModified
-
     def handle_410(self, response):
         '''
         Gone
         '''
         self.feed.is_enabled    = False
         self.feed.error_count   += 1        
-
+        self.feed.last_status   = response.status_code
         logger.warn(u"%s is gone, disabled" % self.netloc)
-        self._synthesize_entry('Feed has been removed from the origin server.')
-        
+        self._synthesize_entry('Feed has been removed from the origin server.')        
         raise HTTPGone
+         
+    def handle_304(self, response):
+        '''
+        Not modified
+        '''
+        self.feed.last_status = response.status_code
+        logger.debug(u"%s hasn't been modified, skipped" % self.netloc)               
+        raise HTTPNotModified
 
     def handle_301(self, response):
         '''
@@ -79,25 +86,22 @@ class Fetcher(object):
         try:
             Feed.get(self_link=self_link)
         except Feed.DoesNotExist:
-            self.feed.self_link = self_link                               
+            self.feed.self_link     = self_link                               
+            self.feed.last_status   = response.status_code
             logger.info(u"%s has changed its location, updated to %s" % (self.netloc, self_link))
         else:
             self.feed.is_enabled    = False
-            self.last_status        = DuplicatedFeedError.code
-            self.feed.error_count   += 1 
-            
+            self.feed.last_status   = DuplicatedFeedError.code
+            self.feed.error_count   += 1             
             self._synthesize_entry('Feed has a duplicated web address.')
             logger.warn(u"new %s location %s is duplicated, disabled" % (self.netloc, self_link))                
-
-            raise DuplicatedFeedError #HTTPMovedPermanently
+            raise DuplicatedFeedError
 
     def handle_200(self, response):
         '''
         OK plus redirects
         '''
         self.feed.etag   = response.headers.get('ETag', None)
-        self.last_status = response.status_code
-        
         # Save final status code discarding redirects
         self.feed.last_status = response.status_code
 
@@ -128,7 +132,7 @@ class Fetcher(object):
                 modified_since=self.feed.last_updated_on)
         except RequestException: 
             # Record any network error as 'Service Unavailable'
-            self.last_status        =  HTTPServiceUnavailable.code
+            self.feed.last_status   =  HTTPServiceUnavailable.code
             self.feed.error_count   += 1   
             logger.warn(u"a network error occured while fetching %s, skipped" % self.netloc)
             return
@@ -147,12 +151,14 @@ class Fetcher(object):
         except (HTTPError, HTTPNotModified, DuplicatedFeedError):
             return # Bail out
         except AttributeError:
-            logger.warn(u"%s replied with status %d, aborted" % (self.netloc, response.status_code))
+            logger.warn(u"%s replied with status %d, aborted" % (self.netloc, status))
             return
         finally:
             self.feed.save()
 
         entries = self.parse_feed(response.text)
+ 
+        #@@TODO: check if error_count > config.fetcher.max_errors and disable feed 
  
         #@@TODO: Use Peewee insert_many?
 

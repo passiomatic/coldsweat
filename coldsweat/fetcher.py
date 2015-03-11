@@ -146,26 +146,24 @@ class Fetcher(object):
             status = response.status_code
         
         try:
-            handler = getattr(self, 'handle_%d' % status)
-            handler(response)
+            handler = getattr(self, 'handle_%d' % status, None)
+            if handler:
+                handler(response)
+            else: 
+                self.feed.last_status = status
+                logger.warn(u"%s replied with status %d, aborted" % (self.netloc, status))
+                return
+            self.parse_feed(response.text)
+            self.fetch_icon()
         except (HTTPError, HTTPNotModified, DuplicatedFeedError):
             return # Bail out
-        except AttributeError:
-            self.feed.last_status = status
-            logger.warn(u"%s replied with status %d, aborted" % (self.netloc, status))
-            return
         finally:
+            if self.feed.error_count > config.fetcher.max_errors:
+                self._synthesize_entry('Feed has accomulated too many errors (last was %s).' % filters.status_title(status))
+                logger.warn(u"%s has accomulated too many errors, disabled" % self.netloc)
+                self.feed.is_enabled = False
             self.feed.save()
-
-        entries = self.parse_feed(response.text)
- 
-        #@@TODO: check if error_count > config.fetcher.max_errors and disable feed 
- 
-        #@@TODO: Use Peewee insert_many?
-
-        self.fetch_icon()
-        
-
+          
     def parse_feed(self, data):
 
         soup = feedparser.parse(data)         
@@ -179,7 +177,7 @@ class Fetcher(object):
         self.feed.alternate_link     = ft.get_alternate_link()        
         self.feed.title              = self.feed.title or ft.get_title() # Do not set again if already set
 
-        self.feed.save()
+        #self.feed.save()
 
         entries = []
         feed_author = ft.get_author()
@@ -238,8 +236,8 @@ class Fetcher(object):
             self.feed.icon                  = self._google_favicon_fetcher(self.feed.alternate_link or self.feed.self_link)
             self.feed.icon_last_updated_on  = self.instant
 
-            logger.debug(u"saved favicon %s..." % (self.feed.icon[:70]))    
-            self.feed.save()
+            logger.debug(u"fetched favicon %s..." % (self.feed.icon[:70]))    
+            #self.feed.save()
 
     
     def _google_favicon_fetcher(self, url):

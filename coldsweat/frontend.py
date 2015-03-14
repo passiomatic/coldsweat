@@ -339,14 +339,15 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         # URL could be passed via a GET (bookmarklet) or POST 
         self_link = self.request.params.get('self_link', '').strip()
         
-        #@@TODO: Allow specify domain.com w/out scheme
-        
         if self.request.method == 'GET':
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
         # Handle POST
-
+        
         group_id = int(self.request.POST.get('group', 0))
+
+        # Assume HTTP if URL is passed w/out scheme        
+        self_link = self_link if self_link.startswith('http') else u'http://' + self_link 
         
         if not validate_url(self_link):
             form_message = u'ERROR Error, specify a valid web address'

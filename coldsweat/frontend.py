@@ -362,7 +362,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
             #return self.respond_with_template('_feed_add_wizard_1.html', locals())
 
         if not sniff_feed(response.text):
-            links = find_feed_links(response.text)
+            links = find_feed_links(response.text, base_url=self_link)
             return self.respond_with_template('_feed_add_wizard_2.html', locals())
 
         # It's a feed

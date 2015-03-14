@@ -25,6 +25,7 @@ def run_tests():
         ('discovery/html5-xhtml.html', 'http://example.com/feed'),
         ('discovery/xhtml.html', 'http://somedomain.com/articles.xml' ),
         ('discovery/html4-base.html', 'http://somedomain.com/articles.xml' ),
+        ('discovery/html4-no-base.html', 'http://example.com/articles.xml' ),
     ]
            
     for filename, expected_url in test_files:

@@ -165,6 +165,7 @@ class FeedLinkFinder(BaseParser):
         d = dict(attrs)
         if 'href' not in d:
             return
+        # Override passed base URL
         self.base_url = d['href']
     
     def start_link(self, attrs):                
@@ -179,7 +180,6 @@ class FeedLinkFinder(BaseParser):
         if 'href' not in d:
             return
 
-        #@@TODO: check if it's relative URL before join
         url, title = urlparse.urljoin(self.base_url, d['href']), d['title'] if 'title' in d else u''
         self.links.append((url, title))
 

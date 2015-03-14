@@ -309,7 +309,7 @@ def feed_worker(feed):
     # Each worker has its own connection
     connect()
     fetcher = Fetcher(feed)
-    fetcher.fetch_feed()
+    fetcher.update_feed()
 
         
         

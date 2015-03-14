@@ -109,9 +109,9 @@ class Fetcher(object):
     handle_302 = handle_200 # Alias
 
 
-    def fetch_feed(self):
+    def update_feed(self):
                 
-        logger.debug(u"fetching %s" % self.netloc)
+        logger.debug(u"updating %s" % self.netloc)
                
         # Check freshness
         for value in [self.feed.last_checked_on, self.feed.last_updated_on]:
@@ -153,8 +153,8 @@ class Fetcher(object):
                 self.feed.last_status = status
                 logger.warn(u"%s replied with status %d, aborted" % (self.netloc, status))
                 return
-            self.parse_feed(response.text)
-            self.fetch_icon()
+            self._parse_feed(response.text)
+            self._fetch_icon()
         except (HTTPError, HTTPNotModified, DuplicatedFeedError):
             return # Bail out
         finally:
@@ -163,8 +163,12 @@ class Fetcher(object):
                 logger.warn(u"%s has accomulated too many errors, disabled" % self.netloc)
                 self.feed.is_enabled = False
             self.feed.save()
-          
-    def parse_feed(self, data):
+            
+    def update_feed_with_data(self, data):
+        self._parse_feed(data)
+        self.feed.save()
+                      
+    def _parse_feed(self, data):
 
         soup = feedparser.parse(data)         
         # Got parsing error?
@@ -176,8 +180,6 @@ class Fetcher(object):
         self.feed.last_updated_on    = ft.get_timestamp(self.instant)        
         self.feed.alternate_link     = ft.get_alternate_link()        
         self.feed.title              = self.feed.title or ft.get_title() # Do not set again if already set
-
-        #self.feed.save()
 
         entries = []
         feed_author = ft.get_author()
@@ -228,7 +230,7 @@ class Fetcher(object):
         return entries
         
 
-    def fetch_icon(self):
+    def _fetch_icon(self):
     
         if not self.feed.icon or not self.feed.icon_last_updated_on or (self.instant - self.feed.icon_last_updated_on).days > FETCH_ICONS_DELTA:
             # Prefer alternate_link if available since self_link could 
@@ -237,7 +239,6 @@ class Fetcher(object):
             self.feed.icon_last_updated_on  = self.instant
 
             logger.debug(u"fetched favicon %s..." % (self.feed.icon[:70]))    
-            #self.feed.save()
 
     
     def _google_favicon_fetcher(self, url):

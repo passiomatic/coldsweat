@@ -367,10 +367,11 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 
         # It's a feed
         
-        #@@TODO: add plugin events
-        feed = self.add_feed_from_url(self_link, fetch_data=False)
-        ff = Fetcher(feed)
-        ff.parse_feed(response.text)
+        feed = self.add_feed_from_url(self_link, fetch_data=False)        
+        logger.debug(u"starting fetcher")
+        trigger_event('fetch_started')        
+        Fetcher(feed).update_feed_with_data(response.text)        
+        trigger_event('fetch_done', [feed])
         
         return self._add_subscription(feed, group_id)
         

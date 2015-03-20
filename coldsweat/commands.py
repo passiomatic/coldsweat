@@ -12,6 +12,7 @@ import readline
 
 from wsgiref.simple_server import make_server
 from webob.static import DirectoryApp
+from peewee import OperationalError
 
 from coldsweat import *
 from models import *

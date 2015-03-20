@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from peewee import *
 from playhouse.migrate import *
 from playhouse.signals import Model as BaseModel, pre_save
+from playhouse.reflection import Introspector
 from webob.exc import status_map
 
 from coldsweat import *
@@ -75,13 +76,8 @@ class PickleField(BlobField):
 
 class CustomModel(BaseModel):
     """
-    Binds the database to all models
+    Binds the same database to all models
     """
-
-    @classmethod
-    def field_exists(klass, db_column):
-        c = klass._meta.database.execute_sql('SELECT * FROM %s;' % klass._meta.db_table)
-        return db_column in [d[0] for d in c.description]
 
     class Meta:
         database = _db
@@ -348,23 +344,28 @@ def migrate_database_schema():
     '''
     Migrate database schema from previous versions (0.9.4 and up)
     '''
+
+    introspector = Introspector.from_database(_db)
+    models = introspector.generate_models()
+    Feed_ = models['feeds']
+    Entry_ = models['entries']
+
     drop_table_migrations, column_migrations = [], []
     
-    # Version 0.9.4 --------------------------------------------------------------
+    # Schema changes introduced in version 0.9.4 --------------------------------------------------------------
 
     # Change columns
 
-    if Feed.field_exists('icon_id') and engine != 'sqlite':
-        #@@TODO: add a logger.info when engine is sqlite
+    if hasattr(Feed_, 'icon_id'):
         column_migrations.append(migrator.drop_column('feeds', 'icon_id'))
 
-    if not Feed.field_exists('icon'):
+    if not hasattr(Feed_, 'icon'):
         column_migrations.append(migrator.add_column('feeds', 'icon', Feed.icon))
 
-    if not Feed.field_exists('icon_last_updated_on'):
+    if not hasattr(Feed_, 'icon_last_updated_on'):
         column_migrations.append(migrator.add_column('feeds', 'icon_last_updated_on', Feed.icon_last_updated_on))
         
-    if not Entry.field_exists('content_type'):
+    if not hasattr(Entry_, 'content_type'):
         column_migrations.append(migrator.add_column('entries', 'content_type', Entry.content_type))
 
     # Drop tables

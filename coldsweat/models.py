@@ -48,7 +48,7 @@ DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 # Defer database init, see connect() below
 engine = config.database.engine
 if engine == 'sqlite':
-    _db = SqliteDatabase(None, threadlocals=True) 
+    _db = SqliteDatabase(None) 
     migrator = SqliteMigrator(_db)
 elif engine == 'mysql':
     _db = MySQLDatabase(None)

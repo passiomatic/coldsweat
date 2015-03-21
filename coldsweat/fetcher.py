@@ -181,7 +181,7 @@ class Fetcher(object):
         self.feed.alternate_link     = ft.get_alternate_link()        
         self.feed.title              = self.feed.title or ft.get_title() # Do not set again if already set
 
-        entries = []
+        #entries = []
         feed_author = ft.get_author()
 
         for entry_dict in soup.entries:
@@ -204,8 +204,8 @@ class Fetcher(object):
                 continue
     
             try:
-                # If entry is already in database with same GUID, then skip it
-                Entry.get(guid=guid)
+                # If entry is already in database with same hashed GUID, skip it
+                Entry.get(guid_hash=make_sha1_hash(guid)) 
                 logger.debug(u"duplicated entry %s, skipped" % guid)
                 continue
             except Entry.DoesNotExist:
@@ -221,13 +221,16 @@ class Fetcher(object):
                 content_type      = content_type,
                 last_updated_on   = timestamp
             )
+            
+            # At this point we are pretty sure we doesn't have the entry 
+            #  already in the database so alert plugins and save data
             trigger_event('entry_parsed', entry, entry_dict)
             entry.save()
             #@@TODO: entries.append(entry)
     
             logger.debug(u"parsed entry %s from %s" % (guid, self.netloc))  
         
-        return entries
+        #return entries
         
 
     def _fetch_icon(self):

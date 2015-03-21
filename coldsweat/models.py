@@ -132,7 +132,7 @@ class User(CustomModel):
         return len(password) >= User.MIN_PASSWORD_LENGTH
         
 @pre_save(sender=User)
-def on_save_handler(model, user, created):
+def on_user_save(model, user, created):
      user.api_key = User.make_api_key(user.username, user.password)
           
 
@@ -141,7 +141,7 @@ class Icon(CustomModel):
     """
     Feed (fav)icons, stored as data URIs
     """
-    data                = TextField() 
+    data = TextField() 
 
     class Meta:
         db_table = 'icons'
@@ -153,7 +153,7 @@ class Group(CustomModel):
     """
     DEFAULT_GROUP = 'Default'
     
-    title               = CharField(unique=True)
+    title = CharField(unique=True)
     
     class Meta:  
         order_by = ('title',)
@@ -168,28 +168,24 @@ class Feed(CustomModel):
     DEFAULT_ICON         = _ICON
     MAX_TITLE_LENGTH     = 255
     
-    is_enabled           = BooleanField(default=True)        # Fetch feed?
-    self_link            = CharField()                       # The URL of the feed itself (rel=self)
+    is_enabled           = BooleanField(default=True)           # Fetch feed?
+    self_link            = TextField()                          # The URL of the feed itself (rel=self)
+    self_link_hash       = CharField(unique=True, max_length=40)
     error_count          = IntegerField(default=0)
 
     # Nullable
 
     title                = CharField(null=True)        
-    alternate_link       = CharField(null=True)              # The URL of the HTML page associated with the feed (rel=alternate)
-    etag                 = CharField(null=True)              # HTTP E-tag
-    last_updated_on      = DateTimeField(null=True)          # As UTC
-    last_checked_on      = DateTimeField(null=True)          # As UTC 
-    last_status          = IntegerField(null=True)           # Last returned HTTP code    
+    alternate_link       = TextField(null=True)                 # The URL of the HTML page associated with the feed (rel=alternate)
+    etag                 = CharField(null=True)                 # HTTP E-tag
+    last_updated_on      = DateTimeField(null=True)             # As UTC
+    last_checked_on      = DateTimeField(index=True, null=True) # As UTC 
+    last_status          = IntegerField(null=True)              # Last returned HTTP code    
 
-    icon                 = TextField(null=True)              # Stored as data URI
-    icon_last_updated_on = DateTimeField(null=True)          # As UTC
-
+    icon                 = TextField(null=True)                 # Stored as data URI
+    icon_last_updated_on = DateTimeField(null=True)             # As UTC
 
     class Meta:
-        indexes = (
-            (('self_link',), True),
-            (('last_checked_on',), False),
-        )
         db_table = 'feeds'
 
     @property
@@ -202,7 +198,11 @@ class Feed(CustomModel):
     @property
     def icon_or_default(self):
         return self.icon if self.icon else Feed.DEFAULT_ICON
-        
+
+@pre_save(sender=Feed)
+def on_feed_save(model, feed, created):
+     feed.self_link_hash = make_sha1_hash(feed.self_link)       
+      
         
 class Entry(CustomModel):
     """
@@ -211,28 +211,30 @@ class Entry(CustomModel):
 
     MAX_TITLE_LENGTH    = 255
 
-    guid                = CharField()                               # 'id' in Atom parlance
+    guid                = TextField()                           # 'id' in Atom parlance
+    guid_hash           = CharField(unique=True, max_length=40)   
     feed                = ForeignKeyField(Feed, on_delete='CASCADE')
     title               = CharField()    
     content_type        = CharField(default='text/html')
     content             = TextField()
     #@@TODO: rename to published_on
-    last_updated_on     = DateTimeField()                           # As UTC
+    last_updated_on     = DateTimeField()                       # As UTC
 
     # Nullable
+
     author              = CharField(null=True)
-    link                = CharField(null=True)    
+    link                = TextField(null=True)                  # If null the entry *must* provide a GUID
     
     class Meta:
-        indexes = (
-            (('guid',), False),
-            (('link',), False),
-        )
         db_table = 'entries'
 
     @property
     def last_updated_on_as_epoch(self):
         return datetime_as_epoch(self.last_updated_on)
+
+@pre_save(sender=Entry)
+def on_entry_save(model, entry, created):
+    entry.guid_hash = make_sha1_hash(entry.guid)    
 
                 
 class Saved(CustomModel):
@@ -282,14 +284,11 @@ class Session(CustomModel):
     """
     Web session
     """    
-    key             = CharField()
+    key             = CharField(unique=True)
     value           = PickleField()     
     expires_on      = DateTimeField()
 
     class Meta:
-        indexes = (
-            (('key', ), True),
-        )  
         db_table = 'sessions' 
 
 
@@ -352,7 +351,7 @@ def migrate_database_schema():
 
     drop_table_migrations, column_migrations = [], []
     
-    # Schema changes introduced in version 0.9.4 --------------------------------------------------------------
+    # Schema changes introduced in version 0.9.4 -------------------------------
 
     # Change columns
 
@@ -372,9 +371,52 @@ def migrate_database_schema():
 
     if Icon.table_exists():
         drop_table_migrations.append(Icon.drop_table)
-        
-    # ----------------------------------------------------------------------------
 
+    # Schema changes introduced in version 0.9.5 -------------------------------
+
+    # Change columns
+
+    class UpdateFeedSelfLinkHashOperation(object):
+        # Fake migrate.Operation protocol and upon saving populate all self_link_hash fields
+        def run(self):        
+            for feed in Feed.select():
+                feed.save()
+
+    class UpdateEntryGuidHashOperation(object):
+        # Fake migrate.Operation protocol and upon saving populate all guid_hash fields
+        def run(self):        
+            for entry in Entry.select():
+                entry.save()
+
+    if not hasattr(Feed_, 'self_link_hash'):
+        # Start relaxing index constrains to cope with existing data...
+        self_link_hash = CharField(null=True, max_length=40)
+        column_migrations.append(migrator.add_column('feeds', 'self_link_hash', self_link_hash))
+        column_migrations.append(UpdateFeedSelfLinkHashOperation())
+        # ...and make them strict again
+        column_migrations.append(migrator.add_index('feeds', ('self_link_hash',), True))
+        
+    if not hasattr(Entry_, 'guid_hash'):
+        # Start relaxing index constrains to cope with existing data...    
+        guid_hash = CharField(null=True, max_length=40)
+        column_migrations.append(migrator.add_column('entries', 'guid_hash', guid_hash))
+        column_migrations.append(UpdateEntryGuidHashOperation())
+        # ...and make them strict again
+        column_migrations.append(migrator.add_index('entries', ('guid_hash',), True))
+
+    # Drop obsolete indices
+    
+    if Feed_.self_link.unique:
+        column_migrations.append(migrator.drop_index('feeds', 'feeds_self_link'))
+    
+    if Entry_.link.index:
+        column_migrations.append(migrator.drop_index('entries', 'entries_link'))
+
+    if Entry_.guid.index:
+        column_migrations.append(migrator.drop_index('entries', 'entries_guid'))        
+        
+    # --------------------------------------------------------------------------
+    
     # Run all table and column migrations
 
     if column_migrations:

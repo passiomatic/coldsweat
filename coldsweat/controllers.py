@@ -175,7 +175,7 @@ class FeedController(BaseController):
         feed.self_link = scrub_url(feed.self_link)
 
         try:
-            previous_feed = Feed.get(Feed.self_link == feed.self_link)
+            previous_feed = Feed.get(self_link_hash=make_sha1_hash(feed.self_link))
             logger.debug(u'feed %s has been already added to database, skipped' % feed.self_link)
             return previous_feed
         except Feed.DoesNotExist:

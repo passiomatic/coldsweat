@@ -331,12 +331,8 @@ def transaction():
     return _db.transaction()
 
 def close():
-    try: 
-        # Attempt to close database connection 
+    if not _db.is_closed():
         _db.close()
-    except ProgrammingError, exc:
-        logger.error(u'caught exception while closing database connection: %s' % exc)
-
 
 def migrate_database_schema():
     '''

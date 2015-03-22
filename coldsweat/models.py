@@ -45,10 +45,15 @@ e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
 a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
 DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
+class SqliteDatabase_(SqliteDatabase):
+    def initialize_connection(self, connection):
+        self.execute_sql('PRAGMA foreign_keys=ON;')
+        self.execute_sql('PRAGMA journal_mode=WAL;')
+        
 # Defer database init, see connect() below
 engine = config.database.engine
 if engine == 'sqlite':
-    _db = SqliteDatabase(None) 
+    _db = SqliteDatabase_(None) 
     migrator = SqliteMigrator(_db)
 elif engine == 'mysql':
     _db = MySQLDatabase(None)
@@ -303,17 +308,11 @@ def _init_mysql():
     kwargs = dict(
         host        = config.database.hostname,
         user        = config.database.username,
-        passwd      = config.database.password        
+        password    = config.database.password        
     )
     _db.init(config.database.database, **kwargs)
 
-def _init_postgresql():
-    kwargs = dict(
-        host        = config.get('database', 'hostname'),
-        user        = config.get('database', 'username'),
-        password    = config.get('database', 'password')        
-    )
-    _db.init(config.database.database, **kwargs)
+_init_postgresql = _init_mysql # Alias
 
 ENGINES = {
     'sqlite'    : _init_sqlite,
@@ -436,11 +435,6 @@ def setup_database_schema():
     """
 
     models = User, Feed, Entry, Group, Read, Saved, Subscription, Session
-
-    # WAL mode is persistent, so we can to setup 
-    #   it once - see http://www.sqlite.org/wal.html
-    if engine == 'sqlite':
-        _db.execute_sql('PRAGMA journal_mode=WAL')
 
     for model in models:
         model.create_table(fail_silently=True)

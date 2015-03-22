@@ -12,6 +12,7 @@ from datetime import datetime
 from ..utilities import datetime_as_epoch
 from ..models import User
 
+TEST_USER_CREDENTIALS = 'test@example.com', 'coldsweat'
 ALL = 'groups feeds unread_item_ids saved_item_ids favicons items links unread_recently_read mark_item mark_feed mark_group mark_all'.split()
 
 def run_tests(endpoint, suites=ALL):
@@ -108,9 +109,8 @@ def run_tests(endpoint, suites=ALL):
         "-dapi_key=%s" % 'wrong-api-key',
         "%s?api&unread_item_ids" % endpoint
     ])
-
-    username, password = User.DEFAULT_CREDENTIALS    
-    api_key=User.make_api_key(username, password)
+    
+    api_key=User.make_api_key(*TEST_USER_CREDENTIALS)
 
     # Test API commands            
     for as_form, q in queries:

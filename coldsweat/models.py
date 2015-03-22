@@ -92,22 +92,32 @@ class User(CustomModel):
     """
     Coldsweat user
     """    
-    DEFAULT_CREDENTIALS = 'coldsweat', 'coldsweat'
+    DEFAULT_USERNAME = 'coldsweat' 
     MIN_PASSWORD_LENGTH = 8
 
     username            = CharField(unique=True)
     password            = CharField()  
-    email               = CharField(null=True)
+    email               = CharField(default='')
     api_key             = CharField(unique=True)
     is_enabled          = BooleanField(default=True) 
 
     class Meta:
         db_table = 'users'
     
-    #@@FIXME: we should use email instead as Fever API dictates
     @staticmethod
-    def make_api_key(username, password):
-        return make_md5_hash(u'%s:%s' % (username, password))
+    def make_api_key(email, password):
+        return make_md5_hash(u'%s:%s' % (email, password))
+
+    @staticmethod
+    def validate_api_key(api_key):
+        try:
+            # Clients may send api_key in uppercase, lower it
+            user = User.get((User.api_key == api_key.lower()) & 
+                (User.is_enabled == True))        
+        except User.DoesNotExist:
+            return None
+
+        return user
 
     @staticmethod
     def validate_credentials(username, password):
@@ -119,26 +129,14 @@ class User(CustomModel):
             return None
 
         return user
-
-    @staticmethod
-    def validate_api_key(api_key):
-        try:
-            # Clients may send api_key in uppercase, lower() it
-            user = User.get((User.api_key == api_key.lower()) & 
-                (User.is_enabled == True))        
-        except User.DoesNotExist:
-            return None
-
-        return user
     
     @staticmethod
     def validate_password(password):
-        #@@TODO: Check for unacceptable chars
         return len(password) >= User.MIN_PASSWORD_LENGTH
         
 @pre_save(sender=User)
 def on_user_save(model, user, created):
-     user.api_key = User.make_api_key(user.username, user.password)
+     user.api_key = User.make_api_key(user.email, user.password)
           
 
 #@@REMOVEME: We keep this only to make migrations work
@@ -346,8 +344,10 @@ def migrate_database_schema():
 
     drop_table_migrations, column_migrations = [], []
     
-    # Schema changes introduced in version 0.9.4 -------------------------------
-
+    # --------------------------------------------------------------------------
+    # Schema changes introduced in version 0.9.4
+    # --------------------------------------------------------------------------
+    
     # Change columns
 
     if hasattr(Feed_, 'icon_id'):
@@ -367,8 +367,10 @@ def migrate_database_schema():
     if Icon.table_exists():
         drop_table_migrations.append(Icon.drop_table)
 
-    # Schema changes introduced in version 0.9.5 -------------------------------
-
+    # --------------------------------------------------------------------------
+    # Schema changes introduced in version 0.9.5
+    # --------------------------------------------------------------------------
+    
     # Change columns
 
     class UpdateFeedSelfLinkHashOperation(object):
@@ -383,6 +385,12 @@ def migrate_database_schema():
             for entry in Entry.select():
                 entry.save()
 
+    class UpdateUserApiKeyOperation(object):
+        # Fake migrate.Operation protocol and upon saving populate all guid_hash fields
+        def run(self):        
+            for user in User.select():
+                user.save()
+                
     if not hasattr(Feed_, 'self_link_hash'):
         # Start relaxing index constrains to cope with existing data...
         self_link_hash = CharField(null=True, max_length=40)
@@ -409,6 +417,10 @@ def migrate_database_schema():
 
     if Entry_.guid.index:
         column_migrations.append(migrator.drop_index('entries', 'entries_guid'))        
+
+    # Misc.
+        
+    column_migrations.append(UpdateUserApiKeyOperation())
         
     # --------------------------------------------------------------------------
     

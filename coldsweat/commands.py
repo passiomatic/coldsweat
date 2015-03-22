@@ -165,14 +165,12 @@ def read_password(prompt_label="Enter password: "):
     
 def run():
 
-    default_username, _ = User.DEFAULT_CREDENTIALS
-
     epilog = "Available commands are: %s" % ', '.join(sorted('import export serve setup upgrade fetch'.split()))
     usage='%prog command [options] [args]'
 
     available_options = [
         make_option('-u', '--username', 
-            dest='username', default=default_username, help="specifies a username (default is %s)" % default_username),
+            dest='username', default=User.DEFAULT_USERNAME, help="specifies a username (default is %s)" % User.DEFAULT_USERNAME),
 #         make_option('-f', '--force',
 #             dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
         make_option('-p', '--port', default='8080', 

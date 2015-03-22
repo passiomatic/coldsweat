@@ -60,7 +60,7 @@ class CommandController(FeedController, UserController):
         for feed, group in feeds:
             self.add_subscription(feed, group)
     
-        print "Import finished for user %s. See log file for more information" % self.user.username
+        print "Import completed for user %s. See log file for more information" % self.user.username
 
 
     def command_export(self, options, args):
@@ -79,7 +79,7 @@ class CommandController(FeedController, UserController):
         with open(filename, 'w') as f:
             f.write(render_template(os.path.join(template_dir, 'export.xml'), locals()))
             
-        print "Export finished for user %s." % self.user.username
+        print "Export completed for user %s." % self.user.username
 
 
     def command_refresh(self, options, args):
@@ -124,8 +124,8 @@ class CommandController(FeedController, UserController):
         except User.DoesNotExist:
             pass
     
-        email = raw_input('Enter e-mail for user %s (hit enter to leave blank): ' % username)
-            
+        email = raw_input('Enter e-mail for user %s (needed for Fever sync, hit enter to leave blank): ' % username)
+
         while True:
             password = read_password("Enter password for user %s: " % username)
             if not User.validate_password(password):
@@ -139,7 +139,7 @@ class CommandController(FeedController, UserController):
                 break
     
         User.create(username=username, email=email, password=password)
-        print "Setup for user %s completed." % username
+        print "Setup completed for user %s." % username
 
     def command_update(self, options, args):
         '''Update Coldsweat internals from a previous version'''

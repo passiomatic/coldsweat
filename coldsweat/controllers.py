@@ -53,10 +53,10 @@ class UserController(BaseController):
         try:
             subscription = Subscription.create(user=self.user, feed=feed, group=group)
         except IntegrityError:
-            logger.debug(u'user %s has already feed %s in her subscriptions' % (self.user.username, feed.self_link))    
+            logger.debug(u'user %s already has feed %s in her subscriptions' % (self.user.username, feed.self_link))    
             return None
     
-        logger.debug(u'added feed %s for user %s' % (feed.self_link, self.user.username))                
+        logger.debug(u'subscribed user %s to feed %s' % (self.user.username, feed.self_link))                
         return subscription    
 
     def remove_subscription(self, feed):

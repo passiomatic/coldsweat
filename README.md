@@ -20,6 +20,15 @@ I'm fed up of online services that are here today and gone tomorrow. After the G
 
 See _[setup]_ page.
 
+## Backwards-incompatible changes
+
+Almost all config options have now a default value so you don't need to necessary adjust the new options listed below.
+
+* Config option `error_threshold` is now called `max_errors`
+* Config option `multiprocessing` has been replaced by `processes`, assign a value of 0 to disable multiprocessing
+
+Take a look at `etc/config-sample` for further information.
+
 ## Upgrading from previous versions
 
 First, always make sure required third-party packages are up-to-date:

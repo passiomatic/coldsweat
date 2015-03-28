@@ -112,7 +112,7 @@ class CommandController(FeedController, UserController):
     # Setup and update
  
     def command_setup(self, options, args):
-        '''Sets up a working database'''
+        '''Setup a working database'''
         username = options.username
     
         setup_database_schema()
@@ -141,17 +141,19 @@ class CommandController(FeedController, UserController):
         User.create(username=username, email=email, password=password)
         print "Setup completed for user %s." % username
 
-    def command_update(self, options, args):
-        '''Update Coldsweat internals from a previous version'''
+    def command_upgrade(self, options, args):
+        '''Upgrades Coldsweat internals from a previous version'''
         
         try:
             if migrate_database_schema():
-                print 'Update completed.'
+                print 'Upgrade completed.'
             else:
                 print 'Database is already up-to-date.'
         except OperationalError, ex:         
             logger.error(u'caught exception updating database schema: (%s)' % ex)
             print  'Error while running database update. See log file for more information.'
+
+    command_update = command_upgrade # Alias
 
 def read_password(prompt_label="Enter password: "):
     if sys.stdin.isatty():
@@ -174,7 +176,7 @@ def run():
 #         make_option('-f', '--force',
 #             dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
         make_option('-p', '--port', default='8080', 
-            dest='port', type='int', help='the port to serve on (default 8080)'),
+            dest='port', type='int', help='specifies the port to serve on (default 8080)'),
         make_option('-r', '--allow-remote-access', action='store_true', dest='allow_remote_access', help='binds to 0.0.0.0 instead of localhost'),
     ]
         

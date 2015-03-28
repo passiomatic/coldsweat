@@ -380,13 +380,11 @@ def migrate_database_schema():
                 feed.save()
 
     class UpdateEntryGuidHashOperation(object):
-        # Fake migrate.Operation protocol and upon saving populate all guid_hash fields
         def run(self):        
             for entry in Entry.select():
                 entry.save()
 
     class UpdateUserApiKeyOperation(object):
-        # Fake migrate.Operation protocol and upon saving populate all guid_hash fields
         def run(self):        
             for user in User.select():
                 user.save()

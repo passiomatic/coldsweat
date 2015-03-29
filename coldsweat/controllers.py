@@ -191,7 +191,7 @@ class FeedController(BaseController):
 #         pass
 
 
-    def add_feeds_from_file(self, filename):
+    def add_feeds_from_file(self, filename, fetch_data=False):
         """
         Add feeds to database reading from a file containing OPML data. 
         """    
@@ -245,7 +245,7 @@ class FeedController(BaseController):
                             setattr(feed, feed_allowed_attribs[k], v)
     
                     
-                    feed = self.add_feed(feed)  
+                    feed = self.add_feed(feed, fetch_data)  
                     feeds.append((feed, groups[-1]))
                 elif element.tag == 'outline':
                     # Leaving a group
@@ -257,7 +257,7 @@ class FeedController(BaseController):
     # Fetching
     # ------------------------------------------------------  
 
-    def fetch_feeds(self, feeds): #@@TODO add processes param? 
+    def fetch_feeds(self, feeds):
         """
         Fetch given feeds, possibly parallelizing requests
         """
@@ -288,8 +288,7 @@ class FeedController(BaseController):
         Fetch all enabled feeds, possibly parallelizing requests
         """
     
-        # Attach feed.subscriptions counter
-        q = Feed.select(Feed, fn.Count(Subscription.user).alias('subscriptions')).join(Subscription, JOIN_LEFT_OUTER).group_by(Feed).where(Feed.is_enabled==True)
+        q = Feed.select().where(Feed.is_enabled==True)
         
         feeds = list(q)
         if not feeds:
@@ -300,11 +299,6 @@ class FeedController(BaseController):
 
 
 def feed_worker(feed):
-
-    #@@REMOVEME: just delete feed if there are no subscribers
-#     if not feed.subscriptions:
-#         logger.debug(u"feed %s has no subscribers, skipped" % feed.self_link)
-#         return
 
     # Each worker has its own connection
     connect()

@@ -56,11 +56,11 @@ class CommandController(FeedController, UserController):
     
         self.user = self._get_user(options.username)
     
-        feeds = self.add_feeds_from_file(args[0])
+        feeds = self.add_feeds_from_file(args[0], options.fetch_data)
         for feed, group in feeds:
             self.add_subscription(feed, group)
     
-        print "Import completed for user %s. See log file for more information" % self.user.username
+        print "Import%s completed for user %s. See log file for more information" % (' and fetch' if options.fetch_data else '', self.user.username)
 
 
     def command_export(self, options, args):
@@ -165,16 +165,18 @@ def read_password(prompt_label="Enter password: "):
 
     return password
     
+COMMANDS = 'import export serve setup upgrade fetch'.split()    
+
 def run():
 
-    epilog = "Available commands are: %s" % ', '.join(sorted('import export serve setup upgrade fetch'.split()))
+    epilog = "Available commands are: %s" % ', '.join(sorted(COMMANDS))
     usage='%prog command [options] [args]'
 
     available_options = [
         make_option('-u', '--username', 
             dest='username', default=User.DEFAULT_USERNAME, help="specifies a username (default is %s)" % User.DEFAULT_USERNAME),
-#         make_option('-f', '--force',
-#             dest='force', action='store_true', help='attempts to refresh even disabled feeds'),
+        make_option('-f', '--fetch',
+            dest='fetch_data', action='store_true', help='fetches each feed data after import'),
         make_option('-p', '--port', default='8080', 
             dest='port', type='int', help='specifies the port to serve on (default 8080)'),
         make_option('-r', '--allow-remote-access', action='store_true', dest='allow_remote_access', help='binds to 0.0.0.0 instead of localhost'),

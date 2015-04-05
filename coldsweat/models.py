@@ -48,12 +48,11 @@ DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 class SqliteDatabase_(SqliteDatabase):
     def initialize_connection(self, connection):
         self.execute_sql('PRAGMA foreign_keys=ON;')
-        self.execute_sql('PRAGMA journal_mode=WAL;')
         
 # Defer database init, see connect() below
 engine = config.database.engine
 if engine == 'sqlite':
-    _db = SqliteDatabase_(None) 
+    _db = SqliteDatabase_(None, journal_mode='WAL') 
     migrator = SqliteMigrator(_db)
 elif engine == 'mysql':
     _db = MySQLDatabase(None)

@@ -122,10 +122,14 @@ class User(CustomModel):
     def validate_credentials(username_or_email, password):        
         '''Lookup for and existing username/e-mail combo and password'''
         try:
-            user = User.get((User.username == username_or_email) | (User.email == username_or_email) & 
-                (User.password == password) & 
-                (User.is_enabled == True))        
+            user = User.get((User.username == username_or_email) | 
+                (User.email == username_or_email) & 
+                (User.is_enabled == True))
         except User.DoesNotExist:
+            return None
+
+        # Do a case-sensitive compare
+        if user.password != password:
             return None
 
         return user

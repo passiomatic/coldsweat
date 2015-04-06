@@ -564,7 +564,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
                 self.user = user
                 return self.redirect_after_post(from_url)
             else:
-                self.alert_message = 'ERROR Unable to log in. Check your username and password.'            
+                self.alert_message = 'ERROR Unable to log in. Check your username, email and password.'            
                 return self.redirect_after_post(self.request.url)
         
         page_title = 'Log In'

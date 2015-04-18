@@ -7,8 +7,9 @@ Tempita==0.5.1
 # Run Coldsweat in FastCGI enviroments (optional)
 #Flup==1.0.3.dev-20110405
 
-# Connect Coldsweat to a MySQL database (optional)
+# Connect Coldsweat to a MySQL database (optional, pick PyMySQL if you have trouble installing Mysql-python)
 #Mysql-python
+#PyMySQL
 
 # Connect Coldsweat to a PostgreSQL database (optional)
 #psycopg2

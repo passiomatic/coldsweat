@@ -1,17 +1,8 @@
 [database]
 
-engine: sqlite
-;engine: mysql
-;engine: postgresql
-
-; MySQL and PostgreSQL database settings
-;hostname: localhost
-;username: root
-;password: secret
-
-;database: coldsweat
-; For SQLite specify a file name instead 
-database: data/coldsweat.db
+connection_url: sqlite:///data/coldsweat.db
+;connection_url: mysql://username:password@localhost/coldsweat
+;connection_url: postgresql://username:password@localhost/coldsweat
 
 ; Configuration settings below are all optional, default values are shown
 

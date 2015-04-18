@@ -6,9 +6,9 @@ Copyright (c) 2013—2015 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-
+import urlparse 
 import pickle
-from datetime import datetime, timedelta
+from datetime import datetime
 from peewee import *
 from playhouse.migrate import *
 from playhouse.signals import Model as BaseModel, pre_save
@@ -48,20 +48,39 @@ DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 class SqliteDatabase_(SqliteDatabase):
     def initialize_connection(self, connection):
         self.execute_sql('PRAGMA foreign_keys=ON;')
-        
-# Defer database init, see connect() below
-engine = config.database.engine
+
+def parse_connection_url(url):
+	parsed = urlparse.urlparse(url, scheme='sqlite')
+	connect_kwargs = {'database': parsed.path[1:]}
+	if parsed.username:
+		connect_kwargs['user'] = parsed.username
+	if parsed.password:
+		connect_kwargs['password'] = parsed.password
+	if parsed.hostname:
+		connect_kwargs['host'] = parsed.hostname
+	if parsed.port:
+		connect_kwargs['port'] = parsed.port
+
+    # Adjust parameters for MySQL
+	if parsed.scheme == 'mysql' and 'password' in connect_kwargs:
+		connect_kwargs['passwd'] = connect_kwargs.pop('password')
+
+	return parsed.scheme, connect_kwargs
+    
+
+engine, kwargs = parse_connection_url(config.database.connection_url)
+database_name = kwargs.pop('database')
 if engine == 'sqlite':
-    _db = SqliteDatabase_(None, journal_mode='WAL') 
+    _db = SqliteDatabase_(database_name, journal_mode='WAL') 
     migrator = SqliteMigrator(_db)
 elif engine == 'mysql':
-    _db = MySQLDatabase(None)
+    _db = MySQLDatabase(database_name, **kwargs)
     migrator = MySQLMigrator(_db)
 elif engine == 'postgresql':
-    _db = PostgresqlDatabase(None, autorollback=True)
+    _db = PostgresqlDatabase(database_name, autorollback=True, **kwargs)
     migrator = PostgresqlMigrator(_db)
 else:
-    raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
+	raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
 
 # ------------------------------------------------------
 # Custom fields
@@ -303,30 +322,10 @@ class Session(CustomModel):
 # Utility functions
 # ------------------------------------------------------
 
-def _init_sqlite():
-    _db.init(config.database.database)    
-
-def _init_mysql():
-    kwargs = dict(
-        host        = config.database.hostname,
-        user        = config.database.username,
-        password    = config.database.password        
-    )
-    _db.init(config.database.database, **kwargs)
-
-_init_postgresql = _init_mysql # Alias
-
-ENGINES = {
-    'sqlite'    : _init_sqlite,
-    'mysql'     : _init_mysql,
-    'postgresql': _init_postgresql,        
-}
-
 def connect():
     """
     Shortcut to init and connect to database
     """
-    ENGINES[engine]()
     _db.connect()
 
 def transaction():

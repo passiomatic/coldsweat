@@ -69,15 +69,14 @@ def parse_connection_url(url):
     
 
 engine, kwargs = parse_connection_url(config.database.connection_url)
-database_name = kwargs.pop('database')
 if engine == 'sqlite':
-    _db = SqliteDatabase_(database_name, journal_mode='WAL') 
+    _db = SqliteDatabase_(journal_mode='WAL', **kwargs) 
     migrator = SqliteMigrator(_db)
 elif engine == 'mysql':
-    _db = MySQLDatabase(database_name, **kwargs)
+    _db = MySQLDatabase(**kwargs)
     migrator = MySQLMigrator(_db)
 elif engine == 'postgresql':
-    _db = PostgresqlDatabase(database_name, autorollback=True, **kwargs)
+    _db = PostgresqlDatabase(autorollback=True, **kwargs)
     migrator = PostgresqlMigrator(_db)
 else:
 	raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
@@ -323,9 +322,6 @@ class Session(CustomModel):
 # ------------------------------------------------------
 
 def connect():
-    """
-    Shortcut to init and connect to database
-    """
     _db.connect()
 
 def transaction():

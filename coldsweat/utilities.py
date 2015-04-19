@@ -79,7 +79,7 @@ def format_datetime(value, format='%a, %b %d at %H:%M'):
 def format_date(value):
     return format_datetime(value, '%b %d, %Y')
 
-def datetime_since(value, comparsion_value=None, default="just now"):
+def datetime_since(value, comparison_value=None, default="just now"):
     """
     Returns string representing "time since" e.g.
     3 days ago, 5 hours ago etc.
@@ -87,8 +87,8 @@ def datetime_since(value, comparsion_value=None, default="just now"):
     From http://flask.pocoo.org/snippets/33/
     """
 
-    comparsion_value = comparsion_value or datetime.utcnow()
-    diff = comparsion_value - value
+    comparison_value = comparison_value or datetime.utcnow()
+    diff = comparison_value - value
     
     periods = (
         (diff.days / 365, "year", "years"),
@@ -106,14 +106,14 @@ def datetime_since(value, comparsion_value=None, default="just now"):
 
     return default
 
-def datetime_since_today(value, comparsion_value=None):
+def datetime_since_today(value, comparison_value=None):
     """
     Returns string representing "date since" e.g.
     today, yesterday and Wed, Jan 29
     """
 
-    comparsion_value = comparsion_value or datetime.utcnow()    
-    delta = comparsion_value - value    
+    comparison_value = comparison_value or datetime.utcnow()    
+    delta = comparison_value - value    
     if delta.days == 0:       
         return 'today'
     elif delta.days == 1: 

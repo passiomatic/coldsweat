@@ -36,8 +36,9 @@ Second, make sure your database structure is up-to-date too:
 
 A few changes have been made to the configuration options:
 
+* A new config option named `connection_url` replaces `engine`, `database`, `hostname`, `username` and `password` options
 * Config option `error_threshold` is now called `max_errors`
-* Config option `multiprocessing` has been replaced by `processes`. Assign a value of 0 to disable multiprocessing
+* Config option `multiprocessing` has been replaced by `processes`. Assigning a value of 0 disables multiprocessing
 
 To make the configuration code more robust almost all options have now a default value so you don't necessary need to adjust the values listed above. Take a look at `etc/config-sample` for further information.
 

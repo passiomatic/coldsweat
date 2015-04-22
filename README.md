@@ -42,10 +42,13 @@ A few changes have been made to the configuration options:
 
 To make the configuration code more robust almost all options have now a default value so you don't necessary need to adjust the values listed above. Take a look at `etc/config-sample` for further information.
 
-#### Fever Sync
+#### Fever sync
 
 Coldsweat now uses the user e-mail instead of username to authorize clients, like Fever API dictates. This means that while configuring your Fever client it is required to specify an e-mail address and password to successully finish to authorization process.
 
+#### New commands names
+
+The commands `update` and `refresh` are now respectively aliases of `upgrade` and `fetch`. Older command names will most likely dropped with the 1.0.0 release.
 
 ## Technical underpinnings
 

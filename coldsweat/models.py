@@ -50,22 +50,22 @@ class SqliteDatabase_(SqliteDatabase):
         self.execute_sql('PRAGMA foreign_keys=ON;')
 
 def parse_connection_url(url):
-	parsed = urlparse.urlparse(url, scheme='sqlite')
-	connect_kwargs = {'database': parsed.path[1:]}
-	if parsed.username:
-		connect_kwargs['user'] = parsed.username
-	if parsed.password:
-		connect_kwargs['password'] = parsed.password
-	if parsed.hostname:
-		connect_kwargs['host'] = parsed.hostname
-	if parsed.port:
-		connect_kwargs['port'] = parsed.port
-
+    parsed = urlparse.urlparse(url, scheme='sqlite')
+    connect_kwargs = {'database': parsed.path[1:]}
+    if parsed.username:
+        connect_kwargs['user'] = parsed.username
+    if parsed.password:
+        connect_kwargs['password'] = parsed.password
+    if parsed.hostname:
+        connect_kwargs['host'] = parsed.hostname
+    if parsed.port:
+        connect_kwargs['port'] = parsed.port
+    
     # Adjust parameters for MySQL
-	if parsed.scheme == 'mysql' and 'password' in connect_kwargs:
-		connect_kwargs['passwd'] = connect_kwargs.pop('password')
-
-	return parsed.scheme, connect_kwargs
+    if parsed.scheme == 'mysql' and 'password' in connect_kwargs:
+        connect_kwargs['passwd'] = connect_kwargs.pop('password')
+    
+    return parsed.scheme, connect_kwargs
     
 
 engine, kwargs = parse_connection_url(config.database.connection_url)
@@ -79,7 +79,7 @@ elif engine == 'postgresql':
     _db = PostgresqlDatabase(autorollback=True, **kwargs)
     migrator = PostgresqlMigrator(_db)
 else:
-	raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
+    raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
 
 # ------------------------------------------------------
 # Custom fields

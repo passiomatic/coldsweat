@@ -56,10 +56,13 @@ class CommandController(FeedController, UserController):
     
         self.user = self._get_user(options.username)
     
-        feeds = self.add_feeds_from_file(args[0], options.fetch_data)
+        feeds = self.add_feeds_from_file(args[0])
         for feed, group in feeds:
-            self.add_subscription(feed, group)
-    
+            self.add_subscription(feed, group)      
+        if options.fetch_data:
+            # Fetch just imported feeds
+            self.fetch_feeds([feed for feed, group in feeds]) 
+        
         print "Import%s completed for user %s. See log file for more information" % (' and fetch' if options.fetch_data else '', self.user.username)
 
 

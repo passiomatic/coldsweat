@@ -39,6 +39,7 @@ A few changes have been made to the configuration options:
 * A new config option named `connection_url` replaces `engine`, `database`, `hostname`, `username` and `password` options
 * Config option `error_threshold` is now called `max_errors`
 * Config option `multiprocessing` has been replaced by `processes`. Assigning a value of 0 disables multiprocessing
+* Log config options `format` and `datefmt` have been removed. Please remove them from your `etc/config` file if Coldsweat raises a `ConfigParser.InterpolationMissingOptionError` exception on startup.
 
 To make the configuration code more robust almost all options have now a default value so you don't necessary need to adjust the values listed above. Take a look at `etc/config-sample` for further information.
 

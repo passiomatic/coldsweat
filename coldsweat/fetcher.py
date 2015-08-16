@@ -48,7 +48,14 @@ class Fetcher(object):
         _, self.netloc, _, _, _ = urlparse.urlsplit(feed.self_link)
  
         self.feed = feed
-        
+
+# @@TODO    
+#       def handle_500(self, response):
+#         '''
+#         Internal server error
+#         '''
+#         pass
+                
     def handle_404(self, response):
         '''
         Not Found
@@ -135,6 +142,7 @@ class Fetcher(object):
             self.feed.last_status   =  HTTPServiceUnavailable.code
             self.feed.error_count   += 1   
             logger.warn(u"a network error occured while fetching %s, skipped" % self.netloc)
+            self.feed.save()            
             return
     
         self.feed.last_checked_on = self.instant

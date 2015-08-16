@@ -322,12 +322,14 @@ class Session(CustomModel):
 # ------------------------------------------------------
 
 def connect():
+    logger.debug('connecting')
     _db.connect()
 
 def transaction():
     return _db.transaction()
 
 def close():
+    logger.debug('closing connection')
     if not _db.is_closed():
         _db.close()
 

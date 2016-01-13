@@ -271,8 +271,11 @@ class FeedController(BaseController):
             
         if config.fetcher.processes:
             from multiprocessing import Pool
-            p = Pool(config.fetcher.processes)
+            # Each worker has its own connection
+            p = Pool(config.fetcher.processes, initializer=connect)
             p.map(feed_worker, feeds)
+            # Exit the worker processes so their connections do not leak
+            p.close()
         else:
             # Just sequence requests in this process
             for feed in feeds:
@@ -299,9 +302,6 @@ class FeedController(BaseController):
 
 
 def feed_worker(feed):
-
-    # Each worker has its own connection
-    connect()
     fetcher = Fetcher(feed)
     fetcher.update_feed()
 

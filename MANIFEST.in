@@ -1,5 +1,6 @@
 graft coldsweat/templates
 
 graft static
+prune static/javascripts/vendor/bootstrap
 prune static/stylesheets
 include static/stylesheets/all.css

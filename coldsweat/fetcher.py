@@ -166,7 +166,7 @@ class Fetcher(object):
         except (HTTPError, HTTPNotModified, DuplicatedFeedError):
             return # Bail out
         finally:
-            if self.feed.error_count > config.fetcher.max_errors:
+            if config.fetcher.max_errors and self.feed.error_count > config.fetcher.max_errors:
                 self._synthesize_entry('Feed has accomulated too many errors (last was %s).' % filters.status_title(status))
                 logger.warn(u"%s has accomulated too many errors, disabled" % self.netloc)
                 self.feed.is_enabled = False
@@ -207,7 +207,7 @@ class Fetcher(object):
             content_type, content   = t.get_content(('text/plain', ''))
         
             # Skip ancient entries        
-            if (self.instant - timestamp).days > config.fetcher.max_history:
+            if config.fetcher.max_history and (self.instant - timestamp).days > config.fetcher.max_history:
                 logger.debug(u"entry %s from %s is over maximum history, skipped" % (guid, self.netloc))
                 continue
     

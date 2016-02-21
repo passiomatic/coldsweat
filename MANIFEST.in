@@ -1,5 +1,5 @@
 graft coldsweat/templates
 
-graft static
-prune static/stylesheets
-include static/stylesheets/all.css
+graft coldsweat/static
+prune coldsweat/static/stylesheets
+include coldsweat/static/stylesheets/all.css

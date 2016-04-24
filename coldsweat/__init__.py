@@ -36,13 +36,13 @@ USER_AGENT      = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldswe
 #  to work for the fetcher script too
 installation_dir, _ = os.path.split(os.path.dirname(os.path.abspath(__file__))) 
 template_dir        = os.path.join(installation_dir, 'coldsweat/templates')
-plugin_dir          = os.path.join(installation_dir, 'plugins')
+plugin_dir          = os.path.abspath('plugins')
 
 # ------------------------------------------------------
 # Load up configuration settings
 # ------------------------------------------------------
 
-config = load_config(os.path.join(installation_dir, 'etc/config'))
+config = load_config(os.path.abspath('etc/config'))
 
 # ------------------------------------------------------
 # Configure logger

@@ -55,7 +55,16 @@ class Fetcher(object):
 #         Internal server error
 #         '''
 #         pass
-                
+
+    def handle_403(self, response):
+        '''
+        Forbidden
+        '''
+        self.feed.error_count   += 1        
+        self.feed.last_status   = response.status_code
+        logger.warn(u"%s access was denied, skipped" % self.netloc)        
+        raise HTTPForbidden
+                        
     def handle_404(self, response):
         '''
         Not Found

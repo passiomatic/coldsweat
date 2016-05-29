@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Description: Scrubber plugin. Remove links and images from 
-  feed entries according to etc/blacklist
+  feed entries according to given blacklist
 
 Copyright (c) 2013—2015 Andrea Peltrin
 License: MIT (see LICENSE for details)
@@ -19,18 +19,15 @@ DOMAINS = []
 def fetcher_started():
     if DOMAINS: return # Already initialized
     
-    backlist_path = os.path.join(installation_dir, 'etc/blacklist')
-    try:
-        with open(backlist_path) as f:
-            for line in f:
-                if line == '\n' or line.startswith('#') or line.startswith(';'):
-                    continue # Skip empty values and comments                
-                DOMAINS.append(line.rstrip('\n'))    
-    except IOError:
-        logger.warn(u"could not load %s" % backlist_path)    
-        return    
-
-    logger.debug(u"loaded blacklist: %s" % ', '.join(DOMAINS))
+    blacklist = getattr(config.plugins, 'scrubber_blacklist', '')
+    
+    if blacklist:
+      DOMAINS.extend(blacklist.split(','))    
+    
+    if DOMAINS:
+      logger.debug(u"scrubber plugin: loaded blacklist: %s" % ', '.join(DOMAINS))
+    else:
+      logger.info(u"scrubber plugin: blacklist is empty, nothing to do")
     
     
 @event('entry_parsed')

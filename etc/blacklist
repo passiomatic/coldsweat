@@ -1,8 +1,0 @@
-; Links and images in entries with these hostnames will 
-; be scrubbed upon fetching. A partial match is performed so, 
-; for example, the "feedsportal.com" line will match both 
-; ad.feedsportal.com and feedsportal.com.
-
-feeds.feedburner.com
-feedsportal.com
-stats.wordpress.com

@@ -39,4 +39,12 @@ filename: coldsweat.log
 [plugins]
 
 ; Comma separated list of plugins to load
-;load : scrubber
+;load: scrubber
+
+; Scubber plugin options
+
+; Comma-separated list of host names. Links and images in entries  
+; with these host names will be scrubbed upon fetching. A partial 
+; match is performed, e.g. the "feedsportal.com" line will match
+; both ad.feedsportal.com and feedsportal.com.
+scrubber_blacklist: feeds.feedburner.com,feedsportal.com,stats.wordpress.com

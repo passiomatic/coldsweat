@@ -20,6 +20,11 @@ from config import *
 __all__ = [
     'VERSION_STRING',
     'USER_AGENT',
+
+    # Synthesized entries and feed URI's 
+    'FEED_TAG_URI',
+    'ENTRY_TAG_URI',
+    
     # Configuration
     'installation_dir',
     'template_dir',
@@ -31,7 +36,10 @@ __all__ = [
 
 VERSION_STRING  = '%d.%d.%d%s' % __version__
 USER_AGENT      = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING
-         
+
+FEED_TAG_URI    = 'tag:lab.passiomatic.com,%d:coldsweat:feed:%s'         
+ENTRY_TAG_URI   = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
+
 # Figure out installation directory. This has 
 #  to work for the fetcher script too
 installation_dir, _ = os.path.split(os.path.dirname(os.path.abspath(__file__))) 

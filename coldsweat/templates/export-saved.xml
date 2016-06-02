@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom"> 
+	<title>Saved entries for user {{self.user.username}}</title>
+	<generator version="{{version}}">Coldsweat</generator>
+	<id>{{guid}}</id>
+	<updated>{{timestamp|iso_datetime}}</updated>
+    {{for e in q}}
+    	<entry>
+    		<title>{{e.title}}</title>
+    		<link rel="alternate" type="text/html" href="{{e.link}}"/>
+    		<id>{{e.guid}}</id>
+    		<updated>{{e.last_updated_on|iso_datetime}}</updated>
+{{if e.content_type == 'text/html'}}
+	<content type="html">
+        {{e.content}}
+	</content>
+{{elif e.content_type == 'application/xhtml+xml'}}
+	<content type="xhtml">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            {{e.content|html}}
+        </div>
+	</content>	
+{{else}}
+	<content type="text">
+        {{e.content}}
+	</content>
+{{endif}}
+    		<author>
+    			<name>{{e.author}}</name>
+    		</author>
+    		<source>
+    		    <title>{{e.feed.title}}</title>
+    		    <link rel="self" href="{{e.feed.self_link}}"/>
+    		</source>
+    	</entry>
+    {{endfor}}
+</feed>

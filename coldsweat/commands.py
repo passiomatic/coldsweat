@@ -22,7 +22,7 @@ from app import *
 import cascade, fever, frontend
 from utilities import render_template
 from plugins import trigger_event, load_plugins
-
+import filters
 
 class CommandError(Exception):
     pass
@@ -52,7 +52,7 @@ class CommandController(FeedController, UserController):
         '''Imports feeds from OPML file'''
     
         if not args:
-            raise CommandError('no OPML file given')
+            raise CommandError('no input OPML file given')
     
         self.user = self._get_user(options.username)
     
@@ -65,25 +65,44 @@ class CommandController(FeedController, UserController):
         
         print "Import%s completed for user %s. See log file for more information" % (' and fetch' if options.fetch_data else '', self.user.username)
 
-
     def command_export(self, options, args):
+        self.user = self._get_user(options.username)
+        if options.saved_entries:
+            self._export_saved_entries(options, args)
+        else:
+            self._export_feeds(options, args)
+        
+        print "Export completed for user %s." % self.user.username
+        
+    def _export_feeds(self, options, args):
         '''Exports feeds to OPML file'''
     
         if not args:
-            raise CommandError('no OPML file given')
-    
-        self.user = self._get_user(options.username)
+            raise CommandError('no output OPML file given')
     
         filename = args[0]
-        timestamp = format_http_datetime(datetime.utcnow())
-        
+        #@@TODO Use a 'http_datetime' filter in template instead
+        timestamp = format_http_datetime(datetime.utcnow())        
         groups = [ (group.title, self.get_group_feeds(group)) for group in self.get_groups() ]
         
         with open(filename, 'w') as f:
             f.write(render_template(os.path.join(template_dir, 'export.xml'), locals()))
-            
-        print "Export completed for user %s." % self.user.username
 
+    def _export_saved_entries(self, options, args):
+        '''Exports saved entries to Atom file'''
+        
+        if not args:
+            raise CommandError('no output Atom file given')
+        
+        filename = args[0]    
+        timestamp = datetime.utcnow()        
+        q = self.get_saved_entries()
+        guid = FEED_TAG_URI % (timestamp.year, make_sha1_hash(self.user.email or self.user.username))
+        version = VERSION_STRING
+
+        with open(filename, 'w') as f:
+            f.write(render_template(os.path.join(template_dir, 'export-saved.xml'), locals(), filters))
+            
 
     def command_refresh(self, options, args):
         '''Starts a feeds refresh procedure'''
@@ -176,12 +195,18 @@ def run():
     usage='%prog command [options] [args]'
 
     available_options = [
+        make_option('-s', '--saved-entries',
+            dest='saved_entries', action='store_true', help='export saved entries'),
+
         make_option('-u', '--username', 
             dest='username', default=User.DEFAULT_USERNAME, help="specifies a username (default is %s)" % User.DEFAULT_USERNAME),
+
         make_option('-f', '--fetch',
             dest='fetch_data', action='store_true', help='fetches each feed data after import'),
+
         make_option('-p', '--port', default='8080', 
             dest='port', type='int', help='specifies the port to serve on (default 8080)'),
+
         make_option('-r', '--allow-remote-access', action='store_true', dest='allow_remote_access', help='binds to 0.0.0.0 instead of localhost'),
     ]
         

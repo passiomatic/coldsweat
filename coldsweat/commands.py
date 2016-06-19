@@ -135,11 +135,38 @@ class CommandController(FeedController, UserController):
  
     def command_setup(self, options, args):
         '''Setup a working database'''
-        username = options.username
-    
+        username = options.username        
+            
         setup_database_schema()
+
+        def get_password(label):
+          while True:
+              password = read_password(label)
+              if not User.validate_password(password):
+                  print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
+                  continue        
+              password_again = read_password("Enter password (again): ")
+              
+              if password != password_again:
+                  print "Error: passwords do not match, please try again"
+              else:
+                  return password
+                            
+
+        # Just reset user password
+        if options.reset_password:
+          try:
+              user = User.get(User.username == username)
+          except User.DoesNotExist:
+              raise CommandError('unknown user %s, please select another username with the -u option' % username)
+
+          password = get_password("Reset password for user %s: " % username)
+          user.password = password
+          user.save()
+
+          return 
     
-        # Check if username is already in use
+        # Regular setup process. Check if username is already in use
         try:
             User.get(User.username == username)
             raise CommandError('user %s already exists, please select another username with the -u option' % username)
@@ -147,18 +174,7 @@ class CommandController(FeedController, UserController):
             pass
     
         email = raw_input('Enter e-mail for user %s (needed for Fever sync, hit enter to leave blank): ' % username)
-
-        while True:
-            password = read_password("Enter password for user %s: " % username)
-            if not User.validate_password(password):
-                print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
-                continue        
-            password_again = read_password("Enter password (again): ")
-            
-            if password != password_again:
-                print "Error: passwords do not match, please try again"
-            else:
-                break
+        password = get_password("Enter password for user %s: " % username)
     
         User.create(username=username, email=email, password=password)
         print "Setup completed for user %s." % username
@@ -200,6 +216,9 @@ def run():
 
         make_option('-u', '--username', 
             dest='username', default=User.DEFAULT_USERNAME, help="specifies a username (default is %s)" % User.DEFAULT_USERNAME),
+
+        make_option('-w', '--password',
+            dest='reset_password', action='store_true', help='reset a user password'),
 
         make_option('-f', '--fetch',
             dest='fetch_data', action='store_true', help='fetches each feed data after import'),

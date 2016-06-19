@@ -446,11 +446,8 @@ def setup_database_schema():
     for model in models:
         model.create_table(fail_silently=True)
 
-    # Create the bare minimum to boostrap system
-    with transaction():
-        
-        # Avoid duplicated default group
-        try:
-            Group.create(title=Group.DEFAULT_GROUP)        
-        except IntegrityError:
-            return
+    # Create the bare minimum to bootstrap system
+    try:
+        Group.create(title=Group.DEFAULT_GROUP)        
+    except IntegrityError:
+        return

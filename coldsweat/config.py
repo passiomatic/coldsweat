@@ -2,7 +2,7 @@
 '''
 Description: configuration settings
 
-Copyright (c) 2013—2015 Andrea Peltrin
+Copyright (c) 2013—2016 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 '''

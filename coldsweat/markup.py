@@ -2,7 +2,7 @@
 """
 Description: HTML parsers and manipulation functions
 
-Copyright (c) 2013—2015 Andrea Peltrin
+Copyright (c) 2013—2016 Andrea Peltrin
 Portions are copyright (c) 2006 Aaron Swartz
 Portions are copyright (c) 2002–4 Mark Pilgrim
 """

@@ -2,7 +2,7 @@
 """
 Description: Template filters
 
-Copyright (c) 2013—2015 Andrea Peltrin
+Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 """
 import re, cgi, urllib, urlparse

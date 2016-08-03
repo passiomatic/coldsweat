@@ -2,7 +2,7 @@
 """
 Description: sweat utility commands
 
-Copyright (c) 2013—2015 Andrea Peltrin
+Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 """
 import os, sys

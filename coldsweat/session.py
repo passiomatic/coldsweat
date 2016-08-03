@@ -2,7 +2,7 @@
 """
 Description: web session functions and classes
 
-Copyright (c) 2013—2015 Andrea Peltrin
+Copyright (c) 2013—2016 Andrea Peltrin
 Copyright (c) 2006 L. C. Rees
 Copyright (c) 2005 Allan Saddi <allan@saddi.com>
 Copyright (c) 2005, the Lawrence Journal-World

@@ -3,7 +3,7 @@
 Description: Scrubber plugin. Remove links and images from 
   feed entries according to given blacklist
 
-Copyright (c) 2013—2015 Andrea Peltrin
+Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 '''
 

@@ -44,13 +44,13 @@ ENTRY_TAG_URI   = 'tag:lab.passiomatic.com,%d:coldsweat:entry:%s'
 #  to work for the fetcher script too
 installation_dir, _ = os.path.split(os.path.dirname(os.path.abspath(__file__))) 
 template_dir        = os.path.join(installation_dir, 'coldsweat/templates')
-plugin_dir          = os.path.abspath('plugins')
+plugin_dir          = os.path.join(installation_dir, 'plugins')
 
 # ------------------------------------------------------
 # Load up configuration settings
 # ------------------------------------------------------
 
-config = load_config(os.path.abspath('etc/config'))
+config = load_config(os.path.join(installation_dir, 'etc/config'))
 
 # ------------------------------------------------------
 # Configure logger

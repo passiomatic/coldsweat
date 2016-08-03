@@ -117,7 +117,7 @@ class CommandController(FeedController, UserController):
     def command_serve(self, options, args):
         '''Starts a local server'''
     
-        static_app = DirectoryApp(os.path.join(installation_dir, 'coldsweat', 'static'), index_page=None)
+        static_app = DirectoryApp("static", index_page=None)
         
         # Create a cascade that looks for static files first, 
         #  then tries the other apps

@@ -1,12 +1,12 @@
-# About
+# Coldsweat 0.9.6
 
 Coldsweat is a Python web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
 
-![Screenshot](screenshots/coldsweat-0.9.5.jpg)
+![Screenshot](screenshots/coldsweat-0.9.6.jpg)
 
 ## Motivation
 
-I'm fed up of online services that are here today and gone tomorrow. After the Google Reader shutdown is clear to me that the less we rely on external services the more the data we care about are preserved. With this in mind I'm writing Coldsweat. It will be my personal take at consuming feeds today.
+I'm fed up of online services that are here today and gone tomorrow. After the Google Reader shutdown is clear to me that the less we rely on external services the more the data we care about are preserved. With this in mind I'm writing Coldsweat. It is my personal take at consuming feeds today.
 
 ## Features
 
@@ -30,26 +30,10 @@ Second, make sure your database structure is up-to-date too:
 
     $ python sweat.py upgrade
 
-### Backwards-incompatible changes in 0.9.5
+### Notable changes from previous releases
 
-#### Configuration
-
-A few changes have been made to the configuration options:
-
-* A new config option named `connection_url` replaces `engine`, `database`, `hostname`, `username` and `password` options
-* Config option `error_threshold` is now called `max_errors`
-* Config option `multiprocessing` has been replaced by `processes`. Assigning a value of 0 disables multiprocessing
-* Log config options `format` and `datefmt` have been removed. Please remove them from your `etc/config` file if Coldsweat raises a `ConfigParser.InterpolationMissingOptionError` exception on startup.
-
-To make the configuration code more robust almost all options have now a default value so you don't necessary need to adjust the values listed above. Take a look at `etc/config-sample` for further information.
-
-#### Fever sync
-
-Coldsweat now uses the user e-mail instead of username to authorize clients, like Fever API dictates. This means that while configuring your Fever client it is required to specify an e-mail address and password to successully finish to authorization process.
-
-#### New commands names
-
-The commands `update` and `refresh` are now respectively aliases of `upgrade` and `fetch`. Older command names will most likely dropped with the 1.0.0 release.
+* Version 0.9.6: the `etc/blacklist` file is no longer available, please use the config `scrubber_blacklist` option instead.
+* Version 0.9.5: older commands `update` and `refresh` are now respectively aliases of `upgrade` and `fetch`. The former names will most likely dropped with the 1.0.0 release.
 
 ## Technical underpinnings
 
@@ -72,6 +56,4 @@ Coldsweat started in July 2013 as a fork of [Bottle Fever][b] by Rui Carmo. By n
 [r]: http://reederapp.com/
 [ff]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-features
 [setup]: https://github.com/passiomatic/coldsweat/wiki/Setup
-[i37]: https://github.com/passiomatic/coldsweat/issues/37
-[i3]: https://github.com/passiomatic/coldsweat/issues/3
 [plugin]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-Plugin-Interface

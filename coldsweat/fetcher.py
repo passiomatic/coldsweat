@@ -160,10 +160,11 @@ class Fetcher(object):
             status = response.history[0].status_code
         else:
             status = response.status_code
-        
+
         try:
             handler = getattr(self, 'handle_%d' % status, None)
             if handler:
+                logger.debug(u"got status %s from server" % status)        
                 handler(response)
             else: 
                 self.feed.last_status = status
@@ -444,6 +445,7 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
 
     # Conditional GET headers
     if etag and modified_since:
+        logger.debug(u"fetching %s with a conditional GET (%s %s)" % (url, etag, format_http_datetime(modified_since)))
         request_headers['If-None-Match'] = etag
         request_headers['If-Modified-Since'] = format_http_datetime(modified_since)
         

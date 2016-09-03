@@ -8,7 +8,9 @@
         {{form_message|alert}}
 
         <label for="self-link-field">Web address (URL) for the site or feed</label> 
-        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="E.g.: theverge.com or http://www.reddit.com/top/.rss">
+        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="">
+        <div class="help-block">For example theverge.com or http://www.reddit.com/top/.rss</div>
+
         {{if length(groups) > 1}}
             <label>Add to group <select name="group">
                 {{for g in groups}}
@@ -17,7 +19,11 @@
             </select></label>             
         {{endif}}
         
+        <label><input type="checkbox" name="is_muted" value="1"> Mute this feed after import</label>
+        
         <hr class="quarter">
+
+
         <div>
             <a href="javascript:window.open('{{application_url}}/feeds/add/1?self_link='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title))"><i class="fa fa-bookmark-o"></i> Subscribe Feed</a><br>
             <span class="help-block">Drag bookmarklet to your browser toolbar and quickly subscribe to any feed.</span>

@@ -265,6 +265,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         
         # Collect editable fields 
         title = feed.title
+        #is_muted = feed.is_muted
 
         q = Subscription.select(Subscription, Group).join(Group).where((Subscription.user == self.user) & (Subscription.feed == feed))
         groups = [s.group for s in q]
@@ -276,10 +277,12 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         form = self.request.POST
         
         title = form.get('title', '').strip()
+        is_muted = form.get('is_muted', False) and True # Convert to bool
         if not title:                
             form_message = u'ERROR Error, feed title cannot be empty'
             return self.respond_with_template('_feed_edit.html', locals())
         feed.title = title
+        feed.is_muted = is_muted
         feed.save()
         self.alert_message = u'SUCCESS Changes have been saved.'
         return self.respond_with_script('_modal_done.js', {'location': '%s/feeds/' % self.application_url}) 
@@ -345,6 +348,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         # Handle POST
         
         group_id = int(self.request.POST.get('group', 0))
+        is_muted = self.request.POST.get('is_muted', False) and True # Convert to bool
 
         # Assume HTTP if URL is passed w/out scheme        
         self_link = self_link if self_link.startswith('http') else u'http://' + self_link 
@@ -368,7 +372,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 
         # It's a feed
         
-        feed = self.add_feed_from_url(self_link, fetch_data=False)        
+        feed = self.add_feed_from_url(self_link, is_muted=is_muted, fetch_data=False)        
         logger.debug(u"starting fetcher")
         trigger_event('fetch_started')        
         Fetcher(feed).update_feed_with_data(response.text)        
@@ -380,9 +384,12 @@ class FrontendApp(WSGIApp, FeedController, UserController):
     @POST(r'^/feeds/add/2$')
     @login_required 
     def feed_add_2(self):  
+      
+        form = self.request.POST
 
-        self_link = self.request.POST.get('self_link', '')
-        group_id = int(self.request.POST.get('group', 0))
+        self_link = form.get('self_link', '')
+        is_muted = form.get('is_muted', False) and True # Convert to bool
+        group_id = int(form.get('group', 0))
 
 #@@TODO: handle multiple feed subscription
 #         urls = self.request.POST.getall('feeds')
@@ -395,7 +402,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 #             form_message = u'ERROR Error, feed address is incorrect or host is unreachable.'
 #             return self.respond_with_template('_feed_add_wizard_1.html', locals())
             
-        feed = self.add_feed_from_url(self_link, fetch_data=True)
+        feed = self.add_feed_from_url(self_link, is_muted=is_muted, fetch_data=True)
         return self._add_subscription(feed, group_id)
                 
 #     def _parse_feed(self, self_link):

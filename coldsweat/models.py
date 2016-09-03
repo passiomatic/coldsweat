@@ -197,7 +197,8 @@ class Feed(CustomModel):
     self_link            = TextField()                          # The URL of the feed itself (rel=self)
     self_link_hash       = CharField(unique=True, max_length=40)
     error_count          = IntegerField(default=0)
-
+    is_muted             = BooleanField(default=False)
+    
     # Nullable
 
     title                = CharField(null=True)        
@@ -420,7 +421,14 @@ def migrate_database_schema():
     # Misc.
         
     column_migrations.append(UpdateUserApiKeyOperation())
-        
+
+    # --------------------------------------------------------------------------
+    # Schema changes introduced in version 0.9.7
+    # --------------------------------------------------------------------------
+
+    if not hasattr(Feed_, 'is_muted'):
+        column_migrations.append(migrator.add_column('feeds', 'is_muted', Feed.is_muted))
+                    
     # --------------------------------------------------------------------------
     
     # Run all table and column migrations

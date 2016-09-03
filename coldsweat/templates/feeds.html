@@ -13,11 +13,11 @@ def feed_status(feed, threshold):
         <li class="feed {{if loop.first}}current{{endif}} {{feed_status(f, max_errors)}}">
             <div class="item-inner">
                 <h3 class="h4">
-                    <img class="favicon" src="{{f.icon_or_default}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>
+                    <img class="favicon" src="{{f.icon_or_default}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a> {{if f.is_muted}}(muted){{endif}}
                 </h3>
                 <div class="meta dim">
                     <span class="feed">
-                        {{if f.entry_count}}{{f.entry_count}}{{else}}No{{endif}} entries
+                        {{if f.entry_count}}{{f.entry_count}}{{else}}No{{endif}} entries 
                     </span>
                     <span class="actions">
 <a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit">About</a>&ensp;&middot;&ensp;

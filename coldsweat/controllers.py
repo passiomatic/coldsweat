@@ -103,7 +103,7 @@ class UserController(BaseController):
      
     def get_unread_entries(self, *select):         
         #@@TODO: include saved information too
-        q = _q(*select).where((Subscription.user == self.user) &
+        q = _q(*select).where((Subscription.user == self.user) & (Feed.is_muted == False) &
             ~(Entry.id << Read.select(Read.entry).where(Read.user == self.user))).distinct()
         return q
     
@@ -160,11 +160,11 @@ class FeedController(BaseController):
     Feed controller class
     '''
     
-    def add_feed_from_url(self, self_link, fetch_data=False):
+    def add_feed_from_url(self, self_link, is_muted=False, fetch_data=False):
         '''
         Save a new feed object to database via its URL
         '''
-        feed = Feed(self_link=self_link)
+        feed = Feed(self_link=self_link, is_muted=is_muted)
         return self.add_feed(feed, fetch_data)
 
 

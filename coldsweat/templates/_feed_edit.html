@@ -12,6 +12,8 @@
         <label for="field-self-link">Web address (URL)</label> 
         <input type="text" id="field-self-link" name="self_link" readonly size="40" value="{{feed.self_link}}">
 
+        <label><input type="checkbox" {{if feed.is_muted}}checked{{endif}} name="is_muted" value="1"> Mute this feed</label>
+        
         <table class="table">
           <tbody>
             {{if feed.alternate_link}}

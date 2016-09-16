@@ -10,7 +10,7 @@ from optparse import OptionParser, make_option
 from getpass import getpass
 import readline
 
-from wsgiref.simple_server import make_server
+from wsgiref.simple_server import *
 from webob.static import DirectoryApp
 from peewee import OperationalError
 
@@ -24,6 +24,16 @@ from utilities import render_template
 from plugins import trigger_event, load_plugins
 import filters
 
+# Ensure all web server activity is logged on stdout 
+#   and not stderr like default WSGIRequestHandler
+class WSGIRequestHandler_(WSGIRequestHandler):
+    def log_message(self, format, *args):
+        sys.stdout.write("%s - - [%s] %s\n" %
+                         (self.client_address[0],
+                          self.log_date_time_string(),
+                          format%args))
+                          
+                          
 class CommandError(Exception):
     pass
 
@@ -117,14 +127,14 @@ class CommandController(FeedController, UserController):
     def command_serve(self, options, args):
         '''Starts a local server'''
     
-        static_app = DirectoryApp("static", index_page=None)
+        static_app = DirectoryApp(os.path.join(installation_dir, "static"), index_page=None)
         
         # Create a cascade that looks for static files first, 
         #  then tries the other apps
         cascade_app = ExceptionMiddleware(cascade.Cascade([static_app, fever.setup_app(), frontend.setup_app()]))
         
         address = '0.0.0.0' if options.allow_remote_access else 'localhost'        
-        httpd = make_server(address, options.port, cascade_app)
+        httpd = make_server(address, options.port, cascade_app,  WSGIServer, WSGIRequestHandler_)
         print 'Serving on http://%s:%s' % (address, options.port)
         try:
             httpd.serve_forever()

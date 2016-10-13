@@ -36,6 +36,9 @@ filename: coldsweat.log
 ; Static files served from a different server
 ;static_url: http://media.example.com/static
 
+; If enabled, all feeds will be re-fetched when 'http://<host>:<port>/feeds/fetch' is called, regardless of 'min_interval'. Response will be identical to the index page (and thus, account-protected).
+;fetch_override: no
+
 [plugins]
 
 ; Comma separated list of plugins to load

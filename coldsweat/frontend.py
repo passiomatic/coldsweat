@@ -235,6 +235,15 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         return self.respond_with_script('_modal_done.js', {'location': redirect_url})
                                 
     # Feeds
+    
+    @GET(r'^/feeds/fetch$')
+    def feed_fetch_all_now(self):
+    	if config.web.fetch_override:
+    		fc = FeedController()
+    		fc.fetch_all_feeds()
+    		return self.entry_list()
+    	else:
+    		raise HTTPForbidden('This feature has not been allowed')
 
     @GET(r'^/feeds/?$')
     @login_required    

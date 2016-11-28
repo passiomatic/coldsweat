@@ -22,6 +22,7 @@ DEFAULTS = {
     'max_history'       : '7',
     'timeout'           : '10',
     'processes'         : '4',
+    'fetch_override'    : 'no',
     
     'level'             : 'INFO',
     'filename'          : '',       # Don't log
@@ -43,6 +44,7 @@ def load_config(config_path):
         'max_history'   : parser.getint,
         'timeout'       : parser.getint,
         'processes'     : parser.getint,
+        'fetch_override': parser.getboolean,
     }
 
     if os.path.exists(config_path):

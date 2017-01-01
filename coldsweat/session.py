@@ -88,9 +88,10 @@ class SessionMiddleware(object):
             if manager.is_new: 
                 return initial_response(environ, start_response)
             return self.app(environ, start_response)
-        # Always close session
         finally:
+            # Always close session and database connection 
             manager.close()
+            close()
 
 class SessionManager(object):
  

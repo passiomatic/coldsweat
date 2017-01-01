@@ -12,6 +12,8 @@ from traceback import format_tb
 from webob import Request, Response
 from webob.exc import *
 
+from models import connect, close
+
 from utilities import *
 from coldsweat import *
 
@@ -70,9 +72,11 @@ class WSGIApp(object):
         self.request            = request
         self.application_url    = request.application_url
         
+        connect()
         response = handler(*args)
         if not response:
             response = Response() # Provide an empty response
+        close()
 
         return response(environ, start_response)
     

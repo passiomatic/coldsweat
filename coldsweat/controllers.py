@@ -25,15 +25,7 @@ from coldsweat import *
 from fetcher import *
 
 
-class BaseController(object):
-
-    def __init__(self):
-        connect()
-        
-    def __del__(self):
-        close()
-
-class UserController(BaseController):
+class UserController(object):
     '''
     Base user controller class. Derived classes may need to override the user property
     '''
@@ -155,7 +147,7 @@ def _q(*select):
 
 
 
-class FeedController(BaseController):
+class FeedController(object):
     '''
     Feed controller class
     '''

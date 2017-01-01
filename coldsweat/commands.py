@@ -247,9 +247,14 @@ def run():
         
     command_name, command_args = args[0].lower(), args[1:]
 
+    connect()
     cc = CommandController()
     try:
         cc.run_command(command_name, command_options, command_args)
     except CommandError, ex:
         parser.error(ex)
-    
+    finally:
+        close()
+        # Flush and close all logging handlers
+        import logging
+        logging.shutdown()

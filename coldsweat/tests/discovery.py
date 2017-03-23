@@ -6,7 +6,7 @@ Description: feed autodiscovery tests.
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 '''
-
+from __future__ import print_function
 from os import path
 from ..markup import find_feed_links
 
@@ -32,7 +32,7 @@ def run_tests():
         with open(path.join(test_dir, filename)) as f:
             url, title = find_feed_link(f.read(), 'http://example.com')
             assert url == expected_url
-            print 'Found', url, title, '(OK)'
+            print('Found', url, title, '(OK)')
         
 if __name__ == '__main__':
     run_tests()

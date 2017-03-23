@@ -7,7 +7,11 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 '''
 
-import sys, os, re, time, urlparse
+import sys, os, re, time
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
 from datetime import datetime
 
 from peewee import IntegrityError
@@ -18,13 +22,12 @@ from webob.exc import *
 
 from coldsweat import *
 
-from plugins import trigger_event
+from .plugins import trigger_event
 
-from models import *
-from utilities import *
+from .models import *
+from .utilities import *
 
-import markup
-import filters
+from . import markup, filters
 
 __all__ = [
     'Fetcher',
@@ -269,7 +272,7 @@ class Fetcher(object):
     
         try:
             response = fetch_url(endpoint)
-        except RequestException, exc:
+        except RequestException as exc:
             logger.warn(u"could not fetch favicon for %s (%s)" % (url, exc))
             return Feed.DEFAULT_ICON
     
@@ -451,7 +454,7 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
         
     try:
         response = requests.get(url, timeout=timeout, headers=request_headers)
-    except RequestException, exc:
+    except RequestException as exc:
         logger.debug(u"tried to fetch %s but got %s" % (url, exc.__class__.__name__))
         raise exc
     

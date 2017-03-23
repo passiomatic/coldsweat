@@ -12,7 +12,7 @@ from traceback import format_tb
 from webob import Request, Response
 from webob.exc import *
 
-from utilities import *
+from .utilities import *
 from coldsweat import *
 
 __all__ = [
@@ -118,7 +118,7 @@ class ExceptionMiddleware(object):
         #   unchanged and catch relevant HTTP exceptions
         try:
             app_iter = self.app(environ, start_response)
-        except (HTTPClientError, HTTPRedirection), exc:        
+        except (HTTPClientError, HTTPRedirection) as exc:        
             app_iter = exc(environ, start_response)            
         # If an exception occours we get the exception information
         #   and prepare a traceback we can render
@@ -157,5 +157,5 @@ class ExceptionMiddleware(object):
 
 def setup_app():    
     # Postpone import to avoid circular dependencies
-    import fever, frontend, cascade
+    from . import fever, frontend, cascade
     return ExceptionMiddleware(cascade.Cascade([fever.setup_app(), frontend.setup_app()]))

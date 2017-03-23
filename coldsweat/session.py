@@ -34,10 +34,13 @@ SUCH DAMAGE.
 
 import sys, os, string, threading, atexit, random, weakref
 from datetime import datetime, timedelta
-from Cookie import SimpleCookie
+try:
+    from Cookie import SimpleCookie
+except ImportError:
+    from http.cookies import SimpleCookie
 
-from utilities import make_sha1_hash
-from models import Session, connect, close
+from .utilities import make_sha1_hash
+from .models import Session, connect, close
 from coldsweat import logger
 
 __all__ = [
@@ -250,8 +253,8 @@ class SessionCache(object):
         '''
         sid = None
         for _ in xrange(10000):
-            a = random.randint(0, sys.maxint-1)
-            b = random.randint(0, sys.maxint-1)            
+            a = random.randint(0, sys.maxsize-1)
+            b = random.randint(0, sys.maxsize-1)            
             sid = make_sha1_hash('%s%s%s' % (a, b, self._secret))
             # Dupe? 
             if not get_session(sid):

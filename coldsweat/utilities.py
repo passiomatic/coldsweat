@@ -6,7 +6,12 @@ Copyright (c) 2013—2016 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-import os, re, cgi, urllib, urlparse
+from __future__ import print_function 
+import os, re, cgi, urllib
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
 from hashlib import md5, sha1
 import base64
 from calendar import timegm
@@ -186,7 +191,7 @@ class Struct(dict):
 def run_tests():
     
     t = datetime.utcnow()                
-    print format_http_datetime(t)
+    print(format_http_datetime(t))
     assert truncate(u'Lorèm ipsum dolor sit ame', 10) == u'Lorèm ips…'
     
 if __name__ == '__main__':

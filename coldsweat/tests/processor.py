@@ -6,7 +6,7 @@ Description: base processor tests
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 '''
-
+from __future__ import print_function
 import feedparser    
 
 from os import path
@@ -31,10 +31,10 @@ def run_tests():
             p.reset()
             p.feed(entry_in.content[0].value)
             content_out = p.output()
-            print '>>>\n', entry_out.content[0].value
-            print '<<<\n', content_out
+            print('>>>\n', entry_out.content[0].value)
+            print('<<<\n', content_out)
             assert content_out == entry_out.content[0].value
-            print entry_in.title, '(OK)'
+            print(entry_in.title, '(OK)')
         
 
 

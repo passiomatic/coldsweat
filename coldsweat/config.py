@@ -8,9 +8,12 @@ License: MIT (see LICENSE for details)
 '''
 
 import os
-from ConfigParser import SafeConfigParser
+try:
+    from ConfigParser import SafeConfigParser
+except ImportError:
+    from configparser import SafeConfigParser
 
-from utilities import Struct
+from .utilities import Struct
 
 __all__ = [
     'load_config',

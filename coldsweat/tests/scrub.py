@@ -6,7 +6,7 @@ Description: scrub tests
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 '''
-
+from __future__ import print_function
 import feedparser    
 
 from os import path
@@ -29,7 +29,7 @@ def run_tests():
         for entry in soup.entries:    
             data = scrub_html(entry.description, blacklist)
             assert data.count(unwanted) == 0
-            print entry.title, '(OK)'
+            print(entry.title, '(OK)')
         
 
 

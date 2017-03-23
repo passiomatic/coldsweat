@@ -15,15 +15,15 @@ from tempita import Template
 from peewee import fn, IntegrityError
 
 from coldsweat import *
-from app import *
-from models import *
-from controllers import *
-from utilities import *
-from fetcher import *
-from markup import *
-from session import SessionMiddleware
-import filters
-from plugins import trigger_event, load_plugins
+from .app import *
+from .models import *
+from .controllers import *
+from .utilities import *
+from .fetcher import *
+from .markup import *
+from .session import SessionMiddleware
+from . import filters
+from .plugins import trigger_event, load_plugins
 
 ENTRIES_PER_PAGE    = 30
 FEEDS_PER_PAGE      = 60
@@ -355,7 +355,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
                 
         try:
             response = fetch_url(self_link)
-        except RequestException, exc:
+        except RequestException as exc:
             form_message = u'ERROR Error, feed address is incorrect or host is unreachable.'
             return self.respond_with_template('_feed_add_wizard_1.html', locals())
         #else:

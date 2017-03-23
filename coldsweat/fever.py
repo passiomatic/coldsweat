@@ -15,10 +15,10 @@ from webob.exc import *
 from peewee import fn, IntegrityError
 
 from coldsweat import *
-from utilities import *    
-from app import *
-from controllers import *
-from models import *
+from .utilities import *    
+from .app import *
+from .controllers import *
+from .models import *
 
 RE_DIGITS           = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 10*60 # 10 minutes
@@ -166,7 +166,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
     
         try:
             mark, status, object_id = self.request.POST['mark'], self.request.POST['as'], int(self.request.POST['id'])
-        except (KeyError, ValueError), ex:
+        except (KeyError, ValueError) as ex:
             logger.debug(u'missing or invalid parameter (%s), ignored' % ex)
             return      
     
@@ -219,7 +219,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
             # Unix timestamp of the the local client’s last items API request
             try:
                 before = datetime.utcfromtimestamp(int(self.request.POST['before']))
-            except (KeyError, ValueError), ex:
+            except (KeyError, ValueError) as ex:
                 logger.debug(u'missing or invalid parameter (%s), ignored' % ex)
                 return              
             
@@ -249,7 +249,7 @@ class FeverApp(WSGIApp, FeedController, UserController):
             # Unix timestamp of the the local client’s 'last items' API request
             try:
                 before = datetime.utcfromtimestamp(int(self.request.POST['before']))
-            except (KeyError, ValueError), ex:
+            except (KeyError, ValueError) as ex:
                 logger.debug(u'missing or invalid parameter (%s), ignored' % ex)
                 return              
     

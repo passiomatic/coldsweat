@@ -8,7 +8,10 @@ Portions are copyright (c) 2005 Ian Bicking and contributors
 License: MIT (see LICENSE for details)
 """
 #import tempfile
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from webob.exc import HTTPException, HTTPNotFound
 #from coldsweat import log
@@ -90,7 +93,7 @@ class Cascade(object):
                         # Exhaust the iterator first, then close
                         tuple(app_iter)
                         app_iter.close()
-            except self.catch_exceptions, exc:
+            except self.catch_exceptions as exc:
                 pass
 
         # Try last app

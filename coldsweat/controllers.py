@@ -7,7 +7,11 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 '''
 
-import sys, os, re, time, urlparse
+import sys, os, re, time
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse 
 from datetime import datetime
 from xml.etree import ElementTree
 
@@ -17,12 +21,12 @@ import requests
 from requests.exceptions import *
 from webob.exc import *
 
-from models import *
-from utilities import *
-from plugins import trigger_event, load_plugins
-from filters import escape_html, status_title
+from .models import *
+from .utilities import *
+from .plugins import trigger_event, load_plugins
+from .filters import escape_html, status_title
 from coldsweat import *
-from fetcher import *
+from .fetcher import *
 
 
 class BaseController(object):

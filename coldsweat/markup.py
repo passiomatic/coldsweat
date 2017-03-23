@@ -8,10 +8,19 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 """
 
 
-from HTMLParser import HTMLParser, HTMLParseError
-import urlparse
+try:
+    from HTMLParser import HTMLParser, HTMLParseError
+except ImportError:
+    from html.parser import HTMLParser
 
-from filters import escape_html
+    # TODO: Cleaner solution?
+    class HTMLParseError(Exception):
+        pass
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
+from .filters import escape_html
 from coldsweat import logger
 
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
@@ -234,7 +243,7 @@ class Scrubber(BaseProcessor):
 def _parse(parser, data):    
     try:
         parser.feed(data)    
-    except HTMLParseError, exc:
+    except HTMLParseError as exc:
         # Log exception and raise it again
         logger.debug(u'could not parse markup (%s)' % exc.msg)
         raise exc

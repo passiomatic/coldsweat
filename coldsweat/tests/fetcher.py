@@ -6,6 +6,7 @@ Description:
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 '''
+from __future__ import print_function
 from requests.exceptions import *
 
 from ..fetcher import fetch_url
@@ -19,7 +20,7 @@ TEST_FEEDS = (
 
 def run_tests():    
     for expected_status, url in TEST_FEEDS:
-        print 'Checking', url, '...'
+        print('Checking', url, '...')
         try:
             response = fetch_url(url, timeout=5)
         except RequestException:

@@ -6,6 +6,7 @@ Description: quick & dirty test suite for Fever API implementation
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 '''
+from __future__ import print_function
 import sys, subprocess, optparse
 from datetime import datetime
 
@@ -102,7 +103,7 @@ def run_tests(endpoint, suites=ALL):
         ])          
                               
     # Test auth failure
-    print ('\n= auth (failure)\n')
+    print('\n= auth (failure)\n')
 
     subprocess.call([
         "curl", 
@@ -114,7 +115,7 @@ def run_tests(endpoint, suites=ALL):
 
     # Test API commands            
     for as_form, q in queries:
-        print ('\n= %s\n' % q)
+        print('\n= %s\n' % q)
 
         if as_form:
             subprocess.call([

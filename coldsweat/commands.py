@@ -5,6 +5,7 @@ Description: sweat utility commands
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 """
+from __future__ import print_function
 import os, sys
 from optparse import OptionParser, make_option
 from getpass import getpass
@@ -15,14 +16,13 @@ from webob.static import DirectoryApp
 from peewee import OperationalError
 
 from coldsweat import *
-from models import *
-from controllers import *
-from app import *
+from .models import *
+from .controllers import *
+from .app import *
 
-import cascade, fever, frontend
-from utilities import render_template
-from plugins import trigger_event, load_plugins
-import filters
+from . import cascade, fever, frontend, filters
+from .utilities import render_template
+from .plugins import trigger_event, load_plugins
 
 # Ensure all web server activity is logged on stdout 
 #   and not stderr like default WSGIRequestHandler
@@ -73,7 +73,7 @@ class CommandController(FeedController, UserController):
             # Fetch just imported feeds
             self.fetch_feeds([feed for feed, group in feeds]) 
         
-        print "Import%s completed for user %s. See log file for more information" % (' and fetch' if options.fetch_data else '', self.user.username)
+        print("Import%s completed for user %s. See log file for more information" % (' and fetch' if options.fetch_data else '', self.user.username))
 
     def command_export(self, options, args):
         self.user = self._get_user(options.username)
@@ -82,7 +82,7 @@ class CommandController(FeedController, UserController):
         else:
             self._export_feeds(options, args)
         
-        print "Export completed for user %s." % self.user.username
+        print("Export completed for user %s." % self.user.username)
         
     def _export_feeds(self, options, args):
         '''Exports feeds to OPML file'''
@@ -118,7 +118,7 @@ class CommandController(FeedController, UserController):
         '''Starts a feeds refresh procedure'''
     
         self.fetch_all_feeds()
-        print 'Fetch completed. See log file for more information'
+        print('Fetch completed. See log file for more information')
     
     command_fetch = command_refresh # Alias
 
@@ -135,11 +135,11 @@ class CommandController(FeedController, UserController):
         
         address = '0.0.0.0' if options.allow_remote_access else 'localhost'        
         httpd = make_server(address, options.port, cascade_app,  WSGIServer, WSGIRequestHandler_)
-        print 'Serving on http://%s:%s' % (address, options.port)
+        print('Serving on http://%s:%s' % (address, options.port))
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
-            print 'Interrupted by user'            
+            print('Interrupted by user')
     
     # Setup and update
  
@@ -153,12 +153,12 @@ class CommandController(FeedController, UserController):
           while True:
               password = read_password(label)
               if not User.validate_password(password):
-                  print 'Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH
+                  print('Error: password should be at least %d characters long' % User.MIN_PASSWORD_LENGTH)
                   continue        
               password_again = read_password("Enter password (again): ")
               
               if password != password_again:
-                  print "Error: passwords do not match, please try again"
+                  print("Error: passwords do not match, please try again")
               else:
                   return password
                             
@@ -183,23 +183,23 @@ class CommandController(FeedController, UserController):
         except User.DoesNotExist:
             pass
     
-        email = raw_input('Enter e-mail for user %s (needed for Fever sync, hit enter to leave blank): ' % username)
+        email = input('Enter e-mail for user %s (needed for Fever sync, hit enter to leave blank): ' % username)
         password = get_password("Enter password for user %s: " % username)
     
         User.create(username=username, email=email, password=password)
-        print "Setup completed for user %s." % username
+        print("Setup completed for user %s." % username)
 
     def command_upgrade(self, options, args):
         '''Upgrades Coldsweat internals from a previous version'''
         
         try:
             if migrate_database_schema():
-                print 'Upgrade completed.'
+                print('Upgrade completed.')
             else:
-                print 'Database is already up-to-date.'
-        except OperationalError, ex:         
+                print('Database is already up-to-date.')
+        except OperationalError as ex:         
             logger.error(u'caught exception updating database schema: (%s)' % ex)
-            print  'Error while running database update. See log file for more information.'
+            print('Error while running database update. See log file for more information.')
 
     command_update = command_upgrade # Alias
 
@@ -208,7 +208,7 @@ def read_password(prompt_label="Enter password: "):
         password = getpass(prompt_label)
     else:
         # Make script be scriptable by reading password from stdin
-        print prompt_label
+        print(prompt_label)
         password = sys.stdin.readline().rstrip()
 
     return password
@@ -250,6 +250,6 @@ def run():
     cc = CommandController()
     try:
         cc.run_command(command_name, command_options, command_args)
-    except CommandError, ex:
+    except CommandError as ex:
         parser.error(ex)
     

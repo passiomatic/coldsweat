@@ -5,9 +5,13 @@ Description: Template filters
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 """
-import re, cgi, urllib, urlparse
+import re, cgi, urllib
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
 from webob.exc import status_map
-import utilities
+from . import utilities
 
 __all__ = []
 

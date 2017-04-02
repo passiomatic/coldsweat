@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<feed xmlns="http://www.w3.org/2005/Atom"> 
+<feed xmlns="https://www.w3.org/2005/Atom"> 
 	<title>Saved entries for user {{self.user.username}}</title>
 	<generator version="{{version}}">Coldsweat</generator>
 	<id>{{guid}}</id>
@@ -16,7 +16,7 @@
 	</content>
 {{elif e.content_type == 'application/xhtml+xml'}}
 	<content type="xhtml">
-        <div xmlns="http://www.w3.org/1999/xhtml">
+        <div xmlns="https://www.w3.org/1999/xhtml">
             {{e.content|html}}
         </div>
 	</content>	

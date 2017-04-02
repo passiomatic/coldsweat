@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns="https://www.w3.org/2005/Atom">
 <title>Daring Fireball</title>
 <subtitle>Mac and web curmudgeonry/nerdery. By John Gruber.</subtitle>
 <link rel="alternate" type="text/html" href="http://daringfireball.net/" />
@@ -45,7 +45,7 @@
   <p>So there I was on Tuesday, sitting on the living room floor with
 my 7-month-old daughter, watching Apple’s Special Event live
 stream on my MacBook while we played with some toys. About an hour
-into the Keynote, Tim Cook put up a “Life on iPad” <a href="http://www.youtube.com/watch?v=B8Le9wvoY00&amp;feature=c4-overview-vl&amp;list=PLHFlHpPjgk713fMv5O4s4Fv7k6yTkXwkV">video</a> to show
+into the Keynote, Tim Cook put up a “Life on iPad” <a href="https://www.youtube.com/watch?v=B8Le9wvoY00&amp;feature=c4-overview-vl&amp;list=PLHFlHpPjgk713fMv5O4s4Fv7k6yTkXwkV">video</a> to show
 some amazing things customers have been doing with their iPads.</p>
 
 <p>I imagine every developer sees these videos and hopes their app
@@ -53,7 +53,7 @@ shows up; I know I always have. But in this case, something felt
 different. In addition to the usual feel-good stuff Apple always
 shows, they were demonstrating serious uses of the iPad, in
 settings ranging from medical to industrial, to hard-core sports
-and the outdoors. A <a href="http://www.youtube.com/watch?v=B8Le9wvoY00&amp;list=PLHFlHpPjgk713fMv5O4s4Fv7k6yTkXwkV&amp;feature=player_detailpage#t=99">couple minutes</a> into the video, I was shocked
+and the outdoors. A <a href="https://www.youtube.com/watch?v=B8Le9wvoY00&amp;list=PLHFlHpPjgk713fMv5O4s4Fv7k6yTkXwkV&amp;feature=player_detailpage#t=99">couple minutes</a> into the video, I was shocked
 to see my signature app, Theodolite HD, being used atop the Great
 Wall of China as an iPad user surveys the mountain scenery and
 architecture around him. Wow!</p>

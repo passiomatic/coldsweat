@@ -138,7 +138,7 @@ class UserController(object):
         return q   
 
 
- # Shortcut
+# Shortcut
 def _q(*select):
     select = select or (Entry, Feed)
     q = Entry.select(*select).join(Feed).join(Subscription)
@@ -210,7 +210,7 @@ class FeedController(object):
     
         for event, element in ElementTree.iterparse(filename, events=('start','end')):
             if event == 'start':
-                 if (element.tag == 'outline') and ('xmlUrl' not in element.attrib):
+                if (element.tag == 'outline') and ('xmlUrl' not in element.attrib):
                     # Entering a group
                     group = Group()
     

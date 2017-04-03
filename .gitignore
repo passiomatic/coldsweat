@@ -35,3 +35,12 @@ nosetests.xml
 # Max OS X
 .DS_Store
 
+# Eclipse/PyDev IDE project files
+/.project
+/.pydevproject
+/.settings
+
+# Coldsweat runtime files/directories
+/data
+/etc/config
+/coldsweat.log

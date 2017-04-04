@@ -1,0 +1,193 @@
+##
+## OpenSSL example configuration file.
+## This is mostly being used to generate certificate requests.
+##
+
+## This definition stops the following lines choking if HOME isn't defined:
+HOME	 = .
+RANDFILE = $ENV::HOME/.rnd
+
+####################################################################
+## SETUP GENERIC CERTIFICATE REQUESTS
+####################################################################
+
+[ req ]
+
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+attributes		   = req_attributes
+
+## This sets a mask for permitted string types. Options:
+##   pkix : PrintableString, BMPString (PKIX recommendation before 2004)
+##   utf8only : only UTF8Strings (PKIX recommendation after 2004)
+##   nombstr : PrintableString, T61String (no BMPStrings or UTF8Strings)
+##   MASK:XXXX a literal mask value.
+## WARNING: ancient versions of Netscape crash on BMPStrings or UTF8Strings.
+## Default: PrintableString, T61String, BMPString.
+string_mask = utf8only
+
+## Extensions to add to self-signed roots:
+x509_extensions = v3_ca
+
+## Extensions to add to signed end-entity certificates:
+req_extensions = v3_req
+
+[ v3_ca ]
+
+## PKIX recommendation:
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+subjectAltName         = email:copy
+issuerAltName          = issuer:copy
+
+## PKIX recommendation:
+basicConstraints = critical,CA:true
+## However, some broken software chokes on critical extensions so:
+# basicConstraints = CA:true
+
+## Key usage:
+keyUsage = cRLSign, keyCertSign
+
+[ v3_req ]
+
+## Target is an end-entity certificate (not a CA):
+basicConstraints = CA:false
+
+## Key usage:
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment, keyAgreement
+
+## Don't forget to allow certifying a server:
+extendedKeyUsage = critical, serverAuth
+
+## Subject Alternative Names:
+subjectAltName = @alt_names
+
+[ alt_names ]
+
+## To be filled programmatically, when needed:
+## Note: IPs must be filled or commented, otherwise OpenSS will complain.
+DNS.1 = 
+DNS.2 = 
+# IP.1 = 
+# IP.2 = 
+
+[ req_distinguished_name ]
+
+countryName = Country code (2 letters)
+countryName_default = IT
+countryName_min = 2
+countryName_max	= 2
+
+stateOrProvinceName = Full name of the target state or province
+stateOrProvinceName_default	= Sweaty Sicily?
+
+localityName = Name of the target region or location (e.g. city)
+localityName_default = Syracuse?
+
+0.organizationName = Primary organization or company name
+0.organizationName_default = Software tests @all.devs.com
+
+## we can do this but it is not needed normally:
+# 1.organizationName = Secondary organization or company name
+# 1.organizationName_default = 
+
+organizationalUnitName		   = Organizational unit or section name
+organizationalUnitName_default = Passiomatic
+
+commonName = Common Name (e.g. server FQDN or YOUR name)
+commonName_default = Coldsweat, MIT license
+commonName_max = 64
+
+emailAddress = Email address associated to Common Name
+emailAddress_default = coldsweat@example.com
+emailAddress_max = 64
+
+[ req_attributes ]
+
+challengePassword = NToKtasgDcr3=4D%
+challengePassword_min = 4
+challengePassword_max = 20
+
+####################################################################
+## SETUP OUR CERTIFICATE AUTHORITY
+####################################################################
+
+[ ca ]
+
+## The default CA section:
+default_ca	= CA_default
+
+[ CA_default ]
+
+## Where everything is kept (default: this dir):
+dir	= .
+
+## Where the issued certs are kept:
+certs = $dir
+
+## Where the issued certs are kept:
+new_certs_dir = $dir
+
+## Where the issued crl are kept:
+crl_dir = $dir
+
+## The current serial number:
+serial = $dir
+
+## The CA certificate:
+certificate	= $dir/coldsweat-ca-cert.crt
+
+## The CA private key:
+private_key	= $dir/coldsweat-ca-priv.pem.enc
+
+## The database index file:
+database = $dir/index.txt
+
+## The current crl number. Must be commented out to leave a V1 CRL.
+crlnumber = $dir/crlnumber.txt
+
+## The current CRL:
+crl = $dir/crl.pem
+
+## Private random number file:
+RANDFILE	= $dir/rand.txt
+
+## Set to 'no' to allow creation of several certificates with same subject:
+unique_subject = no
+
+## Extensions to add to signed certificates:
+x509_extensions	= v3_req
+
+## Comment out the following two lines for the "traditional" (and highly broken) format:
+name_opt = ca_default		# Subject Name options
+cert_opt = ca_default		# Certificate field options
+
+## How long before next CRL:
+default_crl_days = 30
+
+## Use public key default MD:
+default_md = default
+
+## Keep passed DN ordering:
+preserve = no
+
+## Specify the policy of field matching between the CA and the CSR:
+policy = policy_default
+
+[ policy_default ]
+countryName = match
+stateOrProvinceName	= match
+localityName = match
+organizationName = supplied
+organizationalUnitName = supplied
+commonName = supplied
+emailAddress = optional
+
+[ policy_optional ]
+countryName = optional
+stateOrProvinceName	= optional
+localityName = optional
+organizationName = supplied
+organizationalUnitName = supplied
+commonName = supplied
+emailAddress = optional

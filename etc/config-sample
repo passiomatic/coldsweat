@@ -34,7 +34,17 @@ filename: coldsweat.log
 [web]
 
 ; Static files served from a different server
-;static_url: http://media.example.com/static
+;static_url: http(s)://media.example.com/static
+
+; Absolute path to HTTPS certificate of your server (or even Coldsweat itself). May be
+; fully arbitrary, as long as the certificate is found, valid and the domain is set
+; up correctly. To find out where OpenSSL keeps its own certificate store, execute:
+; 	openssl version -d  
+;path_cert: coldsweat/tests/certs/coldsweat-server-cert.crt
+
+; Absolute path to the private key associated to your certificate (see above). May be
+; fully arbitrary, as long as the key is NOT encrypted and matches your certificate.   
+;path_cert_key: coldsweat/tests/certs/coldsweat-server-priv.pem
 
 [plugins]
 

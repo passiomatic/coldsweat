@@ -133,9 +133,9 @@ class CommandController(FeedController, UserController):
         
         # Determine the schemes to serve
         # Limitation: the default WSGI server can only serve a single scheme with a single instance...
-        ssl_only = hasattr(options, 'ssl_only') and options.ssl_only
-        https = True if ssl_only else False # or (hasattr(options, 'ssl') and options.ssl) 
-        http = not ssl_only
+        https_only = hasattr(options, 'https_only') and options.https_only
+        https = True if https_only else False # or (hasattr(options, 'ssl') and options.ssl) 
+        http = not https_only
         
         # If we are to serve HTTPS, we need to make sure that basic things are configured properly
         if https:
@@ -362,7 +362,7 @@ def run():
         # TODO: the default WSGI web server is not capable of doing this with a single server instance - switch to (e.g.) CherryPy
         # make_option('--ssl', action='store_true', dest='ssl', help='serve under both http:// and https://'),
         
-        make_option('--ssl-only', action='store_true', dest='ssl_only', help='serve ONLY under https:// (no redirection from http://)'),
+        make_option('--https-only', action='store_true', dest='https_only', help='serve ONLY under https:// (no redirection from http://)'),
     ]
         
     parser = OptionParser(option_list=available_options, usage=usage, epilog=epilog)

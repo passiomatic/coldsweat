@@ -27,6 +27,8 @@ DEFAULTS = {
     'filename'          : '',       # Don't log
     
     'static_url'        : '',
+    'path_cert'         : '',
+    'path_cert_key'     : '',
     
     'load'              : ''
 }

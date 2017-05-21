@@ -158,7 +158,7 @@ class User(CustomModel):
         
 @pre_save(sender=User)
 def on_user_save(model, user, created):
-     user.api_key = User.make_api_key(user.email, user.password)
+    user.api_key = User.make_api_key(user.email, user.password)
           
 
 #@@REMOVEME: We keep this only to make migrations work
@@ -226,7 +226,7 @@ class Feed(CustomModel):
 
 @pre_save(sender=Feed)
 def on_feed_save(model, feed, created):
-     feed.self_link_hash = make_sha1_hash(feed.self_link)       
+    feed.self_link_hash = make_sha1_hash(feed.self_link)       
       
         
 class Entry(CustomModel):

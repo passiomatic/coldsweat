@@ -6,12 +6,99 @@ Copyright (c) 2013—2016 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-import os, re, cgi, urllib, urlparse
+import os, sys, traceback, re, cgi, urllib, urlparse
 from hashlib import md5, sha1
 import base64
 from calendar import timegm
 from datetime import datetime, timedelta
 from tempita import HTMLTemplate
+
+# --------------------
+# Dump utilities
+# --------------------
+
+def dump_obj(obj, output=sys.stdout, nested_level=0):
+    """
+    A generic method to recursively pretty print the object's attributes and values.
+    """
+    spacing = '   '
+    if type(obj) == dict:
+        print >> output, '%s{' % ((nested_level) * spacing)
+        for k, v in obj.items():
+            if hasattr(v, '__iter__'):
+                print >> output, '%s%s:' % ((nested_level + 1) * spacing, k)
+                dump_obj(v, output, nested_level + 1,)
+            else:
+                print >> output, '%s%s: %s' % ((nested_level + 1) * spacing, k, v)
+        print >> output, '%s}' % (nested_level * spacing)
+    elif type(obj) == list:
+        print >> output, '%s[' % ((nested_level) * spacing)
+        for v in obj:
+            if hasattr(v, '__iter__'):
+                dump_obj(v, output, nested_level + 1)
+            else:
+                print >> output, '%s%s' % ((nested_level + 1) * spacing, v)
+        print >> output, '%s]' % ((nested_level) * spacing)
+    else:
+        print >> output, '%s%s' % (nested_level * spacing, obj)
+
+def dump_environ(obj, output=sys.stdout):
+    """
+    Specialized method to dump the WSGI 'environ' dictionary. Useful to debug requests.
+    Note all values are printed, however. To do that, use 'dump_obj' instead.
+    """
+    
+    if type(obj) == dict:
+        spacing = '   '
+        print >> output, '{'
+        if obj.has_key('SERVER_SOFTWARE'):
+            print >> output, '%s%s: %s' % (spacing, 'SERVER', obj['SERVER_SOFTWARE'])
+        if obj.has_key('GATEWAY_INTERFACE'):
+            print >> output, '%s%s: %s' % (spacing, 'WSGI', obj['GATEWAY_INTERFACE'])
+        if obj.has_key('wsgi.version'):
+            print >> output, '%s%s: %s' % (spacing, 'WSGI_VERSION', obj['wsgi.version'])
+        if obj.has_key('wsgi.url_scheme'):
+            print >> output, '%s%s: %s' % (spacing, 'WSGI_URL_SCHEME', obj['wsgi.url_scheme'])
+        if obj.has_key('SERVER_PROTOCOL'):
+            print >> output, '%s%s: %s' % (spacing, 'PROTOCOL', obj['SERVER_PROTOCOL'])
+        if obj.has_key('REQUEST_METHOD'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_REQUEST_METHOD', obj['REQUEST_METHOD'])
+        if obj.has_key('REMOTE_ADDR'):
+            print >> output, '%s%s: %s' % (spacing, 'REMOTE_ADDR', obj['REMOTE_ADDR'])
+        if obj.has_key('SERVER_PORT'):
+            print >> output, '%s%s: %s' % (spacing, 'SERVER_PORT', obj['SERVER_PORT'])
+        if obj.has_key('HTTP_HOST'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_HOST', obj['HTTP_HOST'])
+        if obj.has_key('HTTP_COOKIE'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_COOKIES', obj['HTTP_COOKIE'])
+        if obj.has_key('HTTP_USER_AGENT'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_USER_AGENT', obj['HTTP_USER_AGENT'])
+        if obj.has_key('HTTP_ACCEPT'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_ACCEPT', obj['HTTP_ACCEPT'])
+        if obj.has_key('HTTP_ACCEPT_LANGUAGE'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_ACCEPT_LANGUAGE', obj['HTTP_ACCEPT_LANGUAGE'])
+        if obj.has_key('HTTP_ACCEPT_ENCODING'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_ACCEPT_ENCODING', obj['HTTP_ACCEPT_ENCODING'])
+        if obj.has_key('HTTP_CONNECTION'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_CONNECTION', obj['HTTP_CONNECTION'])
+        if obj.has_key('CONTENT_TYPE'):
+            print >> output, '%s%s: %s' % (spacing, 'CONTENT_TYPE', obj['CONTENT_TYPE'])
+        if obj.has_key('PATH_INFO'):
+            print >> output, '%s%s: %s' % (spacing, 'PATH_INFO', obj['PATH_INFO'])
+        if obj.has_key('QUERY_STRING'):
+            print >> output, '%s%s: %s' % (spacing, 'QUERY_STRING', obj['QUERY_STRING'])
+        if obj.has_key('HTTP_DNT'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_DNT', obj['HTTP_DNT'])
+        if obj.has_key('HTTP_UPGRADE_INSECURE_REQUESTS'):
+            print >> output, '%s%s: %s' % (spacing, 'HTTP_UPGRADE_INSECURE_REQUESTS', obj['HTTP_UPGRADE_INSECURE_REQUESTS'])
+        if obj.has_key('CONTENT_LENGTH'):
+            print >> output, '%s%s: %s' % (spacing, 'CONTENT_LENGTH', obj['CONTENT_LENGTH'])
+        if obj.has_key('SCRIPT_NAME'):
+            print >> output, '%s%s: %s' % (spacing, 'SCRIPT_NAME', obj['SCRIPT_NAME'])
+        print >> output, '}'
+    else:
+        raise ValueError("the given object is not a dictionary")
+
 
 # --------------------
 # String utilities

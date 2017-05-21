@@ -265,7 +265,7 @@ class Fetcher(object):
         '''
         Fetch a site favicon via Google service
         '''
-        endpoint = "http://www.google.com/s2/favicons?domain=%s" % urlparse.urlsplit(url).hostname
+        endpoint = "https://www.google.com/s2/favicons?domain=%s" % urlparse.urlsplit(url).hostname
     
         try:
             response = fetch_url(endpoint)

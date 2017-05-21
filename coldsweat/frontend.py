@@ -6,7 +6,7 @@ Copyright (c) 2013—2015 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-import os
+import os, re
 from datetime import datetime, timedelta
 from functools import wraps
 from webob import Request, Response
@@ -346,8 +346,8 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         
         group_id = int(self.request.POST.get('group', 0))
 
-        # Assume HTTP if URL is passed w/out scheme        
-        self_link = self_link if self_link.startswith('http') else u'http://' + self_link 
+        # Assume HTTP if URL is passed w/out a scheme (may get redirected to HTTPS anyway)
+        self_link = self_link if re.match(r'^https?://', self_link) else u'http://' + self_link 
         
         if not validate_url(self_link):
             form_message = u'ERROR Error, specify a valid web address'
@@ -505,7 +505,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         namespace.update(view_namespace or {})
         
         if 'self' in namespace:
-             # Avoid passing self or Tempita will complain
+            # Avoid passing self or Tempita will complain
             del namespace['self']
 
         response = Response(

@@ -8,7 +8,7 @@
         {{form_message|alert}}
 
         <label for="self-link-field">Web address (URL) for the site or feed</label> 
-        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="E.g.: theverge.com or http://www.reddit.com/top/.rss">
+        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="E.g.: theverge.com or https://www.reddit.com/top/.rss">
         {{if length(groups) > 1}}
             <label>Add to group <select name="group">
                 {{for g in groups}}

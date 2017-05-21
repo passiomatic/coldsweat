@@ -10,7 +10,7 @@ License: MIT (see LICENSE for details)
 try:
     from flup.server.fcgi_fork import WSGIServer
 except ImportError, exc:
-    print 'Error: unable to import Flup package.\nColdsweat needs Flup to run as a FastCGI process.\nDownload it from PyPI: http://pypi.python.org/pypi/flup'
+    print 'Error: unable to import Flup package.\nColdsweat needs Flup to run as a FastCGI process.\nDownload it from PyPI: https://pypi.python.org/pypi/flup'
     raise exc
 
 from coldsweat.app import setup_app

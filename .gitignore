@@ -18,6 +18,9 @@ develop-eggs
 lib
 lib64
 
+# Elm
+elm-stuff
+
 # Installer logs
 pip-log.txt
 

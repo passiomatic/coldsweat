@@ -52,7 +52,37 @@ def make_nonce():
         # urandom might not be available on certain platforms
         nonce = datetime.now().isoformat()
     return nonce.encode('base64')
-            
+
+# --------------------
+# URL utilities
+# --------------------
+
+BLACKLIST_QS = ["utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_cid", "utm_term", "piwik_campaign", "piwik_kwd"]
+     
+# Lifted from https://github.com/django/django/blob/master/django/core/validators.py
+RE_URL = re.compile(
+    r'^https?://'                           # http:// or https://
+    r'(?:[^:@/]+:[^:@/]+@)?'                # credentials
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+    r'localhost|'                           # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+    r'(?::\d+)?'                            # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)    
+    #@@TODO: Add IPv6
+    
+
+def validate_url(value):
+    return value and RE_URL.search(value)
+
+def scrub_url(url):
+    '''
+    Clean query string arguments
+    '''
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+    d = urlparse.parse_qs(query)
+    d = dict((k, v) for k, v in d.items() if k not in BLACKLIST_QS)
+    return urlparse.urlunsplit((scheme, netloc, path, urllib.urlencode(d, doseq=True), fragment))
+                
 # --------------------
 # Date/time functions
 # --------------------
@@ -188,6 +218,13 @@ def run_tests():
     t = datetime.utcnow()                
     print format_http_datetime(t)
     assert truncate(u'Lorèm ipsum dolor sit ame', 10) == u'Lorèm ips…'
+
+    assert scrub_url('http://example.org/feed.xml?utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml'     
+    assert scrub_url('http://example.org/feed.xml?a=1&a=2&b=1&utm_source=foo&utm_medium=bar&utm_content=baz&utm_campaign=qux') == 'http://example.org/feed.xml?a=1&a=2&b=1'
+    assert validate_url('https://user.name:password123@example.com/feed.xml')   # OK
+    assert validate_url('https://example.com')                                  # OK
+    assert validate_url('http://example.org/feed.xml')                          # OK
+    assert not validate_url('example.com')                                      # Fail
     
 if __name__ == '__main__':
     run_tests()

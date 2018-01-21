@@ -18,6 +18,7 @@ from coldsweat import *
 from models import *
 from controllers import *
 from app import *
+from translators import *
 
 import cascade, fever, frontend
 from utilities import render_template
@@ -56,7 +57,7 @@ class CommandController(FeedController, UserController):
 
         handler(options, args)        
         
-    # Feeds
+    # Import
      
     def command_import(self, options, args):
         '''Imports feeds from OPML file'''
@@ -65,30 +66,45 @@ class CommandController(FeedController, UserController):
             raise CommandError('no input OPML file given')
     
         self.user = self._get_user(options.username)
-    
+
+        if options.saved_entries:
+            self._import_saved_entries(options, args)
+        else:
+            self._import_feeds(options, args)
+                
+    def _import_feeds(self, options, args): 
+        
         feeds = self.add_feeds_from_file(args[0])
         for feed, group in feeds:
             self.add_subscription(feed, group)      
         if options.fetch_data:
-            # Fetch just imported feeds
-            self.fetch_feeds([feed for feed, group in feeds]) 
+            # Fetch only imported feeds
+            self.fetch_feeds([feed for feed, _ in feeds]) 
         
         print "Import%s completed for user %s. See log file for more information" % (' and fetch' if options.fetch_data else '', self.user.username)
 
+    def _import_saved_entries(self, options, args):
+        import_entries(args[0])
+    
+        print "Import completed for user %s. See log file for more information" % self.user.username
+
+    # Export
+    
     def command_export(self, options, args):
+    
+        if not args:
+            raise CommandError('no output OPML file given')
+
         self.user = self._get_user(options.username)
         if options.saved_entries:
             self._export_saved_entries(options, args)
         else:
             self._export_feeds(options, args)
         
-        print "Export completed for user %s." % self.user.username
+        print "Export completed for user %s" % self.user.username
         
     def _export_feeds(self, options, args):
         '''Exports feeds to OPML file'''
-    
-        if not args:
-            raise CommandError('no output OPML file given')
     
         filename = args[0]
         #@@TODO Use a 'http_datetime' filter in template instead
@@ -107,20 +123,21 @@ class CommandController(FeedController, UserController):
         filename = args[0]    
         timestamp = datetime.utcnow()        
         q = self.get_saved_entries()
-        guid = FEED_TAG_URI % (timestamp.year, make_sha1_hash(self.user.email or self.user.username))
+        guid = FEED_TAG_URI % make_sha1_hash(self.user.email or self.user.username)
         version = VERSION_STRING
 
         with open(filename, 'w') as f:
             f.write(render_template(os.path.join(template_dir, 'export-saved.xml'), locals(), filters))
-            
 
-    def command_refresh(self, options, args):
+    # Fetch            
+
+    def command_fetch(self, options, args):
         '''Starts a feeds refresh procedure'''
     
         self.fetch_all_feeds()
         print 'Fetch completed. See log file for more information'
     
-    command_fetch = command_refresh # Alias
+    command_refresh = command_fetch # Alias
 
     # Local server
 
@@ -141,7 +158,7 @@ class CommandController(FeedController, UserController):
         except KeyboardInterrupt:
             print 'Interrupted by user'            
     
-    # Setup and update
+    # Setup and upgrade
  
     def command_setup(self, options, args):
         '''Setup a working database'''
@@ -203,15 +220,82 @@ class CommandController(FeedController, UserController):
 
     command_update = command_upgrade # Alias
 
+# --------------------
+# Utility functions
+# --------------------
+
 def read_password(prompt_label="Enter password: "):
     if sys.stdin.isatty():
         password = getpass(prompt_label)
     else:
-        # Make script be scriptable by reading password from stdin
+        # Make scriptable by reading password from stdin
         print prompt_label
         password = sys.stdin.readline().rstrip()
 
     return password
+
+def import_entries(filename):
+
+  soup = feedparser.parse(filename)         
+  # Got parsing error?
+  if hasattr(soup, 'bozo') and soup.bozo:
+      logger.debug(u"%s caused a parser error (%s), tried to parse it anyway" % (filename, soup.bozo_exception))
+  
+  ft = FeedTranslator(soup.feed)
+  
+#   self.feed.last_updated_on    = ft.get_timestamp(self.instant)        
+#   self.feed.alternate_link     = ft.get_alternate_link()        
+#   self.feed.title              = self.feed.title or ft.get_title() # Do not set again if already set
+  
+  feed_author = ft.get_author()
+  
+  for entry_dict in soup.entries:
+  
+      t = EntryTranslator(entry_dict)
+      
+      link    = t.get_link()
+      guid    = t.get_guid(default=link)
+      source  = t.get_source()
+  
+      if not guid:
+          logger.warn(u'could not find GUID for entry from %s, skipped' % filename)
+          continue
+  
+      timestamp               = t.get_timestamp(self.instant)
+      content_type, content   = t.get_content(('text/plain', ''))
+
+      #@@TODO feed = ...
+  
+      try:
+          # If entry is already in database with same hashed GUID, skip it
+          Entry.get(guid_hash=make_sha1_hash(guid)) 
+          logger.debug(u"duplicated entry %s, skipped" % guid)
+          continue
+      except Entry.DoesNotExist:
+          pass
+  
+      entry = Entry(
+          feed              = feed,                
+          guid              = guid,
+          link              = link,
+          title             = t.get_title(default='Untitled'),
+          author            = t.get_author() or feed_author,
+          content           = content,
+          content_type      = content_type,
+          last_updated_on   = timestamp
+      )
+      
+      # At this point we are pretty sure we doesn't have the entry 
+      #  already in the database so alert plugins and save data
+      #trigger_event('entry_parsed', entry, entry_dict)
+      entry.save()
+  
+      logger.debug(u"parsed entry %s from %s" % (guid, filename))  
+
+
+# --------------------
+# Entry point
+# --------------------
     
 COMMANDS = 'import export serve setup upgrade fetch'.split()    
 
@@ -222,7 +306,7 @@ def run():
 
     available_options = [
         make_option('-s', '--saved-entries',
-            dest='saved_entries', action='store_true', help='export saved entries'),
+            dest='saved_entries', action='store_true', help='export or import saved entries'),
 
         make_option('-u', '--username', 
             dest='username', default=User.DEFAULT_USERNAME, help="specifies a username (default is %s)" % User.DEFAULT_USERNAME),

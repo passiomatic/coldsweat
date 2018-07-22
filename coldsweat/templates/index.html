@@ -18,12 +18,7 @@
             <li class="filter-saved"><a data-toggle="tooltip" data-placement="right" title="Saved entries (2 key)" href="{{application_url}}/entries/?saved"><i class="fa fa-star fa-fw"></i></a></li>
             <li class="filter-all"><a data-toggle="tooltip" data-placement="right" title="All entries (3 key)" href="{{application_url}}/entries/?all"><i class="fa fa-archive fa-fw"></i></a></li>
             {{if length(groups) > 1}}
-                <li class="dropdown {{if group_id}}filter-group{{endif}}"><a data-toggle="dropdown" href="#"><i class="fa {{if group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i></a>                    
-                        <ul class="dropdown-menu" role="menu">
-                            {{for loop, g in looper(groups)}}
-                                <li><a  href="{{application_url}}/entries/?group={{g.id}}"><i class="fa {{if g.id == group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i> {{g.title|html}}</a></li>            
-                            {{endfor}}            
-                        </ul>
+                <li class="dropdown {{if group_id}}filter-group{{endif}}"><a  href="{{application_url}}/groups/"><i class="fa {{if group_id}}fa-folder-open{{else}}fa-folder{{endif}} fa-fw"></i></a>                    
                 </li>
             {{endif}}
             <li class="sep filter-feeds"><a data-toggle="tooltip" data-placement="right" title="Subscribed feeds (4 key)" href="{{application_url}}/feeds/"><i class="fa fa-rss fa-fw"></i></a></li>                            

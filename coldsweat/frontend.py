@@ -27,6 +27,7 @@ from plugins import trigger_event, load_plugins
 
 ENTRIES_PER_PAGE    = 30
 FEEDS_PER_PAGE      = 60
+GROUPS_PER_PAGE     = 30
 USER_SESSION_KEY    = 'FrontendApp.user'
 COOKIE_SESSION_KEY  = '_SID_'
 
@@ -233,7 +234,24 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         
         self.alert_message = message        
         return self.respond_with_script('_modal_done.js', {'location': redirect_url})
-                                
+
+    # Groups
+
+    @GET(r'^/groups/?$')
+    @login_required    
+    def group_list(self):
+        '''
+        Show feed groups for current user
+        '''
+        offset, group_id, filter_class, panel_title, page_title = 0, 0, 'groups', 'Groups', 'Groups'
+
+        count, q = self.get_groups().count(), self.get_groups()  
+        offset = int(self.request.GET.get('offset', 0))
+        groups = q.offset(offset).limit(GROUPS_PER_PAGE)
+        offset += GROUPS_PER_PAGE
+        
+        return self.respond_with_template('groups.html', locals())  
+
     # Feeds
 
     @GET(r'^/feeds/?$')

@@ -44,7 +44,10 @@ def feed_status(feed, threshold):
     {{def panel_block}}
     {{if count}}
         <div class="panel-content">
-            <ul class="view list-view">                      
+            <ul class="view list-view">                    
+                    <li class="heading">
+                        <h2>Feeds</h2>
+                    </li>                       
                 {{render_feeds()}}
             </ul>
         </div>

@@ -46,13 +46,15 @@ class Fetcher(object):
         _, self.netloc, _, _, _ = urlparse.urlsplit(feed.self_link)
  
         self.feed = feed
-
-# @@TODO    
-#       def handle_500(self, response):
-#         '''
-#         Internal server error
-#         '''
-#         pass
+    
+    def handle_500(self, response):
+        '''
+        Internal server error
+        '''
+        self.feed.error_count   += 1        
+        self.feed.last_status   = response.status_code
+        logger.warn(u"%s has caused an error on server, skipped" % self.netloc)        
+        raise HTTPInternalServerError
 
     def handle_403(self, response):
         '''
@@ -87,8 +89,8 @@ class Fetcher(object):
         '''
         Not modified
         '''
-        self.feed.last_status = response.status_code
         logger.debug(u"%s hasn't been modified, skipped" % self.netloc)               
+        self.feed.last_status = response.status_code        
         raise HTTPNotModified
 
     def handle_301(self, response):
@@ -167,17 +169,18 @@ class Fetcher(object):
                 handler(response)
             else: 
                 self.feed.last_status = status
-                logger.warn(u"%s replied with status %d, aborted" % (self.netloc, status))
+                logger.warn(u"%s replied with unhandled status %d, aborted" % (self.netloc, status))
                 return
             self._parse_feed(response.text)
             self._fetch_icon()
-        except (HTTPError, HTTPNotModified, DuplicatedFeedError):
-            return # Bail out
-        finally:
+        except HTTPNotModified: 
+            pass # Nothing to do
+        except (HTTPError, DuplicatedFeedError):
             if config.fetcher.max_errors and self.feed.error_count > config.fetcher.max_errors:
-                self._synthesize_entry('Feed has accomulated too many errors (last was %s).' % filters.status_title(status))
+                self._synthesize_entry('Feed has accumulated too many errors (last was %s).' % filters.status_title(status))
                 logger.warn(u"%s has accomulated too many errors, disabled" % self.netloc)
                 self.feed.is_enabled = False
+        finally:
             self.feed.save()
             
     def update_feed_with_data(self, data):

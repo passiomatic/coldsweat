@@ -151,6 +151,7 @@ class Fetcher(object):
             self.feed.last_status   =  HTTPServiceUnavailable.code
             self.feed.error_count   += 1   
             logger.warn(u"a network error occured while fetching %s, skipped" % self.netloc)
+            self.check_feed_health()
             self.feed.save()            
             return
     
@@ -176,13 +177,17 @@ class Fetcher(object):
         except HTTPNotModified: 
             pass # Nothing to do
         except (HTTPError, DuplicatedFeedError):
-            if config.fetcher.max_errors and self.feed.error_count > config.fetcher.max_errors:
-                self._synthesize_entry('Feed has accumulated too many errors (last was %s).' % filters.status_title(status))
-                logger.warn(u"%s has accomulated too many errors, disabled" % self.netloc)
-                self.feed.is_enabled = False
+            self.check_feed_health()
         finally:
             self.feed.save()
-            
+
+    def check_feed_health(self):
+        if config.fetcher.max_errors and self.feed.error_count > config.fetcher.max_errors:
+            self._synthesize_entry('Feed has accumulated too many errors (last was %s).' % filters.status_title(self.feed.last_status))
+            logger.warn(u"%s has accomulated too many errors, disabled" % self.netloc)
+            self.feed.is_enabled = False        
+        return 
+
     def update_feed_with_data(self, data):
         self._parse_feed(data)
         self.feed.save()

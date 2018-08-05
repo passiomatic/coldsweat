@@ -599,9 +599,8 @@ nav {
         &.unread li.filter-unread,
         &.saved li.filter-saved,
         &.feeds li.filter-feeds,
-        &.groups li.filter-groups,        
-        &.all li.filter-all,
-        li.filter-group {
+        &.groups li.filter-group,        
+        &.all li.filter-all {
             > a {
                 color: $white;
                 background: $neutralcolor;                  

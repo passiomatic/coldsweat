@@ -1,23 +1,48 @@
-# -*- coding: utf-8 -*-
-"""
-Description: Cascades through several applications, 
-  so long as applications return '404 Not Found'
+# (c) 2005 Ian Bicking and contributors; written for Paste (http://pythonpaste.org)
+# Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
-Copyright (c) 2013—2016 Andrea Peltrin
-Portions are copyright (c) 2005 Ian Bicking and contributors
-License: MIT (see LICENSE for details)
 """
-#import tempfile
+Cascades through several applications, so long as applications
+return ``404 Not Found``.
+"""
+from paste import httpexceptions
+from paste.util import converters
+import tempfile
 from cStringIO import StringIO
 
-from webob.exc import HTTPException, HTTPNotFound
-#from coldsweat import log
+__all__ = ['Cascade']
 
-CHUNK_SIZE = 4096
-    
+def make_cascade(loader, global_conf, catch='404', **local_conf):
+    """
+    Entry point for Paste Deploy configuration
+
+    Expects configuration like::
+
+        [composit:cascade]
+        use = egg:Paste#cascade
+        # all start with 'app' and are sorted alphabetically
+        app1 = foo
+        app2 = bar
+        ...
+        catch = 404 500 ...
+    """
+    catch = map(int, converters.aslist(catch))
+    apps = []
+    for name, value in local_conf.items():
+        if not name.startswith('app'):
+            raise ValueError(
+                "Bad configuration key %r (=%r); all configuration keys "
+                "must start with 'app'"
+                % (name, value))
+        app = loader.get_app(value, global_conf=global_conf)
+        apps.append((name, app))
+    apps.sort()
+    apps = [app for name, app in apps]
+    return Cascade(apps, catch=catch)
+
 class Cascade(object):
 
-    '''
+    """
     Passed a list of applications, ``Cascade`` will try each of them
     in turn.  If one returns a status code listed in ``catch`` (by
     default just ``404 Not Found``) then the next application is
@@ -27,76 +52,82 @@ class Cascade(object):
     response is used.
 
     Instances of this class are WSGI applications.
-    '''
+    """
 
-    def __init__(self, applications, catch=(HTTPNotFound,)):
+    def __init__(self, applications, catch=(404,)):
         self.apps = applications
         self.catch_codes = {}
         self.catch_exceptions = []
         for error in catch:
-            if issubclass(error, HTTPException):
+            if isinstance(error, str):
+                error = int(error.split(None, 1)[0])
+            if isinstance(error, httpexceptions.HTTPException):
                 exc = error
                 code = error.code
             else:
-                raise ValueError('%s must be a subclass of webob.exc.HTTPException' % error)
+                exc = httpexceptions.get_exception(error)
+                code = error
             self.catch_codes[code] = exc
             self.catch_exceptions.append(exc)
         self.catch_exceptions = tuple(self.catch_exceptions)
-                
+
     def __call__(self, environ, start_response):
-        '''
+        """
         WSGI application interface
-        '''
+        """
+        failed = []
+        def repl_start_response(status, headers, exc_info=None):
+            code = int(status.split(None, 1)[0])
+            if code in self.catch_codes:
+                failed.append(None)
+                return _consuming_writer
+            return start_response(status, headers, exc_info)
 
         try:
             length = int(environ.get('CONTENT_LENGTH', 0) or 0)
         except ValueError:
             length = 0
-
-        # POST/PUT request: copy wsgi.input
         if length > 0:
+            # We have to copy wsgi.input
             copy_wsgi_input = True
-            f = environ['wsgi.input']
-            if length < 0:
-                data = f.read()
+            if length > 4096 or length < 0:
+                f = tempfile.TemporaryFile()
+                if length < 0:
+                    f.write(environ['wsgi.input'].read())
+                else:
+                    copy_len = length
+                    while copy_len > 0:
+                        chunk = environ['wsgi.input'].read(min(copy_len, 4096))
+                        if not chunk:
+                            raise IOError("Request body truncated")
+                        f.write(chunk)
+                        copy_len -= len(chunk)
+                f.seek(0)
             else:
-                data = f.read(length)
-            environ['wsgi.input'] = StringIO(data)
+                f = StringIO(environ['wsgi.input'].read(length))
+            environ['wsgi.input'] = f
         else:
             copy_wsgi_input = False
-
-        def repl_start_response(status, headers, exc_info=None):
-            code = status.split(None, 1)[0]
-            if int(code) in self.catch_codes:
-                failed.append(None)
-                return _consuming_writer
-            return start_response(status, headers, exc_info)
-
-        apps = list(self.apps)
-        last_app = apps.pop()
-
-        for app in apps:
-
+        for app in self.apps[:-1]:
             environ_copy = environ.copy()
             if copy_wsgi_input:
                 environ_copy['wsgi.input'].seek(0)
             failed = []
             try:
-                app_iter = app(environ_copy, repl_start_response)
+                v = app(environ_copy, repl_start_response)
                 if not failed:
-                    return app_iter
+                    return v
                 else:
-                    if hasattr(app_iter, 'close'):
-                        # Exhaust the iterator first, then close
-                        tuple(app_iter)
-                        app_iter.close()
-            except self.catch_exceptions, exc:
+                    if hasattr(v, 'close'):
+                        # Exhaust the iterator first:
+                        list(v)
+                        # then close:
+                        v.close()
+            except self.catch_exceptions:
                 pass
-
-        # Try last app
         if copy_wsgi_input:
             environ['wsgi.input'].seek(0)
-        return last_app(environ, start_response)
+        return self.apps[-1](environ, start_response)
 
 def _consuming_writer(s):
     pass

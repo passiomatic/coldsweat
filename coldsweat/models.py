@@ -11,16 +11,13 @@ import pickle
 
 from datetime import datetime
 
-from playhouse.signals import Model as BaseModel, pre_save
-from playhouse.reflection import Introspector
+import peewee
+from playhouse.signals import Model, pre_save
 
 from peewee import (BlobField, BooleanField, CharField, DateTimeField,
                     ForeignKeyField,
-                    IntegerField, IntegrityError, MySQLDatabase,
-                    PostgresqlDatabase,
+                    IntegerField, IntegrityError,
                     TextField, SqliteDatabase)
-from playhouse.migrate import (migrate, MySQLMigrator, PostgresqlMigrator,
-                               SqliteMigrator)
 
 from coldsweat import config, logger
 from utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
@@ -38,7 +35,6 @@ __all__ = [
     'close',
     'transaction',
     'setup_database_schema',
-    'migrate_database_schema',
 ]
 
 # Feed default icon
@@ -51,12 +47,6 @@ VTGBB77SihPakgLRM4Vhr79bYuguxmWwlBRRwiqruhzSjrAs50nWo8S8BdvbjaMOiNrAF\
 e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
 a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
 DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
-
-
-class SqliteDatabase_(SqliteDatabase):
-
-    def initialize_connection(self, connection):
-        self.execute_sql('PRAGMA foreign_keys=ON;')
 
 
 def parse_connection_url(url):
@@ -81,14 +71,16 @@ def parse_connection_url(url):
 engine, kwargs = parse_connection_url(config.database.connection_url)
 
 if engine == 'sqlite':
-    _db = SqliteDatabase_(journal_mode='WAL', **kwargs)
-    migrator = SqliteMigrator(_db)
-elif engine == 'mysql':
-    _db = MySQLDatabase(**kwargs)
-    migrator = MySQLMigrator(_db)
-elif engine == 'postgresql':
-    _db = PostgresqlDatabase(autorollback=True, **kwargs)
-    migrator = PostgresqlMigrator(_db)
+    database = SqliteDatabase(pragmas={'journal_mode': 'wal',
+                                       'foreign_keys': 1},
+                              **kwargs)
+#
+# elif engine == 'mysql':
+#    _db = MySQLDatabase(**kwargs)
+#    migrator = MySQLMigrator(_db)
+# elif engine == 'postgresql':
+#    _db = PostgresqlDatabase(autorollback=True, **kwargs)
+#    migrator = PostgresqlMigrator(_db)
 else:
     raise ValueError(
         'Unknown database engine %s. Should be sqlite, postgresql or mysql'
@@ -113,16 +105,16 @@ class PickleField(BlobField):
 # ------------------------------------------------------
 
 
-class CustomModel(BaseModel):
+class BaseModel(Model):
     """
     Binds the same database to all models
     """
 
     class Meta:
-        database = _db
+        database = database
 
 
-class User(CustomModel):
+class User(BaseModel):
     """
     Coldsweat user
     """
@@ -181,7 +173,7 @@ def on_user_save(model, user, created):
 
 
 # @@REMOVEME: We keep this only to make migrations work
-class Icon(CustomModel):
+class Icon(BaseModel):
     """
     Feed (fav)icons, stored as data URIs
     """
@@ -191,7 +183,7 @@ class Icon(CustomModel):
         db_table = 'icons'
 
 
-class Group(CustomModel):
+class Group(BaseModel):
     """
     Feed group/folder
     """
@@ -204,7 +196,7 @@ class Group(CustomModel):
         db_table = 'groups'
 
 
-class Feed(CustomModel):
+class Feed(BaseModel):
     """
     Atom/RSS feed
     """
@@ -250,7 +242,7 @@ def on_feed_save(model, feed, created):
     feed.self_link_hash = make_sha1_hash(feed.self_link)
 
 
-class Entry(CustomModel):
+class Entry(BaseModel):
     """
     Atom/RSS entry
     """
@@ -285,7 +277,7 @@ def on_entry_save(model, entry, created):
     entry.guid_hash = make_sha1_hash(entry.guid)
 
 
-class Saved(CustomModel):
+class Saved(BaseModel):
     """
     Entries 'saved' status
     """
@@ -299,7 +291,7 @@ class Saved(CustomModel):
         )
 
 
-class Read(CustomModel):
+class Read(BaseModel):
     """
     Entries 'read' status
     """
@@ -313,7 +305,7 @@ class Read(CustomModel):
         )
 
 
-class Subscription(CustomModel):
+class Subscription(BaseModel):
     """
     A user's feed subscription
     """
@@ -328,7 +320,7 @@ class Subscription(CustomModel):
         db_table = 'subscriptions'
 
 
-class Session(CustomModel):
+class Session(BaseModel):
     """
     Web session
     """
@@ -346,143 +338,30 @@ class Session(CustomModel):
 
 def connect():
     logger.debug('opening connection')
-    _db.connect()
+    if peewee.__version__.split('.')[0] != '2':
+        database.connect(reuse_if_open=True)
+    else:
+        database.connect()
 
 
 def transaction():
-    return _db.transaction()
+    return database.transaction()
 
 
 def close():
-    if not _db.is_closed():
+    if not database.is_closed():
         logger.debug('closing connection')
-        _db.close()
-
-
-def migrate_database_schema():
-    '''
-    Migrate database schema from previous versions (0.9.4 and up)
-    '''
-
-    introspector = Introspector.from_database(_db)
-    models = introspector.generate_models()
-    Feed_ = models['feeds']
-    Entry_ = models['entries']
-
-    drop_table_migrations, column_migrations = [], []
-
-    # --------------------------------------------------------------------------
-    # Schema changes introduced in version 0.9.4
-    # --------------------------------------------------------------------------
-
-    # Change columns
-
-    if hasattr(Feed_, 'icon_id'):
-        column_migrations.append(migrator.drop_column('feeds', 'icon_id'))
-
-    if not hasattr(Feed_, 'icon'):
-        column_migrations.append(
-            migrator.add_column('feeds', 'icon', Feed.icon))
-
-    if not hasattr(Feed_, 'icon_last_updated_on'):
-        column_migrations.append(
-            migrator.add_column(
-                'feeds', 'icon_last_updated_on', Feed.icon_last_updated_on))
-
-    if not hasattr(Entry_, 'content_type'):
-        column_migrations.append(
-            migrator.add_column('entries', 'content_type', Entry.content_type))
-
-    # Drop tables
-
-    if Icon.table_exists():
-        drop_table_migrations.append(Icon.drop_table)
-
-    # --------------------------------------------------------------------------
-    # Schema changes introduced in version 0.9.5
-    # --------------------------------------------------------------------------
-
-    # Change columns
-
-    class UpdateFeedSelfLinkHashOperation(object):
-        # Fake migrate.Operation protocol and upon saving
-        # populate all self_link_hash fields
-        def run(self):
-            for feed in Feed.select():
-                feed.save()
-
-    class UpdateEntryGuidHashOperation(object):
-        def run(self):
-            for entry in Entry.select():
-                entry.save()
-
-    class UpdateUserApiKeyOperation(object):
-        def run(self):
-            for user in User.select():
-                user.save()
-
-    if not hasattr(Feed_, 'self_link_hash'):
-        # Start relaxing index constrains to cope with existing data...
-        self_link_hash = CharField(null=True, max_length=40)
-        column_migrations.append(
-            migrator.add_column('feeds', 'self_link_hash', self_link_hash))
-        column_migrations.append(UpdateFeedSelfLinkHashOperation())
-        # ...and make them strict again
-        column_migrations.append(
-            migrator.add_index('feeds', ('self_link_hash',), True))
-
-    if not hasattr(Entry_, 'guid_hash'):
-        # Start relaxing index constrains to cope with existing data...
-        guid_hash = CharField(null=True, max_length=40)
-        column_migrations.append(
-            migrator.add_column('entries', 'guid_hash', guid_hash))
-        column_migrations.append(UpdateEntryGuidHashOperation())
-        # ...and make them strict again
-        column_migrations.append(
-            migrator.add_index('entries', ('guid_hash',), True))
-
-    # Drop obsolete indices
-
-    if Feed_.self_link.unique:
-        column_migrations.append(
-            migrator.drop_index('feeds', 'feeds_self_link'))
-
-    if Entry_.link.index:
-        column_migrations.append(
-            migrator.drop_index('entries', 'entries_link'))
-
-    if Entry_.guid.index:
-        column_migrations.append(
-            migrator.drop_index('entries', 'entries_guid'))
-
-    # Misc.
-
-    column_migrations.append(UpdateUserApiKeyOperation())
-
-    # --------------------------------------------------------------------------
-
-    # Run all table and column migrations
-
-    if column_migrations:
-        # Let caller to catch any OperationalError's
-        migrate(*column_migrations)
-
-    for drop in drop_table_migrations:
-        drop()
-
-    # True if at least one is non-empty
-    return drop_table_migrations or column_migrations
+        database.close()
 
 
 def setup_database_schema():
     """
     Create database and tables for all models and setup bootstrap data
     """
-
-    models = User, Feed, Entry, Group, Read, Saved, Subscription, Session
-
-    for model in models:
-        model.create_table(fail_silently=True)
+    with database:
+        database.create_tables([User, Feed, Entry, Group, Read, Saved,
+                                Subscription, Session],
+                               safe=True)
 
     # Create the bare minimum to bootstrap system
     try:

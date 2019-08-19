@@ -12,21 +12,16 @@ from getpass import getpass
 from datetime import datetime
 
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, make_server
+
 from webob.static import DirectoryApp
-from peewee import OperationalError
 
 from models import (connect,
                     close,
-                    Entry,
                     User,
-                    migrate_database_schema,
                     setup_database_schema
                     )
 
-from controllers import FeedController, UserController, feedparser
-
-from fetcher import FeedTranslator
-from translators import EntryTranslator
+from controllers import FeedController, UserController
 
 import cascade
 import fever
@@ -35,7 +30,6 @@ import frontend
 
 from app import ExceptionMiddleware
 from coldsweat import (installation_dir,
-                       logger,
                        template_dir,
                        FEED_TAG_URI,
                        VERSION_STRING)
@@ -111,12 +105,6 @@ class CommandController(FeedController, UserController):
               " See log file for more information"
               % (' and fetch' if options.fetch_data else '',
                  self.user.username))
-
-    def _import_saved_entries(self, options, args):
-        import_entries(args[0])
-
-        print("Import completed for user %s. See log file for more "
-              "information" % self.user.username)
 
     # Export
 
@@ -248,7 +236,7 @@ class CommandController(FeedController, UserController):
         except User.DoesNotExist:
             pass
 
-        email = input(
+        email = raw_input(
             'Enter e-mail for user %s (needed for Fever sync, '
             'hit enter to leave blank): ' % username)
         password = get_password("Enter password for user %s: " % username)
@@ -256,22 +244,6 @@ class CommandController(FeedController, UserController):
         User.create(username=username, email=email, password=password)
         print("Setup completed for user %s." % username)
 
-    def command_upgrade(self, options, args):
-        '''Upgrades Coldsweat internals from a previous version'''
-
-        try:
-            if migrate_database_schema():
-                print('Upgrade completed.')
-            else:
-                print('Database is already up-to-date.')
-        except OperationalError as ex:
-            logger.error(
-                u'caught exception updating database schema: (%s)' % ex)
-            print(
-                'Error while running database update. '
-                'See log file for more information.')
-
-    command_update = command_upgrade  # Alias
 
 # --------------------
 # Utility functions
@@ -287,68 +259,6 @@ def read_password(prompt_label="Enter password: "):
         password = sys.stdin.readline().rstrip()
 
     return password
-
-
-def import_entries(filename):
-
-    soup = feedparser.parse(filename)
-    # Got parsing error?
-    if hasattr(soup, 'bozo') and soup.bozo:
-        logger.debug(
-            u"%s caused a parser error (%s), tried to parse it anyway" % (
-                filename, soup.bozo_exception))
-
-    ft = FeedTranslator(soup.feed)
-
-#     self.feed.last_updated_on    = ft.get_timestamp(self.instant)
-#     self.feed.alternate_link     = ft.get_alternate_link()
-#     self.feed.title = self.feed.title or ft.get_title()
-#     Do not set again if already set
-
-    feed_author = ft.get_author()
-
-    for entry_dict in soup.entries:
-
-        t = EntryTranslator(entry_dict)
-
-        link = t.get_link()
-        guid = t.get_guid(default=link)
-
-        if not guid:
-            logger.warn(
-                u'could not find GUID for entry from %s, skipped' % filename)
-            continue
-
-        timestamp = t.get_timestamp(self.instant)
-        content_type, content = t.get_content(('text/plain', ''))
-
-        #  @@TODO feed = ...
-
-        try:
-            # If entry is already in database with same hashed GUID, skip it
-            Entry.get(guid_hash=make_sha1_hash(guid))
-            logger.debug(u"duplicated entry %s, skipped" % guid)
-            continue
-        except Entry.DoesNotExist:
-            pass
-
-        entry = Entry(
-            feed=feed,
-            guid=guid,
-            link=link,
-            title=t.get_title(default='Untitled'),
-            author=t.get_author() or feed_author,
-            content=content,
-            content_type=content_type,
-            last_updated_on=timestamp
-        )
-
-        # At this point we are pretty sure we doesn't have the entry
-        # already in the database so alert plugins and save data
-        # trigger_event('entry_parsed', entry, entry_dict)
-        entry.save()
-
-        logger.debug(u"parsed entry %s from %s" % (guid, filename))
 
 
 # --------------------

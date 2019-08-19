@@ -658,8 +658,10 @@ def get_stats():
     '''
 
     now = datetime.utcnow()
-
-    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    import pdb; pdb.set_trace()
+    # peewee 2.10 code
+    # last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    last_checked_on = Feed.select(fn.Max(Feed.last_checked_on))
     if last_checked_on:
         last_checked_on = format_datetime(last_checked_on)
     else:

@@ -664,7 +664,7 @@ def get_stats():
     last_checked_on = Feed.select(
         fn.Max(Feed.last_checked_on)).get().get_or_none()
     if last_checked_on:
-        last_checked_on = format_datetime(last_checked_on)
+        last_checked_on = format_datetime(last_checked_on.last_updated_on)
     else:
         last_checked_on = 'Never'
 

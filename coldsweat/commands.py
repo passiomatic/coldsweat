@@ -14,6 +14,9 @@ from datetime import datetime
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, make_server
 
 from webob.static import DirectoryApp
+from webob import exc
+from webob.dec import wsgify
+from webob.response import Response
 
 from models import (connect,
                     close,
@@ -28,7 +31,7 @@ import fever
 
 import frontend
 
-from app import ExceptionMiddleware
+from app import ExceptionMiddleware, ROUTES
 from coldsweat import (installation_dir,
                        template_dir,
                        FEED_TAG_URI,
@@ -38,6 +41,10 @@ from utilities import (render_template,
                        make_sha1_hash,
                        format_http_datetime)
 import filters
+
+if sys.version_info.major < 3:
+    input = raw_input  # noqa
+
 
 # Ensure all web server activity is logged on stdout
 #   and not stderr like default WSGIRequestHandler
@@ -167,8 +174,12 @@ class CommandController(FeedController, UserController):
     def command_serve(self, options, args):
         '''Starts a local server'''
 
-        static_app = DirectoryApp(
-            os.path.join(installation_dir, "static"), index_page=None)
+        for route in ROUTES:
+            print(route[0].pattern, route[1], route[2])
+
+        static_app = CustomDirectoryApp(
+            os.path.join(installation_dir, "static"),
+            index_page=None)
 
         # Create a cascade that looks for static files first,
         #  then tries the other apps
@@ -236,7 +247,7 @@ class CommandController(FeedController, UserController):
         except User.DoesNotExist:
             pass
 
-        email = raw_input(
+        email = input(
             'Enter e-mail for user %s (needed for Fever sync, '
             'hit enter to leave blank): ' % username)
         password = get_password("Enter password for user %s: " % username)
@@ -330,3 +341,36 @@ def run():
         # Flush and close all logging handlers
         import logging
         logging.shutdown()
+
+
+class CustomDirectoryApp(DirectoryApp):
+
+    """
+    Fixes a weired bug in the latest WebOb (1.8.5) version
+    """
+
+    @wsgify
+    def __call__(self, req):
+        path = os.path.abspath(os.path.join(
+            self.path, req.path_info.lstrip('/').encode()))
+
+        # this is needed to work around a bug in WebOb
+        if os.path.isdir(path):
+            path += os.path.sep
+        if os.path.isdir(path) and self.index_page:
+            return self.index(req, path)
+        if (self.index_page and self.hide_index_with_redirect
+                and path.endswith(os.path.sep + self.index_page)):
+            new_url = req.path_url.rsplit('/', 1)[0]
+            new_url += '/'
+            if req.query_string:
+                new_url += '?' + req.query_string
+            return Response(
+                status=301,
+                location=new_url)
+        if not path.startswith(self.path):
+            return exc.HTTPForbidden()
+        elif not os.path.isfile(path):
+            return exc.HTTPNotFound(comment=path)
+        else:
+            return self.make_fileapp(path)

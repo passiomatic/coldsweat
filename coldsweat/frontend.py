@@ -75,9 +75,9 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 
         groups = self.get_groups()
         r = Entry.select(Entry.id).join(Read).where((Read.user
-                                                     == self.user)).naive()
+                                                     == self.user)).objects()
         s = Entry.select(Entry.id).join(Saved).where((Saved.user
-                                                      == self.user)).naive()
+                                                      == self.user)).objects()
         read_ids = dict((i.id, None) for i in r)
         saved_ids = dict((i.id, None) for i in s)
 
@@ -661,7 +661,8 @@ def get_stats():
     import pdb; pdb.set_trace()
     # peewee 2.10 code
     # last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
-    last_checked_on = Feed.select(fn.Max(Feed.last_checked_on)).get().get_or_none()
+    last_checked_on = Feed.select(
+        fn.Max(Feed.last_checked_on)).get().get_or_none()
     if last_checked_on:
         last_checked_on = format_datetime(last_checked_on)
     else:

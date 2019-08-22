@@ -1,5 +1,10 @@
 CSS_FILES=./static/stylesheets/all.scss:./static/stylesheets/all.css
 
+.PHONY: test
+
+test:
+	python -m pytest
+
 all: update
 
 update:
@@ -10,4 +15,3 @@ watch:
 
 clean:
 	rm -r ./.sass-cache
-	

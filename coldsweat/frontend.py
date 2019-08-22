@@ -18,17 +18,17 @@ from peewee import fn, IntegrityError
 from requests import RequestException
 from tempita import Template
 
-from app import GET, POST, WSGIApp, form
+from .app import GET, POST, WSGIApp, form
 from coldsweat import config, logger, template_dir, VERSION_STRING
-from fetcher import fetch_url, Fetcher
-from markup import sniff_feed, find_feed_links
-from models import (Entry, Group, Feed, Read, Saved, User,
-                    Subscription, transaction)
+from .fetcher import fetch_url, Fetcher
+from .markup import sniff_feed, find_feed_links
+from .models import (Entry, Group, Feed, Read, Saved, User,
+                     Subscription, transaction)
 
-from plugins import trigger_event
-from controllers import FeedController, UserController
-from session import SessionMiddleware
-from utilities import format_datetime, validate_url
+from .plugins import trigger_event
+from .controllers import FeedController, UserController
+from .session import SessionMiddleware
+from .utilities import format_datetime, validate_url
 import filters
 
 ENTRIES_PER_PAGE = 30

@@ -12,6 +12,7 @@ Welcome to coldsweet's documentation!
 
    setup
    using-with-nginx
+   fetcher-features
 
 
 Indices and tables

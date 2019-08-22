@@ -10,6 +10,7 @@ Welcome to coldsweet's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   using-with-nginx
 
 
 Indices and tables

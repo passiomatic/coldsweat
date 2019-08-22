@@ -5,6 +5,9 @@ CSS_FILES=./static/stylesheets/all.scss:./static/stylesheets/all.css
 test:
 	python -m pytest
 
+coverage:
+	python -m pytest -vv --cov=coldsweat tests
+
 all: update
 
 update:

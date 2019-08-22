@@ -6,7 +6,11 @@ Copyright (c) 2013—2016 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
+
 import pickle
 
 from datetime import datetime
@@ -20,7 +24,7 @@ from peewee import (BlobField, BooleanField, CharField, DateTimeField,
                     TextField, SqliteDatabase)
 
 from coldsweat import config, logger
-from utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
+from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
 
 __all__ = [
     'User',
@@ -133,7 +137,7 @@ class User(BaseModel):
 
     @staticmethod
     def make_api_key(email, password):
-        return make_md5_hash(u'%s:%s' % (email, password))
+        return make_md5_hash('%s:%s' % (email, password))
 
     @staticmethod
     def validate_api_key(api_key):

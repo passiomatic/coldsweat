@@ -8,7 +8,10 @@ License: MIT (see LICENSE for details)
 '''
 
 import os
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 
 from datetime import datetime
 
@@ -26,16 +29,16 @@ from webob.exc import (
 from webob.exc import status_map
 from coldsweat import (config, logger, template_dir, USER_AGENT, ENTRY_TAG_URI)
 
-from plugins import trigger_event
+from .plugins import trigger_event
 
-from models import (Entry, Feed)
-from translators import EntryTranslator, FeedTranslator
-from utilities import (datetime_as_epoch,
-                       format_http_datetime,
-                       make_sha1_hash,
-                       make_data_uri,
-                       make_nonce,
-                       render_template,)
+from .models import (Entry, Feed)
+from .translators import EntryTranslator, FeedTranslator
+from .utilities import (datetime_as_epoch,
+                        format_http_datetime,
+                        make_sha1_hash,
+                        make_data_uri,
+                        make_nonce,
+                        render_template,)
 
 import filters
 

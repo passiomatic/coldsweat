@@ -13,7 +13,7 @@ from traceback import format_tb
 
 from webob import Request, Response
 from webob.exc import HTTPClientError, HTTPNotFound, HTTPRedirection
-from models import connect, close
+from . models import connect, close
 
 from coldsweat import logger
 

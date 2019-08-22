@@ -8,6 +8,7 @@ License: MIT (see LICENSE for details)
 '''
 
 import os
+
 try:
     from ConfigParser import SafeConfigParser
 except ImportError:

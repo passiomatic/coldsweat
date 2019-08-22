@@ -13,7 +13,7 @@ __license__ = 'MIT'
 
 import os
 import logging
-from config import load_config
+from .config import load_config
 
 # Define an informal API for plugin implementations
 

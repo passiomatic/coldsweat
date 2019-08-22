@@ -8,8 +8,14 @@ License: MIT (see LICENSE for details)
 """
 import os
 import re
-import urllib
-import urlparse
+
+try:
+    import urllib
+    import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+    import urllib
+
 from hashlib import md5, sha1
 import base64
 from calendar import timegm

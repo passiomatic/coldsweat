@@ -1,5 +1,7 @@
-# (c) 2005 Ian Bicking and contributors; written for Paste (http://pythonpaste.org)
-# Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+# (c) 2005 Ian Bicking and contributors;
+# written for Paste (http://pythonpaste.org)
+# Licensed under the MIT licensae:
+# http://www.opensource.org/licenses/mit-license.php
 
 """
 Cascades through several applications, so long as applications
@@ -8,9 +10,14 @@ return ``404 Not Found``.
 from paste import httpexceptions
 from paste.util import converters
 import tempfile
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 
 __all__ = ['Cascade']
+
 
 def make_cascade(loader, global_conf, catch='404', **local_conf):
     """
@@ -26,9 +33,9 @@ def make_cascade(loader, global_conf, catch='404', **local_conf):
         ...
         catch = 404 500 ...
     """
-    catch = map(int, converters.aslist(catch))
+    catch = list(map(int, converters.aslist(catch)))
     apps = []
-    for name, value in local_conf.items():
+    for name, value in list(local_conf.items()):
         if not name.startswith('app'):
             raise ValueError(
                 "Bad configuration key %r (=%r); all configuration keys "
@@ -39,6 +46,7 @@ def make_cascade(loader, global_conf, catch='404', **local_conf):
     apps.sort()
     apps = [app for name, app in apps]
     return Cascade(apps, catch=catch)
+
 
 class Cascade(object):
 
@@ -76,6 +84,7 @@ class Cascade(object):
         WSGI application interface
         """
         failed = []
+
         def repl_start_response(status, headers, exc_info=None):
             code = int(status.split(None, 1)[0])
             if code in self.catch_codes:
@@ -128,6 +137,7 @@ class Cascade(object):
         if copy_wsgi_input:
             environ['wsgi.input'].seek(0)
         return self.apps[-1](environ, start_response)
+
 
 def _consuming_writer(s):
     pass

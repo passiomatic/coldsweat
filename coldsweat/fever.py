@@ -16,11 +16,11 @@ from webob.exc import HTTPBadRequest
 from peewee import fn, IntegrityError
 
 from coldsweat import logger
-from utilities import Struct, datetime_as_epoch
-from app import WSGIApp, POST
-from controllers import FeedController, UserController
-from models import (Entry, Feed, Group, Read, Saved, Subscription, User,
-                    transaction)
+from .utilities import Struct, datetime_as_epoch
+from .app import WSGIApp, POST
+from .controllers import FeedController, UserController
+from .models import (Entry, Feed, Group, Read, Saved, Subscription, User,
+                     transaction)
 
 RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 600  # 10 minutes

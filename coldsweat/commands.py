@@ -18,29 +18,29 @@ from webob import exc
 from webob.dec import wsgify
 from webob.response import Response
 
-from models import (connect,
-                    close,
-                    User,
-                    setup_database_schema
-                    )
+from . models import (connect,
+                      close,
+                      User,
+                      setup_database_schema
+                      )
 
-from controllers import FeedController, UserController
+from . controllers import FeedController, UserController
 
-import cascade
-import fever
+from . import cascade
+from . import fever
 
-import frontend
+from . import frontend
 
-from app import ExceptionMiddleware, ROUTES
+from . app import ExceptionMiddleware, ROUTES
 from coldsweat import (installation_dir,
                        template_dir,
                        FEED_TAG_URI,
                        VERSION_STRING)
 
-from utilities import (render_template,
-                       make_sha1_hash,
-                       format_http_datetime)
-import filters
+from . utilities import (render_template,
+                         make_sha1_hash,
+                         format_http_datetime)
+from . import filters
 
 if sys.version_info.major < 3:
     input = raw_input  # noqa

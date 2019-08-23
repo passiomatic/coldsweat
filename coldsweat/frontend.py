@@ -29,7 +29,7 @@ from .plugins import trigger_event
 from .controllers import FeedController, UserController
 from .session import SessionMiddleware
 from .utilities import format_datetime, validate_url
-import filters
+from . import filters
 
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60

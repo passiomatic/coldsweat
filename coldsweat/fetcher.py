@@ -40,7 +40,7 @@ from .utilities import (datetime_as_epoch,
                         make_nonce,
                         render_template,)
 
-import filters
+from . import filters
 
 __all__ = [
     'Fetcher',

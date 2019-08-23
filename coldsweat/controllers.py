@@ -13,12 +13,12 @@ from xml.etree import ElementTree
 
 from peewee import JOIN, fn, IntegrityError
 
-from utilities import make_sha1_hash, scrub_url
-from plugins import trigger_event, load_plugins
+from .utilities import make_sha1_hash, scrub_url
+from .plugins import trigger_event, load_plugins
 from coldsweat import config, logger
 from coldsweat.models import (connect, Entry, Feed, Group, Read, Saved,
                               Subscription)
-from fetcher import Fetcher
+from .fetcher import Fetcher
 
 
 class UserController(object):

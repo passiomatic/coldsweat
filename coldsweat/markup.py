@@ -7,11 +7,15 @@ Portions are copyright (c) 2006 Aaron Swartz
 Portions are copyright (c) 2002–4 Mark Pilgrim
 """
 
+try:
+    from HTMLParser import HTMLParser, HTMLParseError
+    import urlparse
+except ImportError:
+    from html.parser import HTMLParser
+    import urllib.parse as urlparse
 
-from HTMLParser import HTMLParser, HTMLParseError
-import urlparse
 
-from filters import escape_html
+from . filters import escape_html
 from coldsweat import logger
 
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
@@ -244,7 +248,7 @@ class Scrubber(BaseProcessor):
 def _parse(parser, data):
     try:
         parser.feed(data)
-    except HTMLParseError as exc:
+    except (HTMLParseError, AssertionError) as exc:
         # Log exception and raise it again
         logger.debug(u'could not parse markup (%s)' % exc.msg)
         raise exc

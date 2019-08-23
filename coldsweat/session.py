@@ -34,7 +34,6 @@ SUCH DAMAGE.
 
 
 import atexit
-import os
 import random
 import sys
 import string
@@ -187,8 +186,8 @@ class SessionCache(object):
         self.checkedout, self._closed = dict(), False
         # Sets if session id is random on every access or not
         self.is_random = is_random
-        self._secret = ''.join(self.idchars[ord(c) % len(self.idchars)]
-                               for c in os.urandom(self.length))
+        self._secret = ''.join(random.SystemRandom().choice(self.idchars)
+                               for _ in range(self.length))
         # Ensure shutdown is called.
         atexit.register(_shutdown, weakref.ref(self))
 

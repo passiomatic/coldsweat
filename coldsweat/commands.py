@@ -351,8 +351,11 @@ class CustomDirectoryApp(DirectoryApp):
 
     @wsgify
     def __call__(self, req):
+        req_path = req.path_info.lstrip('/')
+        if sys.version_info.major < 3:
+            req_path = req_path.encode()
         path = os.path.abspath(os.path.join(
-            self.path, req.path_info.lstrip('/').encode()))
+            self.path, req_path))
 
         # this is needed to work around a bug in WebOb
         if os.path.isdir(path):

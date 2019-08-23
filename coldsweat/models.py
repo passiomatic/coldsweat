@@ -133,7 +133,7 @@ class User(BaseModel):
     is_enabled = BooleanField(default=True)
 
     class Meta:
-        db_table = 'users'
+        table_name = 'users'
 
     @staticmethod
     def make_api_key(email, password):
@@ -184,7 +184,7 @@ class Icon(BaseModel):
     data = TextField()
 
     class Meta:
-        db_table = 'icons'
+        table_name = 'icons'
 
 
 class Group(BaseModel):
@@ -197,7 +197,7 @@ class Group(BaseModel):
 
     class Meta:
         order_by = ('title',)
-        db_table = 'groups'
+        table_name = 'groups'
 
 
 class Feed(BaseModel):
@@ -227,7 +227,7 @@ class Feed(BaseModel):
     icon_last_updated_on = DateTimeField(null=True)  # As UTC
 
     class Meta:
-        db_table = 'feeds'
+        table_name = 'feeds'
 
     @property
     def last_updated_on_as_epoch(self):
@@ -269,7 +269,7 @@ class Entry(BaseModel):
     # If null the entry *must* provide a GUID
 
     class Meta:
-        db_table = 'entries'
+        table_name = 'entries'
 
     @property
     def last_updated_on_as_epoch(self):
@@ -321,7 +321,7 @@ class Subscription(BaseModel):
         indexes = (
             (('user', 'group', 'feed'), True),
         )
-        db_table = 'subscriptions'
+        table_name = 'subscriptions'
 
 
 class Session(BaseModel):
@@ -333,7 +333,7 @@ class Session(BaseModel):
     expires_on = DateTimeField()
 
     class Meta:
-        db_table = 'sessions'
+        table_name = 'sessions'
 
 
 # ------------------------------------------------------

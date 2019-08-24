@@ -16,7 +16,7 @@ from webob.exc import (HTTPBadRequest,
                        HTTPTemporaryRedirect)
 from peewee import fn, IntegrityError
 from requests import RequestException
-from tempita import Template
+from tempita import Template as BaseTemplate
 
 from .app import GET, POST, WSGIApp, form
 from coldsweat import config, logger, template_dir, VERSION_STRING
@@ -36,6 +36,36 @@ FEEDS_PER_PAGE = 60
 GROUPS_PER_PAGE = 30
 USER_SESSION_KEY = 'FrontendApp.user'
 COOKIE_SESSION_KEY = '_SID_'
+
+
+def unicode_get_file_template(name, from_template, encoding='utf-8'):
+    """
+    Monkey patch Template because it failes to pass utf-8 to all templates
+    """
+    path = os.path.join(os.path.dirname(from_template.name), name)
+    return from_template.__class__.from_filename(
+        path, namespace=from_template.namespace,
+        get_template=from_template.get_template,
+        encoding=encoding)
+
+
+class Template(BaseTemplate):
+
+    @classmethod
+    def from_filename(cls,
+                      filename,
+                      namespace=None,
+                      encoding=None,
+                      default_inherit=None,
+                      get_template=unicode_get_file_template):
+
+        f = open(filename, 'rb')
+        c = f.read()
+        f.close()
+        if encoding:
+            c = c.decode(encoding)
+        return cls(content=c, name=filename, namespace=namespace,
+                   default_inherit=default_inherit, get_template=get_template)
 
 
 def login_required(handler):
@@ -647,7 +677,8 @@ def setup_app():
 # @@TODO: use utilities.render_template - see http://bit.ly/P5Hh5m
 def _render_template(filename, namespace):
     return Template.from_filename(os.path.join(template_dir, filename),
-                                  namespace=namespace).substitute()
+                                  namespace=namespace,
+                                  encoding='utf-8').substitute()
 
 # Stats
 

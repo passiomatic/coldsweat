@@ -6,12 +6,14 @@ Copyright (c) 2013—2016 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 '''
+import io
 import re
 import sys
 
 from traceback import format_tb
 
 from webob import Request, Response
+from webob.request import LimitedLengthFile, DisconnectionError
 from webob.exc import HTTPClientError, HTTPNotFound, HTTPRedirection
 from . models import connect, close
 
@@ -59,11 +61,64 @@ def form(pattern):
 # ------------------------------------------------------
 
 
+def patched_read_into(self, buff):
+    if not self.remaining:
+        return 0
+    sz0 = min(len(buff), self.remaining)
+    data = self.file.read(sz0)
+    sz = len(data)
+    self.remaining -= sz
+    if sz < sz0 and self.remaining:
+        raise DisconnectionError(
+            "The client disconnected while sending the body "
+            "(%d more bytes were expected)" % (self.remaining,)
+        )
+    buff[:sz] = data.encode()
+    return sz
+
+
+LimitedLengthFile.readinto = patched_read_into
+
+
+class PatchedRequest(Request):
+
+    @property
+    def body_file(self):
+        """
+            Input stream of the request (wsgi.input).
+            Setting this property resets the content_length and seekable flag
+            (unlike setting req.body_file_raw).
+        """
+
+        if not self.is_body_readable:
+            return io.BytesIO()
+
+        r = self.body_file_raw
+        clen = self.content_length
+
+        if not self.is_body_seekable and clen is not None:
+            # we need to wrap input in LimitedLengthFile
+            # but we have to cache the instance as well
+            # otherwise this would stop working
+            # (.remaining counter would reset between calls):
+            #   req.body_file.read(100)
+            #   req.body_file.read(100)
+            env = self.environ
+            wrapped, raw = env.get("webob._body_file", (0, 0))
+
+            #  if raw is not r:
+            wrapped = LimitedLengthFile(r, clen)
+            wrapped = io.BufferedReader(wrapped)
+            env["webob._body_file"] = wrapped, r
+            r = wrapped
+
+        return r
+
+
 class WSGIApp(object):
 
     def __call__(self, environ, start_response):
-
-        request = Request(environ)
+        request = PatchedRequest(environ)
 
         handler, args = self._find_handler(request)
         if not handler:

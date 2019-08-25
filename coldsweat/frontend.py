@@ -285,7 +285,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
                     Read.create(user=self.user, entry=entry)
                 except IntegrityError:
                     logger.debug(
-                        u'entry %d already marked as read, ignored' % entry.id)
+                        'entry %d already marked as read, ignored' % entry.id)
                     continue
 
         self.alert_message = message
@@ -356,11 +356,11 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 
         title = form.get('title', '').strip()
         if not title:
-            form_message = u'ERROR Error, feed title cannot be empty'
+            form_message = 'ERROR Error, feed title cannot be empty'
             return self.respond_with_template('_feed_edit.html', locals())
         feed.title = title
         feed.save()
-        self.alert_message = u'SUCCESS Changes have been saved.'
+        self.alert_message = 'SUCCESS Changes have been saved.'
         return self.respond_with_script(
             '_modal_done.js', {'location': '%s/feeds/' % self.application_url})
 
@@ -376,7 +376,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         if self.request.method == 'GET':
             return self.respond_with_modal(
                 '%s/feeds/remove/%d' % (self.application_url, feed.id),
-                title=u'Remove <i>%s</i> from your subscriptions?'
+                title='Remove <i>%s</i> from your subscriptions?'
                 % feed.title, button='Remove')
 
         # Handle postback
@@ -384,7 +384,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
             (Subscription.user == self.user
              ) & (Subscription.feed == feed)).execute()
         self.alert_message = (
-            u'SUCCESS You are no longer subscribed to <i>%s</i>.' % feed.title)
+            'SUCCESS You are no longer subscribed to <i>%s</i>.' % feed.title)
 
         return self.redirect_after_post('%s/feeds/' % self.application_url)
 
@@ -402,7 +402,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         if self.request.method == 'GET':
             return self.respond_with_modal(
                 '%s/feeds/enable/%d' % (self.application_url, feed.id),
-                title=u'Enable <i>%s</i> again?' % feed.title,
+                title='Enable <i>%s</i> again?' % feed.title,
                 body=('Coldsweat will attempt to update '
                       'it again during the next feeds fetch.'),
                 button='Enable')
@@ -410,7 +410,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         # Handle postback
         feed.is_enabled, feed.error_count = True, 0
         feed.save()
-        self.alert_message = (u'SUCCESS Feed <i>%s</i> is now enabled.'
+        self.alert_message = ('SUCCESS Feed <i>%s</i> is now enabled.'
                               % feed.title)
 
         return self.redirect_after_post('%s/feeds/' % self.application_url)
@@ -434,17 +434,17 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 
         # Assume HTTP if URL is passed w/out scheme
         self_link = self_link if self_link.startswith('http') \
-            else u'http://' + self_link
+            else 'http://' + self_link
 
         if not validate_url(self_link):
-            form_message = u'ERROR Error, specify a valid web address'
+            form_message = 'ERROR Error, specify a valid web address'
             return self.respond_with_template('_feed_add_wizard_1.html',
                                               locals())
 
         try:
             response = fetch_url(self_link)
         except RequestException:
-            form_message = (u'ERROR Error, feed address is incorrect or '
+            form_message = ('ERROR Error, feed address is incorrect or '
                             'host is unreachable.')
             return self.respond_with_template('_feed_add_wizard_1.html',
                                               locals())
@@ -456,7 +456,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
         # It's a feed
 
         feed = self.add_feed_from_url(self_link, fetch_data=False)
-        logger.debug(u"starting fetcher")
+        logger.debug("starting fetcher")
         trigger_event('fetch_started')
         Fetcher(feed).update_feed_with_data(response.text)
         trigger_event('fetch_done', [feed])
@@ -499,10 +499,10 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 
         subscription = self.add_subscription(feed, group)
         if subscription:
-            self.alert_message = (u'SUCCESS Feed has been added to '
+            self.alert_message = ('SUCCESS Feed has been added to '
                                   '<i>%s</i> group' % group.title)
         else:
-            self.alert_message = (u'INFO Feed is already in <i>%s</i> group'
+            self.alert_message = ('INFO Feed is already in <i>%s</i> group'
                                   % group.title)
         return self.respond_with_script(
             '_modal_done.js', {'location': '%s/?feed=%d' % (
@@ -539,7 +539,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
                 user.save()
                 return self.respond_with_script('_modal_done.js')
             else:
-                form_message = u'ERROR Error, password is too short.'
+                form_message = 'ERROR Error, password is too short.'
 
         return self.respond_with_template('_user_edit.html', locals())
 

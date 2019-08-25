@@ -9,6 +9,7 @@ return ``404 Not Found``.
 """
 from paste import httpexceptions
 from paste.util import converters
+import sys
 import tempfile
 try:
     from cStringIO import StringIO
@@ -113,13 +114,17 @@ class Cascade(object):
                         copy_len -= len(chunk)
                 f.seek(0)
             else:
-                f = StringIO(environ['wsgi.input'].read(length))
-            environ['wsgi.input'] = f
+                if sys.version_info.major == 3:
+                    f = StringIO(environ['wsgi.input'].read(length).decode())
+                else:
+                    f = StringIO(environ['wsgi.input'].read(length))
+                environ['wsgi.input'] = f
         else:
             copy_wsgi_input = False
         for app in self.apps[:-1]:
             environ_copy = environ.copy()
             if copy_wsgi_input:
+                # io.UnsupportedOperation: File or stream is not seekable.
                 environ_copy['wsgi.input'].seek(0)
             failed = []
             try:

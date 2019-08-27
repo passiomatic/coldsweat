@@ -25,7 +25,6 @@ def test_scrub(filename, unwanted):
 
     # Figure out current dir
     test_dir = path.dirname(path.abspath(__file__))
-
     soup = feedparser.parse(path.join(test_dir, filename))
     for entry in soup.entries:
         data = scrub_html(entry.description, blacklist)

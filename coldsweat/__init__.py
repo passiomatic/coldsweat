@@ -44,7 +44,13 @@ ENTRY_TAG_URI = 'tag:lab.passiomatic.com,2017:coldsweat:entry:%s'
 
 # Figure out installation directory. This has
 #  to work for the fetcher script too
-installation_dir, _ = os.path.split(os.path.dirname(os.path.abspath(__file__)))
+
+installation_dir = os.environ.get("COLDSWEAT_INSTALL_DIR")
+
+if not installation_dir:
+    installation_dir, _ = os.path.split(
+        os.path.dirname(os.path.abspath(__file__)))
+
 template_dir = os.path.join(installation_dir, 'coldsweat/templates')
 plugin_dir = os.path.join(installation_dir, 'plugins')
 
@@ -52,7 +58,12 @@ plugin_dir = os.path.join(installation_dir, 'plugins')
 # Load up configuration settings
 # ------------------------------------------------------
 
-config = load_config(os.path.join(installation_dir, 'etc/config'))
+config_path = os.environ.get("COLDSWEAT_CONFIG_PATH")
+
+if not config_path:
+    config_path = os.path.join(installation_dir, 'etc/config')
+
+config = load_config(config_path)
 
 # ------------------------------------------------------
 # Configure logger

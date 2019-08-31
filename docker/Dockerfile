@@ -4,7 +4,7 @@ MAINTAINER  Oz Tiram <oz.tiram@gmail.com>
 RUN apk update && \
     apk add py3-pip uwsgi uwsgi-python3 gnupg sqlite && \
     pip3 install --upgrade pip && \
-    test -d /run/coldsweat || mkdir /run/coldsweet && \
+    test -d /run/coldsweat || mkdir /run/coldsweat && \
     test -d /var/lib/coldsweat || mkdir /var/lib/coldsweat && \
     test -d /etc/coldsweat || mkdir /etc/coldsweat
 

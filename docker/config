@@ -1,6 +1,6 @@
 [database]
 
-connection_url: sqlite:///var/lib/coldsweat/db/coldsweat.db
+connection_url: sqlite:////var/lib/coldsweat/db/coldsweat.db
 
 ;connection_url: postgresql://username:password@localhost/coldsweat
 
@@ -12,7 +12,6 @@ connection_url: sqlite:///var/lib/coldsweat/db/coldsweat.db
 ;level: INFO
 
 ; Comment to avoid logging to a file altogether
-filename: stderr
 
 [fetcher]
 

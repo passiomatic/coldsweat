@@ -24,4 +24,4 @@ docker-build:
 	docker build -t $(ORG)/$(IMG):$(TAG) -f docker/Dockerfile .
 
 docker-run:
-	docker run -p 9001:9001 -v $(CWD)/data:/var/lib/coldsweat/db $(ORG)/$(IMG):$(TAG)
+	docker run -it -p 9001:9001 -v $(CURDIR)/data:/var/lib/coldsweat/db $(ORG)/$(IMG):$(TAG)

@@ -1,18 +1,20 @@
 #!/bin/sh
 
 UWSGI_PORT="${UWSGI_PORT:-9001}"
-UWSGI_PROCS=${UWSGI_PROCS:-4}
-UWSGI_THREADS=${UWSGI_THREADS:-2}
+UWSGI_PROCS=${UWSGI_PROCS:-1}
+UWSGI_THREADS=${UWSGI_THREADS:-1}
 
 export COLDSWEAT_INSTALL_DIR=/run/coldsweat
 export COLDSWEAT_CONFIG_PATH=/etc/coldsweat/config
 
 chdir /run/coldsweat
 
-ls /etc/coldsweat/
-cat /etc/coldsweat/config
+# if you want to use python's reference server ...
+# good for debugging, don't use in production
+#exec python3 sweat.py serve -p 9001
 
 exec uwsgi --need-app --plugins-dir /usr/lib/uwsgi  --need-plugin python3 \
+	--honour-stdin \
 	--pythonpath /run/coldsweat \
 	--plugin python3 --processes "${UWSGI_PROCS}" \
 	--threads "${UWSGI_THREADS}" --http-socket 0.0.0.0:"${UWSGI_PORT}" \

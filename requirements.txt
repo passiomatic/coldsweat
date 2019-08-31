@@ -3,7 +3,7 @@ chardet==3.0.4
 feedparser==5.2.1
 idna==2.7
 Paste==3.1.0
-peewee==2.7.3
+peewee==3.10.0
 requests==2.20.1
 six==1.12.0
 Tempita==0.5.1

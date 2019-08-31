@@ -176,8 +176,8 @@ class ExceptionMiddleware(object):
         """
         Call the application and catch exceptions.
         """
-        app_iter = None
 
+        app_iter = None
         # Just call the application and send the output back
         #   unchanged and catch relevant HTTP exceptions
         try:

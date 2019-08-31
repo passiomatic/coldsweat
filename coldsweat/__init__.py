@@ -70,16 +70,20 @@ config = load_config(config_path)
 # ------------------------------------------------------
 
 # Shared logger instance
+for module in 'peewee', 'requests':
+    logging.getLogger(module).setLevel(logging.WARN)
+
+print(config)
 logger = logging.getLogger()
 
-if config.log.filename:
+if config.log.filename == 'stderr':
+    logger.addHandler(logging.StreamHandler())
+elif config.log.filename:
     logging.basicConfig(
         filename=config.log.filename,
         level=getattr(logging, config.log.level),
         format='[%(asctime)s] %(process)d %(levelname)s %(message)s',
     )
-    for module in 'peewee', 'requests':
-        logging.getLogger(module).setLevel(logging.WARN)
 else:
     # Silence is golden
     logger.addHandler(logging.NullHandler())

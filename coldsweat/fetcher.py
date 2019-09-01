@@ -9,7 +9,7 @@ License: MIT (see LICENSE for details)
 
 import os
 try:
-    import urlparse
+    import urllib.parse
 except ImportError:
     import urllib.parse as urlparse
 
@@ -60,7 +60,7 @@ class Fetcher(object):
         # Save timestamp for current fetch operation
         self.instant = datetime.utcnow()
         # Extract netloc
-        _, self.netloc, _, _, _ = urlparse.urlsplit(feed.self_link)
+        _, self.netloc, _, _, _ = urllib.parse.urlsplit(feed.self_link)
 
         self.feed = feed
 
@@ -70,7 +70,7 @@ class Fetcher(object):
         '''
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
-        logger.warn(u"%s has caused an error on server, skipped" % self.netloc)
+        logger.warn("%s has caused an error on server, skipped" % self.netloc)
         raise HTTPInternalServerError
 
     def handle_403(self, response):
@@ -79,7 +79,7 @@ class Fetcher(object):
         '''
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
-        logger.warn(u"%s access was denied, skipped" % self.netloc)
+        logger.warn("%s access was denied, skipped" % self.netloc)
         raise HTTPForbidden
 
     def handle_404(self, response):
@@ -88,7 +88,7 @@ class Fetcher(object):
         '''
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
-        logger.warn(u"%s has been not found, skipped" % self.netloc)
+        logger.warn("%s has been not found, skipped" % self.netloc)
         raise HTTPNotFound
 
     def handle_410(self, response):
@@ -98,7 +98,7 @@ class Fetcher(object):
         self.feed.is_enabled = False
         self.feed.error_count += 1
         self.feed.last_statu = response.status_code
-        logger.warn(u"%s is gone, disabled" % self.netloc)
+        logger.warn("%s is gone, disabled" % self.netloc)
         self._synthesize_entry('Feed has been removed from the origin server.')
         raise HTTPGone
 
@@ -106,7 +106,7 @@ class Fetcher(object):
         '''
         Not modified
         '''
-        logger.debug(u"%s hasn't been modified, skipped" % self.netloc)
+        logger.debug("%s hasn't been modified, skipped" % self.netloc)
         self.feed.last_status = response.status_code
         raise HTTPNotModified
 
@@ -122,7 +122,7 @@ class Fetcher(object):
             self.feed.self_link = self_link
             self.feed.last_status = response.status_code
             logger.info(
-                u"%s has changed its location, updated to %s" % (
+                "%s has changed its location, updated to %s" % (
                     self.netloc, self_link))
         else:
             self.feed.is_enabled = False
@@ -130,7 +130,7 @@ class Fetcher(object):
             self.feed.error_count += 1
             self._synthesize_entry('Feed has a duplicated web address.')
             logger.warn(
-                u"new %s location %s is duplicated, disabled" % (
+                "new %s location %s is duplicated, disabled" % (
                     self.netloc, self_link))
             raise DuplicatedFeedError
 
@@ -147,7 +147,7 @@ class Fetcher(object):
 
     def update_feed(self):
 
-        logger.debug(u"updating %s" % self.netloc)
+        logger.debug("updating %s" % self.netloc)
 
         # Check freshness
         for value in [self.feed.last_checked_on, self.feed.last_updated_on]:
@@ -159,7 +159,7 @@ class Fetcher(object):
             delta = datetime_as_epoch(self.instant) - datetime_as_epoch(value)
             if delta < config.fetcher.min_interval:
                 logger.debug(
-                    u"%s is below minimun fetch interval, skipped"
+                    "%s is below minimun fetch interval, skipped"
                     % self.netloc)
                 return
 
@@ -173,7 +173,7 @@ class Fetcher(object):
             self.feed.last_status = HTTPServiceUnavailable.code
             self.feed.error_count += 1
             logger.warn(
-                u"a network error occured while fetching %s, skipped"
+                "a network error occured while fetching %s, skipped"
                 % self.netloc)
             self.check_feed_health()
             self.feed.save()
@@ -190,12 +190,12 @@ class Fetcher(object):
         try:
             handler = getattr(self, 'handle_%d' % status, None)
             if handler:
-                logger.debug(u"got status %s from server" % status)
+                logger.debug("got status %s from server" % status)
                 handler(response)
             else:
                 self.feed.last_status = status
                 logger.warn(
-                    u"%s replied with unhandled status %d, aborted" % (
+                    "%s replied with unhandled status %d, aborted" % (
                         self.netloc, status))
                 return
             self._parse_feed(response.text)
@@ -214,7 +214,7 @@ class Fetcher(object):
                 'Feed has accumulated too many errors (last was %s).'
                 % filters.status_title(self.feed.last_status))
             logger.warn(
-                u"%s has accomulated too many errors, disabled" % self.netloc)
+                "%s has accomulated too many errors, disabled" % self.netloc)
             self.feed.is_enabled = False
 
     def update_feed_with_data(self, data):
@@ -227,7 +227,7 @@ class Fetcher(object):
         # Got parsing error?
         if hasattr(soup, 'bozo') and soup.bozo:
             logger.debug(
-                u"%s caused a parser error (%s), tried to parse it anyway" % (
+                "%s caused a parser error (%s), tried to parse it anyway" % (
                     self.netloc, soup.bozo_exception))
 
         ft = FeedTranslator(soup.feed)
@@ -248,7 +248,7 @@ class Fetcher(object):
 
             if not guid:
                 logger.warn(
-                    u'could not find GUID for entry from %s, skipped'
+                    'could not find GUID for entry from %s, skipped'
                     % self.netloc)
                 continue
 
@@ -260,14 +260,14 @@ class Fetcher(object):
                                                - timestamp).days > \
                     config.fetcher.max_history:
                 logger.debug(
-                    u"entry %s from %s is over maximum history, skipped" % (
+                    "entry %s from %s is over maximum history, skipped" % (
                         guid, self.netloc))
                 continue
 
             try:
                 # If entry is already in database with same hashed GUID, skip
                 Entry.get(guid_hash=make_sha1_hash(guid))
-                logger.debug(u"duplicated entry %s, skipped" % guid)
+                logger.debug("duplicated entry %s, skipped" % guid)
                 continue
             except Entry.DoesNotExist:
                 pass
@@ -289,7 +289,7 @@ class Fetcher(object):
             entry.save()
             #  @@TODO: entries.append(entry)
 
-            logger.debug(u"parsed entry %s from %s" % (guid, self.netloc))
+            logger.debug("parsed entry %s from %s" % (guid, self.netloc))
 
     def _fetch_icon(self):
 
@@ -302,19 +302,19 @@ class Fetcher(object):
                 self.feed.alternate_link or self.feed.self_link)
             self.feed.icon_last_updated_on = self.instant
 
-            logger.debug(u"fetched favicon %s..." % (self.feed.icon[:70]))
+            logger.debug("fetched favicon %s..." % (self.feed.icon[:70]))
 
     def _google_favicon_fetcher(self, url):
         '''
         Fetch a site favicon via Google service
         '''
         endpoint = ("http://www.google.com/s2/favicons?domain=%s"
-                    % urlparse.urlsplit(url).hostname)
+                    % urllib.parse.urlsplit(url).hostname)
 
         try:
             response = fetch_url(endpoint)
         except RequestException as exc:
-            logger.warn(u"could not fetch favicon for %s (%s)" % (url, exc))
+            logger.warn("could not fetch favicon for %s (%s)" % (url, exc))
             return Feed.DEFAULT_ICON
 
         return make_data_uri(
@@ -342,11 +342,11 @@ class Fetcher(object):
             last_updated_on=self.instant
         )
         entry.save()
-        logger.debug(u"synthesized entry %s" % guid)
+        logger.debug("synthesized entry %s" % guid)
         return entry
 
     def _synthesize_entry(self, reason):
-        title = u'This feed has been disabled'
+        title = 'This feed has been disabled'
         content = render_template(
             os.path.join(template_dir, '_entry_feed_disabled.html'),
             {'reason': reason})
@@ -365,7 +365,7 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
     # Conditional GET headers
     if etag and modified_since:
         logger.debug(
-            u"fetching %s with a conditional GET (%s %s)" %
+            "fetching %s with a conditional GET (%s %s)" %
             (url, etag, format_http_datetime(modified_since)))
         request_headers['If-None-Match'] = etag
         request_headers['If-Modified-Since'] = format_http_datetime(
@@ -374,7 +374,7 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
         response = requests.get(url, timeout=timeout, headers=request_headers)
     except RequestException as exc:
         logger.debug(
-            u"tried to fetch %s but got %s" % (url, exc.__class__.__name__))
+            "tried to fetch %s but got %s" % (url, exc.__class__.__name__))
         raise exc
     return response
 

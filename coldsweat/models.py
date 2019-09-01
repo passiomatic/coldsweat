@@ -22,6 +22,7 @@ from peewee import (BlobField, BooleanField, CharField, DateTimeField,
                     ForeignKeyField,
                     IntegerField, IntegrityError,
                     TextField, SqliteDatabase)
+from passlib import context
 
 from coldsweat import config, logger
 from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
@@ -127,10 +128,18 @@ class User(BaseModel):
     MIN_PASSWORD_LENGTH = 8
 
     username = CharField(unique=True)
-    password = CharField()
     email = CharField(default='')
     api_key = CharField(unique=True)
     is_enabled = BooleanField(default=True)
+    password = BlobField(255)
+
+    pw_context = context.CryptContext(
+        schemes=['pbkdf2_sha512', 'sha512_crypt'],
+        default='pbkdf2_sha512'
+    )
+
+    def __repr__(self):
+        return "<%s|%s>" % (self.name, self.email)
 
     class Meta:
         table_name = 'users'
@@ -150,6 +159,18 @@ class User(BaseModel):
 
         return user
 
+    def check_password(self, input_password):
+        passed = User.pw_context.verify(input_password, self.password)
+        if not passed:
+            return False
+
+        elif User.pw_context.identify(self.password) != User.pw_context.default_scheme():  # noqa
+            self.password = User.pw_context.hash(input_password)
+            self.save()
+            return True
+        else:
+            return True
+
     @staticmethod
     def validate_credentials(username_or_email, password):
         '''Lookup for and existing username/e-mail combo and password'''
@@ -161,7 +182,7 @@ class User(BaseModel):
             return None
 
         # Do a case-sensitive compare
-        if user.password != password:
+        if not user.check_password(password):
             return None
 
         return user
@@ -170,10 +191,22 @@ class User(BaseModel):
     def validate_password(password):
         return len(password) >= User.MIN_PASSWORD_LENGTH
 
+    def hash_password(self, raw=False):
+        """
+        Set password for user with specified encryption scheme
+        """
+        # for the list of hash schemes see
+        # https://wiki2.dovecot.org/Authentication/PasswordSchemes
+        if raw:
+            self.password = self.password
+        else:
+            self.password = User.pw_context.hash(self.password)
+
 
 @pre_save(sender=User)
 def on_user_save(model, user, created):
     user.api_key = User.make_api_key(user.email, user.password)
+    user.hash_password()
 
 
 # @@REMOVEME: We keep this only to make migrations work

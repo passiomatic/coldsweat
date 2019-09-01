@@ -19,3 +19,4 @@ WebOb==1.8.5
 # Connect Coldsweat to a PostgreSQL database (optional)
 #psycopg2
 
+passlib

@@ -10,11 +10,11 @@ import os
 import re
 
 try:
-    import urllib
-    import urlparse
+    import urllib.request, urllib.parse, urllib.error
+    import urllib.parse
 except ImportError:
     from urllib.parse import urlparse
-    import urllib
+    import urllib.request, urllib.parse, urllib.error
 
 from hashlib import md5, sha1
 import base64
@@ -37,7 +37,7 @@ def truncate(value, max_length):
     """
     if len(value) < max_length:
         return value
-    return value[:max_length-1] + u'…'
+    return value[:max_length-1] + '…'
 
 
 def make_data_uri(content_type, data):
@@ -98,11 +98,11 @@ def scrub_url(url):
     '''
     Clean query string arguments
     '''
-    scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
-    d = urlparse.parse_qs(query)
-    d = dict((k, v) for k, v in d.items() if k not in BLACKLIST_QS)
-    return urlparse.urlunsplit((scheme, netloc, path,
-                                urllib.urlencode(d, doseq=True), fragment))
+    scheme, netloc, path, query, fragment = urllib.parse.urlsplit(url)
+    d = urllib.parse.parse_qs(query)
+    d = dict((k, v) for k, v in list(d.items()) if k not in BLACKLIST_QS)
+    return urllib.parse.urlunsplit((scheme, netloc, path,
+                                urllib.parse.urlencode(d, doseq=True), fragment))
 
 # --------------------
 # Date/time functions
@@ -226,7 +226,7 @@ class Struct(dict):
     def __init__(self, d=None):
         d = d or {}
         super(Struct, self).__init__(d)
-        for k, v in d.items():
+        for k, v in list(d.items()):
             if isinstance(v, dict):
                 self.__dict__[k] = Struct(v)
             else:
@@ -249,8 +249,8 @@ class Struct(dict):
 def run_tests():
 
     t = datetime.utcnow()
-    print(format_http_datetime(t))
-    assert truncate(u'Lorèm ipsum dolor sit ame', 10) == u'Lorèm ips…'
+    print((format_http_datetime(t)))
+    assert truncate('Lorèm ipsum dolor sit ame', 10) == 'Lorèm ips…'
 
     assert scrub_url(
         'http://example.org/feed.xml?utm_source='

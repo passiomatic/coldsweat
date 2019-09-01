@@ -9,10 +9,10 @@ connection_url: sqlite:///data/coldsweat.db
 [log]
 
 ; Values are: DEBUG (more verbose), INFO, WARNING, ERROR, CRITICAL (less verbose)
-;level: INFO
+level: debug
 
 ; Comment to avoid logging to a file altogether
-filename: coldsweat.log
+filename: stderr
 
 [fetcher]
 

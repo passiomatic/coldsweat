@@ -73,11 +73,11 @@ config = load_config(config_path)
 for module in 'peewee', 'requests':
     logging.getLogger(module).setLevel(logging.WARN)
 
-print(config)
 logger = logging.getLogger()
 
 if config.log.filename == 'stderr':
     logger.addHandler(logging.StreamHandler())
+    logger.setLevel(config.log.level)
 elif config.log.filename:
     logging.basicConfig(
         filename=config.log.filename,

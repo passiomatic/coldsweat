@@ -263,8 +263,13 @@ class SessionCache(object):
         '''
         sid = None
         for _ in range(10000):
-            a = random.randint(0, sys.maxint-1)
-            b = random.randint(0, sys.maxint-1)
+            try:
+                a = random.randint(0, sys.maxint-1)
+                b = random.randint(0, sys.maxint-1)
+            except AttributeError:
+                a = random.randint(0, sys.maxsize-1)
+                b = random.randint(0, sys.maxsize-1)
+
             sid = make_sha1_hash('%s%s%s' % (a, b, self._secret))
             # Dupe?
             if not get_session(sid):

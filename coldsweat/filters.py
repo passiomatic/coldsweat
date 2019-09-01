@@ -7,10 +7,10 @@ License: MIT (see LICENSE for details)
 """
 import html
 try:
-    import urllib
-    import urlparse
+    import urllib.request, urllib.parse, urllib.error
+    import urllib.parse
 except ImportError:
-    import urllib
+    import urllib.request, urllib.parse, urllib.error
     import urllib.parse as urlparse
 
 from webob.exc import status_map
@@ -43,14 +43,14 @@ def escape_html(value):
 @filter('url')
 def escape_url(value):
     if value:
-        return urllib.quote(utilities.encode(value))
+        return urllib.parse.quote(utilities.encode(value))
     return ''
 
 
 @filter('friendly_url')
 def friendly_url(value):
     if value:
-        u = urlparse.urlsplit(value)
+        u = urllib.parse.urlsplit(value)
         return u.netloc
     return ''
 
@@ -126,10 +126,10 @@ def alert(message):
     if not message:
         return ''
     try:
-        klass, text = message.split(u' ', 1)
+        klass, text = message.split(' ', 1)
     except ValueError:
         return text
-    return u'<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
+    return '<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
 
 
 def run_tests():

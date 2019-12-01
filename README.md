@@ -1,4 +1,10 @@
-# Coldsweat 0.9.8
+# Coldsweat is not maintaned anymore
+
+However, Oz Tiram has ported Coldsweat to Python 3. Please check the `dev` branch at:
+
+https://github.com/oz123/coldsweat/tree/dev
+
+* * * 
 
 Coldsweat is a Python web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
 

@@ -42,10 +42,6 @@ from . utilities import (render_template,
                          format_http_datetime)
 from . import filters
 
-if sys.version_info.major < 3:
-    input = raw_input  # noqa
-
-
 # Ensure all web server activity is logged on stdout
 #   and not stderr like default WSGIRequestHandler
 

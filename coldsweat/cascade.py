@@ -9,12 +9,8 @@ return ``404 Not Found``.
 """
 from paste import httpexceptions
 from paste.util import converters
-import sys
 import tempfile
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+from six import BytesIO
 
 
 __all__ = ['Cascade']
@@ -34,9 +30,9 @@ def make_cascade(loader, global_conf, catch='404', **local_conf):
         ...
         catch = 404 500 ...
     """
-    catch = list(map(int, converters.aslist(catch)))
+    catch = map(int, converters.aslist(catch))
     apps = []
-    for name, value in list(local_conf.items()):
+    for name, value in local_conf.items():
         if not name.startswith('app'):
             raise ValueError(
                 "Bad configuration key %r (=%r); all configuration keys "
@@ -49,7 +45,7 @@ def make_cascade(loader, global_conf, catch='404', **local_conf):
     return Cascade(apps, catch=catch)
 
 
-class Cascade(object):
+class Cascade:
 
     """
     Passed a list of applications, ``Cascade`` will try each of them
@@ -114,17 +110,15 @@ class Cascade(object):
                         copy_len -= len(chunk)
                 f.seek(0)
             else:
-                if sys.version_info.major == 3:
-                    f = StringIO(environ['wsgi.input'].read(length).decode())
-                else:
-                    f = StringIO(environ['wsgi.input'].read(length))
-                environ['wsgi.input'] = f
+                f = BytesIO(environ['wsgi.input'].read(length))
+
+            environ['wsgi.input'] = f
+
         else:
             copy_wsgi_input = False
         for app in self.apps[:-1]:
             environ_copy = environ.copy()
             if copy_wsgi_input:
-                # io.UnsupportedOperation: File or stream is not seekable.
                 environ_copy['wsgi.input'].seek(0)
             failed = []
             try:

@@ -8,10 +8,7 @@ License: MIT (see LICENSE for details)
 '''
 
 import os
-try:
-    import urllib.parse
-except ImportError:
-    import urllib.parse as urlparse
+import urllib.parse as urlparse
 
 from datetime import datetime
 

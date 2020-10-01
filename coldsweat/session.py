@@ -41,10 +41,7 @@ import threading
 import weakref
 
 from datetime import datetime, timedelta
-try:
-    from Cookie import SimpleCookie
-except ImportError:
-    from http.cookies import SimpleCookie
+from http.cookies import SimpleCookie
 
 from .utilities import make_sha1_hash
 from .models import Session, connect, close

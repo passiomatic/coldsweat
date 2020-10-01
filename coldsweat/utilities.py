@@ -9,12 +9,8 @@ License: MIT (see LICENSE for details)
 import os
 import re
 
-try:
-    import urllib.request, urllib.parse, urllib.error
-    import urllib.parse
-except ImportError:
-    from urllib.parse import urlparse
-    import urllib.request, urllib.parse, urllib.error
+from urllib.parse import urlparse
+import urllib.request, urllib.parse, urllib.error
 
 from hashlib import md5, sha1
 import base64

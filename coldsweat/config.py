@@ -9,10 +9,7 @@ License: MIT (see LICENSE for details)
 
 import os
 
-try:
-    from ConfigParser import SafeConfigParser
-except ImportError:
-    from configparser import ConfigParser as SafeConfigParser
+from configparser import ConfigParser as SafeConfigParser
 
 from . utilities import Struct
 

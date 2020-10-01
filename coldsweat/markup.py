@@ -7,12 +7,8 @@ Portions are copyright (c) 2006 Aaron Swartz
 Portions are copyright (c) 2002–4 Mark Pilgrim
 """
 
-try:
-    from HTMLParser import HTMLParser, HTMLParseError
-    import urlparse
-except ImportError:
-    from html.parser import HTMLParser
-    import urllib.parse as urlparse
+from html.parser import HTMLParser
+import urllib.parse as urlparse
 
 
 from . filters import escape_html

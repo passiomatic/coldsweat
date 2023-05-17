@@ -304,9 +304,10 @@ class Fetcher(object):
 
     def _google_favicon_fetcher(self, url):
         '''
-        Fetch a site favicon via Google service
+        Fetch a site favicon via service
         '''
-        endpoint = ("http://www.google.com/s2/favicons?domain=%s"
+        # @@FIXME Use new service https://dev.to/derlin/get-favicons-from-any-website-using-a-hidden-google-api-3p1e
+        endpoint = ("https://icons.duckduckgo.com/ip3/%s"
                     % urllib.parse.urlsplit(url).hostname)
 
         try:
@@ -344,10 +345,10 @@ class Fetcher(object):
         return entry
 
     def _synthesize_entry(self, reason):
-        title = 'This feed has been disabled'
-        content = render_template(
-            os.path.join(template_dir, '_entry_feed_disabled.html'),
-            {'reason': reason})
+        content = title = 'This feed has been disabled'
+        # content = render_template(
+        #     os.path.join(template_dir, '_entry_feed_disabled.html'),
+        #     {'reason': reason})
         return self.add_synthesized_entry(title, 'text/html', content)
 
 

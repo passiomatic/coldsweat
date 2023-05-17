@@ -32,19 +32,27 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 """
 
-import sys, os, string, threading, atexit, random, weakref
-from datetime import datetime, timedelta
-from Cookie import SimpleCookie
 
-from utilities import make_sha1_hash
-from models import Session, connect, close
+import atexit
+import random
+import sys
+import string
+import threading
+import weakref
+
+from datetime import datetime, timedelta
+from http.cookies import SimpleCookie
+
+from .utilities import make_sha1_hash
+from .models import Session, connect, close
 from coldsweat import logger
 
 __all__ = [
     'SessionMiddleware',
 ]
 
-SESSION_TIMEOUT = 60*60*24*30 # 1 month
+SESSION_TIMEOUT = 60*60*24*30  # 1 month
+
 
 def synchronized(func):
     def wrapper(self, *__args, **__kw):
@@ -66,14 +74,14 @@ class SessionMiddleware(object):
 
     def __init__(self, app, **kwargs):
         self.app = app
-        self.kwargs = kwargs # Pass everything else to SessionManager
+        self.kwargs = kwargs  # Pass everything else to SessionManager
 
     def __call__(self, environ, start_response):
         connect()
-        
+
         # New session manager instance each time
         manager = SessionManager(environ, **self.kwargs)
-        # Add a session object to wrapped app        
+        # Add a session object to wrapped app
         self.app.session = manager.session
 
         # Initial response to a cookie session
@@ -85,27 +93,28 @@ class SessionMiddleware(object):
 
         try:
             # Return initial response if new or session id is random
-            if manager.is_new: 
+            if manager.is_new:
                 return initial_response(environ, start_response)
             return self.app(environ, start_response)
         finally:
-            # Always close session and database connection 
+            # Always close session and database connection
             manager.close()
             close()
 
+
 class SessionManager(object):
- 
-    def __init__(self, environ, fieldname, path='/'):   
+
+    def __init__(self, environ, fieldname, path='/'):
         self._cache = SessionCache()
         self._fieldname = fieldname
         self._path = path
-        
+
         self.session = self._sid = None
         self.is_new = False
-        
+
         self._get(environ)
 
-    def _get(self, environ):  
+    def _get(self, environ):
         '''
         Attempt to associate with an existing session
         '''
@@ -129,24 +138,26 @@ class SessionManager(object):
         Sets a session cookie header if needed
         '''
         cookie, name = SimpleCookie(), self._fieldname
-        cookie[name], cookie[name]['path'],  cookie[name]['max-age'] = self._sid, self._path, SESSION_TIMEOUT
+        cookie[name], cookie[name]['path'],  cookie[name]['max-age'] = \
+            self._sid, self._path, SESSION_TIMEOUT
         headers.append(('Set-Cookie', cookie[name].OutputString()))
 
     def delete_cookie(self, headers):
         pass
 
-    def _from_cookie(self, environ): 
+    def _from_cookie(self, environ):
         '''
-        Attempt to load the associated session using the identifier from the cookie
+        Attempt to load the associated session using the identifier from the
+        cookie
         '''
-        #@@TODO: Use Webob.request
-        
+        # @@TODO: Use Webob.request
+
         cookie = SimpleCookie(environ.get('HTTP_COOKIE'))
         morsel = cookie.get(self._fieldname, None)
         if morsel:
             self._sid, self.session = self._cache.checkout(morsel.value)
             cookie_sid = morsel.value
-            if cookie_sid != self._sid: 
+            if cookie_sid != self._sid:
                 self.is_new = True
 
 
@@ -154,13 +165,13 @@ def _shutdown(ref):
     cache = ref()
     if cache:
         cache.shutdown()
-            
+
 
 class SessionCache(object):
     '''
-    You first acquire a session by calling create() or checkout(). After 
-    using the session, you must call checkin(). You must not keep references 
-    to sessions outside of a check in/check out block. Always obtain a fresh 
+    You first acquire a session by calling create() or checkout(). After
+    using the session, you must call checkin(). You must not keep references
+    to sessions outside of a check in/check out block. Always obtain a fresh
     reference
     '''
     # Would be nice if len(idchars) were some power of 2
@@ -169,14 +180,13 @@ class SessionCache(object):
 
     def __init__(self, is_random=False):
         self._lock = threading.Condition()
-        self.checkedout, self._closed  = dict(), False
+        self.checkedout, self._closed = dict(), False
         # Sets if session id is random on every access or not
         self.is_random = is_random
-        self._secret = ''.join(self.idchars[ord(c) % len(self.idchars)]
-            for c in os.urandom(self.length))
+        self._secret = ''.join(random.SystemRandom().choice(self.idchars)
+                               for _ in range(self.length))
         # Ensure shutdown is called.
         atexit.register(_shutdown, weakref.ref(self))
-
 
     def __del__(self):
         self.shutdown()
@@ -208,7 +218,7 @@ class SessionCache(object):
         # If we know it's already checked out, block.
         while sid in self.checkedout:
             self._lock.wait()
-        
+
         session = get_session(sid)
         if session:
             # Randomize session id if requested and remove old session id
@@ -240,8 +250,7 @@ class SessionCache(object):
             for sid, value in self.checkedout.items():
                 set_session(sid, value)
             self.checkedout.clear()
-            #self.cache._cull()
-            self._closed = True        
+            self._closed = True
 
     # Utilities
 
@@ -250,36 +259,42 @@ class SessionCache(object):
         Returns a session key that is not being used
         '''
         sid = None
-        for _ in xrange(10000):
-            a = random.randint(0, sys.maxint-1)
-            b = random.randint(0, sys.maxint-1)            
+        for _ in range(10000):
+            try:
+                a = random.randint(0, sys.maxint-1)
+                b = random.randint(0, sys.maxint-1)
+            except AttributeError:
+                a = random.randint(0, sys.maxsize-1)
+                b = random.randint(0, sys.maxsize-1)
+
             sid = make_sha1_hash('%s%s%s' % (a, b, self._secret))
-            # Dupe? 
+            # Dupe?
             if not get_session(sid):
                 break
         return sid
-        
+
 # --------------------------------------
-# Model interface 
+# Model interface
 # --------------------------------------
+
 
 def get_session(sid, default=None):
     try:
-        session = Session.get(Session.key==sid)
+        session = Session.get(Session.key == sid)
     except Session.DoesNotExist:
         return default
-    
+
     # Expired?
     if session.expires_on < datetime.utcnow().replace(microsecond=0):
         session.delete_instance()
-        logger.debug(u"session %s is expired, deleted" % sid)
+        logger.debug("session %s is expired, deleted" % sid)
         return default
-    
+
     return session
 
 
 def delete_session(sid):
-    Session.delete().where(Session.key==sid).execute()
+    Session.delete().where(Session.key == sid).execute()
 
 
 def set_session(sid, value, timeout=SESSION_TIMEOUT):
@@ -288,8 +303,9 @@ def set_session(sid, value, timeout=SESSION_TIMEOUT):
     if not session:
         # New session if sid not present
         session = Session(key=sid)
-        logger.debug(u"session %s created" % sid)
+        logger.debug("session %s created" % sid)
 
-    session.expires_on = (datetime.utcnow() + timedelta(seconds=timeout)).replace(microsecond=0)
+    session.expires_on = (datetime.utcnow() + timedelta(
+                          seconds=timeout)).replace(microsecond=0)
     session.value = value
     session.save()

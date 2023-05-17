@@ -6,17 +6,23 @@ Copyright (c) 2013—2016 Andrea Peltrin
 Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 """
-import urlparse 
-import pickle
-from datetime import datetime
-from peewee import *
-from playhouse.migrate import *
-from playhouse.signals import Model as BaseModel, pre_save
-from playhouse.reflection import Introspector
-from webob.exc import status_map
+import urllib.parse as urlparse
 
-from coldsweat import *
-from utilities import *
+import pickle
+
+from datetime import datetime
+
+import peewee
+from playhouse.signals import Model, pre_save
+
+from peewee import (BlobField, BooleanField, CharField, DateTimeField,
+                    ForeignKeyField,
+                    IntegerField, IntegrityError,
+                    TextField, SqliteDatabase)
+from passlib import context
+
+from coldsweat import config, logger
+from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
 
 __all__ = [
     'User',
@@ -31,7 +37,6 @@ __all__ = [
     'close',
     'transaction',
     'setup_database_schema',
-    'migrate_database_schema',
 ]
 
 # Feed default icon
@@ -45,9 +50,6 @@ e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
 a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
 DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
-class SqliteDatabase_(SqliteDatabase):
-    def initialize_connection(self, connection):
-        self.execute_sql('PRAGMA foreign_keys=ON;')
 
 def parse_connection_url(url):
     parsed = urlparse.urlparse(url, scheme='sqlite')
@@ -60,34 +62,42 @@ def parse_connection_url(url):
         connect_kwargs['host'] = parsed.hostname
     if parsed.port:
         connect_kwargs['port'] = parsed.port
-    
+
     # Adjust parameters for MySQL
     if parsed.scheme == 'mysql' and 'password' in connect_kwargs:
         connect_kwargs['passwd'] = connect_kwargs.pop('password')
-    
+
     return parsed.scheme, connect_kwargs
-    
+
 
 engine, kwargs = parse_connection_url(config.database.connection_url)
+
 if engine == 'sqlite':
-    _db = SqliteDatabase_(journal_mode='WAL', **kwargs) 
-    migrator = SqliteMigrator(_db)
-elif engine == 'mysql':
-    _db = MySQLDatabase(**kwargs)
-    migrator = MySQLMigrator(_db)
-elif engine == 'postgresql':
-    _db = PostgresqlDatabase(autorollback=True, **kwargs)
-    migrator = PostgresqlMigrator(_db)
+    database = SqliteDatabase(pragmas={'journal_mode': 'wal',
+                                       'foreign_keys': 1},
+                              **kwargs)
+#
+# elif engine == 'mysql':
+#    _db = MySQLDatabase(**kwargs)
+#    migrator = MySQLMigrator(_db)
+# elif engine == 'postgresql':
+#    _db = PostgresqlDatabase(autorollback=True, **kwargs)
+#    migrator = PostgresqlMigrator(_db)
 else:
-    raise ValueError('Unknown database engine %s. Should be sqlite, postgresql or mysql' % engine)
+    raise ValueError(
+        'Unknown database engine %s. Should be sqlite, postgresql or mysql'
+        % engine)
 
 # ------------------------------------------------------
 # Custom fields
 # ------------------------------------------------------
 
+
 class PickleField(BlobField):
+
     def db_value(self, value):
-        return super(PickleField, self).db_value(pickle.dumps(value, 2)) # Use newer protocol 
+        return super(PickleField, self).db_value(pickle.dumps(value, 2))
+    # Use newer protocol
 
     def python_value(self, value):
         return pickle.loads(value)
@@ -96,179 +106,218 @@ class PickleField(BlobField):
 # Coldsweat models
 # ------------------------------------------------------
 
-class CustomModel(BaseModel):
+
+class BaseModel(Model):
     """
     Binds the same database to all models
     """
 
     class Meta:
-        database = _db
+        database = database
 
 
-class User(CustomModel):
+class User(BaseModel):
     """
     Coldsweat user
-    """    
-    DEFAULT_USERNAME = 'coldsweat' 
+    """
+
+    DEFAULT_USERNAME = 'coldsweat'
     MIN_PASSWORD_LENGTH = 8
 
-    username            = CharField(unique=True)
-    password            = CharField()  
-    email               = CharField(default='')
-    api_key             = CharField(unique=True)
-    is_enabled          = BooleanField(default=True) 
+    username = CharField(unique=True)
+    email = CharField(default='')
+    api_key = CharField(unique=True)
+    is_enabled = BooleanField(default=True)
+    password = BlobField(255)
+
+    pw_context = context.CryptContext(
+        schemes=['pbkdf2_sha512', 'sha512_crypt'],
+        default='pbkdf2_sha512'
+    )
+
+    def __repr__(self):
+        return "<%s|%s>" % (self.name, self.email)
 
     class Meta:
-        db_table = 'users'
-    
+        table_name = 'users'
+
     @staticmethod
     def make_api_key(email, password):
-        return make_md5_hash(u'%s:%s' % (email, password))
+        return make_md5_hash('%s:%s' % (email, password))
 
     @staticmethod
     def validate_api_key(api_key):
         try:
             # Clients may send api_key in uppercase, lower it
-            user = User.get((User.api_key == api_key.lower()) & 
-                (User.is_enabled == True))        
+            user = User.get((User.api_key == api_key.lower()) &
+                            (User.is_enabled == True))  # noqa
         except User.DoesNotExist:
             return None
 
         return user
 
+    def check_password(self, input_password):
+        passed = User.pw_context.verify(input_password, self.password)
+        if not passed:
+            return False
+
+        elif User.pw_context.identify(self.password) != User.pw_context.default_scheme():  # noqa
+            self.password = User.pw_context.hash(input_password)
+            self.save()
+            return True
+        else:
+            return True
+
     @staticmethod
-    def validate_credentials(username_or_email, password):        
+    def validate_credentials(username_or_email, password):
         '''Lookup for and existing username/e-mail combo and password'''
         try:
-            user = User.get(((User.username == username_or_email) | 
-                (User.email == username_or_email)) & 
-                (User.is_enabled == True))
+            user = User.get(((User.username == username_or_email) |
+                            (User.email == username_or_email)) &
+                            (User.is_enabled == True))  # noqa
         except User.DoesNotExist:
             return None
 
         # Do a case-sensitive compare
-        if user.password != password:
+        if not user.check_password(password):
             return None
 
         return user
-    
+
     @staticmethod
     def validate_password(password):
         return len(password) >= User.MIN_PASSWORD_LENGTH
-        
+
+    def hash_password(self, raw=False):
+        """
+        Set password for user with specified encryption scheme
+        """
+        # for the list of hash schemes see
+        # https://wiki2.dovecot.org/Authentication/PasswordSchemes
+        if raw:
+            self.password = self.password
+        else:
+            self.password = User.pw_context.hash(self.password)
+
+
 @pre_save(sender=User)
 def on_user_save(model, user, created):
-     user.api_key = User.make_api_key(user.email, user.password)
-          
+    user.api_key = User.make_api_key(user.email, user.password)
+    user.hash_password()
 
-#@@REMOVEME: We keep this only to make migrations work
-class Icon(CustomModel):
+
+# @@REMOVEME: We keep this only to make migrations work
+class Icon(BaseModel):
     """
     Feed (fav)icons, stored as data URIs
     """
-    data = TextField() 
+    data = TextField()
 
     class Meta:
-        db_table = 'icons'
-      
+        table_name = 'icons'
 
-class Group(CustomModel):
+
+class Group(BaseModel):
     """
     Feed group/folder
     """
     DEFAULT_GROUP = 'Default'
-    
+
     title = CharField(unique=True)
-    
-    class Meta:  
+
+    class Meta:
         order_by = ('title',)
-        db_table = 'groups'    
+        table_name = 'groups'
 
 
-class Feed(CustomModel):
+class Feed(BaseModel):
     """
     Atom/RSS feed
     """
 
-    DEFAULT_ICON         = _ICON
-    MAX_TITLE_LENGTH     = 255
-    
-    is_enabled           = BooleanField(default=True)           # Fetch feed?
-    self_link            = TextField()                          # The URL of the feed itself (rel=self)
-    self_link_hash       = CharField(unique=True, max_length=40)
-    error_count          = IntegerField(default=0)
+    DEFAULT_ICON = _ICON
+    MAX_TITLE_LENGTH = 255
+
+    is_enabled = BooleanField(default=True)           # Fetch feed?
+    self_link = TextField()   # The URL of the feed itself (rel=self)
+    self_link_hash = CharField(unique=True, max_length=40)
+    error_count = IntegerField(default=0)
 
     # Nullable
 
-    title                = CharField(null=True)        
-    alternate_link       = TextField(null=True)                 # The URL of the HTML page associated with the feed (rel=alternate)
-    etag                 = CharField(null=True)                 # HTTP E-tag
-    last_updated_on      = DateTimeField(null=True)             # As UTC
-    last_checked_on      = DateTimeField(index=True, null=True) # As UTC 
-    last_status          = IntegerField(null=True)              # Last returned HTTP code    
+    title = CharField(null=True)
+    alternate_link = TextField(null=True)
+    # The URL of the HTML page associated with the feed (rel=alternate)
+    etag = CharField(null=True)                 # HTTP E-tag
+    last_updated_on = DateTimeField(null=True)             # As UTC
+    last_checked_on = DateTimeField(index=True, null=True)  # As UTC
+    last_status = IntegerField(null=True)  # Last returned HTTP code
 
-    icon                 = TextField(null=True)                 # Stored as data URI
-    icon_last_updated_on = DateTimeField(null=True)             # As UTC
+    icon = TextField(null=True)  # Stored as data URI
+    icon_last_updated_on = DateTimeField(null=True)  # As UTC
 
     class Meta:
-        db_table = 'feeds'
+        table_name = 'feeds'
 
     @property
     def last_updated_on_as_epoch(self):
         # Never updated?
-        if self.last_updated_on: 
+        if self.last_updated_on:
             return datetime_as_epoch(self.last_updated_on)
-        return 0 
+        return 0
 
     @property
     def icon_or_default(self):
         return self.icon if self.icon else Feed.DEFAULT_ICON
 
+
 @pre_save(sender=Feed)
 def on_feed_save(model, feed, created):
-     feed.self_link_hash = make_sha1_hash(feed.self_link)       
-      
-        
-class Entry(CustomModel):
+    feed.self_link_hash = make_sha1_hash(feed.self_link)
+
+
+class Entry(BaseModel):
     """
     Atom/RSS entry
     """
 
-    MAX_TITLE_LENGTH    = 255
+    MAX_TITLE_LENGTH = 255
 
-    guid                = TextField()                           # 'id' in Atom parlance
-    guid_hash           = CharField(unique=True, max_length=40)   
-    feed                = ForeignKeyField(Feed, on_delete='CASCADE')
-    title               = CharField()    
-    content_type        = CharField(default='text/html')
-    content             = TextField()
-    #@@TODO: rename to published_on
-    last_updated_on     = DateTimeField()                       # As UTC
+    guid = TextField()  # 'id' in Atom parlance
+    guid_hash = CharField(unique=True, max_length=40)
+    feed = ForeignKeyField(Feed, on_delete='CASCADE')
+    title = CharField()
+    content_type = CharField(default='text/html')
+    content = TextField()
+    # @@TODO: rename to published_on
+    last_updated_on = DateTimeField()  # As UTC
 
     # Nullable
 
-    author              = CharField(null=True)
-    link                = TextField(null=True)                  # If null the entry *must* provide a GUID
-    
+    author = CharField(null=True)
+    link = TextField(null=True)
+    # If null the entry *must* provide a GUID
+
     class Meta:
-        db_table = 'entries'
+        table_name = 'entries'
 
     @property
     def last_updated_on_as_epoch(self):
         return datetime_as_epoch(self.last_updated_on)
 
+
 @pre_save(sender=Entry)
 def on_entry_save(model, entry, created):
-    entry.guid_hash = make_sha1_hash(entry.guid)    
+    entry.guid_hash = make_sha1_hash(entry.guid)
 
-                
-class Saved(CustomModel):
+
+class Saved(BaseModel):
     """
-    Entries 'saved' status 
+    Entries 'saved' status
     """
-    user            = ForeignKeyField(User)
-    entry           = ForeignKeyField(Entry, on_delete='CASCADE')    
-    saved_on        = DateTimeField(default=datetime.utcnow)  
+    user = ForeignKeyField(User)
+    entry = ForeignKeyField(Entry, on_delete='CASCADE')
+    saved_on = DateTimeField(default=datetime.utcnow)
 
     class Meta:
         indexes = (
@@ -276,13 +325,13 @@ class Saved(CustomModel):
         )
 
 
-class Read(CustomModel):
+class Read(BaseModel):
     """
-    Entries 'read' status 
+    Entries 'read' status
     """
-    user           = ForeignKeyField(User)
-    entry          = ForeignKeyField(Entry, on_delete='CASCADE')    
-    read_on        = DateTimeField(default=datetime.utcnow) 
+    user = ForeignKeyField(User)
+    entry = ForeignKeyField(Entry, on_delete='CASCADE')
+    read_on = DateTimeField(default=datetime.utcnow)
 
     class Meta:
         indexes = (
@@ -290,31 +339,31 @@ class Read(CustomModel):
         )
 
 
-class Subscription(CustomModel):
+class Subscription(BaseModel):
     """
     A user's feed subscription
     """
-    user           = ForeignKeyField(User)
-    group          = ForeignKeyField(Group, on_delete='CASCADE')
-    feed           = ForeignKeyField(Feed, on_delete='CASCADE')
+    user = ForeignKeyField(User)
+    group = ForeignKeyField(Group, on_delete='CASCADE')
+    feed = ForeignKeyField(Feed, on_delete='CASCADE')
 
     class Meta:
         indexes = (
             (('user', 'group', 'feed'), True),
-        )    
-        db_table = 'subscriptions'
+        )
+        table_name = 'subscriptions'
 
 
-class Session(CustomModel):
+class Session(BaseModel):
     """
     Web session
-    """    
-    key             = CharField(unique=True)
-    value           = PickleField()     
-    expires_on      = DateTimeField()
+    """
+    key = CharField(unique=True)
+    value = PickleField()
+    expires_on = DateTimeField()
 
     class Meta:
-        db_table = 'sessions' 
+        table_name = 'sessions'
 
 
 # ------------------------------------------------------
@@ -323,131 +372,33 @@ class Session(CustomModel):
 
 def connect():
     logger.debug('opening connection')
-    _db.connect()
+    if peewee.__version__.split('.')[0] != '2':
+        database.connect(reuse_if_open=True)
+    else:
+        database.connect()
+
 
 def transaction():
-    return _db.transaction()
+    return database.transaction()
+
 
 def close():
-    if not _db.is_closed():
+    if not database.is_closed():
         logger.debug('closing connection')
-        _db.close()
-
-def migrate_database_schema():
-    '''
-    Migrate database schema from previous versions (0.9.4 and up)
-    '''
-
-    introspector = Introspector.from_database(_db)
-    models = introspector.generate_models()
-    Feed_ = models['feeds']
-    Entry_ = models['entries']
-
-    drop_table_migrations, column_migrations = [], []
-    
-    # --------------------------------------------------------------------------
-    # Schema changes introduced in version 0.9.4
-    # --------------------------------------------------------------------------
-    
-    # Change columns
-
-    if hasattr(Feed_, 'icon_id'):
-        column_migrations.append(migrator.drop_column('feeds', 'icon_id'))
-
-    if not hasattr(Feed_, 'icon'):
-        column_migrations.append(migrator.add_column('feeds', 'icon', Feed.icon))
-
-    if not hasattr(Feed_, 'icon_last_updated_on'):
-        column_migrations.append(migrator.add_column('feeds', 'icon_last_updated_on', Feed.icon_last_updated_on))
-        
-    if not hasattr(Entry_, 'content_type'):
-        column_migrations.append(migrator.add_column('entries', 'content_type', Entry.content_type))
-
-    # Drop tables
-
-    if Icon.table_exists():
-        drop_table_migrations.append(Icon.drop_table)
-
-    # --------------------------------------------------------------------------
-    # Schema changes introduced in version 0.9.5
-    # --------------------------------------------------------------------------
-    
-    # Change columns
-
-    class UpdateFeedSelfLinkHashOperation(object):
-        # Fake migrate.Operation protocol and upon saving populate all self_link_hash fields
-        def run(self):        
-            for feed in Feed.select():
-                feed.save()
-
-    class UpdateEntryGuidHashOperation(object):
-        def run(self):        
-            for entry in Entry.select():
-                entry.save()
-
-    class UpdateUserApiKeyOperation(object):
-        def run(self):        
-            for user in User.select():
-                user.save()
-                
-    if not hasattr(Feed_, 'self_link_hash'):
-        # Start relaxing index constrains to cope with existing data...
-        self_link_hash = CharField(null=True, max_length=40)
-        column_migrations.append(migrator.add_column('feeds', 'self_link_hash', self_link_hash))
-        column_migrations.append(UpdateFeedSelfLinkHashOperation())
-        # ...and make them strict again
-        column_migrations.append(migrator.add_index('feeds', ('self_link_hash',), True))
-        
-    if not hasattr(Entry_, 'guid_hash'):
-        # Start relaxing index constrains to cope with existing data...    
-        guid_hash = CharField(null=True, max_length=40)
-        column_migrations.append(migrator.add_column('entries', 'guid_hash', guid_hash))
-        column_migrations.append(UpdateEntryGuidHashOperation())
-        # ...and make them strict again
-        column_migrations.append(migrator.add_index('entries', ('guid_hash',), True))
-
-    # Drop obsolete indices
-    
-    if Feed_.self_link.unique:
-        column_migrations.append(migrator.drop_index('feeds', 'feeds_self_link'))
-    
-    if Entry_.link.index:
-        column_migrations.append(migrator.drop_index('entries', 'entries_link'))
-
-    if Entry_.guid.index:
-        column_migrations.append(migrator.drop_index('entries', 'entries_guid'))        
-
-    # Misc.
-        
-    column_migrations.append(UpdateUserApiKeyOperation())
-        
-    # --------------------------------------------------------------------------
-    
-    # Run all table and column migrations
-
-    if column_migrations:
-        # Let caller to catch any OperationalError's
-        migrate(*column_migrations)        
-
-    for drop in drop_table_migrations:
-        drop()
-
-    # True if at least one is non-empty
-    return drop_table_migrations or column_migrations
+        database.close()
 
 
 def setup_database_schema():
     """
     Create database and tables for all models and setup bootstrap data
     """
-
-    models = User, Feed, Entry, Group, Read, Saved, Subscription, Session
-
-    for model in models:
-        model.create_table(fail_silently=True)
+    with database:
+        database.create_tables([User, Feed, Entry, Group, Read, Saved,
+                                Subscription, Session],
+                               safe=True)
 
     # Create the bare minimum to bootstrap system
     try:
-        Group.create(title=Group.DEFAULT_GROUP)        
+        Group.create(title=Group.DEFAULT_GROUP)
     except IntegrityError:
         return

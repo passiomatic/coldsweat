@@ -1,7 +1,7 @@
 [database]
 
-connection_url: sqlite:///data/coldsweat.db
-;connection_url: mysql://username:password@localhost/coldsweat
+connection_url: sqlite:////var/lib/coldsweat/db/coldsweat.db
+
 ;connection_url: postgresql://username:password@localhost/coldsweat
 
 ; Configuration settings below are all optional, default values are shown
@@ -9,10 +9,9 @@ connection_url: sqlite:///data/coldsweat.db
 [log]
 
 ; Values are: DEBUG (more verbose), INFO, WARNING, ERROR, CRITICAL (less verbose)
-level: debug
+;level: INFO
 
 ; Comment to avoid logging to a file altogether
-filename: stderr
 
 [fetcher]
 
@@ -25,7 +24,7 @@ filename: stderr
 ; Do not retrieve feed entries older than given days, with 0 the setting is ignored
 ;max_history: 7
 
-; Number of seconds before timeout a web request 
+; Number of seconds before timeout a web request
 ;timeout: 10
 
 ; Number of processes to spawn during the feed fetching, 0 disables multiprocessing
@@ -43,8 +42,8 @@ filename: stderr
 
 ; Scubber plugin options
 
-; Comma-separated list of host names. Links and images in entries  
-; with these host names will be scrubbed upon fetching. A partial 
+; Comma-separated list of host names. Links and images in entries
+; with these host names will be scrubbed upon fetching. A partial
 ; match is performed, e.g. the "feedsportal.com" line will match
 ; both ad.feedsportal.com and feedsportal.com.
 scrubber_blacklist: feeds.feedburner.com,feedsportal.com,stats.wordpress.com

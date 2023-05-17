@@ -28,6 +28,12 @@ coverage:  ## run the tests and collect metrics
 
 all: update
 
+venv:
+	python3 -m venv .venv
+
+install-deps:
+	python -m pip install -r requirements.txt 
+
 update:  ## update css files from sass sources
 	sass -f -t compressed --update $(CSS_FILES)
 

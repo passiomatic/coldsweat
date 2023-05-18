@@ -1,0 +1,37 @@
+[project]
+name = "coldsweat"
+version = "1.0.0"
+authors = [
+  { name="Andrea Peltrin" },
+]
+description = "Web RSS aggregator and reader compatible with the Fever API"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "peewee >= 3.15.4,<4",
+  "requests >= 2.28.1,<3",
+  "feedparser >= 6.0.10",
+  "passlib >= 1.7.4"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/passiomatic/coldsweat"
+"Bug Tracker" = "https://github.com/passiomatic/coldsweat/issues"
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["coldsweat"]
+
+[tool.setuptools.package-data]
+videobox = ["static/*.*", "templates/*.html"]

@@ -1,9 +1,8 @@
-CSS_FILES=./static/stylesheets/all.scss:./static/stylesheets/all.css
+CSS_FILES=./coldsweat/static/stylesheets/all.scss:./coldsweat/static/stylesheets/all.css
 
 all: update
 
-test:
-	python -m pytest
+# Env. Setup 
 
 venv:
 	python3 -m venv .venv
@@ -17,5 +16,27 @@ update:
 watch:
 	sass --watch $(CSS_FILES)
 
+# Tests
+
+test:
+	python -m pytest
+
+# Build Wheel/PyPI Support
+
+install-build-deps:
+	python -m pip install build twine
+
+build: clean
+	python -m build
+
+check:
+	twine check dist/* 
+
+upload:
+	twine upload dist/*
+
+upload-test:
+	twine upload -r testpypi dist/*
+
 clean:
-	rm -r ./.sass-cache
+	rm -rf dist/ build/

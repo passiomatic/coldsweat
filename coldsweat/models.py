@@ -191,7 +191,7 @@ class User(BaseModel):
     def hash_password(self, raw=False):
         """
         Set password for user with specified encryption scheme
-        
+
         For a list of hash schemes see: https://wiki2.dovecot.org/Authentication/PasswordSchemes?action=recall&rev=46
         """
         if raw:
@@ -361,10 +361,7 @@ class Session(BaseModel):
 
 def connect():
     logger.debug('opening connection')
-    if peewee.__version__.split('.')[0] != '2':
-        database.connect(reuse_if_open=True)
-    else:
-        database.connect()
+    database.connect(reuse_if_open=True)
 
 
 def transaction():

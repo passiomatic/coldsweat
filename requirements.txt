@@ -10,6 +10,7 @@ Tempita==0.5.2
 WebOb==1.8.5
 pytest==7.3.1
 urllib3==1.26.6
+flask==2.3.2
 # Connect Coldsweat to a MySQL database (optional, pick PyMySQL if you have trouble installing Mysql-python)
 #Mysql-python
 #PyMySQL

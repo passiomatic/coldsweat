@@ -34,4 +34,4 @@ build-backend = "setuptools.build_meta"
 packages = ["coldsweat"]
 
 [tool.setuptools.package-data]
-videobox = ["static/*.*", "templates/*.html"]
+coldsweat = ["static/*.*", "templates/*.html"]

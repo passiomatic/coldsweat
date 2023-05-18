@@ -1,4 +1,4 @@
-all: update
+all: run
 
 # Env. Setup 
 
@@ -13,6 +13,9 @@ build-css:
 
 watch-css:
 	npm run watch-css
+
+run:
+	flask --app coldsweat/app2.py run --debug
 
 # Tests
 

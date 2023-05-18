@@ -1,8 +1,7 @@
-{{inherit "site.html"}}
+{% extends "site.html" %}
 
-{{def container_block}}        
+{% block container_block %} 
     <section class="panel">
-        {{self.panel_block}}
         <footer role="contentinfo">    
             <div class="dim">Coldsweat&ensp;<i title="Loves" class="fa fa-heart"></i>&ensp;Your Feeds&ensp;&middot;&ensp;<a data-remote-modal href="{{application_url}}/cheatsheet">Cheatsheet</a>
             </div>
@@ -17,10 +16,10 @@
             <li class="filter-unread"><a data-toggle="tooltip" data-placement="right" title="Unread entries (1 key)" href="{{application_url}}/entries/?unread"><i class="fa fa-circle fa-fw"></i></a></li>
             <li class="filter-saved"><a data-toggle="tooltip" data-placement="right" title="Saved entries (2 key)" href="{{application_url}}/entries/?saved"><i class="fa fa-star fa-fw"></i></a></li>
             <li class="filter-all"><a data-toggle="tooltip" data-placement="right" title="All entries (3 key)" href="{{application_url}}/entries/?all"><i class="fa fa-archive fa-fw"></i></a></li>
-            {{if length(groups) > 1}}
-                <li class="filter-group"><a  data-toggle="tooltip" data-placement="right" title="All groups (4 key)"  href="{{application_url}}/groups/"><i class="fa fa-folder fa-fw"></i></a>                    
+            {% if groups | length  > 1 %}
+                <li class="filter-group"><a  data-toggle="tooltip" data-placement="right" title="All groups (4 key)"  href="{{application_url}}/groups/"><i class="fa fa-folder fa-fw"></i></a>
                 </li>
-            {{endif}}
+            {% endif %}
             <li class="sep filter-feeds"><a data-toggle="tooltip" data-placement="right" title="Subscribed feeds (5 key)" href="{{application_url}}/feeds/"><i class="fa fa-rss fa-fw"></i></a></li>                            
             <li><a data-toggle="tooltip" class="add-trigger" href="{{application_url}}/feeds/add/1" data-placement="right" title="Add feed subscription" data-remote-modal="modal-add-subscription"><i class="fa fa-plus-square fa-fw"></i></a></li>                                    
             <li class="sep"><li class="dropdown"><a data-toggle="dropdown" href="#"><i class="fa fa-user fa-fw"></i></a>   
@@ -31,5 +30,5 @@
             </li>
         </ul>
     </nav>  
-{{enddef}}
+{% endblock %}
 

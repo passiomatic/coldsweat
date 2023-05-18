@@ -4,7 +4,7 @@ Coldsweat {{version_string}}
 http://lab.passiomatic.com/coldsweat/
 Copyright (c) 2013–2016 Andrea Peltrin
 -->
-<html class="no-js" lang="en">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>{{page_title}} — Coldsweat</title>
@@ -12,21 +12,19 @@ Copyright (c) 2013–2016 Andrea Peltrin
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="cleartype" content="on">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<link rel='stylesheet' href='{{static_url}}/stylesheets/all.css?{{version_string}}'>
-<link rel="shortcut icon" href="{{static_url}}/favicon.ico">
-<link rel="shortcut icon" href="{{static_url}}/favicon.png" sizes="32x32">
-<link rel="apple-touch-icon" sizes="152x152" href="{{static_url}}/images/apple-touch-icon.png">
+<link rel='stylesheet' href='/static/stylesheets/all.css?{{version_string}}'>
+<link rel="shortcut icon" href="/static/favicon.ico">
+<link rel="shortcut icon" href="/static/favicon.png" sizes="32x32">
+<link rel="apple-touch-icon" sizes="152x152" href="/static/images/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Coldsweat">
-<meta name="msapplication-TileImage" content="{{static_url}}/images/tile-icon.png">
-<meta name="msapplication-TileColor" content="#fff">
-<script src='{{static_url}}/javascripts/vendor/head.load.min.js'></script>
-{{self.get.head_block}}
+<script src='/static/javascripts/vendor/head.load.min.js'></script>
+{% block head_block %}{% endblock %}
 </head>
-<body tabindex="1"> <!-- Make focusable -->
+<body>
 
 <div class="container">
-    {{alert_message|alert}}
-    {{self.container_block}}
+    {{alert_message}}
+    {% block container_block %}{% endblock %}
 </div><!-- container -->
 
 <script>
@@ -55,8 +53,7 @@ head.js(
 "{{static_url}}/javascripts/app.js?{{version_string}}",
 
 function() {    
-    // Do something when we are ready
-    {{self.get.page_script_block}}
+    // Do something when we are read
 });
 </script>
 

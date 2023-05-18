@@ -15,8 +15,6 @@ import os
 import logging
 from .config import load_config
 
-# Define an informal API for plugin implementations
-
 __all__ = [
     'VERSION_STRING',
     'USER_AGENT',
@@ -28,7 +26,6 @@ __all__ = [
     # Configuration
     'installation_dir',
     'template_dir',
-    'plugin_dir',
     'config',
 
     # Logging
@@ -52,7 +49,6 @@ if not installation_dir:
         os.path.dirname(os.path.abspath(__file__)))
 
 template_dir = os.path.join(installation_dir, 'coldsweat/templates')
-plugin_dir = os.path.join(installation_dir, 'plugins')
 
 # ------------------------------------------------------
 # Load up configuration settings

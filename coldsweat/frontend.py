@@ -25,7 +25,6 @@ from .markup import sniff_feed, find_feed_links
 from .models import (Entry, Group, Feed, Read, Saved, User,
                      Subscription, transaction)
 
-from .plugins import trigger_event
 from .controllers import FeedController, UserController
 from .session import SessionMiddleware
 from .utilities import format_datetime, validate_url
@@ -392,8 +391,6 @@ class FrontendApp(WSGIApp, FeedController, UserController):
     @login_required
     def feed_enable(self, feed_id):
 
-        #  @@TODO: Track in which view user triggers command
-
         try:
             feed = Feed.get(Feed.id == feed_id)
         except Feed.DoesNotExist:
@@ -457,9 +454,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
 
         feed = self.add_feed_from_url(self_link, fetch_data=False)
         logger.debug("starting fetcher")
-        trigger_event('fetch_started')
         Fetcher(feed).update_feed_with_data(response.text)
-        trigger_event('fetch_done', [feed])
 
         return self._add_subscription(feed, group_id)
 

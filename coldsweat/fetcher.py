@@ -27,8 +27,6 @@ from webob.exc import (
 from webob.exc import status_map
 from coldsweat import (config, logger, template_dir, USER_AGENT, ENTRY_TAG_URI)
 
-from .plugins import trigger_event
-
 from .models import (Entry, Feed)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
@@ -281,9 +279,6 @@ class Fetcher(object):
                 last_updated_on=timestamp
             )
 
-            # At this point we are pretty sure we doesn't have the entry
-            #  already in the database so alert plugins and save data
-            trigger_event('entry_parsed', entry, entry_dict)
             entry.save()
             #  @@TODO: entries.append(entry)
 

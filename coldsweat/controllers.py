@@ -14,7 +14,6 @@ from xml.etree import ElementTree
 from peewee import JOIN, fn, IntegrityError
 
 from .utilities import make_sha1_hash, scrub_url
-from .plugins import trigger_event, load_plugins
 from coldsweat import config, logger
 from coldsweat.models import (connect, Entry, Feed, Group, Read, Saved,
                               Subscription)
@@ -278,10 +277,7 @@ class FeedController(object):
 
         start = time.time()
 
-        load_plugins()
-
         logger.debug(u"starting fetcher")
-        trigger_event('fetch_started')
 
         if config.fetcher.processes:
             from multiprocessing import Pool
@@ -294,8 +290,6 @@ class FeedController(object):
             # Just sequence requests in this process
             for feed in feeds:
                 feed_worker(feed)
-
-        trigger_event('fetch_done', feeds)
 
         logger.info(u"%d feeds checked in %.2fs" % (
             len(feeds), time.time() - start))

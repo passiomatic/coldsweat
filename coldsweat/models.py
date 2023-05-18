@@ -206,17 +206,6 @@ def on_user_save(model, user, created):
     user.hash_password()
 
 
-# @@REMOVEME: We keep this only to make migrations work
-class Icon(BaseModel):
-    """
-    Feed (fav)icons, stored as data URIs
-    """
-    data = TextField()
-
-    class Meta:
-        table_name = 'icons'
-
-
 class Group(BaseModel):
     """
     Feed group/folder

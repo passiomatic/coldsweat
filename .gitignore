@@ -1,3 +1,4 @@
+.venv
 *.py[cod]
 
 # C extensions
@@ -18,9 +19,6 @@ develop-eggs
 lib
 lib64
 
-# Elm
-elm-stuff
-
 # Installer logs
 pip-log.txt
 
@@ -32,8 +30,8 @@ nosetests.xml
 # Translations
 *.mo
 
-# SASS
-.sass-cache
+# Parcel
+.parcel-cache
 
 # Max OS X
 .DS_Store

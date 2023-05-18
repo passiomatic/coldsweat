@@ -11,6 +11,7 @@ WebOb==1.8.5
 pytest==7.3.1
 urllib3==1.26.6
 flask==2.3.2
+flask-login==0.6.2
 # Connect Coldsweat to a MySQL database (optional, pick PyMySQL if you have trouble installing Mysql-python)
 #Mysql-python
 #PyMySQL

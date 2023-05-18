@@ -195,7 +195,7 @@ class CommandController(FeedController, UserController):
         except KeyboardInterrupt:
             print('Interrupted by user')
 
-    # Setup and upgrade
+    # Setup
 
     def command_setup(self, options, args):
         '''Setup a working database'''
@@ -272,7 +272,7 @@ def read_password(prompt_label="Enter password: "):
 # Entry point
 # --------------------
 
-COMMANDS = 'import export serve setup upgrade fetch'.split()
+COMMANDS = 'import export serve setup fetch'.split()
 
 
 def run():

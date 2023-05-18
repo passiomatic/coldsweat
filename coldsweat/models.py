@@ -191,9 +191,9 @@ class User(BaseModel):
     def hash_password(self, raw=False):
         """
         Set password for user with specified encryption scheme
+        
+        For a list of hash schemes see: https://wiki2.dovecot.org/Authentication/PasswordSchemes?action=recall&rev=46
         """
-        # for the list of hash schemes see
-        # https://wiki2.dovecot.org/Authentication/PasswordSchemes
         if raw:
             self.password = self.password
         else:

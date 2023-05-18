@@ -19,13 +19,8 @@ text-align : right;
 @include box-sizing(border-box); }
 
 .controls {
-*display : inline-block;
 margin-left : 49%;
-*margin-left : 0;
-*padding-left : $gutterwidth;
 
-&:first-child {
-*padding-left : $gutterwidth; }
 }/*controls*/
 
 .help-block {
@@ -49,8 +44,6 @@ input,
 textarea,
 select {
 display : inline-block;
-*display: inline;
-*zoom : 1;
 margin-bottom : 0;
 vertical-align : middle; }
 

@@ -6,11 +6,8 @@
 
 .btn {
 display : inline-block;
-*display : inline;
-*zoom : 1;
 padding : $buttonpadding;
 margin-bottom : 0;
-*margin-left : .3em;
 font : {
 weight : normal;
 family : $buttonfontfamily; }
@@ -33,9 +30,6 @@ color : darken($buttoncolor, 20%);
 text-decoration : none; }
 
 }/*btn*/
-
-.btn:first-child { 
-*margin-left : 0; }
 
 .btn-disabled {
 opacity : .5;
@@ -139,9 +133,6 @@ border-width : $buttonborderwidth * 2;
 border-radius : $borderradius * 2; } 
 
 .btn.btn-large {
-*padding : {
-top : 7px;
-bottom : 7px; }
 }/*btn.btn-large*/
 
 .btn-large {
@@ -162,8 +153,6 @@ line-height : inherit; }
 
 .btn-group {
 position : relative;
-*zoom : 1;
-*margin-left : .3em;
 margin-bottom : $baselineheight; 
 
 .btn {
@@ -194,6 +183,5 @@ margin-bottom : $baselineheight / 2;
 
 .btn-group {
 display : inline-block;
-*display : inline;
-*zoom : 1; }
+}
 }/*btn.btn-toolbar*/

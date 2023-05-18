@@ -1,0 +1,18 @@
+{
+  "name": "coldsweat",
+  "version": "1.0.0",
+  "scripts": {
+    "build-css": "parcel build coldsweat/static/stylesheets/all.scss",
+    "watch-css": "parcel watch coldsweat/static/stylesheets/all.scss"
+  },
+  "keywords": [],
+  "author": "Andrea Peltrin",
+  "description": "",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.8.3",
+    "parcel": "2.8.3"
+  },
+  "browserslist": [
+    "defaults"
+  ]
+}

@@ -1,5 +1,3 @@
-CSS_FILES=./coldsweat/static/stylesheets/all.scss:./coldsweat/static/stylesheets/all.css
-
 all: update
 
 # Env. Setup 
@@ -10,11 +8,11 @@ venv:
 install-deps:
 	python -m pip install -r requirements.txt 
 
-update:
-	sass -f -t compressed --update $(CSS_FILES)
+build-css:
+	npm run build-css
 
-watch:
-	sass --watch $(CSS_FILES)
+watch-css:
+	npm run watch-css
 
 # Tests
 
@@ -39,4 +37,4 @@ upload-test:
 	twine upload -r testpypi dist/*
 
 clean:
-	rm -rf dist/ build/
+	rm -rf dist/ build/ .parcel-cache/

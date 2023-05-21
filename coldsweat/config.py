@@ -13,10 +13,6 @@ from configparser import ConfigParser as SafeConfigParser
 
 from . utilities import Struct
 
-__all__ = [
-    'load_config',
-]
-
 DEFAULTS = {
     'min_interval': '900',
     'max_errors': '50',
@@ -60,3 +56,12 @@ def load_config(config_path):
         config[section] = Struct(d)
 
     return config
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    DATABASE_URI = os.environ.get('DATABASE_URI')\
+        or 'sqlite:///' + os.path.join(basedir, 'coldsweat.db')

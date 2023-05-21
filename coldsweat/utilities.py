@@ -57,12 +57,8 @@ def make_sha1_hash(s):
 
 
 def make_nonce():
-    try:
-        nonce = os.urandom(16)
-    except NotImplementedError:
-        # urandom might not be available on certain platforms
-        nonce = datetime.now().isoformat()
-    return nonce.encode('base64')
+    nonce = os.urandom(16)    
+    return nonce.hex()
 
 # --------------------
 # URL utilities

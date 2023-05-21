@@ -6,20 +6,37 @@ import flask
 import flask_login
 from peewee import *
 import coldsweat.models as models
-
-app = flask.Flask(__name__)
-app.secret_key = 'super secret string'  # Change this!
-
-
-@app.before_request
-def before_request():
-    models.connect()
+import coldsweat.fever as fever
+from .config import Config
 
 
-@app.after_request
-def after_request(response):
-    models.close()
-    return response
+def create_app(config_class=Config):
+    app = flask.Flask(__name__)
+    #app.config.from_object(config_class)
+    app.secret_key = 'super secret string'  # Change this!    
+
+    # Initialize Flask extensions here
+
+    login_manager = flask_login.LoginManager()
+    login_manager.init_app(app)
+
+    # Register Fever API handlers
+    app.register_blueprint(fever.routes.fever_bp)
+
+    @app.before_request
+    def before_request():
+        models.connect()
+
+    @app.after_request
+    def after_request(response):
+        models.close()
+        return response
+
+    @app.route('/test/')
+    def test_page():
+        return '<h1>Testing the Flask Application Factory Pattern</h1>'
+    
+    return app 
 
 # ---------
 # Setup template filters and context
@@ -46,9 +63,6 @@ def human_date(value):
 # ---------
 # User auth
 # ---------
-
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
 
 
 class SessionUser(flask_login.UserMixin):
@@ -119,3 +133,7 @@ def protected():
 @app.route('/')
 def home():
     return flask.render_template("index.html")
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

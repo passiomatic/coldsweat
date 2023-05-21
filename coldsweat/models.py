@@ -50,7 +50,7 @@ e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
 a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
 DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
-
+# @@FIXME Use https://docs.peewee-orm.com/en/latest/peewee/database.html#connecting-using-a-database-url
 def parse_connection_url(url):
     parsed = urlparse.urlparse(url, scheme='sqlite')
     connect_kwargs = {'database': parsed.path[1:]}

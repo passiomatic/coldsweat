@@ -57,7 +57,7 @@ template_dir = os.path.join(installation_dir, 'coldsweat/templates')
 config_path = os.environ.get("COLDSWEAT_CONFIG_PATH")
 
 if not config_path:
-    config_path = os.path.join(installation_dir, 'etc/config')
+    config_path = os.path.join(installation_dir, 'config')
 
 config = load_config(config_path)
 

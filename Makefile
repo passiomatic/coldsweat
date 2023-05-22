@@ -41,3 +41,8 @@ upload-test:
 
 clean:
 	rm -rf dist/ build/ .parcel-cache/
+
+# Database 
+
+sql:
+	sqlite3 data/coldsweat.db

@@ -1,14 +1,13 @@
-{{inherit "site.html"}}
+{% extends "base.html" %}
 
-{{def container_block}}
+{% block container_block %}
 
 <section class="page">
-    <article> 
+    <article>
         <h1>Fever Endpoint</h1>
         <p>You should use the address of this page to configure your Fever client.
-        </p>      
+        </p>
     </article>
 </section>
- 
-    
-{{enddef}}
+
+{% endblock %}

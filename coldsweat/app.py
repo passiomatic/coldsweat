@@ -1,228 +1,126 @@
-# -*- coding: utf-8 -*-
-'''
-Description: Web app machinery
-
-Copyright (c) 2013—2016 Andrea Peltrin
-Portions are copyright (c) 2013 Rui Carmo
-License: MIT (see LICENSE for details)
-'''
-import io
-import re
-import sys
-
-from traceback import format_tb
-
-from webob import Request, Response
-from webob.request import LimitedLengthFile, DisconnectionError
-from webob.exc import HTTPClientError, HTTPNotFound, HTTPRedirection
-from . models import connect, close
-
-from coldsweat import logger
+#from datetime import datetime, date, timezone, timedelta
+# from pathlib import Path
+# from operator import attrgetter
+# from itertools import groupby, islice
+import flask
+import flask_login
+from peewee import *
+import coldsweat.models as models
+from .config import Config
 
 
-__all__ = [
-    'GET',
-    'POST',
-    'form',
-    'WSGIApp',
-    'ExceptionMiddleware',
-    'setup_app'
-]
+def create_app(config_class=Config):
+    app = flask.Flask(__name__)
+    #app.config.from_object(config_class)
+    app.secret_key = 'super secret string'  # Change this!    
 
-# ------------------------------------------------------
-# Decorators
-# ------------------------------------------------------
+    # Initialize Flask extensions here
 
-ROUTES = []
+    login_manager = flask_login.LoginManager()
+    login_manager.init_app(app)
 
+    @login_manager.user_loader
+    def user_loader(email):
+        if not models.User.get_or_none(email=email):
+            return
 
-def on(pattern, http_methods):
-    def wrapper(handler):
-        route = re.compile(pattern, re.U), http_methods, handler.__name__
-        ROUTES.append(route)
-        return handler
-    return wrapper
+        user = SessionUser()
+        user.id = email
+        return user
 
 
-def GET(pattern):
-    return on(pattern, ('GET', ))
+    @login_manager.request_loader
+    def request_loader(request):
+        email = request.form.get('email')
+        if not models.User.get_or_none(email=email):
+            return
+
+        user = SessionUser()
+        user.id = email
+        return user
+
+    # Register main app routes
+    from coldsweat.main import bp as main_blueprint
+    app.register_blueprint(main_blueprint)    
+
+    # Register Fever API routes
+    from coldsweat.fever import bp as fever_blueprint
+    app.register_blueprint(fever_blueprint)    
+
+    @app.before_request
+    def before_request():
+        models.database.connect()
+
+    @app.after_request
+    def after_request(response):
+        models.database.close()
+        return response
+    
+    return app 
+
+# ---------
+# Setup template filters and context
+# ---------
 
 
-def POST(pattern):
-    return on(pattern, ('POST', ))
+# @app.template_filter("human_date")
+# def human_date(value):
+#     return value.strftime("%b %d, %Y")
 
 
-# Handler for both GET and POST requests
-def form(pattern):
-    return on(pattern, ('GET', 'POST'))
+# @app.template_filter("human_date_time")
+# def human_date(value):
+#     return value.strftime("%b %d, %Y at %H:%M")
 
-# ------------------------------------------------------
-# Base WSGI app
-# ------------------------------------------------------
+# @app.context_processor
+# def inject_template_vars():
+#     return {
+#         "last_sync": models.get_last_log(),
+#         "nav_tags": get_nav_tags(MAX_TOP_TAGS)
+#     }
 
+# ---------
+# User auth
+# ---------
 
-def patched_read_into(self, buff):
-    if not self.remaining:
-        return 0
-    sz0 = min(len(buff), self.remaining)
-    data = self.file.read(sz0)
-    sz = len(data)
-    self.remaining -= sz
-    if sz < sz0 and self.remaining:
-        raise DisconnectionError(
-            "The client disconnected while sending the body "
-            "(%d more bytes were expected)" % (self.remaining,)
-        )
-    buff[:sz] = data.encode()
-    return sz
+class SessionUser(flask_login.UserMixin):
+    pass
 
 
-LimitedLengthFile.readinto = patched_read_into
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if flask.request.method == 'GET':
+#         return '''
+#                <form action='login' method='POST'>
+#                 <input type='email' name='email' id='email' value="andrea@passiomatic.com" placeholder='email'/>
+#                 <input type='text' name='password' value="password" id='password' placeholder='password'/>
+#                 <input type='submit' name='submit'/>
+#                </form>
+#                '''
+
+#     email = flask.request.form['email']
+#     password = flask.request.form['password']
+#     user = models.User.validate_credentials(email, password)
+#     if user:
+#         session_user = SessionUser()
+#         session_user.id = email
+#         flask_login.login_user(session_user)
+#         return flask.redirect(flask.url_for('protected'))
+
+#     return 'Bad login'
 
 
-class PatchedRequest(Request):
-
-    @property
-    def body_file(self):
-        """
-            Input stream of the request (wsgi.input).
-            Setting this property resets the content_length and seekable flag
-            (unlike setting req.body_file_raw).
-        """
-
-        if not self.is_body_readable:
-            return io.BytesIO()
-
-        r = self.body_file_raw
-        clen = self.content_length
-
-        if not self.is_body_seekable and clen is not None:
-            # we need to wrap input in LimitedLengthFile
-            # but we have to cache the instance as well
-            # otherwise this would stop working
-            # (.remaining counter would reset between calls):
-            #   req.body_file.read(100)
-            #   req.body_file.read(100)
-            env = self.environ
-            wrapped, raw = env.get("webob._body_file", (0, 0))
-
-            #  if raw is not r:
-            wrapped = LimitedLengthFile(r, clen)
-            wrapped = io.BufferedReader(wrapped)
-            env["webob._body_file"] = wrapped, r
-            r = wrapped
-
-        return r
+# @app.route('/logout')
+# def logout():
+#     flask_login.logout_user()
+#     return 'Logged out'
 
 
-class WSGIApp(object):
-
-    def __call__(self, environ, start_response):
-        request = PatchedRequest(environ)
-
-        handler, args = self._find_handler(request)
-        if not handler:
-            raise HTTPNotFound(
-                'No handler defined for %s (%s)' % (
-                    request.path_info, request.method))
-        if not args:
-            args = ()
-
-        # Save request object for handlers
-        self.request = request
-        self.application_url = request.application_url
-
-        connect()
-        response = handler(*args)
-        if not response:
-            response = Response()  # Provide an empty response
-        close()
-
-        return response(environ, start_response)
-
-    def _find_handler(self, request):
-
-        # Sanity check
-        try:
-            request.path_info
-        except KeyError:
-            request.path_info = ''  # @@TODO add / ?
-
-        for pattern, http_methods, name in ROUTES:
-            match = pattern.match(request.path_info)
-            if match and request.method in http_methods:
-                try:
-                    return getattr(self, name), match.groups()
-                except AttributeError:
-                    break  # path_info matches, but app does not
-
-        # No match found
-        return None, None
-
-# ------------------------------------------------------
-# Exception middleware
-# ------------------------------------------------------
+# @app.route('/protected')
+# @flask_login.login_required
+# def protected():
+#     return 'Logged in as: ' + flask_login.current_user.id
 
 
-class ExceptionMiddleware(object):
-    '''
-    WSGI middleware which sends out an exception traceback
-      if something goes wrong. See: http://bit.ly/hQd5b1
-    '''
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        """
-        Call the application and catch exceptions.
-        """
-
-        app_iter = None
-        # Just call the application and send the output back
-        #   unchanged and catch relevant HTTP exceptions
-        try:
-            app_iter = self.app(environ, start_response)
-        except (HTTPClientError, HTTPRedirection) as exc:
-            app_iter = exc(environ, start_response)
-        # If an exception occours we get the exception information
-        #   and prepare a traceback we can render
-        except Exception:
-            exc_type, exc_value, tb = sys.exc_info()
-            traceback = ['Traceback (most recent call last):']
-            traceback += format_tb(tb)
-            traceback.append('%s: %s' % (exc_type.__name__, exc_value))
-            # We might have not a stated response by now. Try to
-            #   start one with the status code 500 or ignore any
-            #   raised exception if the application already
-            #   started one
-            try:
-                start_response('500 Internal Server Error', [
-                               ('Content-Type', 'text/plain')])
-            except Exception:
-                pass
-
-            traceback = '\n'.join(traceback)
-            logger.error(traceback)
-
-            yield traceback
-
-        for item in app_iter:
-            yield item
-
-        # Returned iterable might have a close function.
-        #   If it exists it *must* be called
-        if hasattr(app_iter, 'close'):
-            app_iter.close()
-
-
-# ------------------------------------------------------
-# Set up WSGI app
-# ------------------------------------------------------
-
-def setup_app():
-    # Postpone import to avoid circular dependencies
-    from coldsweat import fever
-    from coldsweat import frontend
-    from coldsweat import cascade
-    return ExceptionMiddleware(
-        cascade.Cascade([fever.setup_app(), frontend.setup_app()]))
+# if __name__ == '__main__':
+#     app.run(debug=True)

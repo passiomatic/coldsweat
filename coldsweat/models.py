@@ -37,6 +37,7 @@ __all__ = [
     'close',
     'transaction',
     'setup_database_schema',
+    'database'
 ]
 
 # Feed default icon

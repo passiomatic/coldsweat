@@ -15,7 +15,7 @@ watch-css:
 	npm run watch-css
 
 run:
-	flask --app coldsweat/app2.py run --debug
+	flask --app coldsweat/app.py run --debug
 
 # Tests
 

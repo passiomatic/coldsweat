@@ -26,6 +26,9 @@ def setup_module(module):
     
     test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
 
+# --------------
+# Auth
+# --------------
 
 def test_auth_failure():
     r = req('wrong-api-key', params=default_params)
@@ -39,21 +42,62 @@ def test_auth():
     r = req(test_api_key, params=default_params)
     assert r.json()['auth'] == 1
 
+# --------------
+# Groups
+# --------------
+
 def test_groups():
-    assert False
+    params = default_params | { 'groups': '' }
+    r = req(test_api_key, params=params)
+    assert len(r.json()['groups']) > 0
+
+# --------------
+# Feeds
+# --------------
 
 def test_feeds():
-    assert False
+    params = default_params | { 'feeds': '' }
+    r = req(test_api_key, params=params)
+    assert len(r.json()['feeds']) > 0
 
-def test_unread_item_ids():
-    assert False
+# --------------
+# Items 
+# --------------
+
+def test_items_max_id():
+    params = default_params | { 'items': '', 'max_id': '50' }
+    r = req(test_api_key, params=params)
+    assert len(r.json()['items']) > 0
+
+def test_items_since_id():
+    params = default_params | { 'items': '', 'since_id': '50' }
+    r = req(test_api_key, params=params)
+    assert len(r.json()['items']) > 0
+
+def test_unread_with_ids():
+    params = default_params | { 'items': '', 'with_ids': '50,51,52' }
+    r = req(test_api_key, params=params)
+    assert find_id(50, r.json()['items']) and find_id(51, r.json()['items']) and find_id(52, r.json()['items'])
+
+def find_id(id, items):
+    return (id in (item['id'] for item in items))
 
 def test_saved_item_ids():
     assert False
 
-def test_favicons():
-    assert False
+# --------------
+# Misc.
+# --------------
 
+def test_favicons():
+    params = default_params | { 'favicons': '' }
+    r = req(test_api_key, params=params)
+    assert len(r.json()['favicons']) > 0
+
+def test_links():
+    params = default_params | { 'links': '' }
+    r = req(test_api_key, params=params)
+    assert len(r.json()['links']) == 0
 
 def req(api_key, params=None):    
     if params:        

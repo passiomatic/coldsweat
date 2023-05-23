@@ -33,7 +33,7 @@ def index_post():
     if 'api' not in flask.request.args:
         flask.abort(400)  # Bad request
 
-    result = Struct({'api_version': API_VERSION, 'auth': 0})
+    result = {'api_version': API_VERSION, 'auth': 0}
 
     if 'api_key' in flask.request.form:
         api_key = flask.request.form['api_key']
@@ -46,7 +46,7 @@ def index_post():
         return flask.jsonify(result)
 
     # Authorized
-    result.auth = 1
+    result['auth'] = 1
 
     # It looks like client *can* send multiple commands at time
     all_commands = globals()
@@ -60,8 +60,7 @@ def index_post():
                 continue
             handler(user, result)
 
-    result.last_refreshed_on_time = get_last_refreshed_on_time()
-
+    result['last_refreshed_on_time'] = get_last_refreshed_on_time()
     return flask.jsonify(result)
 
 # ------------------------------------------------------
@@ -71,16 +70,16 @@ def index_post():
 
 def groups_command(user, result):
     q = feed.get_groups(user)
-    result.groups = [{
+    result['groups'] = [{
         'id': group.id,
         'title': group.title
     } for group in q]
-    result.feeds_groups = get_feed_groups(user)
+    result['feeds_groups'] = get_feed_groups(user)
 
 
 def feeds_command(user, result):
     q = feed.get_feeds(user)
-    result.feeds = [{
+    result['feeds'] = [{
         'id': feed.id,
         'favicon_id': feed.id,
         'title': feed.title,
@@ -89,24 +88,24 @@ def feeds_command(user, result):
         'is_spark': 0,  # Unsupported, always zero
         'last_updated_on_time': feed.last_updated_on_as_epoch
     } for feed in q]
-    result.feeds_groups = get_feed_groups(user)
+    result['feeds_groups'] = get_feed_groups(user)
 
 
 def unread_item_ids_command(user, result):
     q = feed.get_unread_entries(user, Entry.id).objects()
     ids = [r.id for r in q]
-    result.unread_item_ids = ','.join(map(str, ids))
+    result['unread_item_ids'] = ','.join(map(str, ids))
 
 
 def saved_item_ids_command(user, result):
     q = feed.get_saved_entries(user, Entry.id).objects()
     ids = [r.id for r in q]
-    result.saved_item_ids = ','.join(map(str, ids))
+    result['saved_item_ids'] = ','.join(map(str, ids))
 
 
 def favicons_command(_, result):
     q = Feed.select()
-    result.favicons = [{
+    result['favicons'] = [{
         'id': feed.id,
         'data': feed.icon_or_default
     } for feed in q]
@@ -114,13 +113,13 @@ def favicons_command(_, result):
 
 def items_command(user, result):
 
-    result.total_items = feed.get_all_entries(user, Entry.id).count()
+    result['total_items'] = feed.get_all_entries(user, Entry.id).count()
     # From the API: "Use the since_id argument with the highest id
     #  of locally cached items to request 50 additional items.
     if 'since_id' in flask.request.args:
         try:
             min_id = int(flask.request.args['since_id'])
-            result.items = get_entries_min(user, min_id)
+            result['items'] = get_entries_min(user, min_id)
         except ValueError:
             pass
 
@@ -132,7 +131,7 @@ def items_command(user, result):
         try:
             max_id = int(flask.request.args['max_id'])
             if max_id:
-                result.items = get_entries_max(user, max_id)
+                result['items'] = get_entries_max(user, max_id)
         except ValueError:
             pass
 
@@ -143,11 +142,11 @@ def items_command(user, result):
     if 'with_ids' in flask.request.args:
         with_ids = flask.request.args['with_ids']
         ids = [int(i) for i in with_ids.split(',') if RE_DIGITS.match(i)]
-        result.items = get_entries(user, ids[:50])
+        result['items'] = get_entries(user, ids[:50])
         return
 
     # Unfiltered results
-    result.items = get_entries(user)
+    result['items'] = get_entries(user)
 
 
 def unread_recently_read_command(user, result):
@@ -314,8 +313,8 @@ def mark_command(user, result):
 
 
 def links_command(_, result):
-    # Hot links (unsupported)
-    result.links = []
+    # Hot links, unsupported
+    result['links'] = []
 
 
 # ------------------------------------------------------

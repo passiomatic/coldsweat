@@ -18,7 +18,7 @@ from peewee import fn, IntegrityError
 from requests import RequestException
 from tempita import Template as BaseTemplate
 
-from .app import GET, POST, WSGIApp, form
+from .app_old import GET, POST, WSGIApp, form
 from coldsweat import config, logger, template_dir, VERSION_STRING
 from .fetcher import fetch_url, Fetcher
 from .markup import sniff_feed, find_feed_links

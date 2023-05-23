@@ -31,7 +31,7 @@ from . import fever
 
 from . import frontend
 
-from . app import ExceptionMiddleware, ROUTES
+from . app_old import ExceptionMiddleware, ROUTES
 from coldsweat import (installation_dir,
                        template_dir,
                        FEED_TAG_URI,

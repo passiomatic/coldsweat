@@ -1,22 +1,65 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-'''
-Description: quick & dirty test suite for Fever API implementation
-
-Copyright (c) 2013—2016 Andrea Peltrin
-License: MIT (see LICENSE for details)
-'''
-import optparse
 import subprocess
 
+import pytest
 from datetime import datetime
+import requests
 
 from coldsweat.utilities import datetime_as_epoch
 from coldsweat.models import User
 
-TEST_USER_CREDENTIALS = 'test@example.com', 'coldsweat'
+API_ENDPOINT = "http://localhost:5000/fever/"
+TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD = 'test', 'test@example.com', 'secret'
 ALL = ('groups feeds unread_item_ids saved_item_ids favicons items links '
        'unread_recently_read mark_item mark_feed mark_group mark_all').split()
+default_params = {'api': ''}
+
+test_user = None
+test_api_key = None
+def setup_module(module):
+
+    global test_user
+    global test_api_key
+
+    test_user = User.get_or_none(User.email == TEST_EMAIL)
+    if not test_user:
+        test_user = User.create(username=TEST_USERNAME, email=TEST_EMAIL, password=TEST_PASSWORD)
+    
+    test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
+
+
+def test_auth_failure():
+    r = req('wrong-api-key', params=default_params)
+    assert r.json()['auth'] == 0
+
+def test_endpoint_failure():
+    r = req('wrong-api-key')
+    assert r.status_code == 400
+
+def test_auth():
+    r = req(test_api_key, params=default_params)
+    assert r.json()['auth'] == 1
+
+def test_groups():
+    assert False
+
+def test_feeds():
+    assert False
+
+def test_unread_item_ids():
+    assert False
+
+def test_saved_item_ids():
+    assert False
+
+def test_favicons():
+    assert False
+
+
+def req(api_key, params=None):    
+    if params:        
+        return requests.post(API_ENDPOINT, data={"api_key": api_key}, params=params)        
+    else:
+        return requests.post(API_ENDPOINT, data={"api_key": api_key})
 
 
 def run_tests(endpoint, suites=ALL):
@@ -110,58 +153,3 @@ def run_tests(endpoint, suites=ALL):
             (True, 'unread_recently_read=1')
         ])
 
-    # Test auth failure
-    print('\n= auth (failure)\n')
-
-    subprocess.call([
-        "curl",
-        "-dapi_key=%s" % 'wrong-api-key',
-        "%s?api&unread_item_ids" % endpoint
-    ])
-
-    api_key = User.make_api_key(*TEST_USER_CREDENTIALS)
-
-    # Test API commands
-    for as_form, q in queries:
-        print('\n= %s\n' % q)
-
-        if as_form:
-            subprocess.call([
-                "curl",
-                "-dapi_key=%s" % api_key,
-                "-d%s" % q,
-                "%s?api" % endpoint
-            ])
-        else:
-            subprocess.call([
-                "curl",
-                "-dapi_key=%s" % api_key,
-                "%s?api&%s" % (endpoint, q),
-            ])
-
-
-parser = optparse.OptionParser(
-    usage='%prog endpoint [-s suite]'
-    )
-parser.add_option(
-    '-s', '--suite',
-    dest='suite',
-    help=('the Fever API test suite to run. Available suites are: groups,'
-          'feeds,unread, saved, favicons, items, links, unread_read,'
-          'mark_item,mark_feed mark_group, mark_all'))
-
-
-if __name__ == '__main__':
-
-    options, args = parser.parse_args()
-
-    if not args:
-        parser.error("no Fever API endpoint given, e.g.:"
-                     "http://localhost:8080/fever/")
-    elif len(args) > 1:
-        parser.error("extraneous argument found, use -s suite to run a "
-                     "specific test suite")
-
-    suite = options.suite if options.suite else ALL
-
-    run_tests(args[0], suite)

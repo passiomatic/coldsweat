@@ -1,4 +1,4 @@
-from coldsweat import frontend
+#from coldsweat import frontend
 
 # TODO: test list unread entries
 

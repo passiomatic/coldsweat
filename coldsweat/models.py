@@ -137,7 +137,7 @@ class User(BaseModel):
     )
 
     def __repr__(self):
-        return "<%s|%s>" % (self.name, self.email)
+        return "<%s|%s>" % (self.username, self.email)
 
     class Meta:
         table_name = 'users'

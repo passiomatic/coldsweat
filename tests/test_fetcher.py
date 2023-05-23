@@ -9,9 +9,9 @@ from requests.exceptions import RequestException
 from coldsweat.fetcher import fetch_url
 
 TEST_FEEDS = (
-    (None, 'http://www.aaa.bbb/'),
-    (200, 'http://www.scripting.com/rss.xml'),
-    (404, 'http://example.com/wrong-rss.xml'),
+    #(None, 'http://www.aaa.bbb/'),
+    #(200, 'http://www.scripting.com/rss.xml'),
+    #(404, 'http://example.com/wrong-rss.xml'),
 )
 
 

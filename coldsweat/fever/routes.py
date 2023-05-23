@@ -393,7 +393,7 @@ def get_last_refreshed_on_time():
     '''
     Time of the most recently *refreshed* feed
     '''
-    last_checked_on = Feed.select().aggregate(fn.Max(Feed.last_checked_on))
+    last_checked_on = Feed.select(fn.Max(Feed.last_checked_on)).scalar()
     if last_checked_on:
         return datetime_as_epoch(last_checked_on)
 

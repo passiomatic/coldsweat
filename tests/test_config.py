@@ -1,2 +1,0 @@
-
-from coldsweat import config

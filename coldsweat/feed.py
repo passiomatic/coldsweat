@@ -13,7 +13,7 @@ from coldsweat.models import (database, Entry, Feed, Group, Read, Saved,
                               Subscription)
 
 from .utilities import make_sha1_hash, scrub_url
-import config
+import coldsweat.config as config
 from .fetcher import Fetcher
 
 

@@ -1,4 +1,4 @@
-#from datetime import datetime, date, timezone, timedelta
+# from datetime import datetime, date, timezone, timedelta
 # from pathlib import Path
 # from operator import attrgetter
 # from itertools import groupby, islice
@@ -11,8 +11,8 @@ from .config import Config
 
 def create_app(config_class=Config):
     app = flask.Flask(__name__)
-    #app.config.from_object(config_class)
-    app.secret_key = 'super secret string'  # Change this!    
+    # app.config.from_object(config_class)
+    app.secret_key = 'super secret string'  # Change this!
 
     # Initialize Flask extensions here
 
@@ -28,7 +28,6 @@ def create_app(config_class=Config):
         user.id = email
         return user
 
-
     @login_manager.request_loader
     def request_loader(request):
         email = request.form.get('email')
@@ -41,11 +40,11 @@ def create_app(config_class=Config):
 
     # Register main app routes
     from coldsweat.main import bp as main_blueprint
-    app.register_blueprint(main_blueprint)    
+    app.register_blueprint(main_blueprint)
 
     # Register Fever API routes
     from coldsweat.fever import bp as fever_blueprint
-    app.register_blueprint(fever_blueprint)    
+    app.register_blueprint(fever_blueprint)
 
     @app.before_request
     def before_request():
@@ -55,8 +54,8 @@ def create_app(config_class=Config):
     def after_request(response):
         models.database.close()
         return response
-    
-    return app 
+
+    return app
 
 # ---------
 # Setup template filters and context

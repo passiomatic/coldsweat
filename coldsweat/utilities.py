@@ -9,8 +9,9 @@ License: MIT (see LICENSE for details)
 import os
 import re
 
-from urllib.parse import urlparse
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from hashlib import md5, sha1
 import base64
@@ -57,7 +58,7 @@ def make_sha1_hash(s):
 
 
 def make_nonce():
-    nonce = os.urandom(16)    
+    nonce = os.urandom(16)
     return nonce.hex()
 
 # --------------------
@@ -94,7 +95,7 @@ def scrub_url(url):
     d = urllib.parse.parse_qs(query)
     d = dict((k, v) for k, v in list(d.items()) if k not in BLACKLIST_QS)
     return urllib.parse.urlunsplit((scheme, netloc, path,
-                                urllib.parse.urlencode(d, doseq=True), fragment))
+                                    urllib.parse.urlencode(d, doseq=True), fragment))
 
 # --------------------
 # Date/time functions

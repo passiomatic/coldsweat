@@ -49,7 +49,7 @@ def create_app(config_class=Config):
 
     @app.before_request
     def before_request():
-        models.database.connect()
+        models.database.connect(reuse_if_open=True)
 
     @app.after_request
     def after_request(response):

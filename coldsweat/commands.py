@@ -325,7 +325,7 @@ def run():
 
     command_name, command_args = args[0].lower(), args[1:]
 
-    connect()
+    #connect()
 
     cc = CommandController()
     try:
@@ -333,7 +333,7 @@ def run():
     except CommandError as ex:
         parser.error(ex)
     finally:
-        close()
+        #close()
         # Flush and close all logging handlers
         import logging
         logging.shutdown()

@@ -2,12 +2,12 @@ import subprocess
 
 import pytest
 from datetime import datetime
-import requests
 
 from coldsweat.utilities import datetime_as_epoch
 from coldsweat.models import User
+from coldsweat.app import create_app
 
-API_ENDPOINT = "http://localhost:5000/fever/"
+API_ENDPOINT = "/fever/"
 TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD = 'test', 'test@example.com', 'secret'
 ALL = ('groups feeds unread_item_ids saved_item_ids favicons items links '
        'unread_recently_read mark_item mark_feed mark_group mark_all').split()
@@ -15,95 +15,128 @@ default_params = {'api': ''}
 
 test_user = None
 test_api_key = None
-def setup_module(module):
 
+
+@pytest.fixture()
+def app():
+    app = create_app()
+    app.config.update({
+        "TESTING": True,
+    })
+
+    # Make sure we have a test user in database
+    
     global test_user
     global test_api_key
 
     test_user = User.get_or_none(User.email == TEST_EMAIL)
     if not test_user:
-        test_user = User.create(username=TEST_USERNAME, email=TEST_EMAIL, password=TEST_PASSWORD)
-    
+        test_user = User.create(username=TEST_USERNAME,
+                                email=TEST_EMAIL, password=TEST_PASSWORD)
+
     test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
+
+    yield app
+
+
+@pytest.fixture()
+def client(app):
+    return app.test_client()
 
 # --------------
 # Auth
 # --------------
 
-def test_auth_failure():
-    r = req('wrong-api-key', params=default_params)
-    assert r.json()['auth'] == 0
 
-def test_endpoint_failure():
-    r = req('wrong-api-key')
+def test_auth_failure(client):
+    r = post(client, 'wrong-api-key', query_string=default_params)
+    assert r.json['auth'] == 0
+
+
+def test_endpoint_failure(client):
+    r = post(client, 'wrong-api-key')
     assert r.status_code == 400
 
-def test_auth():
-    r = req(test_api_key, params=default_params)
-    assert r.json()['auth'] == 1
+
+def test_auth(client):
+    r = post(client, test_api_key, query_string=default_params)
+    assert r.json['auth'] == 1
 
 # --------------
 # Groups
 # --------------
 
-def test_groups():
-    params = default_params | { 'groups': '' }
-    r = req(test_api_key, params=params)
-    assert len(r.json()['groups']) > 0
+
+def test_groups(client):
+    params = default_params | {'groups': ''}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['groups']) > 0
 
 # --------------
 # Feeds
 # --------------
 
-def test_feeds():
-    params = default_params | { 'feeds': '' }
-    r = req(test_api_key, params=params)
-    assert len(r.json()['feeds']) > 0
+
+def test_feeds(client):
+    params = default_params | {'feeds': ''}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['feeds']) > 0
 
 # --------------
-# Items 
+# Items
 # --------------
 
-def test_items_max_id():
-    params = default_params | { 'items': '', 'max_id': '50' }
-    r = req(test_api_key, params=params)
-    assert len(r.json()['items']) > 0
 
-def test_items_since_id():
-    params = default_params | { 'items': '', 'since_id': '50' }
-    r = req(test_api_key, params=params)
-    assert len(r.json()['items']) > 0
+def test_items_max_id(client):
+    params = default_params | {'items': '', 'max_id': '50'}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['items']) > 0
 
-def test_unread_with_ids():
-    params = default_params | { 'items': '', 'with_ids': '50,51,52' }
-    r = req(test_api_key, params=params)
-    assert find_id(50, r.json()['items']) and find_id(51, r.json()['items']) and find_id(52, r.json()['items'])
+
+def test_items_since_id(client):
+    params = default_params | {'items': '', 'since_id': '50'}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['items']) > 0
+
+
+def test_unread_with_ids(client):
+    params = default_params | {'items': '', 'with_ids': '50,51,52'}
+    r = post(client, test_api_key, query_string=params)
+    items = r.json['items']
+    assert find_id(50, items)
+    assert find_id(51, items)
+    assert find_id(52, items)
+
 
 def find_id(id, items):
     return (id in (item['id'] for item in items))
 
-def test_saved_item_ids():
+
+def test_saved_item_ids(client):
     assert False
 
 # --------------
 # Misc.
 # --------------
 
-def test_favicons():
-    params = default_params | { 'favicons': '' }
-    r = req(test_api_key, params=params)
-    assert len(r.json()['favicons']) > 0
 
-def test_links():
-    params = default_params | { 'links': '' }
-    r = req(test_api_key, params=params)
-    assert len(r.json()['links']) == 0
+def test_favicons(client):
+    params = default_params | {'favicons': ''}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['favicons']) > 0
 
-def req(api_key, params=None):    
-    if params:        
-        return requests.post(API_ENDPOINT, data={"api_key": api_key}, params=params)        
+
+def test_links(client):
+    params = default_params | {'links': ''}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['links']) == 0
+
+
+def post(client, api_key, query_string=None):
+    if query_string:
+        return client.post(API_ENDPOINT, data={"api_key": api_key},  query_string=query_string)
     else:
-        return requests.post(API_ENDPOINT, data={"api_key": api_key})
+        return client.post(API_ENDPOINT, data={"api_key": api_key})
 
 
 def run_tests(endpoint, suites=ALL):
@@ -115,16 +148,6 @@ def run_tests(endpoint, suites=ALL):
 
     queries = []
 
-    if 'groups' in suites:
-        queries.extend([
-            (False, 'groups')
-        ])
-
-    if 'feeds' in suites:
-        queries.extend([
-            (False, 'feeds')
-        ])
-
     if 'unread' in suites:
         queries.extend([
             (False, 'unread_item_ids')
@@ -135,22 +158,12 @@ def run_tests(endpoint, suites=ALL):
             (False, 'saved_item_ids')
         ])
 
-    if 'favicons' in suites:
-        queries.extend([
-            (False, 'favicons')
-        ])
-
     if 'items' in suites:
         queries.extend([
             (False, 'items'),
             (False, 'items&with_ids=50,51,52'),
             (False, 'items&max_id=5'),
             (False, 'items&since_id=50')
-        ])
-
-    if 'links' in suites:
-        queries.extend([
-            (False, 'links')                                 # Unsupported
         ])
 
     if 'mark_item' in suites:
@@ -196,4 +209,3 @@ def run_tests(endpoint, suites=ALL):
         queries.extend([
             (True, 'unread_recently_read=1')
         ])
-

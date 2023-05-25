@@ -1,11 +1,7 @@
-# from datetime import datetime, date, timezone, timedelta
-# from pathlib import Path
-# from operator import attrgetter
-# from itertools import groupby, islice
 import flask
 import flask_login
-from peewee import *
 import coldsweat.models as models
+import coldsweat.cli as cli
 from .config import Config
 
 
@@ -46,6 +42,9 @@ def create_app(config_class=Config):
     from coldsweat.fever import bp as fever_blueprint
     app.register_blueprint(fever_blueprint)
 
+    # Add CLI support
+    cli.add_commands(app)
+
     @app.before_request
     def before_request():
         models.database.connect(reuse_if_open=True)
@@ -56,6 +55,7 @@ def create_app(config_class=Config):
         return response
 
     return app
+
 
 # ---------
 # Setup template filters and context

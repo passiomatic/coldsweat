@@ -275,21 +275,21 @@ def fetch_feeds(feeds):
 
     start = time.time()
 
-    app.logger.debug(u"starting fetcher")
+    app.logger.debug("starting fetcher")
 
-    if config.fetcher.processes:
-        from multiprocessing import Pool
-        # Each worker has its own connection
-        p = Pool(config.fetcher.processes, initializer=database.connect)
-        p.map(feed_worker, feeds)
-        # Exit the worker processes so their connections do not leak
-        p.close()
-    else:
-        # Just sequence requests in this process
-        for feed in feeds:
-            feed_worker(feed)
+    # if config.fetcher.processes:
+    #     from multiprocessing import Pool
+    #     # Each worker has its own connection
+    #     p = Pool(4, initializer=database.connect)
+    #     p.map(feed_worker, feeds)
+    #     # Exit the worker processes so their connections do not leak
+    #     p.close()
+    # else:
+    # Just sequence requests in this process
+    for feed in feeds:
+        feed_worker(feed)
 
-    app.logger.info(u"%d feeds checked in %.2fs" % (
+    app.logger.info("fetch completed: %d feeds checked in %.1fs" % (
         len(feeds), time.time() - start))
 
 
@@ -298,11 +298,10 @@ def fetch_all_feeds():
     Fetch all enabled feeds, possibly parallelizing requests
     """
 
-    q = Feed.select().where(Feed.is_enabled == True)  # noqa
+    feeds = Feed.select().where(Feed.is_enabled == True)  # noqa
 
-    feeds = list(q)
-    if not feeds:
-        app.logger.debug(u"no feeds found to fetch, halted")
+    if feeds.count() == 0:
+        app.logger.debug("no feeds found to fetch, halted")
         return
 
     fetch_feeds(feeds)

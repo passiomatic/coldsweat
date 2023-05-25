@@ -17,6 +17,9 @@ watch-css:
 run:
 	flask --app coldsweat/app.py run --debug
 
+fetch:
+	flask --app coldsweat/app.py --debug fetch 
+
 # Tests
 
 test:

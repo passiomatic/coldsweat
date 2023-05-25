@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
-Description: the feed fetcher
-
-Copyright (c) 2013—2016 Andrea Peltrin
-Portions are copyright (c) 2013 Rui Carmo
-License: MIT (see LICENSE for details)
+The feed fetcher
 '''
 
-import os
-#import urllib.parse as urlparse
 import urllib
 
 from datetime import datetime
@@ -25,7 +19,7 @@ from webob.exc import (
                        HTTPForbidden,
                        HTTPError)
 from webob.exc import status_map
-from coldsweat import (config, logger, template_dir, USER_AGENT, ENTRY_TAG_URI)
+from coldsweat import (logger, USER_AGENT, ENTRY_TAG_URI)
 
 from .models import (Entry, Feed)
 from .translators import EntryTranslator, FeedTranslator
@@ -33,8 +27,7 @@ from .utilities import (datetime_as_epoch,
                         format_http_datetime,
                         make_sha1_hash,
                         make_data_uri,
-                        make_nonce,
-                        render_template,)
+                        make_nonce)
 
 from . import filters
 
@@ -43,8 +36,10 @@ __all__ = [
     'fetch_url'
 ]
 
-
-FETCH_ICONS_DELTA = 30  # Days
+FETCH_TIMEOUT = 10  # Seconds
+MIN_FETCH_INTERVAL = 60*3  # Seconds
+MAX_FETCH_ERRORS = 50
+FETCH_ICONS_INTERVAL = 30  # Days
 
 
 class Fetcher(object):
@@ -153,7 +148,8 @@ class Fetcher(object):
             # No datetime.timedelta since we need to
             #   deal with large seconds values
             delta = datetime_as_epoch(self.instant) - datetime_as_epoch(value)
-            if delta < config.fetcher.min_interval:
+            # @@TODO Skip check while DEBUG env
+            if delta < MIN_FETCH_INTERVAL:
                 logger.debug(
                     "%s is below minimun fetch interval, skipped"
                     % self.netloc)
@@ -161,7 +157,7 @@ class Fetcher(object):
 
         try:
             response = fetch_url(self.feed.self_link,
-                                 timeout=config.fetcher.timeout,
+                                 timeout=FETCH_TIMEOUT,
                                  etag=self.feed.etag,
                                  modified_since=self.feed.last_updated_on)
         except RequestException:
@@ -204,8 +200,8 @@ class Fetcher(object):
             self.feed.save()
 
     def check_feed_health(self):
-        if config.fetcher.max_errors and \
-           self.feed.error_count > config.fetcher.max_errors:
+        # @@TODO Increase error_count only with 4xx errors
+        if self.feed.error_count > MAX_FETCH_ERRORS:
             self._synthesize_entry(
                 'Feed has accumulated too many errors (last was %s).'
                 % filters.status_title(self.feed.last_status))
@@ -251,15 +247,6 @@ class Fetcher(object):
             timestamp = t.get_timestamp(self.instant)
             content_type, content = t.get_content(('text/plain', ''))
 
-            # Skip ancient entries
-            if config.fetcher.max_history and (self.instant
-                                               - timestamp).days > \
-                    config.fetcher.max_history:
-                logger.debug(
-                    "entry %s from %s is over maximum history, skipped" % (
-                        guid, self.netloc))
-                continue
-
             try:
                 # If entry is already in database with same hashed GUID, skip
                 Entry.get(guid_hash=make_sha1_hash(guid))
@@ -288,16 +275,16 @@ class Fetcher(object):
 
         if not self.feed.icon or not self.feed.icon_last_updated_on or \
            (self.instant - self.feed.icon_last_updated_on).days > \
-                FETCH_ICONS_DELTA:
+                FETCH_ICONS_INTERVAL:
             # Prefer alternate_link if available since self_link could
             # point to Feed Burner or similar services
-            self.feed.icon = self._google_favicon_fetcher(
+            self.feed.icon = self._favicon_fetcher(
                 self.feed.alternate_link or self.feed.self_link)
             self.feed.icon_last_updated_on = self.instant
 
             logger.debug("fetched favicon %s..." % (self.feed.icon[:70]))
 
-    def _google_favicon_fetcher(self, url):
+    def _favicon_fetcher(self, url):
         '''
         Fetch a site favicon via service
         '''

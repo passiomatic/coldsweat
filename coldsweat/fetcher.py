@@ -239,13 +239,15 @@ class Fetcher(object):
             link = t.get_link()
             guid = t.get_guid(default=link)
 
+            # If an entry doesn't have a link nor a GUID we
+            #   cannot uniquely identify it
             if not guid:
                 app.logger.warning(
                     'could not find GUID for entry from %s, skipped'
                     % self.netloc)
                 continue
 
-            timestamp = t.get_timestamp(self.instant)
+            timestamp = t.get_timestamp(default=self.instant)
             content_type, content = t.get_content(('text/plain', ''))
 
             try:

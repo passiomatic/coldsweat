@@ -58,8 +58,7 @@ class EntryTranslator(object):
         """
         Get a useful GUID from a feed entry
         """
-        value = getattr(self.entry_dict, 'id', None)
-        return value or default
+        return getattr(self.entry_dict, 'id', default)
 
     def get_timestamp(self, default):
         """

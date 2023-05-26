@@ -1,6 +1,5 @@
 {
   "name": "coldsweat",
-  "version": "1.0.0",
   "scripts": {
     "build-css": "parcel build coldsweat/static/stylesheets/all.scss",
     "watch-css": "parcel watch coldsweat/static/stylesheets/all.scss"

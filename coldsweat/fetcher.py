@@ -227,8 +227,8 @@ class Fetcher(object):
 
         self.feed.last_updated_on = ft.get_timestamp(self.instant)
         self.feed.alternate_link = ft.get_alternate_link()
+        # Do not set title again if already set
         self.feed.title = self.feed.title or ft.get_title()
-        # Do not set again if already set
 
         feed_author = ft.get_author()
 

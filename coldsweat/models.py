@@ -5,7 +5,7 @@ import pickle
 
 from datetime import datetime
 
-from playhouse.signals import pre_save
+from playhouse.signals import (pre_save, Model)
 from playhouse.flask_utils import FlaskDB
 
 from peewee import (BlobField, BooleanField, CharField, DateTimeField,
@@ -39,8 +39,9 @@ e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
 a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
 DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
+# Pass Peewee Model class with signal support
 # See https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#database-wrapper
-db_wrapper = FlaskDB()
+db_wrapper = FlaskDB(model_class=Model)
 
 # ------------------------------------------------------
 # Custom fields

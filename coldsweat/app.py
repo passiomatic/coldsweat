@@ -3,6 +3,9 @@ import flask_login
 import coldsweat.models as models
 import coldsweat.cli as cli
 from .config import Config
+from coldsweat.main.routes import SessionUser
+from coldsweat.main import bp as main_blueprint
+from coldsweat.fever import bp as fever_blueprint
 
 
 def create_app(config_class=Config):
@@ -36,11 +39,9 @@ def create_app(config_class=Config):
         return user
 
     # Register main app routes
-    from coldsweat.main import bp as main_blueprint
     app.register_blueprint(main_blueprint)
 
     # Register Fever API routes
-    from coldsweat.fever import bp as fever_blueprint
     app.register_blueprint(fever_blueprint)
 
     # Add CLI support
@@ -69,49 +70,3 @@ def create_app(config_class=Config):
 #         "last_sync": models.get_last_log(),
 #         "nav_tags": get_nav_tags(MAX_TOP_TAGS)
 #     }
-
-# ---------
-# User auth
-# ---------
-
-class SessionUser(flask_login.UserMixin):
-    pass
-
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if flask.request.method == 'GET':
-#         return '''
-#                <form action='login' method='POST'>
-#                 <input type='email' name='email' id='email' value="andrea@passiomatic.com" placeholder='email'/>
-#                 <input type='text' name='password' value="password" id='password' placeholder='password'/>
-#                 <input type='submit' name='submit'/>
-#                </form>
-#                '''
-
-#     email = flask.request.form['email']
-#     password = flask.request.form['password']
-#     user = models.User.validate_credentials(email, password)
-#     if user:
-#         session_user = SessionUser()
-#         session_user.id = email
-#         flask_login.login_user(session_user)
-#         return flask.redirect(flask.url_for('protected'))
-
-#     return 'Bad login'
-
-
-# @app.route('/logout')
-# def logout():
-#     flask_login.logout_user()
-#     return 'Logged out'
-
-
-# @app.route('/protected')
-# @flask_login.login_required
-# def protected():
-#     return 'Logged in as: ' + flask_login.current_user.id
-
-
-# if __name__ == '__main__':
-#     app.run(debug=True)

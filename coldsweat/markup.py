@@ -9,10 +9,9 @@ Portions are copyright (c) 2002–4 Mark Pilgrim
 
 from html.parser import HTMLParser
 import urllib.parse as urlparse
-
+#from flask import current_app as app
 
 from . filters import escape_html
-from coldsweat import logger
 
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
 HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
@@ -205,8 +204,8 @@ class Scrubber(BaseProcessor):
         d = dict(_normalize_attrs(attrs))
         if 'href' in d:
             if self.is_blacklisted(d['href']):
-                logger.debug(
-                    u'matched anchor with blacklisted href=%s' % d['href'])
+                # app.logger.debug(
+                #     u'matched anchor with blacklisted href=%s' % d['href'])
                 self.blacklisted += 1
                 return
 
@@ -224,8 +223,8 @@ class Scrubber(BaseProcessor):
         if 'src' in d:
             if self.is_blacklisted(d['src']):
                 self.pieces.append(d['alt'] if 'alt' in d else '')
-                logger.debug(
-                    u'matched image with blacklisted src=%s' % d['src'])
+                # app.logger.debug(
+                #     u'matched image with blacklisted src=%s' % d['src'])
                 return
 
         # Proceed to default handling
@@ -246,7 +245,7 @@ def _parse(parser, data):
         parser.feed(data)
     except (HTMLParseError, AssertionError) as exc:
         # Log exception and raise it again
-        logger.debug(u'could not parse markup (%s)' % exc.msg)
+        # app.logger.debug(u'could not parse markup (%s)' % exc.msg)
         raise exc
 
 # Link discovery functions

@@ -5,7 +5,7 @@ Description: translates feed and entries fields to Coldsweat nomenclature
 Copyright (c) 2013—2016 Andrea Peltrin
 License: MIT (see LICENSE for details)
 '''
-from coldsweat import logger
+#from flask import current_app as app
 from . utilities import tuple_as_datetime, scrub_url, truncate
 
 from . models import Feed, Entry
@@ -29,7 +29,7 @@ class FeedTranslator(object):
             if value:
                 # Fix future dates
                 return min(tuple_as_datetime(value), default)
-        logger.debug(u'no feed timestamp found, using default')
+        # app.logger.debug(u'no feed timestamp found, using default')
         return default
 
     # Nullable fields
@@ -70,7 +70,7 @@ class EntryTranslator(object):
             if value:
                 # Fix future dates
                 return min(tuple_as_datetime(value), default)
-        logger.debug(u'no entry timestamp found, using default')
+        # app.logger.debug(u'no entry timestamp found, using default')
         return default
 
     def get_title(self, default):
@@ -99,7 +99,7 @@ class EntryTranslator(object):
         if candidates:
             return candidates[0].type, candidates[0].value
 
-        logger.debug(u'no entry content found, using default')
+        # app.logger.debug(u'no entry content found, using default')
         return default
 
     # Nullable fields

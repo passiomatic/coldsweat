@@ -39,7 +39,7 @@ def index_post():
         api_key = flask.request.form['api_key']
         user = User.validate_api_key(api_key)
         if not user:
-            app.logger.warn('unknown API key %s, unauthorized' % api_key)
+            app.logger.warning('unknown API key %s, unauthorized' % api_key)
             return flask.jsonify(result)
     else:
         app.logger.warn('missing API key, unauthorized')

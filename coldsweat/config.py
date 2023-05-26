@@ -7,6 +7,7 @@ Portions are copyright (c) 2013 Rui Carmo
 License: MIT (see LICENSE for details)
 '''
 
+from pathlib import Path
 import os
 
 from configparser import ConfigParser as SafeConfigParser
@@ -58,10 +59,10 @@ def load_config(config_path):
     return config
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+base_dir = Path(__file__).parent.parent
 
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    DATABASE_URI = os.environ.get('DATABASE_URI')\
-        or 'sqlite:///' + os.path.join(basedir, 'coldsweat.db')
+    DATABASE_URL = os.environ.get('DATABASE_URL')\
+        or f"sqlite:///{base_dir.joinpath('data', 'coldsweat.db')}"

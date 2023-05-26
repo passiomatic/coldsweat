@@ -1,26 +1,19 @@
-# -*- coding: utf-8 -*-
 """
-Description: database models
-
-Copyright (c) 2013—2016 Andrea Peltrin
-Portions are copyright (c) 2013 Rui Carmo
-License: MIT (see LICENSE for details)
+Database models
 """
-import urllib.parse as urlparse
-
 import pickle
 
 from datetime import datetime
 
-from playhouse.signals import Model, pre_save
+from playhouse.signals import pre_save
+from playhouse.flask_utils import FlaskDB
 
 from peewee import (BlobField, BooleanField, CharField, DateTimeField,
                     ForeignKeyField,
                     IntegerField, IntegrityError,
-                    TextField, SqliteDatabase)
+                    TextField)
 from passlib import context
 
-from coldsweat import config, logger
 from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
 
 __all__ = [
@@ -32,11 +25,7 @@ __all__ = [
     'Saved',
     'Subscription',
     'Session',
-    'connect',
-    'close',
-    'transaction',
-    'setup_database_schema',
-    'database'
+    'setup',
 ]
 
 # Feed default icon
@@ -50,45 +39,8 @@ e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
 a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
 DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
-# @@FIXME Use https://docs.peewee-orm.com/en/latest/peewee/database.html#connecting-using-a-database-url
-
-
-def parse_connection_url(url):
-    parsed = urlparse.urlparse(url, scheme='sqlite')
-    connect_kwargs = {'database': parsed.path[1:]}
-    if parsed.username:
-        connect_kwargs['user'] = parsed.username
-    if parsed.password:
-        connect_kwargs['password'] = parsed.password
-    if parsed.hostname:
-        connect_kwargs['host'] = parsed.hostname
-    if parsed.port:
-        connect_kwargs['port'] = parsed.port
-
-    # Adjust parameters for MySQL
-    if parsed.scheme == 'mysql' and 'password' in connect_kwargs:
-        connect_kwargs['passwd'] = connect_kwargs.pop('password')
-
-    return parsed.scheme, connect_kwargs
-
-
-engine, kwargs = parse_connection_url(config.database.connection_url)
-
-if engine == 'sqlite':
-    database = SqliteDatabase(pragmas={'journal_mode': 'wal',
-                                       'foreign_keys': 1},
-                              **kwargs)
-#
-# elif engine == 'mysql':
-#    _db = MySQLDatabase(**kwargs)
-#    migrator = MySQLMigrator(_db)
-# elif engine == 'postgresql':
-#    _db = PostgresqlDatabase(autorollback=True, **kwargs)
-#    migrator = PostgresqlMigrator(_db)
-else:
-    raise ValueError(
-        'Unknown database engine %s. Should be sqlite, postgresql or mysql'
-        % engine)
+# See https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#database-wrapper
+db_wrapper = FlaskDB()
 
 # ------------------------------------------------------
 # Custom fields
@@ -109,16 +61,7 @@ class PickleField(BlobField):
 # ------------------------------------------------------
 
 
-class BaseModel(Model):
-    """
-    Binds the same database to all models
-    """
-
-    class Meta:
-        database = database
-
-
-class User(BaseModel):
+class User(db_wrapper.Model):
     """
     Coldsweat user
     """
@@ -208,7 +151,7 @@ def on_user_save(model, user, created):
     user.hash_password()
 
 
-class Group(BaseModel):
+class Group(db_wrapper.Model):
     """
     Feed group/folder
     """
@@ -221,7 +164,7 @@ class Group(BaseModel):
         table_name = 'groups'
 
 
-class Feed(BaseModel):
+class Feed(db_wrapper.Model):
     """
     Atom/RSS feed
     """
@@ -267,7 +210,7 @@ def on_feed_save(model, feed, created):
     feed.self_link_hash = make_sha1_hash(feed.self_link)
 
 
-class Entry(BaseModel):
+class Entry(db_wrapper.Model):
     """
     Atom/RSS entry
     """
@@ -302,7 +245,7 @@ def on_entry_save(model, entry, created):
     entry.guid_hash = make_sha1_hash(entry.guid)
 
 
-class Saved(BaseModel):
+class Saved(db_wrapper.Model):
     """
     Entries 'saved' status
     """
@@ -316,7 +259,7 @@ class Saved(BaseModel):
         )
 
 
-class Read(BaseModel):
+class Read(db_wrapper.Model):
     """
     Entries 'read' status
     """
@@ -330,7 +273,7 @@ class Read(BaseModel):
         )
 
 
-class Subscription(BaseModel):
+class Subscription(db_wrapper.Model):
     """
     A user's feed subscription
     """
@@ -345,7 +288,7 @@ class Subscription(BaseModel):
         table_name = 'subscriptions'
 
 
-class Session(BaseModel):
+class Session(db_wrapper.Model):
     """
     Web session
     """
@@ -357,26 +300,7 @@ class Session(BaseModel):
         table_name = 'sessions'
 
 
-# ------------------------------------------------------
-# Utility functions
-# ------------------------------------------------------
-
-def connect():
-    logger.debug('opening connection')
-    database.connect(reuse_if_open=True)
-
-
-def transaction():
-    return database.transaction()
-
-
-def close():
-    if not database.is_closed():
-        logger.debug('closing connection')
-        database.close()
-
-
-def setup_database_schema():
+def setup(database):
     """
     Create database and tables for all models and setup bootstrap data
     """

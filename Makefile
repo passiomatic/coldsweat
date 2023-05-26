@@ -15,12 +15,12 @@ watch-css:
 	npm run watch-css
 
 run:
-	flask --app coldsweat/app.py run --debug
+	flask --app coldsweat/app:create_app run --debug
 
 fetch:
-	flask --app coldsweat/app.py --debug fetch 
+	flask --app coldsweat/app:create_app --debug fetch
 
-# Tests
+# Run Tests
 
 test:
 	python -m pytest

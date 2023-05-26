@@ -7,13 +7,11 @@ from xml.etree import ElementTree
 from flask import current_app as app
 
 from peewee import JOIN, fn, IntegrityError
-from flask import current_app as app
 
-from coldsweat.models import (database, Entry, Feed, Group, Read, Saved,
+from coldsweat.models import (Entry, Feed, Group, Read, Saved,
                               Subscription)
 
 from .utilities import make_sha1_hash, scrub_url
-import coldsweat.config as config
 from .fetcher import Fetcher
 
 

@@ -7,10 +7,11 @@ from .config import Config
 
 def create_app(config_class=Config):
     app = flask.Flask(__name__)
-    # app.config.from_object(config_class)
+    app.config.from_object(config_class)
     app.secret_key = 'super secret string'  # Change this!
 
     # Initialize Flask extensions here
+    models.db_wrapper.init_app(app)
 
     login_manager = flask_login.LoginManager()
     login_manager.init_app(app)
@@ -44,15 +45,6 @@ def create_app(config_class=Config):
 
     # Add CLI support
     cli.add_commands(app)
-
-    @app.before_request
-    def before_request():
-        models.database.connect(reuse_if_open=True)
-
-    @app.after_request
-    def after_request(response):
-        models.database.close()
-        return response
 
     return app
 

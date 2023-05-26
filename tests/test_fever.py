@@ -1,5 +1,3 @@
-import subprocess
-
 import pytest
 from datetime import datetime
 
@@ -25,7 +23,7 @@ def app():
     })
 
     # Make sure we have a test user in database
-    
+
     global test_user
     global test_api_key
 

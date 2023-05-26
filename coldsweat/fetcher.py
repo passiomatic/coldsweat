@@ -62,7 +62,7 @@ class Fetcher(object):
         '''
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
-        app.logger.warn("%s has caused an error on server, skipped" % self.netloc)
+        app.logger.warning("%s has caused an error on server, skipped" % self.netloc)
         raise HTTPInternalServerError
 
     def handle_403(self, response):
@@ -71,7 +71,7 @@ class Fetcher(object):
         '''
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
-        app.logger.warn("%s access was denied, skipped" % self.netloc)
+        app.logger.warning("%s access was denied, skipped" % self.netloc)
         raise HTTPForbidden
 
     def handle_404(self, response):
@@ -90,7 +90,7 @@ class Fetcher(object):
         self.feed.is_enabled = False
         self.feed.error_count += 1
         self.feed.last_statu = response.status_code
-        app.logger.warn("%s is gone, disabled" % self.netloc)
+        app.logger.warning("%s is gone, disabled" % self.netloc)
         self._synthesize_entry('Feed has been removed from the origin server.')
         raise HTTPGone
 
@@ -121,7 +121,7 @@ class Fetcher(object):
             self.feed.last_status = DuplicatedFeedError.code
             self.feed.error_count += 1
             self._synthesize_entry('Feed has a duplicated web address.')
-            app.logger.warn(
+            app.logger.warning(
                 "new %s location %s is duplicated, disabled" % (
                     self.netloc, self_link))
             raise DuplicatedFeedError
@@ -165,7 +165,7 @@ class Fetcher(object):
             # Record any network error as 'Service Unavailable'
             self.feed.last_status = HTTPServiceUnavailable.code
             self.feed.error_count += 1
-            app.logger.warn(
+            app.logger.warning(
                 "a network error occured while fetching %s, skipped"
                 % self.netloc)
             self.check_feed_health()
@@ -187,7 +187,7 @@ class Fetcher(object):
                 handler(response)
             else:
                 self.feed.last_status = status
-                app.logger.warn(
+                app.logger.warning(
                     "%s replied with unhandled status %d, aborted" % (
                         self.netloc, status))
                 return
@@ -206,7 +206,7 @@ class Fetcher(object):
             self._synthesize_entry(
                 'Feed has accumulated too many errors (last was %s).'
                 % filters.status_title(self.feed.last_status))
-            app.logger.warn(
+            app.logger.warning(
                 "%s has accomulated too many errors, disabled" % self.netloc)
             self.feed.is_enabled = False
 
@@ -240,7 +240,7 @@ class Fetcher(object):
             guid = t.get_guid(default=link)
 
             if not guid:
-                app.logger.warn(
+                app.logger.warning(
                     'could not find GUID for entry from %s, skipped'
                     % self.netloc)
                 continue
@@ -296,7 +296,7 @@ class Fetcher(object):
         try:
             response = fetch_url(endpoint)
         except RequestException as exc:
-            app.logger.warn("could not fetch favicon for %s (%s)" % (url, exc))
+            app.logger.warning("could not fetch favicon for %s (%s)" % (url, exc))
             return Feed.DEFAULT_ICON
 
         return make_data_uri(

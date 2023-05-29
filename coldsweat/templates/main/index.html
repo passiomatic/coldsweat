@@ -2,6 +2,8 @@
 
 {% block container_block %} 
     <section class="panel">
+        {% block panel_block %} 
+        {% endblock %}
         <footer role="contentinfo">    
             <div class="dim">Coldsweat&ensp;<i title="Loves" class="fa fa-heart"></i>&ensp;Your Feeds&ensp;&middot;&ensp;<a data-remote-modal href="{{application_url}}/cheatsheet">Cheatsheet</a>
             </div>
@@ -24,8 +26,8 @@
             <li><a data-toggle="tooltip" class="add-trigger" href="{{application_url}}/feeds/add/1" data-placement="right" title="Add feed subscription" data-remote-modal="modal-add-subscription"><i class="fa fa-plus-square fa-fw"></i></a></li>                                    
             <li class="sep"><li class="dropdown"><a data-toggle="dropdown" href="#"><i class="fa fa-user fa-fw"></i></a>   
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="{{application_url}}/profile" data-remote-modal>Your profile</a>
-                    <li><a href="{{application_url}}/logout">Log out</a>
+                    <li><a href="#" data-remote-modal>Your profile</a>
+                    <li><a href="{{ url_for('main.logout') }}">Log out</a>
                 </ul>
             </li>
         </ul>

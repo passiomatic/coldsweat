@@ -64,9 +64,10 @@ class User(db_wrapper.Model):
     """
 
     DEFAULT_USERNAME = 'coldsweat'
-    MIN_PASSWORD_LENGTH = 8
+    MIN_PASSWORD_LENGTH = 12
 
     username = CharField(unique=True)
+    #display_name = CharField(default='')
     email = CharField(default='')
     api_key = CharField(unique=True)
     is_enabled = BooleanField(default=True)

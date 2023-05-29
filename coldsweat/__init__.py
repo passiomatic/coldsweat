@@ -1,18 +1,18 @@
 '''
 Coldsweat - RSS aggregator and web reader compatible with the Fever API
 '''
-
 __version__ = (0, 10, 0, '')
 VERSION_STRING = '%d.%d.%d%s' % __version__
 
-import flask
-import flask_login
-import coldsweat.models as models
-import coldsweat.cli as cli
-from .config import Config
-from .main.routes import SessionUser
-from .main import bp as main_blueprint
 from .fever import bp as fever_blueprint
+from .main import bp as main_blueprint
+from .main.routes import SessionUser
+from .config import Config
+import coldsweat.cli as cli
+import coldsweat.models as models
+import flask_login
+import flask
+
 
 def create_app(config_class=Config):
     app = flask.Flask(__name__)
@@ -27,22 +27,20 @@ def create_app(config_class=Config):
 
     @login_manager.user_loader
     def user_loader(email):
-        if not models.User.get_or_none(email=email):
-            return
+        user = models.User.get_or_none(email=email)
+        if not user:
+            return None
 
-        user = SessionUser()
-        user.id = email
-        return user
+        return SessionUser(user)
 
     @login_manager.request_loader
     def request_loader(request):
         email = request.form.get('email')
-        if not models.User.get_or_none(email=email):
-            return
+        user = models.User.get_or_none(email=email)
+        if not user:
+            return None
 
-        user = SessionUser()
-        user.id = email
-        return user
+        return SessionUser(user)
 
     # Register main app routes
     app.register_blueprint(main_blueprint)
@@ -54,4 +52,3 @@ def create_app(config_class=Config):
     cli.add_commands(app)
 
     return app
-

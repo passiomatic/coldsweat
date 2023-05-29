@@ -1,14 +1,25 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 '''
-Description: feed autodiscovery tests.
-
-Copyright (c) 2013—2016 Andrea Peltrin
-License: MIT (see LICENSE for details)
+Feed autodiscovery tests
 '''
 
 from os import path
+import pytest
 from coldsweat.markup import find_feed_links
+
+test_dir = path.dirname(path.abspath(__file__))
+
+
+@pytest.mark.parametrize("filename, expected_url", [
+    ('discovery/html5-xhtml.html', 'http://example.com/feed'),
+    ('discovery/xhtml.html', 'http://somedomain.com/articles.xml'),
+    ('discovery/html4-base.html', 'http://somedomain.com/articles.xml'),
+    ('discovery/html4-no-base.html', 'http://example.com/articles.xml'),
+]
+)
+def test_discovery(filename, expected_url):
+    with open(path.join(test_dir, filename)) as f:
+        url, _ = find_feed_link(f.read(), 'http://example.com')
+        assert url == expected_url
 
 
 def find_feed_link(data, base_url):
@@ -16,22 +27,3 @@ def find_feed_link(data, base_url):
     if links:
         return links[0]
     return None
-
-
-def test_discovery():
-
-    # Figure out current dir
-    test_dir = path.dirname(path.abspath(__file__))
-
-    test_files = [
-        ('discovery/html5-xhtml.html', 'http://example.com/feed'),
-        ('discovery/xhtml.html', 'http://somedomain.com/articles.xml'),
-        ('discovery/html4-base.html', 'http://somedomain.com/articles.xml'),
-        ('discovery/html4-no-base.html', 'http://example.com/articles.xml'),
-    ]
-
-    for filename, expected_url in test_files:
-        with open(path.join(test_dir, filename)) as f:
-            url, title = find_feed_link(f.read(), 'http://example.com')
-            assert url == expected_url
-            print('Found', url, title, '(OK)')

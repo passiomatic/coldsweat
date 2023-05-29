@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Description: HTML parsers and manipulation functions
-
-Copyright (c) 2013—2016 Andrea Peltrin
-Portions are copyright (c) 2006 Aaron Swartz
-Portions are copyright (c) 2002–4 Mark Pilgrim
-"""
+'''
+HTML parsers and manipulation functions
+'''
 
 from html.parser import HTMLParser
 import urllib.parse as urlparse
-#from flask import current_app as app
+# from flask import current_app as app
 
 from . filters import escape_html
 

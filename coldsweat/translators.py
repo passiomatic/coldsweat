@@ -1,15 +1,8 @@
-# -*- coding: utf-8 -*-
 '''
-Description: translates feed and entries fields to Coldsweat nomenclature
-
-Copyright (c) 2013—2016 Andrea Peltrin
-License: MIT (see LICENSE for details)
+Translates feed and entries fields to Coldsweat nomenclature
 '''
-#from flask import current_app as app
 from . utilities import tuple_as_datetime, scrub_url, truncate
-
 from . models import Feed, Entry
-
 from . import markup
 
 __all__ = [

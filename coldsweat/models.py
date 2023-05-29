@@ -1,19 +1,15 @@
-"""
+'''
 Database models
-"""
+'''
 import pickle
-
 from datetime import datetime
-
 from playhouse.signals import (pre_save, Model)
 from playhouse.flask_utils import FlaskDB
-
 from peewee import (BlobField, BooleanField, CharField, DateTimeField,
                     ForeignKeyField,
                     IntegerField, IntegrityError,
                     TextField)
 from passlib import context
-
 from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
 
 __all__ = [

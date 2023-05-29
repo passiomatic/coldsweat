@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-Description: Template filters
+'''
+Template filters
+'''
 
-Copyright (c) 2013—2016 Andrea Peltrin
-License: MIT (see LICENSE for details)
-"""
 import html
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import urllib.parse as urlparse
 
 from webob.exc import status_map

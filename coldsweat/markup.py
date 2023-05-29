@@ -238,7 +238,7 @@ class Scrubber(BaseProcessor):
 def _parse(parser, data):
     try:
         parser.feed(data)
-    except (HTMLParseError, AssertionError) as exc:
+    except AssertionError as exc:
         # Log exception and raise it again
         # app.logger.debug(u'could not parse markup (%s)' % exc.msg)
         raise exc

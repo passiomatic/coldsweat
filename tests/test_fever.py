@@ -1,9 +1,9 @@
 import pytest
 from datetime import datetime
 
+from coldsweat import create_app
 from coldsweat.utilities import datetime_as_epoch
 from coldsweat.models import User
-from coldsweat.app import create_app
 
 API_ENDPOINT = "/fever/"
 TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD = 'test', 'test@example.com', 'secret'

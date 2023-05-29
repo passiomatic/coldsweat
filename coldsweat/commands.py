@@ -33,14 +33,15 @@ from . import frontend
 
 from . app_old import ExceptionMiddleware, ROUTES
 from coldsweat import (installation_dir,
-                       template_dir,
-                       FEED_TAG_URI,
+                       template_dir,                  
                        VERSION_STRING)
 
 from . utilities import (render_template,
                          make_sha1_hash,
                          format_http_datetime)
 from . import filters
+
+FEED_TAG_URI = 'tag:lab.passiomatic.com,2017:coldsweat:feed:%s'
 
 # Ensure all web server activity is logged on stdout
 #   and not stderr like default WSGIRequestHandler

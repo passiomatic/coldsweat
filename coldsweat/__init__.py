@@ -2,67 +2,56 @@
 Coldsweat - RSS aggregator and web reader compatible with the Fever API
 '''
 
-__author__ = 'Andrea Peltrin'
 __version__ = (0, 10, 0, '')
-__license__ = 'MIT'
-
-__all__ = [
-    'VERSION_STRING',
-    'USER_AGENT',
-
-    # Synthesized entries and feed URI's
-    'FEED_TAG_URI',
-    'ENTRY_TAG_URI',
-]
-
 VERSION_STRING = '%d.%d.%d%s' % __version__
-USER_AGENT = ('Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/'
-              'coldsweat/>' % VERSION_STRING)
 
-FEED_TAG_URI = 'tag:lab.passiomatic.com,2017:coldsweat:feed:%s'
-ENTRY_TAG_URI = 'tag:lab.passiomatic.com,2017:coldsweat:entry:%s'
+import flask
+import flask_login
+import coldsweat.models as models
+import coldsweat.cli as cli
+from .config import Config
+from .main.routes import SessionUser
+from .main import bp as main_blueprint
+from .fever import bp as fever_blueprint
 
-# Figure out installation directory. This has
-#  to work for the fetcher script too
+def create_app(config_class=Config):
+    app = flask.Flask(__name__)
+    app.config.from_object(config_class)
+    app.secret_key = 'super secret string'  # Change this!
 
-# installation_dir = os.environ.get("COLDSWEAT_INSTALL_DIR")
+    # Initialize Flask extensions here
+    models.db_wrapper.init_app(app)
 
-# if not installation_dir:
-#     installation_dir, _ = os.path.split(
-#         os.path.dirname(os.path.abspath(__file__)))
+    login_manager = flask_login.LoginManager()
+    login_manager.init_app(app)
 
-# template_dir = os.path.join(installation_dir, 'coldsweat/templates')
+    @login_manager.user_loader
+    def user_loader(email):
+        if not models.User.get_or_none(email=email):
+            return
 
-# ------------------------------------------------------
-# Load up configuration settings
-# ------------------------------------------------------
+        user = SessionUser()
+        user.id = email
+        return user
 
-# config_path = os.environ.get("COLDSWEAT_CONFIG_PATH")
+    @login_manager.request_loader
+    def request_loader(request):
+        email = request.form.get('email')
+        if not models.User.get_or_none(email=email):
+            return
 
-# if not config_path:
-#     config_path = os.path.join(installation_dir, 'config')
+        user = SessionUser()
+        user.id = email
+        return user
 
-# config = load_config(config_path)
+    # Register main app routes
+    app.register_blueprint(main_blueprint)
 
-# ------------------------------------------------------
-# Configure logger
-# ------------------------------------------------------
+    # Register Fever API routes
+    app.register_blueprint(fever_blueprint)
 
-# Shared logger instance
-# for module in 'peewee', 'requests':
-#     logging.getLogger(module).setLevel(logging.WARN)
+    # Add CLI support
+    cli.add_commands(app)
 
-# logger = logging.getLogger()
+    return app
 
-# if config.log.filename == 'stderr':
-#     logger.addHandler(logging.StreamHandler())
-#     logger.setLevel(config.log.level)
-# elif config.log.filename:
-#     logging.basicConfig(
-#         filename=config.log.filename,
-#         level=getattr(logging, config.log.level),
-#         format='[%(asctime)s] %(process)d %(levelname)s %(message)s',
-#     )
-# else:
-#     # Silence is golden
-#     logger.addHandler(logging.NullHandler())

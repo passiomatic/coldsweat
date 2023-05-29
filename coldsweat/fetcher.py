@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''
 The feed fetcher
 '''
@@ -12,16 +11,14 @@ import feedparser
 import requests
 from requests.exceptions import RequestException
 from webob.exc import (
-                       HTTPGone,
-                       HTTPNotModified,
-                       HTTPServiceUnavailable,
-                       HTTPNotFound,
-                       HTTPInternalServerError,
-                       HTTPForbidden,
-                       HTTPError)
+    HTTPGone,
+    HTTPNotModified,
+    HTTPServiceUnavailable,
+    HTTPNotFound,
+    HTTPInternalServerError,
+    HTTPForbidden,
+    HTTPError)
 from webob.exc import status_map
-from coldsweat import (USER_AGENT, ENTRY_TAG_URI)
-
 from .models import (Entry, Feed)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
@@ -29,7 +26,7 @@ from .utilities import (datetime_as_epoch,
                         make_sha1_hash,
                         make_data_uri,
                         make_nonce)
-
+from . import VERSION_STRING
 from . import filters
 
 __all__ = [
@@ -41,6 +38,9 @@ FETCH_TIMEOUT = 10  # Seconds
 MIN_FETCH_INTERVAL = 60*3  # Seconds
 MAX_FETCH_ERRORS = 50
 FETCH_ICONS_INTERVAL = 30  # Days
+ENTRY_TAG_URI = 'tag:lab.passiomatic.com,2017:coldsweat:entry:%s'
+USER_AGENT = ('Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/'
+              'coldsweat/>' % VERSION_STRING)
 
 
 class Fetcher(object):
@@ -62,7 +62,8 @@ class Fetcher(object):
         '''
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
-        app.logger.warning("%s has caused an error on server, skipped" % self.netloc)
+        app.logger.warning(
+            "%s has caused an error on server, skipped" % self.netloc)
         raise HTTPInternalServerError
 
     def handle_403(self, response):
@@ -298,7 +299,8 @@ class Fetcher(object):
         try:
             response = fetch_url(endpoint)
         except RequestException as exc:
-            app.logger.warning("could not fetch favicon for %s (%s)" % (url, exc))
+            app.logger.warning(
+                "could not fetch favicon for %s (%s)" % (url, exc))
             return Feed.DEFAULT_ICON
 
         return make_data_uri(

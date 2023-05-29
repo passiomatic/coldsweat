@@ -1,29 +1,31 @@
 <!doctype html>
 <!-- 
-Coldsweat {{version_string}}
-http://lab.passiomatic.com/coldsweat/
-Copyright (c) 2013–2016 Andrea Peltrin
+Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>{{page_title}} — Coldsweat</title>
+<title>{{page_title}} • Coldsweat</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="cleartype" content="on">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<link rel='stylesheet' href='/static/stylesheets/all.css?{{version_string}}'>
-<link rel="shortcut icon" href="/static/favicon.ico">
-<link rel="shortcut icon" href="/static/favicon.png" sizes="32x32">
-<link rel="apple-touch-icon" sizes="152x152" href="/static/images/apple-touch-icon.png">
+<link rel='stylesheet' href='{{ url_for("static", filename="stylesheets/all.css") }}'>
+<link rel="shortcut icon" href='{{ url_for("static", filename="favicon.ico") }}'>
+<link rel="shortcut icon" href='{{ url_for("static", filename="favicon.png") }}' sizes="32x32">
+<link rel="apple-touch-icon" sizes="152x152" href='{{ url_for("static", filename="images/apple-touch-icon.png") }}'>
 <meta name="apple-mobile-web-app-title" content="Coldsweat">
-<script src='/static/javascripts/vendor/head.load.min.js'></script>
+<script src='{{ url_for("static", filename="javascripts/vendor/head.load.min.js") }}'></script>
 {% block head_block %}{% endblock %}
 </head>
 <body>
 
 <div class="container">
-    {{alert_message}}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
     {% block container_block %}{% endblock %}
 </div><!-- container -->
 
@@ -31,29 +33,28 @@ Copyright (c) 2013–2016 Andrea Peltrin
 window.applicationURL = '{{application_url}}';
 head.js(
 // Libraries
-"{{static_url}}/javascripts/vendor/modernizr-min.js",
-"{{static_url}}/javascripts/vendor/jquery-min.js",
+'{{ url_for("static", filename="javascripts/vendor/jquery-min.js") }}',
 
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-transition.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-tooltip.js",
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-transition.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-tooltip.js") }}',
 
 // Popover has a dependency on tooltip, so make sure and include 
 // bootstrap-tooltip regardless in order for popovers to work
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-popover.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-modal.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-collapse.js",
-"{{static_url}}/javascripts/vendor/bootstrap/bootstrap-dropdown.js",
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-popover.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-modal.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-collapse.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-dropdown.js") }}',
 
 // Plugins
-"{{static_url}}/javascripts/plugins.js",
+'{{ url_for("static", filename="javascripts/plugins.js") }}',
 
 // App scripts
-"{{static_url}}/javascripts/app.js?{{version_string}}",
+'{{ url_for("static", filename="javascripts/app.js") }}',
 
 function() {    
-    // Do something when we are read
+    // Do something when we are ready
 });
 </script>
 

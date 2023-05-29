@@ -8,6 +8,9 @@ venv:
 install-deps:
 	python -m pip install -r requirements.txt 
 
+install-package:
+	pip install -e .  
+	
 build-css:
 	npm run build-css
 

@@ -28,7 +28,7 @@ from .models import (Entry, Group, Feed, Read, Saved, User,
 from .controllers import FeedController, UserController
 from .session import SessionMiddleware
 from .utilities import format_datetime, validate_url
-from . import filters
+#from . import filters
 
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60

@@ -27,7 +27,7 @@ from .utilities import (datetime_as_epoch,
                         make_data_uri,
                         make_nonce)
 from . import VERSION_STRING
-from . import filters
+#from . import filters
 
 __all__ = [
     'Fetcher',
@@ -206,7 +206,7 @@ class Fetcher(object):
         if self.feed.error_count > MAX_FETCH_ERRORS:
             self._synthesize_entry(
                 'Feed has accumulated too many errors (last was %s).'
-                % filters.status_title(self.feed.last_status))
+                % self.feed.last_status)
             app.logger.warning(
                 "%s has accomulated too many errors, disabled" % self.netloc)
             self.feed.is_enabled = False

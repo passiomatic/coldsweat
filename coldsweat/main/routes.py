@@ -43,10 +43,9 @@ def entry_list():
 def entry(entry_id):
     entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
-    # @@TODO
-    # mark_entry(entry, 'read')
-
     user = User.get(flask_login.current_user.id)
+    
+    feed.mark_entry(user, entry, 'read')
     query, view_variables = _make_view_variables(user)
     n = query.where(Entry.last_updated_on < entry.last_updated_on).order_by(
         Entry.last_updated_on.desc()).limit(1)

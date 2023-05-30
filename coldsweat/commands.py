@@ -39,7 +39,7 @@ from coldsweat import (installation_dir,
 from . utilities import (render_template,
                          make_sha1_hash,
                          format_http_datetime)
-from . import filters
+#from . import filters
 
 FEED_TAG_URI = 'tag:lab.passiomatic.com,2017:coldsweat:feed:%s'
 

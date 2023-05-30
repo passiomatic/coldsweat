@@ -39,8 +39,8 @@
                         <hr class="halved">
                     {% endif %}
                     <div class="meta dim">    
-                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on }} {%if entry.author%} by {{ entry.author }}{% endif %}
-                        {%if entry.link %}&emsp;<i class="fa fa-twitter"></i> <a title="Share on Twitter" target="_blank" href="http://twitter.com/home?status={{entry.title}}%20%E2%80%94%20{{entry.link}}">Twitter</a>{% endif %}                                                
+                        <i class="fa fa-info-circle"></i> Posted {{entry.last_updated_on|datetime }} {%if entry.author%} by {{ entry.author }}{% endif %}
+                        {%if entry.link %}&emsp;<i class="fa fa-twitter"></i> <a title="Share on Twitter" target="_blank" href="http://twitter.com/home?status={{entry.title|urlencode}}%20%E2%80%94%20{{entry.link|urlencode}}">Twitter</a>{% endif %}                                                
                     </div>
                 </article>    
             </div>

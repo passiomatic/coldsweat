@@ -1,112 +1,63 @@
 '''
-Template filters
+Custom Jinja Filters
 '''
 
-import html
-import urllib.request
-import urllib.parse
-import urllib.error
-import urllib.parse as urlparse
+from flask import current_app as app
 
 from webob.exc import status_map
 from . import utilities
 
-__all__ = []
 
-
-def filter(filtername):
-    '''
-    Define a filter
-    '''
-    def _(handler):
-        handler.name = filtername
-        __all__.append(handler.__name__)
-        return handler
-    return _
-# ------------------------------------------------------
-# Filters
-# ------------------------------------------------------
-
-
-@filter('html')
-def escape_html(value):
-    if value:
-        return html.escape(value, quote=True)
-    return ''
-
-
-@filter('url')
-def escape_url(value):
-    if value:
-        return urllib.parse.quote(utilities.encode(value))
-    return ''
-
-
-@filter('friendly_url')
+@app.template_filter('friendly_url')
 def friendly_url(value):
     if value:
-        u = urllib.parse.urlsplit(value)
-        return u.netloc
+        return utilities.friendly_url(value)
     return ''
 
 
-@filter('capitalize')
-def capitalize(value):
-    if value:
-        return value.capitalize()
-    return ''
-
-
-@filter('length')
-def length(value):
-    if value:
-        return len(list(value))
-    return 0
-
-
-@filter('datetime')
+@app.template_filter('datetime')
 def datetime(value):
     if value:
         return utilities.format_datetime(value)
     return '—'
 
 
-@filter('iso_datetime')
+@app.template_filter('iso_datetime')
 def iso_datetime(value):
     if value:
         return utilities.format_iso_datetime(value)
     return ''
 
 
-@filter('date')
+@app.template_filter('date')
 def date(value):
     if value:
         return utilities.format_date(value)
     return '—'
 
 
-@filter('since')
+@app.template_filter('since')
 def datetime_since(value):
     if value:
         return utilities.datetime_since(value)
     return '—'
 
 
-@filter('since_today')
+@app.template_filter('since_today')
 def datetime_since_today(value):
     if value:
         return utilities.datetime_since_today(value)
     return '—'
 
 
-@filter('epoch')
+@app.template_filter('epoch')
 def epoch(value):
     if value:
         return utilities.datetime_as_epoch(value)
     return '—'
 
 
-@filter('status_title')
+@app.template_filter('status_title')
 def status_title(code):
     title = 'Unknown (%s)' % code
     try:
@@ -114,24 +65,3 @@ def status_title(code):
     except KeyError:
         pass
     return title
-
-
-@filter('alert')
-def alert(message):
-    if not message:
-        return ''
-    try:
-        klass, text = message.split(' ', 1)
-    except ValueError:
-        return text
-    return '<div class="alert alert--%s">%s</div>' % (klass.lower(), text)
-
-
-def run_tests():
-
-    assert friendly_url('http://example.org/feed.xml') == 'example.org'
-    assert friendly_url(None) == ''
-
-
-if __name__ == '__main__':
-    run_tests()

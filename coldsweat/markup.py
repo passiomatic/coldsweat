@@ -5,8 +5,7 @@ HTML parsers and manipulation functions
 from html.parser import HTMLParser
 import urllib.parse as urlparse
 # from flask import current_app as app
-
-from . filters import escape_html
+import markupsafe
 
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
 HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
@@ -78,7 +77,7 @@ class BaseProcessor(BaseParser):
         #   value have been removed and character and entity references
         #   have been replaced. Starting Python 2.6 all entity references from
         #   htmlentitydefs are replaced in the attribute values
-        s = "".join([' %s="%s"' % (key, escape_html(value)) for key, value in
+        s = "".join([' %s="%s"' % (key, markupsafe.escape(value)) for key, value in
                      attrs])
         if self.xhtml_mode and (tag in self.void_elements):
             self.pieces.append("<%s%s />" % (tag, s))

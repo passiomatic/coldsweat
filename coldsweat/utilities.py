@@ -9,7 +9,6 @@ from hashlib import md5, sha1
 import base64
 from calendar import timegm
 from datetime import datetime
-from tempita import HTMLTemplate
 
 # --------------------
 # String utilities
@@ -88,6 +87,11 @@ def scrub_url(url):
     d = dict((k, v) for k, v in list(d.items()) if k not in BLACKLIST_QS)
     return urllib.parse.urlunsplit((scheme, netloc, path,
                                     urllib.parse.urlencode(d, doseq=True), fragment))
+
+
+def friendly_url(url):
+    u = urllib.parse.urlsplit(url)
+    return u.netloc
 
 # --------------------
 # Date/time functions
@@ -183,25 +187,6 @@ def datetime_since_today(value, comparison_value=None):
 # Misc.
 # --------------------
 
-# def render_template(filename, namespace):
-#     return HTMLTemplate.from_filename(filename,
-#                                       namespace=namespace).substitute()
-
-def render_template(filename, namespace, filters_module=None):
-    # Install template filters if given
-    if filters_module:
-        filters_namespace = {}
-        for name in filters_module.__all__:
-            filter = getattr(filters_module, name)
-            filters_namespace[filter.name] = filter
-        # @@HACK Remove conflicting filter with HTMLTemplate
-        del filters_namespace['html']
-        # Update namespace, possibly overriding names
-        namespace.update(filters_namespace)
-    return HTMLTemplate.from_filename(filename,
-                                      namespace=namespace).substitute()
-
-
 class Struct(dict):
     """
     An object that recursively builds itself from a dict
@@ -248,7 +233,6 @@ def run_tests():
     assert validate_url('https://example.com')
     assert validate_url('http://example.org/feed.xml')
     assert not validate_url('example.com')
+    assert friendly_url('http://example.org/feed.xml') == 'example.org'
+    assert friendly_url(None) == ''
 
-
-if __name__ == '__main__':
-    run_tests()

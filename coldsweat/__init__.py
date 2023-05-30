@@ -51,4 +51,7 @@ def create_app(config_class=Config):
     # Add CLI support
     cli.add_commands(app)
 
+    with app.app_context():
+        from . import filters  # noqa
+
     return app

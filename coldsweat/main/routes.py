@@ -37,6 +37,26 @@ def entry_list():
     return flask.render_template("main/entries.html", **view_variables)
 
 
+@bp.route('/feeds')
+@flask_login.login_required
+def feed_list():
+    '''
+    Show subscribed feeds
+    '''
+    offset, group_id, feed_id, filter_class, panel_title, page_title = \
+        0, 0, 0, 'feeds', 'Feeds', 'Feeds'
+
+    user = User.get(flask_login.current_user.id)
+    offset = flask.request.args.get('offset', 0, type=int)
+    max_errors = 100
+    groups = feed.get_groups(user)
+    count, query = feed.get_feeds(user, Feed.id).count(), feed.get_feeds(user)
+    feeds = query.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
+    offset += FEEDS_PER_PAGE
+
+    return flask.render_template('main/feeds.html', **locals())
+
+
 def _make_view_variables(user):
 
     count, group_id, feed_id, filter_name, \

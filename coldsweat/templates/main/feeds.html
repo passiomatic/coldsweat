@@ -1,48 +1,44 @@
-{{py:
-def feed_status(feed, threshold):
-    if not feed.is_enabled:
-        return 'status-disabled'
-    if threshold and feed.error_count > (threshold * .80):
-        return 'status-sick'
-    return ''
-}}
+{% extends "main/index.html" %}
 
+{% macro feed_status(feed, threshold) %}
+    {% if not feed.is_enabled %}
+        status-disabled
+    {% endif %}          
+    {% if threshold and feed.error_count > (threshold * 0.80) %}
+        status-sick
+    {% endif %}          
+{% endmacro %}
 
-{{def render_feeds}}
-    {{for loop, f in looper(feeds)}}
-        <li class="feed {{if loop.first}}current{{endif}} {{feed_status(f, max_errors)}}">
+{% macro render_feeds() %}
+    {% for f in feeds %}
+        <li class="feed {% if loop.first %}current{% endif %} {{feed_status(f, max_errors)}}">
             <div class="item-inner">
                 <h3 class="h4">
-                    <img class="favicon" src="{{f.icon_or_default}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title|html}}</a>
+                    <img class="favicon" src="{{f.icon_or_default}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{application_url}}/?feed={{f.id}}">{{f.title}}</a>
                 </h3>
                 <div class="meta dim">
                     <span class="feed">
-                        {{if f.entry_count}}{{f.entry_count}}{{else}}No{{endif}} entries
+                        {%if f.entry_count%}{{f.entry_count }}{% else %}No{% endif %} entries
                     </span>
                     <span class="actions">
 <a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit">About</a>&ensp;&middot;&ensp;
 <a href="{{application_url}}/feeds/remove/{{f.id}}" data-remote-modal>Remove</a>
-{{if not f.is_enabled}}&ensp;&middot;&ensp;<a href="{{application_url}}/feeds/enable/{{f.id}}" data-remote-modal>Enable Again</a>{{endif}}
+{% if not f.is_enabled %}&ensp;&middot;&ensp;<a href="{{application_url}}/feeds/enable/{{f.id}}" data-remote-modal>Enable Again</a>{% endif %}
                     </span>
                 </div>                                              
             </div>
         </li>
-    {{endfor}}
-    {{if offset < count }}
+    {% endfor %}
+    {% if offset < count %}
         <li class="more">
             <a href="{{application_url}}/feeds/?offset={{offset}}">More</a>
         </li>
-    {{endif}}            
-{{enddef}}
+    {% endif %}            
+{% endmacro %}
 
-{{# Ajax request?}}
-{{if request.is_xhr}}
-    {{render_feeds()}}
-{{else}}
-    {{inherit "index.html"}}
-    
-    {{def panel_block}}
-    {{if count}}
+ 
+{% block panel_block %}
+    {% if count %}
         <div class="panel-content">
             <ul class="view list-view">                    
                     <li class="heading">
@@ -51,12 +47,12 @@ def feed_status(feed, threshold):
                 {{render_feeds()}}
             </ul>
         </div>
-    {{else}}
+    {% else %}
         <div class="notice">
             <p><i class="fa fa-tint fa-4x"></i>
             No feeds found.</p>
             <a class="btn btn-small btn-default" href="{{application_url}}/feeds/add/1" data-remote-modal="modal-add-subscription">Add Feed Subscription</a>
         </div>
-    {{endif}}
-    {{enddef}}
-{{endif}}
+    {% endif %}
+{% endblock %}
+ 

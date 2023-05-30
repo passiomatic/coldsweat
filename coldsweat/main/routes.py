@@ -1,6 +1,7 @@
 import flask
 import flask_login
 from coldsweat.models import (User, Feed, Group, Entry, Read, Saved)
+from playhouse.flask_utils import get_object_or_404
 import coldsweat.feed as feed
 from coldsweat.main import bp
 
@@ -35,6 +36,29 @@ def entry_list():
     })
 
     return flask.render_template("main/entries.html", **view_variables)
+
+
+@bp.route('/entries/<int:entry_id>')
+@flask_login.login_required
+def entry(entry_id):
+    entry = get_object_or_404(Entry, (Entry.id == entry_id))
+
+    # @@TODO
+    # mark_entry(entry, 'read')
+
+    user = User.get(flask_login.current_user.id)
+    query, view_variables = _make_view_variables(user)
+    n = query.where(Entry.last_updated_on < entry.last_updated_on).order_by(
+        Entry.last_updated_on.desc()).limit(1)
+
+    view_variables.update({
+        'entry': entry,
+        'page_title': entry.title,
+        'next_entries': n,
+        'count': 0  # Fake it
+    })
+
+    return flask.render_template('main/entry.html', **view_variables)
 
 
 @bp.route('/feeds')

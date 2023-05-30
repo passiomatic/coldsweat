@@ -5,11 +5,6 @@ from . utilities import tuple_as_datetime, scrub_url, truncate
 from . models import Feed, Entry
 from . import markup
 
-__all__ = [
-    'FeedTranslator',
-    'EntryTranslator'
-]
-
 
 class FeedTranslator(object):
 

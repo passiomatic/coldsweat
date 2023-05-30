@@ -1,11 +1,11 @@
 {% extends "main/index.html" %}
 
 {% macro render_groups() %}
-    {% for g in groups %}
+    {% for group in groups %}
         <li class="group {% if loop.first %}current{% endif %}">
             <div class="item-inner">
                 <h3 class="h4">
-                        <i class="favicon fa fa-folder-o fa-fw"></i><a title="Show all entries for group" href="{{application_url}}/entries/?group={{g.id}}">{{g.title}}</a>
+                        <i class="favicon fa fa-folder-o fa-fw"></i><a title="Show all entries for group" href="{{ url_for('main.entry_list', group=group.id) }}">{{group.title}}</a>
                 </h3>
             </div>
         </li>

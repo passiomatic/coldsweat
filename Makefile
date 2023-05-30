@@ -21,7 +21,7 @@ run:
 	flask --app coldsweat run --debug
 
 fetch:
-	flask --app coldsweat/app:create_app --debug fetch
+	flask --app coldsweat --debug fetch
 
 # Run Tests
 

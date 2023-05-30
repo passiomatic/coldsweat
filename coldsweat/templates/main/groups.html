@@ -1,30 +1,24 @@
-{{def render_groups}}
-    {{for loop, g in looper(groups)}}
-        <li class="group {{if loop.first}}current{{endif}}">
+{% extends "main/index.html" %}
+
+{% macro render_groups() %}
+    {% for g in groups %}
+        <li class="group {% if loop.first %}current{% endif %}">
             <div class="item-inner">
                 <h3 class="h4">
-                        <i class="favicon fa fa-folder-o fa-fw"></i><a title="Show all entries for group" href="{{application_url}}/entries/?group={{g.id}}">{{g.title|html}}</a>
+                        <i class="favicon fa fa-folder-o fa-fw"></i><a title="Show all entries for group" href="{{application_url}}/entries/?group={{g.id}}">{{g.title}}</a>
                 </h3>
-                <!-- <div class="meta dim">
-                </div>                                               -->
             </div>
         </li>
-    {{endfor}}
-    {{if offset < count }}
+    {% endfor %}
+    {% if offset < count %}
         <li class="more">
             <a href="{{application_url}}/groups/?offset={{offset}}">More</a>
         </li>
-    {{endif}}            
-{{enddef}}
+    {% endif %}       
+{% endmacro %}
 
-{{# Ajax request?}}
-{{if request.is_xhr}}
-    {{render_feeds()}}
-{{else}}
-    {{inherit "index.html"}}
-    
-    {{def panel_block}}
-    {{if count}}
+{% block panel_block %}
+    {% if count %}
         <div class="panel-content">
             <ul class="view list-view">       
                 <li class="heading">
@@ -33,11 +27,11 @@
                 {{render_groups()}}
             </ul>
         </div>
-    {{else}}
+    {% else %}
         <div class="notice">
             <p><i class="fa fa-tint fa-4x"></i>
             No groups found.</p>
         </div>
-    {{endif}}
-    {{enddef}}
-{{endif}}
+    {% endif %}
+{% endblock %}
+ 

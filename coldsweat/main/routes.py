@@ -46,8 +46,8 @@ def feed_list():
     offset, group_id, feed_id, filter_class, panel_title, page_title = \
         0, 0, 0, 'feeds', 'Feeds', 'Feeds'
 
-    user = User.get(flask_login.current_user.id)
     offset = flask.request.args.get('offset', 0, type=int)
+    user = User.get(flask_login.current_user.id)
     max_errors = 100
     groups = feed.get_groups(user)
     count, query = feed.get_feeds(user, Feed.id).count(), feed.get_feeds(user)
@@ -55,6 +55,24 @@ def feed_list():
     offset += FEEDS_PER_PAGE
 
     return flask.render_template('main/feeds.html', **locals())
+
+
+@bp.route('/groups')
+@flask_login.login_required
+def group_list():
+    '''
+    Show feed groups
+    '''
+    offset, group_id, filter_class, panel_title, page_title = \
+        0, 0, 'groups', 'Groups', 'Groups'
+
+    offset = flask.request.args.get('offset', 0, type=int)
+    user = User.get(flask_login.current_user.id)
+    count, query = feed.get_groups(user).count(), feed.get_groups(user)
+    groups = query.offset(offset).limit(GROUPS_PER_PAGE)
+    offset += GROUPS_PER_PAGE
+
+    return flask.render_template('main/groups.html', **locals())
 
 
 def _make_view_variables(user):
@@ -96,7 +114,7 @@ def _make_view_variables(user):
         page_title = feed_.title
     elif 'all' in flask.request.args:
         count = feed.get_all_entries(user, Entry.id).count()
-        q = feed.get_all_entries()
+        q = feed.get_all_entries(user)
         panel_title = 'All'
         filter_class = filter_name = 'all'
         page_title = 'All'
@@ -112,16 +130,10 @@ def _make_view_variables(user):
 
     return q, locals()
 
-
-# @bp.route('/protected')
-# @flask_login.login_required
-# def protected():
-#     return f'Logged in as: {flask_login.current_user.id}'
-
-
 # ---------
 # User auth
 # ---------
+
 
 class SessionUser(flask_login.UserMixin):
     '''

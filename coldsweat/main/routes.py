@@ -129,8 +129,8 @@ def _make_view_variables(user):
     elif 'feed' in flask.request.args:
         feed_id = int(flask.request.args['feed'])
         feed_ = Feed.get(Feed.id == feed_id)
-        count = feed.get_feed_entries(user, feed_, Entry.id).count()
-        q = feed.get_feed_entries(user, feed)
+        count = feed.get_feed_entries(user, feed_, Feed.id).count()
+        q = feed.get_feed_entries(user, feed_)
         panel_title = feed_.title
         filter_class = 'feeds'
         filter_name = f'feed={feed_id}'

@@ -67,8 +67,8 @@ class User(db_wrapper.Model):
     MIN_PASSWORD_LENGTH = 12
 
     username = CharField(unique=True)
-    #display_name = CharField(default='')
-    email = CharField(default='')
+    # display_name = CharField(default='')
+    email = CharField(unique=True)
     api_key = CharField(unique=True)
     is_enabled = BooleanField(default=True)
     password = BlobField(255)
@@ -79,7 +79,7 @@ class User(db_wrapper.Model):
     )
 
     def __repr__(self):
-        return "<%s|%s>" % (self.username, self.email)
+        return "<%s:%s>" % (self.id, self.email)
 
     class Meta:
         table_name = 'users'
@@ -158,7 +158,6 @@ class Group(db_wrapper.Model):
     title = CharField(unique=True)
 
     class Meta:
-        order_by = ('title',)
         table_name = 'groups'
 
 
@@ -170,23 +169,23 @@ class Feed(db_wrapper.Model):
     DEFAULT_ICON = _ICON
     MAX_TITLE_LENGTH = 255
 
-    is_enabled = BooleanField(default=True)           # Fetch feed?
-    self_link = TextField()   # The URL of the feed itself (rel=self)
+    is_enabled = BooleanField(default=True)
+    self_link = TextField()  # URL of the feed itself (rel=self)
     self_link_hash = CharField(unique=True, max_length=40)
     error_count = IntegerField(default=0)
+    title = CharField()
+    # URL associated with the feed (rel=alternate)
+    alternate_link = TextField(default='')
+    etag = CharField(default='')  # HTTP E-tag
 
-    # Nullable
+    # Nullable fields
 
-    title = CharField(null=True)
-    alternate_link = TextField(null=True)
-    # The URL of the HTML page associated with the feed (rel=alternate)
-    etag = CharField(null=True)                 # HTTP E-tag
-    last_updated_on = DateTimeField(null=True)             # As UTC
-    last_checked_on = DateTimeField(index=True, null=True)  # As UTC
+    last_updated_on = DateTimeField(null=True)
+    last_checked_on = DateTimeField(index=True, null=True)
     last_status = IntegerField(null=True)  # Last returned HTTP code
 
-    icon = TextField(null=True)  # Stored as data URI
-    icon_last_updated_on = DateTimeField(null=True)  # As UTC
+    icon = TextField(default='')  # Stored as data URI
+    icon_last_updated_on = DateTimeField(null=True)
 
     class Meta:
         table_name = 'feeds'
@@ -222,13 +221,10 @@ class Entry(db_wrapper.Model):
     content_type = CharField(default='text/html')
     content = TextField()
     # @@TODO: rename to published_on
-    last_updated_on = DateTimeField()  # As UTC
-
-    # Nullable
-
-    author = CharField(null=True)
-    link = TextField(null=True)
-    # If null the entry *must* provide a GUID
+    last_updated_on = DateTimeField()
+    author = CharField(default='')
+    link = TextField(default='')
+    # If empty the entry *must* provide a GUID
 
     class Meta:
         table_name = 'entries'
@@ -286,26 +282,13 @@ class Subscription(db_wrapper.Model):
         table_name = 'subscriptions'
 
 
-class Session(db_wrapper.Model):
-    """
-    Web session
-    """
-    key = CharField(unique=True)
-    value = PickleField()
-    expires_on = DateTimeField()
-
-    class Meta:
-        table_name = 'sessions'
-
-
 def setup(database):
     """
     Create database and tables for all models and setup bootstrap data
     """
     with database:
         database.create_tables([User, Feed, Entry, Group, Read, Saved,
-                                Subscription, Session],
-                               safe=True)
+                                Subscription], safe=True)
 
     # Create the bare minimum to bootstrap system
     try:

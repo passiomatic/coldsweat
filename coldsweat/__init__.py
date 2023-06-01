@@ -4,9 +4,10 @@ Coldsweat - RSS aggregator and web reader compatible with the Fever API
 __version__ = (0, 10, 0, '')
 VERSION_STRING = '%d.%d.%d%s' % __version__
 
-from .fever import bp as fever_blueprint
+from .auth import bp as auth_blueprint
 from .main import bp as main_blueprint
-from .main.routes import SessionUser
+from .fever import bp as fever_blueprint
+from .auth import SessionUser
 from .config import Config
 import coldsweat.cli as cli
 import coldsweat.models as models
@@ -41,6 +42,9 @@ def create_app(config_class=Config):
             return None
 
         return SessionUser(user)
+
+    # Register auth routes
+    app.register_blueprint(auth_blueprint)
 
     # Register main app routes
     app.register_blueprint(main_blueprint)

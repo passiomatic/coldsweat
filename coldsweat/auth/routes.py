@@ -15,12 +15,11 @@ def login():
     if user:
         session_user = SessionUser(user)
         flask_login.login_user(session_user)
-        return flask.redirect(flask.url_for('main'))
-
-    return 'Bad login'
+        return flask.redirect(flask.url_for('main.index'))
+    return flask.render_template("auth/login.html")
 
 
 @bp.route('/logout')
 def logout():
     flask_login.logout_user()
-    return 'Logged out'
+    return flask.redirect(flask.url_for('main.index'))

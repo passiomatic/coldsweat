@@ -24,11 +24,12 @@ def create_app(config_class=Config):
     models.db_wrapper.init_app(app)
 
     login_manager = flask_login.LoginManager()
+    login_manager.login_view = "auth.login"
     login_manager.init_app(app)
 
     @login_manager.user_loader
-    def user_loader(email):
-        user = models.User.get_or_none(email=email)
+    def user_loader(user_id):
+        user = models.User.get_or_none(user_id)
         if not user:
             return None
 

@@ -131,7 +131,7 @@ class Fetcher(object):
         '''
         OK plus redirects
         '''
-        self.feed.etag = response.headers.get('ETag', None)
+        self.feed.etag = response.headers.get('ETag', '')
         # Save final status code discarding redirects
         self.feed.last_status = response.status_code
 

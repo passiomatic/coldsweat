@@ -20,21 +20,19 @@ class FeedTranslator(object):
         # app.logger.debug(u'no feed timestamp found, using default')
         return default
 
-    # Nullable fields
-
     def get_author(self):
         if 'name' in self.feed_dict.get('author_detail', []):
             return self.feed_dict.author_detail.name
-        return None
+        return ''
 
     def get_alternate_link(self):
-        return self.feed_dict.get('link', None)
+        return self.feed_dict.get('link', '')
 
     def get_title(self):
         if 'title' in self.feed_dict:
             return truncate(markup.strip_html(self.feed_dict.title),
                             Feed.MAX_TITLE_LENGTH)
-        return None
+        return ''
 
 
 class EntryTranslator(object):
@@ -92,14 +90,15 @@ class EntryTranslator(object):
     # Nullable fields
 
     def get_link(self):
-        # Special case for FeedBurner entries, see: http://bit.ly/1gRAvJv
+        # Special case for FeedBurner entries
+        # https://stackoverflow.com/questions/25760622/difference-between-origlink-and-link-in-rss-feedback-xml-file
         if 'feedburner_origlink' in self.entry_dict:
             return scrub_url(self.entry_dict.feedburner_origlink)
         if 'link' in self.entry_dict:
             return scrub_url(self.entry_dict.link)
-        return None
+        return ''
 
     def get_author(self):
         if 'name' in self.entry_dict.get('author_detail', []):
             return self.entry_dict.author_detail.name
-        return None
+        return ''

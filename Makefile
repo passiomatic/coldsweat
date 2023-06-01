@@ -17,6 +17,10 @@ build-css:
 watch-css:
 	npm run watch-css
 
+setup:
+	flask --app coldsweat --debug setup
+	flask --app coldsweat --debug import subscriptions.opml
+
 run:
 	flask --app coldsweat run --debug
 

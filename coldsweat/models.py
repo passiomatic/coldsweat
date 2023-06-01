@@ -223,8 +223,7 @@ class Entry(db_wrapper.Model):
     # @@TODO: rename to published_on
     last_updated_on = DateTimeField()
     author = CharField(default='')
-    link = TextField(default='')
-    # If empty the entry *must* provide a GUID
+    link = TextField(default='')  # If empty the entry *must* provide a GUID
 
     class Meta:
         table_name = 'entries'
@@ -282,11 +281,11 @@ class Subscription(db_wrapper.Model):
         table_name = 'subscriptions'
 
 
-def setup(database):
+def setup():
     """
     Create database and tables for all models and setup bootstrap data
     """
-    with database:
+    with db_wrapper.database as database:
         database.create_tables([User, Feed, Entry, Group, Read, Saved,
                                 Subscription], safe=True)
 

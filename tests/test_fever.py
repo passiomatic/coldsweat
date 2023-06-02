@@ -4,6 +4,7 @@ from datetime import datetime
 from coldsweat import create_app
 from coldsweat.utilities import datetime_as_epoch
 from coldsweat.models import User
+from coldsweat.config import TestingConfig
 
 API_ENDPOINT = "/fever/"
 TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD = 'test', 'test@example.com', 'secret'
@@ -17,10 +18,7 @@ test_api_key = None
 
 @pytest.fixture()
 def app():
-    app = create_app()
-    app.config.update({
-        "TESTING": True,
-    })
+    app = create_app(config_class=TestingConfig)
 
     # Make sure we have a test user in database
 

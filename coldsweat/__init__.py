@@ -18,7 +18,6 @@ import flask
 def create_app(config_class=Config):
     app = flask.Flask(__name__)
     app.config.from_object(config_class)
-    app.secret_key = 'super secret string'  # Change this!
 
     # Initialize Flask extensions here
     models.db_wrapper.init_app(app)

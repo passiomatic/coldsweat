@@ -27,7 +27,12 @@ run:
 fetch:
 	flask --app coldsweat --debug fetch
 
-# Run Tests
+# Tests
+
+# make-test-db:
+# 	export FLASK_APP=coldsweat
+# 	flask setup alice@example.com -p secret-password -n "Alice Cooper"
+# 	flask import tests/subscriptions.opml alice@example.com
 
 test:
 	python -m pytest

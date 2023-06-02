@@ -1,4 +1,3 @@
-import sys
 from getpass import getpass
 import click
 import coldsweat.feed as feed
@@ -9,27 +8,27 @@ from .models import User
 def add_commands(app):
 
     @app.cli.command("setup")
-    def command_setup():
-        # @@REMOVEME: use only email instead
-        username = 'coldsweat'
-
+    @click.argument('email')
+    @click.option('-p', '--password',  help=f'User password, at least {User.MIN_PASSWORD_LENGTH} characters long)')  # noqa
+    @click.option('-n', '--name', default="", help='User display name')
+    def command_setup(email, password, name):
         models.setup()
 
-        # Regular setup process. Check if username is already in use
         try:
-            User.get(User.username == username)
+            User.get(User.email == email)
             raise ValueError(
-                'user %s already exists, please select another username with the -u option' % username)
+                f'user with email {email} already exists, please use another one')
         except User.DoesNotExist:
             pass
 
-        email = input(
-            'Enter e-mail for user %s (needed for Fever sync, '
-            'hit enter to leave blank): ' % username)
-        password = get_password("Enter password for user %s: " % username)
+        # @@TODO Check password length
+        if not password:
+            password = get_password(f"Enter password for user {email}: ")
 
-        User.create(username=username, email=email, password=password)
-        print("Setup completed for user %s." % username)
+        # @@REMOVEME: use only email instead
+        # @@TODO: pass display name
+        User.create(username=email, email=email, password=password)
+        print(f"Setup completed for {email}")
 
     @app.cli.command("fetch")
     def command_fetch():
@@ -59,31 +58,23 @@ def add_commands(app):
 
 
 def get_password(label):
+    '''
+    Get password from stdin
+    '''
 
     while True:
-        password = read_password(label)
+        password = getpass(label)
         if not User.validate_password(password):
             print(
                 'Error: password should be at least %d characters long'
                 % User.MIN_PASSWORD_LENGTH)
             continue
-        password_again = read_password("Enter password (again): ")
+        password_again = getpass("Enter password (again): ")
 
         if password != password_again:
             print("Error: passwords do not match, please try again")
         else:
             return password
-
-
-def read_password(prompt_label="Enter password: "):
-    if sys.stdin.isatty():
-        password = getpass(prompt_label)
-    else:
-        # Make scriptable by reading password from stdin
-        print(prompt_label)
-        password = sys.stdin.readline().rstrip()
-
-    return password
 
 
 def get_user(username):

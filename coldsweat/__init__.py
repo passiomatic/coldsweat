@@ -4,6 +4,7 @@ Coldsweat - RSS aggregator and web reader compatible with the Fever API
 __version__ = (0, 10, 0, '')
 VERSION_STRING = '%d.%d.%d%s' % __version__
 
+import os 
 from .auth import bp as auth_blueprint
 from .main import bp as main_blueprint
 from .fever import bp as fever_blueprint
@@ -18,6 +19,9 @@ import flask
 def create_app(config_class=Config):
     app = flask.Flask(__name__)
     app.config.from_object(config_class)
+
+    # Create instance path if needed
+    os.makedirs(app.instance_path, exist_ok=True)
 
     # Initialize Flask extensions here
     models.db_wrapper.init_app(app)
@@ -34,14 +38,15 @@ def create_app(config_class=Config):
 
         return SessionUser(user)
 
-    @login_manager.request_loader
-    def request_loader(request):
-        email = request.form.get('email')
-        user = models.User.get_or_none(email=email)
-        if not user:
-            return None
+    # @@TODO Use for API auth 
+    # @login_manager.request_loader
+    # def request_loader(request):
+    #     email = request.form.get('email')
+    #     user = models.User.get_or_none(email=email)
+    #     if not user:
+    #         return None
 
-        return SessionUser(user)
+    #     return SessionUser(user)
 
     # Register auth routes
     app.register_blueprint(auth_blueprint)

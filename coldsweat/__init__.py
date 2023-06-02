@@ -5,6 +5,9 @@ __version__ = (0, 10, 0, '')
 VERSION_STRING = '%d.%d.%d%s' % __version__
 
 import os 
+import flask_login
+import flask
+
 from .auth import bp as auth_blueprint
 from .main import bp as main_blueprint
 from .fever import bp as fever_blueprint
@@ -12,8 +15,6 @@ from .auth import SessionUser
 from .config import Config
 import coldsweat.cli as cli
 import coldsweat.models as models
-import flask_login
-import flask
 
 
 def create_app(config_class=Config):

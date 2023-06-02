@@ -9,7 +9,8 @@ from peewee import (BlobField, BooleanField, CharField, DateTimeField,
                     ForeignKeyField,
                     IntegerField, IntegrityError,
                     TextField)
-from passlib import context
+from werkzeug import security
+# from passlib import context
 from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
 
 __all__ = [
@@ -71,12 +72,7 @@ class User(db_wrapper.Model):
     email = CharField(unique=True)
     api_key = CharField(unique=True)
     is_enabled = BooleanField(default=True)
-    password = BlobField(255)
-
-    pw_context = context.CryptContext(
-        schemes=['pbkdf2_sha512', 'sha512_crypt'],
-        default='pbkdf2_sha512'
-    )
+    password = CharField(255)
 
     def __repr__(self):
         return "<%s:%s>" % (self.id, self.email)
@@ -100,28 +96,17 @@ class User(db_wrapper.Model):
         return user
 
     def check_password(self, input_password):
-        passed = User.pw_context.verify(input_password, self.password)
-        if not passed:
-            return False
-
-        elif User.pw_context.identify(self.password) != User.pw_context.default_scheme():  # noqa
-            self.password = User.pw_context.hash(input_password)
-            self.save()
-            return True
-        else:
-            return True
+        return security.check_password_hash(self.password, input_password)
 
     @staticmethod
-    def validate_credentials(username_or_email, password):
-        '''Lookup for and existing username/e-mail combo and password'''
+    def validate_credentials(email, password):
+        '''Check for an existing e-mail and password'''
         try:
-            user = User.get(((User.username == username_or_email) |
-                            (User.email == username_or_email)) &
+            user = User.get(((User.email == email)) &
                             (User.is_enabled == True))  # noqa
         except User.DoesNotExist:
             return None
 
-        # Do a case-sensitive compare
         if not user.check_password(password):
             return None
 
@@ -131,22 +116,11 @@ class User(db_wrapper.Model):
     def validate_password(password):
         return len(password) >= User.MIN_PASSWORD_LENGTH
 
-    def hash_password(self, raw=False):
-        """
-        Set password for user with specified encryption scheme
-
-        For a list of hash schemes see: https://wiki2.dovecot.org/Authentication/PasswordSchemes?action=recall&rev=46
-        """
-        if raw:
-            self.password = self.password
-        else:
-            self.password = User.pw_context.hash(self.password)
-
 
 @pre_save(sender=User)
 def on_user_save(model, user, created):
     user.api_key = User.make_api_key(user.email, user.password)
-    user.hash_password()
+    user.password = security.generate_password_hash(user.password)
 
 
 class Group(db_wrapper.Model):

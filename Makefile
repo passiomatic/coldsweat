@@ -60,4 +60,4 @@ clean:
 # Database 
 
 sql:
-	sqlite3 data/coldsweat.db
+	sqlite3 instance/coldsweat.db

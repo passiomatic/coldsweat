@@ -17,4 +17,3 @@ flask-login==0.6.2
 #PyMySQL
 # Connect Coldsweat to a PostgreSQL database (optional)
 #psycopg2
-passlib==1.7.4

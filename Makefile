@@ -29,10 +29,13 @@ fetch:
 
 # Tests
 
-# make-test-db:
-# 	export FLASK_APP=coldsweat
-# 	flask setup alice@example.com -p secret-password -n "Alice Cooper"
-# 	flask import tests/subscriptions.opml alice@example.com
+test-db:
+	rm ./instance/coldsweat-test.db
+	export FLASK_APP=coldsweat
+	export DATABASE_URL="sqlite:///instance/coldsweat-test.db"
+	flask setup alice@example.com -p secret-password -n "Alice Cooper"
+	flask import ./tests/subscriptions.xml alice@example.com
+	sqlite3 ./instance/coldsweat-test.db ".dump" > tests/test-data.sql
 
 test:
 	python -m pytest

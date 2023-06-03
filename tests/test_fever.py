@@ -1,9 +1,10 @@
-import pytest
+from pathlib import Path
 from datetime import datetime
+import pytest
 
 from coldsweat import create_app
 from coldsweat.utilities import datetime_as_epoch
-from coldsweat.models import User
+from coldsweat.models import User, db_wrapper
 from coldsweat.config import TestingConfig
 
 API_ENDPOINT = "/fever/"
@@ -15,24 +16,33 @@ default_params = {'api': ''}
 test_user = None
 test_api_key = None
 
+test_dir = Path(__file__).parent
+
 
 @pytest.fixture()
 def app():
     app = create_app(config_class=TestingConfig)
+    with open(test_dir.joinpath("test-data.sql"), 'r') as f:
+        print("@pytest.fixture()")
+        # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.executescript
+        sql = f.read()
+        db_wrapper.database.connection().executescript(sql)
 
     # Make sure we have a test user in database
 
-    global test_user
-    global test_api_key
+    # global test_user
+    # global test_api_key
 
-    test_user = User.get_or_none(User.email == TEST_EMAIL)
-    if not test_user:
-        test_user = User.create(username=TEST_USERNAME,
-                                email=TEST_EMAIL, password=TEST_PASSWORD)
+    # test_user = User.get_or_none(User.email == TEST_EMAIL)
+    # if not test_user:
+    #     test_user = User.create(username=TEST_USERNAME,
+    #                             email=TEST_EMAIL, password=TEST_PASSWORD)
 
-    test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
+    # test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
 
     yield app
+
+    db_wrapper.database.connection().close()
 
 
 @pytest.fixture()

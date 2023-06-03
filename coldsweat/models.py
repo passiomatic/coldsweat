@@ -10,7 +10,6 @@ from peewee import (BlobField, BooleanField, CharField, DateTimeField,
                     IntegerField, IntegrityError,
                     TextField)
 from werkzeug import security
-# from passlib import context
 from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
 
 __all__ = [

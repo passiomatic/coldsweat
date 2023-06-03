@@ -30,7 +30,7 @@ fetch:
 # Tests
 
 test-db:
-	rm ./instance/coldsweat-test.db
+	rm -f ./instance/coldsweat-test.db
 	export FLASK_APP=coldsweat
 	export DATABASE_URL="sqlite:///instance/coldsweat-test.db"
 	flask setup alice@example.com -p secret-password -n "Alice Cooper"

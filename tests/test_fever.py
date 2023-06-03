@@ -23,7 +23,6 @@ test_dir = Path(__file__).parent
 def app():
     app = create_app(config_class=TestingConfig)
     with open(test_dir.joinpath("test-data.sql"), 'r') as f:
-        print("@pytest.fixture()")
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.executescript
         sql = f.read()
         db_wrapper.database.connection().executescript(sql)

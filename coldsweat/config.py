@@ -15,5 +15,5 @@ class Config:
 
 
 class TestingConfig(Config):
-    DATABASE_URI = 'sqlite:///:memory:'
+    DATABASE_URL = 'sqlite:///:memory:'
     TESTING = True

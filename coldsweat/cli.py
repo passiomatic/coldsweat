@@ -7,7 +7,7 @@ from .models import User
 
 def add_commands(app):
 
-    @app.cli.command("setup")
+    @app.cli.command("setup", help="Set up a new Coldsweat database")
     @click.argument('email')
     @click.option('-p', '--password',  help=f'User password, at least {User.MIN_PASSWORD_LENGTH} characters long)')  # noqa
     @click.option('-n', '--name', default="", help='User display name')
@@ -30,11 +30,11 @@ def add_commands(app):
         User.create(username=email, email=email, password=password)
         print(f"Setup completed for {email}")
 
-    @app.cli.command("fetch")
+    @app.cli.command("fetch", help="Update all feeds")
     def command_fetch():
         feed.fetch_all_feeds()
 
-    @app.cli.command("import")
+    @app.cli.command("import", help="Import an OPML file for given user")
     @click.argument("filename")
     @click.argument("email")
     @click.option('-f', '--fetch', is_flag=True, default=False, help='Fetch subscriptions immediately after import')

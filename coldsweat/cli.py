@@ -37,23 +37,26 @@ def add_commands(app):
     @app.cli.command("import")
     @click.argument("filename")
     @click.argument("email")
-    @click.option('--fetch', default=False, help='Fetch subscriptions immediately after add')
+    @click.option('-f', '--fetch', is_flag=True, default=False, help='Fetch subscriptions immediately after import')
     def command_import(filename, email, fetch):
-        """Import an OPML file and add subscription to given user"""
-        # @@TODO Add fetch option
-        fetch_data = False
-
-        user = User.get(User.email == email)
+        '''
+        Import an OPML file and add subscription to given user
+        '''
+        try:
+            user = User.get(User.email == email)
+        except User.DoesNotExist:
+            raise ValueError(
+                f"unable to find user with email {email}. Please specify a different user or run setup command to create the desired user first")
 
         feeds = feed.add_feeds_from_opml(filename)
         for f, g in feeds:
             feed.add_subscription(user, f, g)
-        if fetch_data:
+        if fetch:
             # Fetch only imported feeds
             feed.fetch_feeds([f for f, _ in feeds])
 
         app.logger.info("import%s completed for user %s."
-                        % (' and fetch' if fetch_data else '',
+                        % (' and fetch' if fetch else '',
                            user.email))
 
 
@@ -75,13 +78,3 @@ def get_password(label):
             print("Error: passwords do not match, please try again")
         else:
             return password
-
-
-def get_user(username):
-    try:
-        user = User.get(User.username == username)
-    except User.DoesNotExist:
-        raise ValueError(
-            f"unable to find user '{username}'. Please specify a different user or run setup command to create the desired user first")
-
-    return user

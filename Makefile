@@ -29,12 +29,12 @@ fetch:
 
 # Tests
 
-test-db:
+create-test-data: export DATABASE_URL=sqlite:///instance/coldsweat-test.db
+
+create-test-data:
 	rm -f ./instance/coldsweat-test.db
-	export FLASK_APP=coldsweat
-	export DATABASE_URL="sqlite:///instance/coldsweat-test.db"
-	flask setup alice@example.com -p secret-password -n "Alice Cooper"
-	flask import ./tests/subscriptions.xml alice@example.com
+	flask --app coldsweat setup test@example.com -p secret-password -n "Test User"
+	flask --app coldsweat import ./tests/subscriptions.xml test@example.com -f
 	sqlite3 ./instance/coldsweat-test.db ".dump" > tests/test-data.sql
 
 test:

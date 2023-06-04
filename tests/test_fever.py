@@ -8,36 +8,26 @@ from coldsweat.models import User, db_wrapper
 from coldsweat.config import TestingConfig
 
 API_ENDPOINT = "/fever/"
-TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD = 'test', 'test@example.com', 'secret'
+TEST_EMAIL, TEST_PASSWORD = 'test@example.com', 'secret-password'
 ALL = ('groups feeds unread_item_ids saved_item_ids favicons items links '
        'unread_recently_read mark_item mark_feed mark_group mark_all').split()
 default_params = {'api': ''}
 
-test_user = None
 test_api_key = None
 
-test_dir = Path(__file__).parent
+TEST_DIR = Path(__file__).parent
 
 
 @pytest.fixture()
 def app():
     app = create_app(config_class=TestingConfig)
-    with open(test_dir.joinpath("test-data.sql"), 'r') as f:
+    with open(TEST_DIR.joinpath("test-data.sql"), 'r') as f:
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.executescript
         sql = f.read()
         db_wrapper.database.connection().executescript(sql)
 
-    # Make sure we have a test user in database
-
-    # global test_user
-    # global test_api_key
-
-    # test_user = User.get_or_none(User.email == TEST_EMAIL)
-    # if not test_user:
-    #     test_user = User.create(username=TEST_USERNAME,
-    #                             email=TEST_EMAIL, password=TEST_PASSWORD)
-
-    # test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
+    global test_api_key
+    test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
 
     yield app
 

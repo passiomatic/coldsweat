@@ -7,7 +7,7 @@ import flask
 from coldsweat.fever import bp
 
 from flask import current_app as app
-from coldsweat.utilities import Struct, datetime_as_epoch
+from coldsweat.utilities import datetime_as_epoch
 import coldsweat.feed as feed
 import coldsweat.models as models
 from coldsweat.models import (

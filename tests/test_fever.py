@@ -9,8 +9,6 @@ from coldsweat.config import TestingConfig
 
 API_ENDPOINT = "/fever/"
 TEST_EMAIL, TEST_PASSWORD = 'test@example.com', 'secret-password'
-ALL = ('groups feeds unread_item_ids saved_item_ids favicons items links '
-       'unread_recently_read mark_item mark_feed mark_group mark_all').split()
 default_params = {'api': ''}
 
 test_api_key = None
@@ -94,21 +92,43 @@ def test_items_since_id(client):
     assert len(r.json['items']) > 0
 
 
-def test_unread_with_ids(client):
-    params = default_params | {'items': '', 'with_ids': '50,51,52'}
+def test_items_with_ids(client):
+    params = default_params | {'items': '', 'with_ids': '1,2'}
     r = post(client, test_api_key, query_string=params)
     items = r.json['items']
-    assert find_id(50, items)
-    assert find_id(51, items)
-    assert find_id(52, items)
+    assert find_id(1, items)
+    assert find_id(2, items)
+
+
+def test_unread_item_ids(client):
+    params = default_params | {'unread_item_ids': ''}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['unread_item_ids']) > 0
+
+
+def test_saved_item_ids(client):
+    params = default_params | {'saved_item_ids': ''}
+    r = post(client, test_api_key, query_string=params)
+    # We don't have any saved items
+    assert len(r.json['saved_item_ids']) == 0
+
+
+def test_mark_item(client):
+    params = default_params | {'mark': 'item', 'as': 'read', 'id': 1}
+    r = post(client, test_api_key, query_string=params)
+    r.status_code == 200
+
+    params = default_params | {'items': '', 'with_ids': '1'}
+    r = post(client, test_api_key, query_string=params)
+    items = r.json['items']
+    assert len(items) > 0
+    read_item = items[0]
+    assert read_item['is_read'] == 1
 
 
 def find_id(id, items):
     return (id in (item['id'] for item in items))
 
-
-def test_saved_item_ids(client):
-    assert False
 
 # --------------
 # Misc.
@@ -134,7 +154,7 @@ def post(client, api_key, query_string=None):
         return client.post(API_ENDPOINT, data={"api_key": api_key})
 
 
-def run_tests(endpoint, suites=ALL):
+def run_tests(endpoint, suites={}):
     """
     Use curl command line utility to run tests
     """
@@ -142,24 +162,6 @@ def run_tests(endpoint, suites=ALL):
     epoch = datetime_as_epoch(datetime.utcnow())
 
     queries = []
-
-    if 'unread' in suites:
-        queries.extend([
-            (False, 'unread_item_ids')
-        ])
-
-    if 'saved' in suites:
-        queries.extend([
-            (False, 'saved_item_ids')
-        ])
-
-    if 'items' in suites:
-        queries.extend([
-            (False, 'items'),
-            (False, 'items&with_ids=50,51,52'),
-            (False, 'items&max_id=5'),
-            (False, 'items&since_id=50')
-        ])
 
     if 'mark_item' in suites:
         queries.extend([

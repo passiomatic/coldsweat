@@ -1,0 +1,16 @@
+[flake8]
+# pyflakes: http://flake8.pycqa.org/en/latest/user/error-codes.html
+# pep8: http://pep8.readthedocs.io/en/latest/intro.html#error-codes
+
+# Catch glaring errors, but don't worry about style.
+#
+# Ignoring:
+# whitespace warnings W2
+# comment spacing warnings E26
+# arithmetic spacing E226
+# blank lines warning E3
+# import ordering E402
+# complexity C901
+select = W1,W3,W5,W6,E1,E20,E21,E23,E25,E27,E5,E7,E9,F
+max-line-length = 200
+max-complexity = 15

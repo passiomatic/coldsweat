@@ -27,7 +27,6 @@ from .utilities import (datetime_as_epoch,
                         make_data_uri,
                         make_nonce)
 from . import VERSION_STRING
-#from . import filters
 
 __all__ = [
     'Fetcher',

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Flask",
+            "name": "Python: Flask Run",
             "type": "python",
             "request": "launch",
             "module": "flask",
@@ -21,5 +21,20 @@
             "jinja": true,
             "justMyCode": true
         },
+        {
+            "name": "Python: Flask Fetch",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "coldsweat",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "fetch",
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },        
     ]
 }

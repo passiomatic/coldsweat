@@ -33,7 +33,7 @@ def make_data_uri(content_type, data):
     Return data as a data:URI scheme
     """
     return "data:%s;base64,%s" % (content_type,
-                                  base64.standard_b64encode(data))
+                                  base64.standard_b64encode(data).decode('utf-8'))
 
 
 # --------------------

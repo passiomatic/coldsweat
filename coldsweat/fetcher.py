@@ -277,8 +277,7 @@ class Fetcher(object):
     def _fetch_icon(self):
 
         if not self.feed.icon or not self.feed.icon_last_updated_on or \
-           (self.instant - self.feed.icon_last_updated_on).days > \
-                FETCH_ICONS_INTERVAL:
+           ((self.instant - self.feed.icon_last_updated_on).days > FETCH_ICONS_INTERVAL):
             # Prefer alternate_link if available since self_link could
             # point to Feed Burner or similar services
             self.feed.icon = self._favicon_fetcher(
@@ -291,9 +290,8 @@ class Fetcher(object):
         '''
         Fetch a site favicon via service
         '''
-        # @@FIXME Use new service https://dev.to/derlin/get-favicons-from-any-website-using-a-hidden-google-api-3p1e
-        endpoint = ("https://icons.duckduckgo.com/ip3/%s"
-                    % urllib.parse.urlsplit(url).hostname)
+        hostname = urllib.parse.urlsplit(url).hostname
+        endpoint = f"https://icons.duckduckgo.com/ip3/{hostname}.ico"
 
         try:
             response = fetch_url(endpoint)

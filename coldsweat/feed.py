@@ -26,12 +26,12 @@ def add_subscription(user, feed, group):
     except IntegrityError:
         app.logger.debug(
             'user %s already has feed %s in subscriptions' % (
-                user.username, feed.self_link))
+                user.email, feed.self_link))
         return None
 
     app.logger.debug(
         'subscribed user %s to feed %s' % (
-            user.username, feed.self_link))
+            user.email, feed.self_link))
     return subscription
 
 

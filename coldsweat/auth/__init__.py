@@ -16,7 +16,7 @@ class SessionUser(flask_login.UserMixin):
     def __init__(self, user):
         self.id = user.id
         # TODO: Use display_name
-        self.display_name = user.username
+        self.display_name = user.email
 
 # Make routes importable directly from the blueprint
 from coldsweat.auth import routes

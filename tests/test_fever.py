@@ -8,13 +8,11 @@ from coldsweat.models import User, db_wrapper
 from coldsweat.config import TestingConfig
 
 API_ENDPOINT = "/fever/"
-TEST_EMAIL, TEST_PASSWORD = 'test@example.com', 'secret-password'
-default_params = {'api': ''}
+TEST_EMAIL = 'test@example.com'
+TEST_DIR = Path(__file__).parent
+DEFAULT_PARAMS = {'api': ''}
 
 test_api_key = None
-
-TEST_DIR = Path(__file__).parent
-
 
 @pytest.fixture()
 def app():
@@ -25,7 +23,8 @@ def app():
         db_wrapper.database.connection().executescript(sql)
 
     global test_api_key
-    test_api_key = User.make_api_key(TEST_EMAIL, TEST_PASSWORD)
+    test_user = User.get(User.email == TEST_EMAIL)
+    test_api_key = test_user.api_key
 
     yield app
 
@@ -42,7 +41,7 @@ def client(app):
 
 
 def test_auth_failure(client):
-    r = post(client, 'wrong-api-key', query_string=default_params)
+    r = post(client, 'wrong-api-key', query_string=DEFAULT_PARAMS)
     assert r.json['auth'] == 0
 
 
@@ -52,7 +51,7 @@ def test_endpoint_failure(client):
 
 
 def test_auth(client):
-    r = post(client, test_api_key, query_string=default_params)
+    r = post(client, test_api_key, query_string=DEFAULT_PARAMS)
     assert r.json['auth'] == 1
 
 # --------------
@@ -61,7 +60,7 @@ def test_auth(client):
 
 
 def test_groups(client):
-    params = default_params | {'groups': ''}
+    params = DEFAULT_PARAMS | {'groups': ''}
     r = post(client, test_api_key, query_string=params)
     assert len(r.json['groups']) > 0
 
@@ -71,7 +70,7 @@ def test_groups(client):
 
 
 def test_feeds(client):
-    params = default_params | {'feeds': ''}
+    params = DEFAULT_PARAMS | {'feeds': ''}
     r = post(client, test_api_key, query_string=params)
     assert len(r.json['feeds']) > 0
 
@@ -81,19 +80,19 @@ def test_feeds(client):
 
 
 def test_items_max_id(client):
-    params = default_params | {'items': '', 'max_id': '50'}
+    params = DEFAULT_PARAMS | {'items': '', 'max_id': '50'}
     r = post(client, test_api_key, query_string=params)
     assert len(r.json['items']) > 0
 
 
 def test_items_since_id(client):
-    params = default_params | {'items': '', 'since_id': '50'}
+    params = DEFAULT_PARAMS | {'items': '', 'since_id': '50'}
     r = post(client, test_api_key, query_string=params)
     assert len(r.json['items']) > 0
 
 
 def test_items_with_ids(client):
-    params = default_params | {'items': '', 'with_ids': '1,2'}
+    params = DEFAULT_PARAMS | {'items': '', 'with_ids': '1,2'}
     r = post(client, test_api_key, query_string=params)
     items = r.json['items']
     assert find_id(1, items)
@@ -101,24 +100,24 @@ def test_items_with_ids(client):
 
 
 def test_unread_item_ids(client):
-    params = default_params | {'unread_item_ids': ''}
+    params = DEFAULT_PARAMS | {'unread_item_ids': ''}
     r = post(client, test_api_key, query_string=params)
     assert len(r.json['unread_item_ids']) > 0
 
 
 def test_saved_item_ids(client):
-    params = default_params | {'saved_item_ids': ''}
+    params = DEFAULT_PARAMS | {'saved_item_ids': ''}
     r = post(client, test_api_key, query_string=params)
     # We don't have any saved items
     assert len(r.json['saved_item_ids']) == 0
 
 
 def test_mark_item(client):
-    params = default_params | {'mark': 'item', 'as': 'read', 'id': 1}
+    params = DEFAULT_PARAMS | {'mark': 'item', 'as': 'read', 'id': 1}
     r = post(client, test_api_key, query_string=params)
     r.status_code == 200
 
-    params = default_params | {'items': '', 'with_ids': '1'}
+    params = DEFAULT_PARAMS | {'items': '', 'with_ids': '1'}
     r = post(client, test_api_key, query_string=params)
     items = r.json['items']
     assert len(items) > 0
@@ -136,13 +135,13 @@ def find_id(id, items):
 
 
 def test_favicons(client):
-    params = default_params | {'favicons': ''}
+    params = DEFAULT_PARAMS | {'favicons': ''}
     r = post(client, test_api_key, query_string=params)
     assert len(r.json['favicons']) > 0
 
 
 def test_links(client):
-    params = default_params | {'links': ''}
+    params = DEFAULT_PARAMS | {'links': ''}
     r = post(client, test_api_key, query_string=params)
     assert len(r.json['links']) == 0
 

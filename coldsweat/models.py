@@ -1,11 +1,10 @@
 '''
 Database models
 '''
-import pickle
 from datetime import datetime
 from playhouse.signals import (pre_save, Model)
 from playhouse.flask_utils import FlaskDB
-from peewee import (BlobField, BooleanField, CharField, DateTimeField,
+from peewee import (BooleanField, CharField, DateTimeField,
                     ForeignKeyField,
                     IntegerField, IntegrityError,
                     TextField)
@@ -20,7 +19,6 @@ __all__ = [
     'Read',
     'Saved',
     'Subscription',
-    'Session',
     'setup',
 ]
 
@@ -38,20 +36,6 @@ DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 # Pass Peewee Model class with signal support
 # See https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#database-wrapper
 db_wrapper = FlaskDB(model_class=Model)
-
-# ------------------------------------------------------
-# Custom fields
-# ------------------------------------------------------
-
-
-class PickleField(BlobField):
-
-    def db_value(self, value):
-        return super(PickleField, self).db_value(pickle.dumps(value, 2))
-    # Use newer protocol
-
-    def python_value(self, value):
-        return pickle.loads(value)
 
 # ------------------------------------------------------
 # Coldsweat models

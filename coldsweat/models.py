@@ -85,14 +85,9 @@ class User(db_wrapper.Model):
 
     @staticmethod
     def validate_api_key(api_key):
-        try:
-            # Clients may send api_key in uppercase, lower it
-            user = User.get((User.api_key == api_key.lower()) &
-                            (User.is_enabled == True))  # noqa
-        except User.DoesNotExist:
-            return None
-
-        return user
+        # Clients may send api_key in uppercase, lower it
+        return User.get_or_none((User.api_key == api_key.lower()) &
+                        (User.is_enabled == True))  # noqa
 
     def check_password(self, input_password):
         return security.check_password_hash(self.password, input_password)
@@ -100,10 +95,9 @@ class User(db_wrapper.Model):
     @staticmethod
     def validate_credentials(email, password):
         '''Check for an existing e-mail and password'''
-        try:
-            user = User.get(((User.email == email)) &
-                            (User.is_enabled == True))  # noqa
-        except User.DoesNotExist:
+        user = User.get_or_none(((User.email == email)) &
+                        (User.is_enabled == True))  # noqa
+        if not user:
             return None
 
         if not user.check_password(password):

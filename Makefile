@@ -18,8 +18,7 @@ watch-css:
 	npm run watch-css
 
 setup:
-	flask --app coldsweat --debug setup
-	flask --app coldsweat --debug import subscriptions.opml
+	flask --app coldsweat --debug setup coldsweat@example.com -p some-password
 
 run:
 	flask --app coldsweat run --debug

@@ -44,7 +44,7 @@ def entry(entry_id):
     entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
     user = User.get(flask_login.current_user.id)
-    
+
     feed.mark_entry(user, entry, 'read')
     query, view_variables = _make_view_variables(user)
     n = query.where(Entry.last_updated_on < entry.last_updated_on).order_by(
@@ -58,6 +58,22 @@ def entry(entry_id):
     })
 
     return flask.render_template('main/entry.html', **view_variables)
+
+@bp.route('/entries/<int:entry_id>', methods=["POST"])
+@flask_login.login_required
+def entry_mark(entry_id):
+    try:
+        status = flask.request.form['as']
+    except KeyError:
+        flask.abort(400, 'Missing parameter as=read|unread|saved|unsaved')
+
+    user = User.get(flask_login.current_user.id)
+    entry = get_object_or_404(Entry, (Entry.id == entry_id))
+
+    if 'mark' in flask.request.form:
+        feed.mark_entry(user, entry, status)    
+
+    return ('', 200)
 
 
 @bp.route('/feeds')
@@ -104,10 +120,10 @@ def _make_view_variables(user):
         filter_class, panel_title, page_title = 0, 0, 0, '', '', '', ''
 
     groups = feed.get_groups(user)
-    r = Entry.select(Entry.id).join(Read).where((Read.user
-                                                 == user)).objects()
-    s = Entry.select(Entry.id).join(Saved).where((Saved.user
-                                                  == user)).objects()
+    r = Entry.select(Entry.id).join(Read).where((Read.user ==
+                                                 user)).objects()
+    s = Entry.select(Entry.id).join(Saved).where((Saved.user ==
+                                                  user)).objects()
     read_ids = dict((i.id, None) for i in r)
     saved_ids = dict((i.id, None) for i in s)
 

@@ -80,7 +80,7 @@ def mark_entry(user, entry, status):
             app.logger.debug('entry %s never saved, ignored' % entry.id)
             return
 
-    app.logger.debug('entry %s %s' % (entry.id, status))
+    app.logger.debug('marked entry %s as %s' % (entry.id, status))
 
 
 def get_unread_entries(user, *select):

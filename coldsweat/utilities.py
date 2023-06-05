@@ -1,10 +1,8 @@
 import os
 import re
-
 import urllib.request
 import urllib.parse
 import urllib.error
-
 from hashlib import md5, sha1
 import base64
 from calendar import timegm

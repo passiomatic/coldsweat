@@ -2,15 +2,13 @@ import re
 from collections import defaultdict
 from datetime import datetime, timedelta
 from peewee import fn, IntegrityError
-
 import flask
-from coldsweat.fever import bp
-
+from . import bp
 from flask import current_app as app
-from coldsweat.utilities import datetime_as_epoch
+from ..utilities import datetime_as_epoch
 import coldsweat.feed as feed
 import coldsweat.models as models
-from coldsweat.models import (
+from ..models import (
     User, Feed, Group, Entry, Read, Saved, Subscription)
 
 

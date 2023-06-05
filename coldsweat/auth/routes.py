@@ -1,7 +1,7 @@
 import flask
 import flask_login
-from coldsweat.models import User
-from . import (bp, SessionUser)
+from ..models import User
+from . import bp, SessionUser
 
 
 @bp.route('/login', methods=['GET', 'POST'])

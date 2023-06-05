@@ -1,9 +1,9 @@
 import flask
 import flask_login
-from coldsweat.models import (User, Feed, Group, Subscription, Entry, Read, Saved)
 from playhouse.flask_utils import get_object_or_404
+from ..models import (Feed, Group, Subscription, Entry, Read, Saved)
 import coldsweat.feed as feed
-from coldsweat.main import bp
+from . import bp
 
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60

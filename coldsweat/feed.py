@@ -5,12 +5,8 @@ Shared feed logic functions
 import time
 from xml.etree import ElementTree
 from flask import current_app as app
-
 from peewee import JOIN, fn, IntegrityError
-
-from coldsweat.models import (Entry, Feed, Group, Read, Saved,
-                              Subscription)
-
+from .models import (Entry, Feed, Group, Read, Saved, Subscription)
 from .utilities import make_sha1_hash, scrub_url
 from .fetcher import Fetcher
 

@@ -296,7 +296,7 @@ def fetch_all_feeds():
     Fetch all enabled feeds, possibly parallelizing requests
     """
 
-    feeds = Feed.select().where(Feed.is_enabled == True)  # noqa
+    feeds = Feed.select().where(Feed.enabled == True)  # noqa
 
     if feeds.count() == 0:
         app.logger.debug("no feeds found to fetch, halted")

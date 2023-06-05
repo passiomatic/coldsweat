@@ -87,7 +87,7 @@ class Fetcher(object):
         '''
         Gone
         '''
-        self.feed.is_enabled = False
+        self.feed.enabled = False
         self.feed.error_count += 1
         self.feed.last_statu = response.status_code
         app.logger.warning("%s is gone, disabled" % self.netloc)
@@ -117,7 +117,7 @@ class Fetcher(object):
                 "%s has changed its location, updated to %s" % (
                     self.netloc, self_link))
         else:
-            self.feed.is_enabled = False
+            self.feed.enabled = False
             self.feed.last_status = DuplicatedFeedError.code
             self.feed.error_count += 1
             self._synthesize_entry('Feed has a duplicated web address.')
@@ -208,7 +208,7 @@ class Fetcher(object):
                 % self.feed.last_status)
             app.logger.warning(
                 "%s has accomulated too many errors, disabled" % self.netloc)
-            self.feed.is_enabled = False
+            self.feed.enabled = False
 
     def update_feed_with_data(self, data):
         self._parse_feed(data)

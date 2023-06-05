@@ -405,7 +405,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
                 button='Enable')
 
         # Handle postback
-        feed.is_enabled, feed.error_count = True, 0
+        feed.enabled, feed.error_count = True, 0
         feed.save()
         self.alert_message = ('SUCCESS Feed <i>%s</i> is now enabled.'
                               % feed.title)
@@ -696,6 +696,6 @@ def get_stats():
         ~(Entry.id << Read.select(Read.entry))).count()
     feed_count = Feed.select().count()
     # @@TODO: count enabled feeds with at least one subscriber
-    active_feed_count = Feed.select().where(Feed.is_enabled==True).count()  # noqa
+    active_feed_count = Feed.select().where(Feed.enabled==True).count()  # noqa
 
     return locals()

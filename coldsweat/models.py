@@ -52,7 +52,7 @@ class User(db_wrapper.Model):
     # display_name = CharField(default='')
     email = CharField(unique=True)
     api_key = CharField(unique=True)
-    is_enabled = BooleanField(default=True)
+    enabled = BooleanField(default=True)
     password = CharField(255)
 
     def __repr__(self):
@@ -69,7 +69,7 @@ class User(db_wrapper.Model):
     def validate_api_key(api_key):
         # Clients may send api_key in uppercase, lower it
         return User.get_or_none((User.api_key == api_key.lower()) &
-                        (User.is_enabled == True))  # noqa
+                        (User.enabled == True))  # noqa
 
     def check_password(self, input_password):
         return security.check_password_hash(self.password, input_password)
@@ -78,7 +78,7 @@ class User(db_wrapper.Model):
     def validate_credentials(email, password):
         '''Check for an existing e-mail and password'''
         user = User.get_or_none(((User.email == email)) &
-                        (User.is_enabled == True))  # noqa
+                        (User.enabled == True))  # noqa
         if not user:
             return None
 
@@ -118,7 +118,7 @@ class Feed(db_wrapper.Model):
     DEFAULT_ICON = _ICON
     MAX_TITLE_LENGTH = 255
 
-    is_enabled = BooleanField(default=True)
+    enabled = BooleanField(default=True)
     self_link = TextField()  # URL of the feed itself (rel=self)
     self_link_hash = CharField(unique=True, max_length=40)
     error_count = IntegerField(default=0)
@@ -169,6 +169,7 @@ class Entry(db_wrapper.Model):
     title = CharField()
     content_type = CharField(default='text/html')
     content = TextField()
+    thumbnail_url = CharField(default='')  # Future use
     # @@TODO: rename to published_on
     last_updated_on = DateTimeField()
     author = CharField(default='')

@@ -1,7 +1,7 @@
 {% extends "main/index.html" %}
 
 {% macro feed_status(feed, threshold) %}
-    {% if not feed.is_enabled %}
+    {% if not feed.enabled %}
         status-disabled
     {% endif %}          
     {% if threshold and feed.error_count > (threshold * 0.80) %}
@@ -23,7 +23,7 @@
                     <span class="actions">
 <a href="{{application_url}}/feeds/edit/{{f.id}}" data-remote-modal="modal-feed-edit">About</a>&ensp;&middot;&ensp;
 <a href="{{application_url}}/feeds/remove/{{f.id}}" data-remote-modal>Remove</a>
-{% if not f.is_enabled %}&ensp;&middot;&ensp;<a href="{{application_url}}/feeds/enable/{{f.id}}" data-remote-modal>Enable Again</a>{% endif %}
+{% if not f.enabled %}&ensp;&middot;&ensp;<a href="{{application_url}}/feeds/enable/{{f.id}}" data-remote-modal>Enable Again</a>{% endif %}
                     </span>
                 </div>                                              
             </div>

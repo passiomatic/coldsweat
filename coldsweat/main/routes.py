@@ -1,6 +1,6 @@
 import flask
 import flask_login
-from coldsweat.models import (User, Feed, Group, Entry, Read, Saved)
+from coldsweat.models import (User, Feed, Group, Subscription, Entry, Read, Saved)
 from playhouse.flask_utils import get_object_or_404
 import coldsweat.feed as feed
 from coldsweat.main import bp
@@ -112,6 +112,41 @@ def group_list():
 
     return flask.render_template('main/groups.html', **locals())
 
+
+@bp.route('/feeds/edit/<int:feed_id>', methods=['GET', 'POST'])
+@flask_login.login_required
+def feed_edit(feed_id):
+    try:
+        feed = Feed.get(Feed.id == feed_id)
+    except Feed.DoesNotExist:
+        flask.abort(404, 'No such feed %s' % feed_id)
+
+    user = flask_login.current_user.db_user
+
+    # Collect editable fields
+    title = feed.title
+
+    q = Subscription.select(
+        Subscription, Group).join(Group).where(
+        (Subscription.user == user
+         ) & (Subscription.feed == feed))
+    groups = [s.group for s in q]
+
+    if flask.request.method == 'GET':
+        return flask.render_template('main/_feed_edit.html', **locals())
+
+    # Handle postback
+    title = flask.request.form.get('title', '').strip()
+    if not title:
+        flask.flash('Error, feed title cannot be empty.', category="error")
+        return flask.render_template('main/_feed_edit.html', **locals())
+    feed.title = title
+    feed.save()
+    flask.flash('Changes have been saved.')
+    template = flask.render_template('main/_modal_done.js', location='%s/feeds/' % flask.request.base_url)
+    r = flask.make_response(template)
+    r.headers["Content-Type"] = "text/javascript"
+    return r
 
 def _make_view_variables(user):
 

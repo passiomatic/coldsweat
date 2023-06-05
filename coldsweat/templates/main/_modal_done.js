@@ -1,6 +1,5 @@
-{{default location = ''}}
-{{if location}}
+{% if location is defined %}
     $('.modal').on('hidden', function () {window.location.assign('{{location}}')}).modal('hide')
-{{else}}
+{% else %}
     $('.modal').modal('hide')
-{{endif}}
+{% endif %}

@@ -24,8 +24,7 @@ def entry_list():
         unread, saved, group or feed
     '''
     offset = flask.request.args.get('offset', 0, type=int)
-    user = User.get(flask_login.current_user.id)
-    query, view_variables = _make_view_variables(user)
+    query, view_variables = _make_view_variables(flask_login.current_user.db_user)
 
     view_variables.update({
         'entries': query.order_by(
@@ -43,7 +42,7 @@ def entry_list():
 def entry(entry_id):
     entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
-    user = User.get(flask_login.current_user.id)
+    user = flask_login.current_user.db_user
 
     feed.mark_entry(user, entry, 'read')
     query, view_variables = _make_view_variables(user)
@@ -67,7 +66,7 @@ def entry_mark(entry_id):
     except KeyError:
         flask.abort(400, 'Missing parameter as=read|unread|saved|unsaved')
 
-    user = User.get(flask_login.current_user.id)
+    user = flask_login.current_user.db_user
     entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
     if 'mark' in flask.request.form:
@@ -86,7 +85,7 @@ def feed_list():
         0, 0, 0, 'feeds', 'Feeds', 'Feeds'
 
     offset = flask.request.args.get('offset', 0, type=int)
-    user = User.get(flask_login.current_user.id)
+    user = flask_login.current_user.db_user
     max_errors = 100
     groups = feed.get_groups(user)
     count, query = feed.get_feeds(user, Feed.id).count(), feed.get_feeds(user)
@@ -106,7 +105,7 @@ def group_list():
         0, 0, 'groups', 'Groups', 'Groups'
 
     offset = flask.request.args.get('offset', 0, type=int)
-    user = User.get(flask_login.current_user.id)
+    user = flask_login.current_user.db_user
     count, query = feed.get_groups(user).count(), feed.get_groups(user)
     groups = query.offset(offset).limit(GROUPS_PER_PAGE)
     offset += GROUPS_PER_PAGE

@@ -9,15 +9,14 @@ bp = Blueprint('auth', __name__, template_folder='templates')
 
 class SessionUser(flask_login.UserMixin):
     '''
-    A user in the urrent web session. We cannot mix model.User with 
-      flask_login.UserMixin due to methdod names clashing.
+    A user in the current web session. We cannot mix models.User with 
+      flask_login.UserMixin due to methdod names clashing, so we wrap it 
+      instead
     '''
 
     def __init__(self, user):
         self.id = user.id
-        # TODO: Use display_name
-        self.display_name = user.email
+        self.db_user = user
 
 # Make routes importable directly from the blueprint
-from coldsweat.auth import routes
-
+from coldsweat.auth import routes  # noqa

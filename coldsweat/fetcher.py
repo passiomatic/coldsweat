@@ -38,8 +38,7 @@ MIN_FETCH_INTERVAL = 60*3  # Seconds
 MAX_FETCH_ERRORS = 50
 FETCH_ICONS_INTERVAL = 30  # Days
 ENTRY_TAG_URI = 'tag:lab.passiomatic.com,2017:coldsweat:entry:%s'
-USER_AGENT = ('Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/'
-              'coldsweat/>' % VERSION_STRING)
+USER_AGENT = ('Coldsweat/%s <https://lab.passiomatic.com/coldsweat/>' % VERSION_STRING)
 
 
 class Fetcher(object):

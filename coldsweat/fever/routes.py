@@ -15,8 +15,6 @@ from ..models import (
 RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 600  # 10 minutes
 API_VERSION = 3
-COMMANDS = 'groups feeds items unread_item_ids saved_item_ids mark unread_recently_read favicons links'.split()
-
 
 @bp.route('/', methods=['GET'])
 def index_get():
@@ -47,15 +45,9 @@ def index_post():
     result['auth'] = 1
 
     # It looks like client *can* send multiple commands at time
-    all_commands = globals()
-    for name in COMMANDS:
+    for name in COMMANDS.keys():
         if name in flask.request.args:
-            try:
-                handler = all_commands[f'{name}_command']
-            except KeyError:
-                app.logger.debug('unrecognized command %s, skipped' % name)
-                # @@TODO End with flask.abort(400) instead?
-                continue
+            handler = COMMANDS[name]
             handler(user, result)
 
     result['last_refreshed_on_time'] = get_last_refreshed_on_time()
@@ -313,6 +305,18 @@ def links_command(_, result):
     # Hot links, unsupported
     result['links'] = []
 
+COMMANDS = {
+    'groups': groups_command,
+    'feeds': feeds_command,
+    'items': items_command,
+    'unread_item_ids': unread_item_ids_command,
+    'saved_item_ids': saved_item_ids_command,
+    'mark': mark_command,
+    'unread_recently_read': unread_recently_read_command,
+    'favicons': favicons_command,
+    'links': links_command
+}
+
 
 # ------------------------------------------------------
 # Specific Fever queries
@@ -371,9 +375,9 @@ def get_entries(user, ids=None):
 
 def get_entries_min(user, min_id, bound=50):
     q = Entry.select(Entry, Feed).join(
-        Feed).join(Subscription).where((Subscription.user == user)
-                                       & (Entry.id > min_id
-                                          )).distinct().limit(bound)
+        Feed).join(Subscription).where((Subscription.user == user) &
+                                       (Entry.id > min_id
+                                        )).distinct().limit(bound)
     return _get_entries(user, q)
 
 

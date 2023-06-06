@@ -172,6 +172,16 @@ def test_links(client):
     assert len(r.json['links']) == 0
 
 
+def test_multiple_commands(client):
+    params = DEFAULT_PARAMS | {'items': '', 'max_id': '50', 'favicons': ''}
+    r = post(client, test_api_key, query_string=params)
+    assert len(r.json['items']) > 0
+    assert len(r.json['favicons']) > 0
+
+# --------------
+#  Helpers 
+# --------------
+
 def post(client, api_key, query_string=None):
     if query_string:
         return client.post(API_ENDPOINT, data={"api_key": api_key},  query_string=query_string)

@@ -147,7 +147,7 @@ class Feed(db_wrapper.Model):
 
     @property
     def last_updated_on_as_epoch(self):
-        # Never updated?
+        # Check if never updated
         if self.last_updated_on:
             return datetime_as_epoch(self.last_updated_on)
         return 0

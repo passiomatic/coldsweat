@@ -124,6 +124,33 @@ def test_mark_item(client):
     assert read_item['is_read'] == 1
 
 
+def test_mark_item_not_found(client):
+    params = DEFAULT_PARAMS | {'mark': 'item', 'as': 'read', 'id': 999}
+    r = post(client, test_api_key, query_string=params)
+    assert r.status_code == 404
+
+
+def test_mark_feed(client):
+    before = datetime_as_epoch(datetime.utcnow())
+    params = DEFAULT_PARAMS | {'mark': 'feed', 'as': 'read', 'id': 1, 'before': before}
+    r = post(client, test_api_key, query_string=params)
+    assert r.status_code == 200
+
+
+def test_mark_feed_not_found(client):
+    before = datetime_as_epoch(datetime.utcnow())
+    params = DEFAULT_PARAMS | {'mark': 'feed', 'as': 'read', 'id': 999, 'before': before}
+    r = post(client, test_api_key, query_string=params)
+    assert r.status_code == 404
+
+
+def test_mark_group(client):
+    before = datetime_as_epoch(datetime.utcnow())
+    params = DEFAULT_PARAMS | {'mark': 'group', 'as': 'read', 'id': 1, 'before': before}
+    r = post(client, test_api_key, query_string=params)
+    assert r.status_code == 200
+
+
 def find_id(id, items):
     return (id in (item['id'] for item in items))
 

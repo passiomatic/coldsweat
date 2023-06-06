@@ -163,7 +163,7 @@ def mark_command(user, result):
         object_id = flask.request.args.get('id', type=int)
     except (KeyError, ValueError) as ex:
         app.logger.debug('missing or invalid parameter (%s), ignored' % ex)
-        return
+        flask.abort(400)
 
     if mark == 'item':
 
@@ -172,7 +172,7 @@ def mark_command(user, result):
             entry = Entry.get(Entry.id == object_id)
         except Entry.DoesNotExist:
             app.logger.debug('could not find entry %d, ignored' % object_id)
-            return
+            flask.abort(404)
 
         if status == 'read':
             try:
@@ -216,7 +216,7 @@ def mark_command(user, result):
             feed = Feed.get(Feed.id == object_id)
         except Feed.DoesNotExist:
             app.logger.debug('could not find feed %d, ignored' % object_id)
-            return
+            flask.abort(404)
 
         # Unix timestamp of the the local client’s last items API request
         try:
@@ -224,7 +224,7 @@ def mark_command(user, result):
         except (KeyError, ValueError) as ex:
             app.logger.debug(
                 'missing or invalid parameter (%s), ignored' % ex)
-            return
+            flask.abort(400)
 
         q = Entry.select(Entry).join(Feed).join(Subscription).where(
             (Subscription.user == user) &
@@ -236,14 +236,14 @@ def mark_command(user, result):
             (Entry.last_updated_on < before)
         ).distinct().objects()
 
-        with models.database.transaction():
+        with models.db_wrapper.database.transaction():
             for entry in q:
                 try:
                     Read.create(user=user, entry=entry)
                 except IntegrityError:
                     # Should not happen,
                     # due to the query above, log as warning
-                    app.logger.warn(
+                    app.logger.warning(
                         'entry %d already marked as read, ignored'
                         % entry.id)
                     continue
@@ -289,7 +289,7 @@ def mark_command(user, result):
                 (Entry.last_updated_on < before)
             ).distinct().objects()
 
-        with models.transaction():
+        with models.db_wrapper.database.transaction():
             for entry in q:
                 try:
                     Read.create(user=user, entry=entry)

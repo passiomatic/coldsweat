@@ -258,7 +258,7 @@ def mark_command(user, result):
         except (KeyError, ValueError) as ex:
             app.logger.debug(
                 'missing or invalid parameter (%s), ignored' % ex)
-            return
+            flask.abort(400)
 
         # Mark all as read?
         if object_id == 0:
@@ -276,7 +276,7 @@ def mark_command(user, result):
             except Group.DoesNotExist:
                 app.logger.debug(
                     'could not find group %d, ignored' % object_id)
-                return
+                flask.abort(404)
 
             q = Entry.select(Entry).join(Feed).join(
                 Subscription).where(
@@ -307,7 +307,7 @@ def mark_command(user, result):
         app.logger.debug(
             'malformed mark command (mark %s (%s) as %s ), ignored' % (
                 mark, object_id, status))
-
+        flask.abort(400)
 
 def links_command(_, result):
     # Hot links, unsupported

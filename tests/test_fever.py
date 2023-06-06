@@ -1,7 +1,6 @@
 from pathlib import Path
 from datetime import datetime
 import pytest
-
 from coldsweat import create_app
 from coldsweat.utilities import datetime_as_epoch
 from coldsweat.models import User, db_wrapper

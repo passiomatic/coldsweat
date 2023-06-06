@@ -25,6 +25,7 @@ def create_app(config_class=Config):
     os.makedirs(app.instance_path, exist_ok=True)
 
     # Initialize Flask extensions here
+    
     models.db_wrapper.init_app(app)
 
     login_manager = flask_login.LoginManager()

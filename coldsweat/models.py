@@ -19,6 +19,7 @@ __all__ = [
     'Read',
     'Saved',
     'Subscription',
+    'ColdsweatDB',
     'setup',
 ]
 
@@ -33,13 +34,21 @@ e+4oc25jl3/aRHthDSO6btaUAxVZQe9loqONAjrxiA/Mqy5WNNajo7S2rz7QUuIAK+NeX\
 a/qy5uunENXcFW38XGAr8KKpl/TD6wNqn/XUqKZxX+mor42gB0XtoQ33LtnOS3p3AdYux\
 DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 
+class ColdsweatDB(FlaskDB):
+    '''
+    Specialised FlaskDB which deals with testing memory 
+      sqlite database, see: https://t.ly/susgy
+    '''
+    def _register_handlers(self, app):
+        if app.config['TESTING']:
+            return
+        app.before_request(self.connect_db)
+        app.teardown_request(self.close_db)
+
+
 # Pass Peewee Model class with signal support
 # See https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#database-wrapper
-db_wrapper = FlaskDB(model_class=Model)
-
-# ------------------------------------------------------
-# Coldsweat models
-# ------------------------------------------------------
+db_wrapper = ColdsweatDB(model_class=Model)
 
 
 class User(db_wrapper.Model):
@@ -68,17 +77,14 @@ class User(db_wrapper.Model):
     @staticmethod
     def validate_api_key(api_key):
         # Clients may send api_key in uppercase, lower it
-        return User.get_or_none((User.api_key == api_key.lower()) &
-                        (User.enabled == True))  # noqa
+        return User.get_or_none(User.api_key == api_key.lower(), User.enabled == True)  # noqa
 
     def check_password(self, input_password):
         return security.check_password_hash(self.password, input_password)
 
     @staticmethod
     def validate_credentials(email, password):
-        '''Check for an existing e-mail and password'''
-        user = User.get_or_none(((User.email == email)) &
-                        (User.enabled == True))  # noqa
+        user = User.get_or_none(User.email == email, User.enabled == True)  # noqa
         if not user:
             return None
 

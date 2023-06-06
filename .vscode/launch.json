@@ -36,5 +36,14 @@
             "jinja": true,
             "justMyCode": true
         },        
+        {
+            "name": "Python: Run Tests",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest", 
+            "args": [
+            ],
+            "justMyCode": true
+        },         
     ]
 }

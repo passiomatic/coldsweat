@@ -158,8 +158,9 @@ def unread_recently_read_command(user, result):
 def mark_command(user, result):
 
     try:
-        mark, status, object_id = flask.request.form['mark'], \
-            flask.request.form['as'], int(flask.request.form['id'])
+        mark = flask.request.args['mark']
+        status = flask.request.args['as']
+        object_id = flask.request.args.get('id', type=int)
     except (KeyError, ValueError) as ex:
         app.logger.debug('missing or invalid parameter (%s), ignored' % ex)
         return
@@ -219,8 +220,7 @@ def mark_command(user, result):
 
         # Unix timestamp of the the local client’s last items API request
         try:
-            before = datetime.utcfromtimestamp(
-                int(flask.request.form['before']))
+            before = datetime.utcfromtimestamp(flask.request.args.get('before', type=int))
         except (KeyError, ValueError) as ex:
             app.logger.debug(
                 'missing or invalid parameter (%s), ignored' % ex)
@@ -254,8 +254,7 @@ def mark_command(user, result):
 
         # Unix timestamp of the the local client’s 'last items' API request
         try:
-            before = datetime.utcfromtimestamp(
-                int(flask.request.form['before']))
+            before = datetime.utcfromtimestamp(flask.request.args.get('before', type=int))
         except (KeyError, ValueError) as ex:
             app.logger.debug(
                 'missing or invalid parameter (%s), ignored' % ex)

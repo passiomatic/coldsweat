@@ -5,7 +5,7 @@
         <li class="heading">
             <div class="toolbar dim">
                 {% if count and (filter_class in ['unread']) %}
-                    <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{application_url}}/entries/mark?all" data-remote-modal><i class="fa fa-check-square"></i></a>
+                    <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{ url_for('main.entry_list_mark', all='') }}" data-remote-modal><i class="fa fa-check-square"></i></a>
                 {% elif count and feed_id and filter_class in ['feeds'] %}
                     <a class="popover-trigger" data-container="body" href="#popover-content"><i class="fa fa-cog"></i> Manage</a>
                 {% endif %}                  

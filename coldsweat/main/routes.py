@@ -1,8 +1,12 @@
+from datetime import datetime
 import flask
 import flask_login
+from flask import current_app as app
+from peewee import IntegrityError
 from playhouse.flask_utils import get_object_or_404
 from requests.exceptions import RequestException
 from ..models import (Feed, Group, Subscription, Entry, Read, Saved)
+import coldsweat.models as models
 import coldsweat.feed as feed
 import coldsweat.fetcher as fetcher
 import coldsweat.markup as markup
@@ -115,6 +119,69 @@ def group_list():
     offset += GROUPS_PER_PAGE
 
     return flask.render_template('main/groups.html', **locals())
+
+
+@bp.route('/entries/mark', methods=['GET', 'POST'])
+@flask_login.login_required
+def entry_list_mark():
+    '''
+    Mark feed|all entries as read
+    '''
+    feed_id = flask.request.args.get('feed', 0, type=int)
+
+    if flask.request.method == 'GET':
+        now = datetime.utcnow()
+        return flask.render_template('main/_entries_mark_%s_read.html' % ('feed' if feed_id else 'all'), **locals())
+
+    # Handle postback
+    try:
+        before = datetime.utcfromtimestamp(flask.request.form.get('before', type=int))
+    except (KeyError, ValueError):
+        flask.abort(400, 'Missing parameter before=time')
+
+    user = flask_login.current_user.db_user
+
+    if feed_id:
+        try:
+            feed = Feed.get((Feed.id == feed_id))
+        except Feed.DoesNotExist:
+            flask.abort(404, f'No such feed {feed_id}')
+
+        q = Entry.select(Entry).join(Feed).join(Subscription).where(
+            (Subscription.user == user) &
+            # Exclude entries already marked as read
+            ~(Entry.id << Read.select(Read.entry).where(
+                Read.user == user)) &
+            # Filter by current feed
+            (Entry.feed == feed) &
+            # Exclude entries fetched after the page load
+            (Feed.last_checked_on < before)
+        ).distinct()
+        flask.flash('Feed has been marked as read', category="info")
+        redirect_url = '%s/entries/?feed=%s' % (flask.request.base_url, feed_id)
+    else:
+        q = Entry.select(Entry).join(Feed).join(Subscription).where(
+            (Subscription.user == user) &
+            # Exclude entries already marked as read
+            ~(Entry.id << Read.select(Read.entry).where(
+                Read.user == user)) &
+            # Exclude entries fetched after the page load
+            (Feed.last_checked_on < before)
+        ).distinct()
+        flask.flash('All entries have been marked as read', category="info")
+        redirect_url = '%s/entries/?unread' % flask.request.base_url
+
+    #  @@TODO: Use insert_many()
+    with models.db_wrapper.database.transaction():
+        for entry in q:
+            try:
+                Read.create(user=user, entry=entry)
+            except IntegrityError:
+                app.logger.debug(
+                    'entry %d already marked as read, ignored' % entry.id)
+                continue
+
+    return _render_script('main/_modal_done.js', location=redirect_url)
 
 
 @bp.route('/feeds/edit/<int:feed_id>', methods=['GET', 'POST'])

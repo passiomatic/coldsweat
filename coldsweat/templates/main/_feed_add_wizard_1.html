@@ -1,50 +1,42 @@
-{{def render_form}}
-<form action="{{application_url}}/feeds/add/1" data-ajax-post method="POST">
-  <div class="modal-header">
-     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>
-    <h3>Add Feed Subscription</h3>
-  </div>
-  <div class="modal-body">          
-        {{form_message|alert}}
 
-        <label for="self-link-field">Web address (URL) for the site or feed</label> 
-        <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="E.g.: theverge.com or http://www.reddit.com/top/.rss">
-        {{if length(groups) > 1}}
-            <label>Add to group <select name="group">
-                {{for g in groups}}
-                    <option {{if g.title == g.DEFAULT_GROUP}}selected{{endif}} value="{{g.id}}">{{g.title}}</option> 
-                {{endfor}}
-            </select></label>             
-        {{endif}}
-        
-        <hr class="quarter">
-        <div>
-            <a href="javascript:window.open('{{application_url}}/feeds/add/1?self_link='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title))"><i class="fa fa-bookmark-o"></i> Subscribe Feed</a><br>
-            <span class="help-block">Drag bookmarklet to your browser toolbar and quickly subscribe to any feed.</span>
-        </div>
-  </div>
-  <div class="modal-footer">
-    <button type="submit" class="btn btn-primary">Continue</button>
-  </div>
-</form>
-{{enddef}}
 
-{{# Ajax request?}}
-{{if request.is_xhr}}
-    {{render_form()}}
-{{else}}
-    {{inherit "site.html"}}
-     
-    {{def container_block}}    
-        <div id="modal-add-subscription" role="dialog" class="modal fade hide">
-            {{render_form()}}
-        </div>
-    {{enddef}}    
-    {{def page_script_block}}
-        $(document).ready(function() {
-            $('#modal-add-subscription').modal('show')
-        })
-    {{enddef}}
-{{endif}}
+{% macro render_form() %}
+    <form action="{{ url_for('main.feed_add_1', ) }}" data-ajax-post method="POST">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>
+        <h3>Add Feed Subscription</h3>
+    </div>
+    <div class="modal-body">          
+
+            <label for="self-link-field">Web address (URL) for the site or feed</label> 
+            <input type="text" id="field-self-link" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="E.g.: theverge.com or http://www.reddit.com/top/.rss">
+            {% if groups|length > 1 %}
+                <label>Add to group <select name="group">
+                    {% for g in groups %}
+                        <option {% if g.title == g.DEFAULT_GROUP %}selected{% endif %} value="{{g.id}}">{{g.title}}</option> 
+                    {% endfor %}
+                </select></label>             
+            {% endif %}
+            
+            <hr class="quarter">
+            <div>
+                <a href="javascript:window.open('{{application_url}}/feeds/add/1?self_link='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title))"><i class="fa fa-bookmark-o"></i> Subscribe Feed</a><br>
+                <span class="help-block">Drag bookmarklet to your browser toolbar and quickly subscribe to any feed.</span>
+            </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Continue</button>
+    </div>
+    </form>
+{% endmacro %}
+    
+{{render_form()}}
+
+{% block page_script_block %}    
+    $(document).ready(function() {
+        $('#modal-add-subscription').modal('show')
+    })
+{% endblock %}
+ 
 
 

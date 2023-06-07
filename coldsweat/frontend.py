@@ -439,7 +439,7 @@ class FrontendApp(WSGIApp, FeedController, UserController):
                                               locals())
 
         try:
-            response = fetch_url(self_link)
+            response = fetcher.fetch_url(self_link)
         except RequestException:
             form_message = ('ERROR Error, feed address is incorrect or '
                             'host is unreachable.')

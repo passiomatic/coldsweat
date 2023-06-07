@@ -1,9 +1,13 @@
 import flask
 import flask_login
 from playhouse.flask_utils import get_object_or_404
+from requests.exceptions import RequestException
 from ..models import (Feed, Group, Subscription, Entry, Read, Saved)
 import coldsweat.feed as feed
+import coldsweat.fetcher as fetcher
+import coldsweat.markup as markup
 from . import bp
+import coldsweat.utilities as utilities
 
 ENTRIES_PER_PAGE = 30
 FEEDS_PER_PAGE = 60
@@ -143,10 +147,92 @@ def feed_edit(feed_id):
     feed.title = title
     feed.save()
     flask.flash('Changes have been saved.')
-    template = flask.render_template('main/_modal_done.js', location='%s/feeds/' % flask.request.base_url)
+    return _render_script('main/_modal_done.js', f'{flask.request.base_url}/feeds/')
+
+
+@bp.route('/feeds/add/1', methods=['GET', 'POST'])
+@flask_login.login_required
+def feed_add_1():
+    groups = feed.get_groups(flask_login.current_user.db_user)
+
+    # URL could be passed via a GET (bookmarklet) or POST
+    self_link = flask.request.values.get('self_link', '').strip()
+
+    # Handle GET
+
+    if flask.request.method == 'GET':
+        return flask.render_template('main/_feed_add_wizard_1.html', **locals())
+
+    # Handle POST
+
+    group_id = flask.request.form.get('group', 0, type=int)
+
+    # Assume HTTP if URL is passed w/out scheme
+    self_link = self_link if self_link.startswith('http') else f'http://{self_link}'
+
+    if not utilities.validate_url(self_link):
+        flask.flash("Error, specify a valid web address", category="error")
+        return flask.render_template('main/_feed_add_wizard_1.html', **locals())
+
+    try:
+        response = fetcher.fetch_url(self_link)
+    except RequestException:
+        flask.flash("Error, feed address is incorrect or remote host is unreachable.", category="error")
+        return flask.render_template('main/_feed_add_wizard_1.html', **locals())    
+    if not markup.sniff_feed(response.text):
+        links = markup.find_feed_links(response.text, base_url=self_link)
+        return flask.render_template('main/_feed_add_wizard_2.html', **locals())
+
+    # It's a feed
+
+    feed_ = feed.add_feed_from_url(self_link, fetch_data=False)
+    #app.logger.debug("starting fetcher")
+    fetcher.Fetcher(feed_).update_feed_with_data(response.text)
+
+    return _add_subscription(feed_, group_id)
+
+@bp.route('/feeds/add/2', methods=['POST'])
+@flask_login.login_required
+def feed_add_2():
+
+    self_link = flask.request.form.get('self_link', '')
+    group_id = flask.request.form.get('group', 0, type=int)
+
+# @@TODO: handle multiple feed subscription
+#         urls = self.request.POST.getall('feeds')
+#         for url in urls:
+#             pass
+# @@TODO: validate feed
+#         try:
+#             response = fetch_url(self_link)
+#         except RequestException, exc:
+#             form_message = (u'ERROR Error, feed address is incorrect or '
+#                              'host is unreachable.')
+#             return self.respond_with_template('_feed_add_wizard_1.html',
+#                                               locals())
+
+    feed_ = feed.add_feed_from_url(self_link, fetch_data=True)
+    return _add_subscription(feed_, group_id)
+    
+def _add_subscription(feed_, group_id):
+    if group_id:
+        group = Group.get(Group.id == group_id)
+    else:
+        group = Group.get(Group.title == Group.DEFAULT_GROUP)
+
+    subscription = feed.add_subscription(flask_login.current_user.db_user, feed_, group)
+    if subscription:
+        flask.flash(f"Feed has been added to <i>{group.title}</i> group", category="info")
+    else:
+        flask.flash(f"Feed is already in <i>{group.title}</i> group'", category="info")
+    return _render_script('main/_modal_done.js', f'{flask.request.base_url}/?feed={feed_.id}')
+
+
+def _render_script(filename, location):
+    template = flask.render_template(filename, location=location)
     r = flask.make_response(template)
     r.headers["Content-Type"] = "text/javascript"
-    return r
+    return r  
 
 def _make_view_variables(user):
 

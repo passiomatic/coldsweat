@@ -128,7 +128,7 @@ class Feed(db_wrapper.Model):
     self_link = TextField()  # URL of the feed itself (rel=self)
     self_link_hash = CharField(unique=True, max_length=40)
     error_count = IntegerField(default=0)
-    title = CharField()
+    title = CharField(default='')
     # URL associated with the feed (rel=alternate)
     alternate_link = TextField(default='')
     etag = CharField(default='')  # HTTP E-tag

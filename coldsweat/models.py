@@ -111,6 +111,8 @@ class Group(db_wrapper.Model):
     DEFAULT_GROUP = 'Default'
 
     title = CharField(unique=True)
+    system = BooleanField(default=False)
+    color = CharField(default="#FFFFFF")  # Future use
 
     class Meta:
         table_name = 'groups'

@@ -23,7 +23,7 @@ def app():
 
     global test_api_key
     test_user = User.get(User.email == TEST_EMAIL)
-    test_api_key = test_user.api_key
+    test_api_key = test_user.fever_api_key
 
     yield app
 

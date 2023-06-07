@@ -60,7 +60,7 @@ class User(db_wrapper.Model):
 
     # display_name = CharField(default='')
     email = CharField(unique=True)
-    api_key = CharField(unique=True)
+    fever_api_key = CharField(unique=True)
     enabled = BooleanField(default=True)
     password = CharField(255)
 
@@ -71,13 +71,13 @@ class User(db_wrapper.Model):
         table_name = 'users'
 
     @staticmethod
-    def make_api_key(email, password):
+    def make_fever_api_key(email, password):
         return make_md5_hash('%s:%s' % (email, password))
 
     @staticmethod
-    def validate_api_key(api_key):
+    def validate_fever_api_key(api_key):
         # Clients may send api_key in uppercase, lower it
-        return User.get_or_none(User.api_key == api_key.lower(), User.enabled == True)  # noqa
+        return User.get_or_none(User.fever_api_key == api_key.lower(), User.enabled == True)  # noqa
 
     def check_password(self, input_password):
         return security.check_password_hash(self.password, input_password)
@@ -100,7 +100,7 @@ class User(db_wrapper.Model):
 
 @pre_save(sender=User)
 def on_user_save(model, user, created):
-    user.api_key = User.make_api_key(user.email, user.password)
+    user.fever_api_key = User.make_fever_api_key(user.email, user.password)
     user.password = security.generate_password_hash(user.password)
 
 

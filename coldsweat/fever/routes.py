@@ -33,7 +33,7 @@ def index_post():
 
     if 'api_key' in flask.request.form:
         api_key = flask.request.form['api_key']
-        user = User.validate_api_key(api_key)
+        user = User.validate_fever_api_key(api_key)
         if not user:
             app.logger.warning('unknown API key %s, unauthorized' % api_key)
             return flask.jsonify(result)

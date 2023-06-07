@@ -26,7 +26,7 @@
             <li><a data-toggle="tooltip" class="add-trigger" href="{{application_url}}/feeds/add/1" data-placement="right" title="Add feed subscription" data-remote-modal="modal-add-subscription"><i class="fa fa-plus-square fa-fw"></i></a></li>                                    
             <li class="sep"><li class="dropdown"><a data-toggle="dropdown" href="#"><i class="fa fa-user fa-fw"></i></a>   
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="#" data-remote-modal>Your profile</a>
+                    <li><a href="{{ url_for('main.profile') }}" data-remote-modal>Your profile</a>
                     <li><a href="{{ url_for('auth.logout') }}">Log out</a>
                 </ul>
             </li>

@@ -5,7 +5,7 @@ from flask import current_app as app
 from peewee import IntegrityError
 from playhouse.flask_utils import get_object_or_404
 from requests.exceptions import RequestException
-from ..models import (Feed, Group, Subscription, Entry, Read, Saved)
+from ..models import (User, Feed, Group, Subscription, Entry, Read, Saved)
 import coldsweat.models as models
 import coldsweat.feed as feed
 import coldsweat.fetcher as fetcher
@@ -280,7 +280,33 @@ def feed_add_2():
 
     feed_ = feed.add_feed_from_url(self_link, fetch_data=True)
     return _add_subscription(feed_, group_id)
-    
+
+@bp.route('/profile', methods=['GET', 'POST'])
+@flask_login.login_required
+def profile():
+
+    user = flask_login.current_user.db_user
+
+    # Collect editable fields
+    email = user.email
+    password = ''
+
+    if flask.request.method == 'POST':
+
+        new_email = flask.request.form.get('email', '')
+        new_password = flask.request.form.get('password', '')
+
+        if User.validate_password(new_password):
+            user.email = new_email
+            user.password = new_password
+            user.save()
+            return _render_script('main/_modal_done.js', location=flask.url_for("main.index"))
+        else:
+            flask.flash('Error, password is too short.', category="error")
+
+    return flask.render_template('main/_user_edit.html', **locals())
+
+
 def _add_subscription(feed_, group_id):
     if group_id:
         group = Group.get(Group.id == group_id)

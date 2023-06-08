@@ -111,7 +111,6 @@ class Group(db_wrapper.Model):
     DEFAULT_GROUP = 'Default'
 
     title = CharField(unique=True)
-    system = BooleanField(default=False)
     color = CharField(default="#FFFFFF")  # Future use
 
     class Meta:
@@ -239,6 +238,18 @@ class Subscription(db_wrapper.Model):
         table_name = 'subscriptions'
 
 
+BUILTIN_GROUPS = [
+    {'id': 1, 'title': Group.DEFAULT_GROUP},
+    {'id': 2, 'title': 'Reserved 2'},
+    {'id': 3, 'title': "Reserved 3"},
+    {'id': 4, 'title': "Reserved 4"},
+    {'id': 5, 'title': "Reserved 5"},
+    {'id': 6, 'title': "Reserved 6"},
+    {'id': 7, 'title': "Reserved 7"},
+    {'id': 8, 'title': "Reserved 8"},
+    {'id': 9, 'title': "Reserved 9"},
+]
+
 def setup():
     """
     Create database and tables for all models and setup bootstrap data
@@ -248,7 +259,8 @@ def setup():
                                 Subscription], safe=True)
 
     # Create the bare minimum to bootstrap system
-    try:
-        Group.create(title=Group.DEFAULT_GROUP)
-    except IntegrityError:
-        return
+    (Group.insert_many(BUILTIN_GROUPS)
+     .on_conflict(
+        conflict_target=[Group.id],
+        # Pass down values from insert clause
+        preserve=[Group.title]).execute())

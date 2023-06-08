@@ -14,11 +14,22 @@ This means that you can connect Coldsweat to a variety of clients like [Reeder][
 * ✅ Support for grouping of similar items
 * TODO: Parallel feed fetching
 
-## Setup
+## Installation and setup
 
 Download Coldsweat from PyPI using `pip`:
 
     $ pip install coldsweat
+
+Create a new user passing email and password to the `setup` command:
+
+    $ flask --app coldsweat setup alice@example.com -p somepassword
+
+Alternatively, you can enter the password interactively:
+
+    $ flask --app coldsweat setup alice@example.com  
+    Enter password for user alice@example.com:
+    Enter password (again):
+    Setup completed for alice@example.com
 
 See _[setup]_ page for additional information.
 

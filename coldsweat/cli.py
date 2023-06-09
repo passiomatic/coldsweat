@@ -25,9 +25,8 @@ def add_commands(app):
         if not password:
             password = get_password(f"Enter password for user {email}: ")
 
-        # @@TODO: pass display name
-        User.create(email=email, password=password)
-        print(f"Setup completed for {email}")
+        User.create(email=email, password=password, display_name=name)
+        print(f"Setup completed for user {email}")
 
     @app.cli.command("fetch", help="Update all feeds")
     def command_fetch():

@@ -4,17 +4,16 @@
     <h3>Your Profile</h3>
   </div>
   <div class="modal-body">          
-        <!-- TODO Use display name -->
-        <p>You are logged in as <b>{{user.email}}</b>.</p>
+        <p>You are logged in as <b>{{user.display_name or user.email}}</b>.</p>
         <fieldset> 
+          <label for="display_name">Your name</label> 
+          <input id="display_name" required type="text" maxlength="40" name="display_name" size="40" value="{{user.display_name}}">
+
           <label>E-mail</label> 
-          <input id="email_" type="email" name="email" size="40" value="{{email}}">
-              <label>New Password (<a id="show-password-trigger" href="#">Show</a>)</label> 
-              <input id="password_" type="password" name="password" size="40" value="{{new_password}}">
-              <span class="help-block">At least {{user.MIN_PASSWORD_LENGTH}} characters long.</span>
+          <input id="email_" required type="email" name="email" size="40" value="{{user.email}}">
         </fieldset>
   </div>
   <div class="modal-footer">
-    <button type="submit" name="" value="" class="btn btn-primary">Save Changes</button>
+    <button type="submit" class="btn btn-primary">Save Changes</button>
   </div>
 </form>

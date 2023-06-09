@@ -61,7 +61,7 @@ class User(db_wrapper.Model):
 
     MIN_PASSWORD_LENGTH = 12
 
-    # display_name = CharField(default='')
+    display_name = CharField(default='')
     email = CharField(unique=True)
     fever_api_key = CharField(unique=True)
     enabled = BooleanField(default=True)

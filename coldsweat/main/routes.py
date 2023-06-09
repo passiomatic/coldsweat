@@ -287,24 +287,17 @@ def profile():
 
     user = flask_login.current_user.db_user
 
-    # Collect editable fields
-    email = user.email
-    password = ''
-
     if flask.request.method == 'POST':
 
         new_email = flask.request.form.get('email', '')
-        new_password = flask.request.form.get('password', '')
+        new_display_name = flask.request.form.get('display_name', '')
 
-        if User.validate_password(new_password):
-            user.email = new_email
-            user.password = new_password
-            user.save()
-            return _render_script('main/_modal_done.js', location=flask.url_for("main.index"))
-        else:
-            flask.flash('Error, password is too short.', category="error")
+        user.email = new_email
+        user.display_name = new_display_name
+        user.save()
+        return _render_script('main/_modal_done.js', location=flask.url_for("main.index"))
 
-    return flask.render_template('main/_user_edit.html', **locals())
+    return flask.render_template('main/_user_edit.html', user=user)
 
 
 def _add_subscription(feed_, group_id):

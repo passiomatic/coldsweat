@@ -10,6 +10,7 @@ from flask import current_app as app
 import feedparser
 import requests
 from requests.exceptions import RequestException
+from peewee import SqliteDatabase
 from webob.exc import (
     HTTPGone,
     HTTPNotModified,
@@ -19,7 +20,7 @@ from webob.exc import (
     HTTPForbidden,
     HTTPError)
 from webob.exc import status_map
-from .models import (Entry, Feed)
+from .models import (Entry, EntryIndex, Feed, FeedIndex, db_wrapper)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
                         format_http_datetime,
@@ -270,6 +271,18 @@ class Fetcher(object):
 
             entry.save()
             #  @@TODO: entries.append(entry)
+
+            # FTS is sqlite only for now
+            # @@TODO if isinstance(db_wrapper.database, SqliteDatabase):
+            (EntryIndex.insert({
+                EntryIndex.rowid: entry.id,
+                EntryIndex.title: entry.title,
+                EntryIndex.content: entry.content,
+                EntryIndex.author: entry.author
+            })
+                # Just replace older values
+                .on_conflict_replace()
+                .execute())
 
             app.logger.debug("parsed entry %s from %s" % (guid, self.netloc))
 

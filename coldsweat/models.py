@@ -4,9 +4,10 @@ Database models
 from datetime import datetime
 from playhouse.signals import (pre_save, Model)
 from playhouse.flask_utils import FlaskDB
+from playhouse.sqlite_ext import FTS5Model, SearchField, RowIDField
 from peewee import (BooleanField, CharField, DateTimeField,
                     ForeignKeyField,
-                    IntegerField, IntegrityError,
+                    IntegerField,
                     TextField)
 from werkzeug import security
 from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
@@ -15,7 +16,9 @@ __all__ = [
     'User',
     'Group',
     'Feed',
+    'FeedIndex',
     'Entry',
+    'EntryIndex',
     'Read',
     'Saved',
     'Subscription',
@@ -163,6 +166,18 @@ def on_feed_save(model, feed, created):
     feed.self_link_hash = make_sha1_hash(feed.self_link)
 
 
+class FeedIndex(FTS5Model):
+    """
+    Full-text search index for feeds
+    """
+    rowid = RowIDField()
+    title = SearchField()
+
+    class Meta:
+        database = db_wrapper.database
+        options = {'tokenize': 'porter'}
+
+
 class Entry(db_wrapper.Model):
     """
     Atom/RSS entry
@@ -188,6 +203,20 @@ class Entry(db_wrapper.Model):
     @property
     def last_updated_on_as_epoch(self):
         return datetime_as_epoch(self.last_updated_on)
+
+
+class EntryIndex(FTS5Model):
+    """
+    Full-text search index for entries
+    """
+    rowid = RowIDField()
+    title = SearchField()
+    content = SearchField()
+    author = SearchField()
+
+    class Meta:
+        database = db_wrapper.database
+        options = {'tokenize': 'porter'}
 
 
 @pre_save(sender=Entry)
@@ -255,7 +284,7 @@ def setup():
     Create database and tables for all models and setup bootstrap data
     """
     with db_wrapper.database as database:
-        database.create_tables([User, Feed, Entry, Group, Read, Saved,
+        database.create_tables([User, Feed, FeedIndex, Entry, EntryIndex, Group, Read, Saved,
                                 Subscription], safe=True)
 
     # Create the bare minimum to bootstrap system

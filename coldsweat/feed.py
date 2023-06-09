@@ -6,7 +6,7 @@ import time
 from xml.etree import ElementTree
 from flask import current_app as app
 from peewee import JOIN, fn, IntegrityError
-from .models import (Entry, Feed, Group, Read, Saved, Subscription)
+from .models import (Entry, Feed, FeedIndex, Group, Read, Saved, Subscription)
 from .utilities import make_sha1_hash, scrub_url
 from .fetcher import Fetcher
 
@@ -177,6 +177,16 @@ def add_feed(feed, fetch_data=False):
         pass
 
     feed.save()
+    # FTS is sqlite only for now
+    # @@TODO if isinstance(db_wrapper.database, SqliteDatabase):
+    (FeedIndex.insert({
+        FeedIndex.rowid: feed.id,
+        FeedIndex.title: feed.title,
+    })
+        # Just replace older values
+        .on_conflict_replace()
+        .execute())
+
     if fetch_data:
         fetch_feeds([feed])
     return feed

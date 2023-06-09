@@ -158,7 +158,7 @@ def entry_list_mark():
             (Feed.last_checked_on < before)
         ).distinct()
         flask.flash('Feed has been marked as read', category="info")
-        redirect_url = '%s/entries/?feed=%s' % (flask.request.base_url, feed_id)
+        redirect_url = flask.url_for('main.entry_list', feed=feed_id)
     else:
         q = Entry.select(Entry).join(Feed).join(Subscription).where(
             (Subscription.user == user) &
@@ -169,7 +169,7 @@ def entry_list_mark():
             (Feed.last_checked_on < before)
         ).distinct()
         flask.flash('All entries have been marked as read', category="info")
-        redirect_url = '%s/entries/?unread' % flask.request.base_url
+        redirect_url = flask.url_for('main.entry_list', unread='')
 
     #  @@TODO: Use insert_many()
     with models.db_wrapper.database.transaction():
@@ -214,7 +214,7 @@ def feed_edit(feed_id):
     feed.title = title
     feed.save()
     flask.flash('Changes have been saved.')
-    return _render_script('main/_modal_done.js', f'{flask.request.base_url}/feeds/')
+    return _render_script('main/_modal_done.js', location=flask.url_for("main.entry_list", feed=feed.id))
 
 
 @bp.route('/feeds/add/1', methods=['GET', 'POST'])
@@ -311,7 +311,7 @@ def _add_subscription(feed_, group_id):
         flask.flash(f"Feed has been added to <i>{group.title}</i> group", category="info")
     else:
         flask.flash(f"Feed is already in <i>{group.title}</i> group'", category="info")
-    return _render_script('main/_modal_done.js', f'{flask.request.base_url}/?feed={feed_.id}')
+    return _render_script('main/_modal_done.js', location=flask.url_for("main.entry_list", feed=feed_.id))
 
 
 def _render_script(filename, location):

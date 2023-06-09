@@ -12,6 +12,7 @@ pytest==7.3.1
 urllib3==1.26.6
 flask==2.3.2
 flask-login==0.6.2
+flask-cdn==1.5.3
 # Connect Coldsweat to a MySQL database (optional)
 #PyMySQL
 # Connect Coldsweat to a PostgreSQL database (optional)

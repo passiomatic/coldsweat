@@ -7,7 +7,7 @@ VERSION_STRING = '%d.%d.%d%s' % __version__
 import os 
 import flask_login
 import flask
-
+from flask_cdn import CDN
 from .auth import bp as auth_blueprint
 from .main import bp as main_blueprint
 from .fever import bp as fever_blueprint
@@ -16,6 +16,7 @@ from .config import Config
 import coldsweat.cli as cli
 import coldsweat.models as models
 
+cdn = CDN()
 
 def create_app(config_class=Config):
     app = flask.Flask(__name__)
@@ -25,6 +26,8 @@ def create_app(config_class=Config):
     os.makedirs(app.instance_path, exist_ok=True)
 
     # Initialize Flask extensions here
+    
+    cdn.init_app(app)
     
     models.db_wrapper.init_app(app)
 

@@ -13,6 +13,7 @@ dependencies = [
   "feedparser >= 6.0.10",
   "flask >= 2.3.0,<3",
   "flask-login >= 0.6.2"
+  "flask-cdn >= 1.5.3"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

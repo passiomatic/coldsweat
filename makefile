@@ -1,4 +1,4 @@
-all: run
+all: run-debug
 
 # Env. Setup 
 
@@ -22,6 +22,9 @@ setup:
 	flask --app coldsweat import subscriptions.opml alice@example.com
 
 run:
+	flask --app coldsweat run
+
+run-debug:
 	flask --app coldsweat run --debug
 
 fetch:

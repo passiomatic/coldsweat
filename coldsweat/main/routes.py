@@ -300,6 +300,11 @@ def profile():
     return flask.render_template('main/_user_edit.html', user=user)
 
 
+@bp.route('/cheatsheet')
+def cheatsheet():
+    return flask.render_template('main/_cheatsheet.html', **locals())
+
+
 def _add_subscription(feed_, group_id):
     if group_id:
         group = Group.get(Group.id == group_id)

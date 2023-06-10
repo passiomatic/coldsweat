@@ -33,7 +33,7 @@
             <h2>Sync with Your Reader</h2>
             
             <p>Configure your favorite feed reader using your Coldsweat credentials and this web address:</p>            
-            <p><pre><code>{{request.application_url}}/fever</code></pre></p>
+            <p><pre><code>{{ url_for("fever.index_get") }}</code></pre></p>
                     
             <hr>
                             
@@ -52,7 +52,7 @@
             
             <p><pre>$ python sweat.py fetch</pre></p>
             
-            <p>You should use Cron or similar utilities to schedule feeds fetch on a regular basis.</p>
+            <p>You should use <code>Cron</code> or similar utilities to schedule feeds fetch on a regular basis.</p>
             
             <hr>
             

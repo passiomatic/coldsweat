@@ -193,8 +193,7 @@ class Entry(db_wrapper.Model):
     content_type = CharField(default='text/html')
     content = TextField()
     thumbnail_url = CharField(default='')  # Future use
-    # @@TODO: rename to published_on
-    last_updated_on = DateTimeField()
+    published_on = DateTimeField()
     author = CharField(default='')
     link = TextField(default='')  # If empty the entry *must* provide a GUID
 
@@ -202,8 +201,8 @@ class Entry(db_wrapper.Model):
         table_name = 'entries'
 
     @property
-    def last_updated_on_as_epoch(self):
-        return datetime_as_epoch(self.last_updated_on)
+    def published_on_as_epoch(self):
+        return datetime_as_epoch(self.published_on)
 
     @property
     def text_content(self):

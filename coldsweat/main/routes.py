@@ -36,7 +36,7 @@ def entry_list():
 
     view_variables.update({
         'entries': query.order_by(
-            Entry.last_updated_on.desc()
+            Entry.published_on.desc()
         ).offset(offset).limit(ENTRIES_PER_PAGE),
         'offset': offset + ENTRIES_PER_PAGE,
         'prev_date': flask.request.args.get('prev_date', None),
@@ -54,8 +54,8 @@ def entry(entry_id):
 
     feed.mark_entry(user, entry, 'read')
     query, view_variables = _make_view_variables(user)
-    n = query.where(Entry.last_updated_on < entry.last_updated_on).order_by(
-        Entry.last_updated_on.desc()).limit(1)
+    n = query.where(Entry.published_on < entry.published_on).order_by(
+        Entry.published_on.desc()).limit(1)
 
     view_variables.update({
         'entry': entry,

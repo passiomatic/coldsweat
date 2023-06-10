@@ -225,7 +225,7 @@ def mark_command(user, result):
             ~(Entry.id << Read.select(Read.entry).where(
                 Read.user == user)) &
             # Exclude entries fetched after last sync
-            (Entry.last_updated_on < before)
+            (Entry.published_on < before)
         ).distinct().objects()
 
         with models.db_wrapper.database.transaction():
@@ -260,7 +260,7 @@ def mark_command(user, result):
                 ~(Entry.id << Read.select(Read.entry).where(
                     Read.user == user)) &
                 # Exclude entries fetched after last sync
-                (Entry.last_updated_on < before)
+                (Entry.published_on < before)
             ).distinct().objects()
         else:
             try:
@@ -278,7 +278,7 @@ def mark_command(user, result):
                 ~(Entry.id << Read.select(
                     Read.entry).where(Read.user == user)) &
                 # Exclude entries fetched after last sync
-                (Entry.last_updated_on < before)
+                (Entry.published_on < before)
             ).distinct().objects()
 
         with models.db_wrapper.database.transaction():
@@ -355,7 +355,7 @@ def _get_entries(user, q):
             'url': entry.link,
             'is_saved': 1 if entry.id in saved_ids else 0,
             'is_read': 1 if entry.id in read_ids else 0,
-            'created_on_time': entry.last_updated_on_as_epoch
+            'created_on_time': entry.published_on_as_epoch
         })
     return result
 

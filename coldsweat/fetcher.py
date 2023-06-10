@@ -266,7 +266,7 @@ class Fetcher(object):
                 author=t.get_author() or feed_author,
                 content=content,
                 content_type=content_type,
-                last_updated_on=timestamp
+                published_on=timestamp
             )
 
             entry.save()
@@ -331,7 +331,7 @@ class Fetcher(object):
             author='Coldsweat',
             content=content,
             content_type=content_type,
-            last_updated_on=self.instant
+            published_on=self.instant
         )
         entry.save()
         app.logger.debug("synthesized entry %s" % guid)

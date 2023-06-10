@@ -20,7 +20,7 @@ from webob.exc import (
     HTTPForbidden,
     HTTPError)
 from webob.exc import status_map
-from .models import (Entry, EntryIndex, Feed, FeedIndex, db_wrapper)
+from .models import (Entry, EntryIndex, Feed, FeedIndex)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
                         format_http_datetime,
@@ -270,15 +270,12 @@ class Fetcher(object):
             )
 
             entry.save()
-            #  @@TODO: entries.append(entry)
 
-            # FTS is sqlite only for now
-            # @@TODO if isinstance(db_wrapper.database, SqliteDatabase):
+            # FTS is sqlite-only
+            #if isinstance(EntryIndex._meta.database.obj, SqliteDatabase):
             (EntryIndex.insert({
                 EntryIndex.rowid: entry.id,
-                EntryIndex.title: entry.title,
-                EntryIndex.content: entry.content,
-                EntryIndex.author: entry.author
+                EntryIndex.content: entry.text_content
             })
                 # Just replace older values
                 .on_conflict_replace()

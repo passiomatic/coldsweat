@@ -10,6 +10,7 @@ from peewee import (BooleanField, CharField, DateTimeField,
                     IntegerField,
                     TextField)
 from werkzeug import security
+from markupsafe import Markup
 from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
 
 __all__ = [
@@ -204,15 +205,20 @@ class Entry(db_wrapper.Model):
     def last_updated_on_as_epoch(self):
         return datetime_as_epoch(self.last_updated_on)
 
+    @property
+    def text_content(self):
+        '''
+        Return entry content suitale for full-text indexing
+        '''
+        return '\n'.join([self.title, self.author,  Markup(self.content).striptags()])
+
 
 class EntryIndex(FTS5Model):
     """
     Full-text search index for entries
     """
     rowid = RowIDField()
-    title = SearchField()
     content = SearchField()
-    author = SearchField()
 
     class Meta:
         database = db_wrapper.database

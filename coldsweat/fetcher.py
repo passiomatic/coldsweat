@@ -11,15 +11,8 @@ import feedparser
 import requests
 from requests.exceptions import RequestException
 from peewee import SqliteDatabase
-from webob.exc import (
-    HTTPGone,
-    HTTPNotModified,
-    HTTPServiceUnavailable,
-    HTTPNotFound,
-    HTTPInternalServerError,
-    HTTPForbidden,
-    HTTPError)
-from webob.exc import status_map
+import werkzeug.exceptions as exceptions
+from werkzeug import http
 from .models import (Entry, EntryIndex, Feed, FeedIndex)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
@@ -63,7 +56,7 @@ class Fetcher(object):
         self.feed.last_status = response.status_code
         app.logger.warning(
             "%s has caused an error on server, skipped" % self.netloc)
-        raise HTTPInternalServerError
+        raise exceptions.InternalServerError
 
     def handle_403(self, response):
         '''
@@ -72,7 +65,7 @@ class Fetcher(object):
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
         app.logger.warning("%s access was denied, skipped" % self.netloc)
-        raise HTTPForbidden
+        raise exceptions.Forbidden
 
     def handle_404(self, response):
         '''
@@ -81,7 +74,7 @@ class Fetcher(object):
         self.feed.error_count += 1
         self.feed.last_status = response.status_code
         app.logger.warn("%s has been not found, skipped" % self.netloc)
-        raise HTTPNotFound
+        raise exceptions.NotFound
 
     def handle_410(self, response):
         '''
@@ -92,7 +85,7 @@ class Fetcher(object):
         self.feed.last_statu = response.status_code
         app.logger.warning("%s is gone, disabled" % self.netloc)
         self._synthesize_entry('Feed has been removed from the origin server.')
-        raise HTTPGone
+        raise exceptions.Gone
 
     def handle_304(self, response):
         '''
@@ -100,7 +93,6 @@ class Fetcher(object):
         '''
         app.logger.debug("%s hasn't been modified, skipped" % self.netloc)
         self.feed.last_status = response.status_code
-        raise HTTPNotModified
 
     def handle_301(self, response):
         '''
@@ -118,13 +110,13 @@ class Fetcher(object):
                     self.netloc, self_link))
         else:
             self.feed.enabled = False
-            self.feed.last_status = DuplicatedFeedError.code
+            self.feed.last_status = DuplicatedFeed.code
             self.feed.error_count += 1
             self._synthesize_entry('Feed has a duplicated web address.')
             app.logger.warning(
                 "new %s location %s is duplicated, disabled" % (
                     self.netloc, self_link))
-            raise DuplicatedFeedError
+            raise DuplicatedFeed
 
     def handle_200(self, response):
         '''
@@ -133,6 +125,8 @@ class Fetcher(object):
         self.feed.etag = response.headers.get('ETag', '')
         # Save final status code discarding redirects
         self.feed.last_status = response.status_code
+        self._parse_feed(response.text)
+        self._fetch_icon()        
 
     handle_307 = handle_200   # Alias
     handle_302 = handle_200   # Alias
@@ -163,7 +157,7 @@ class Fetcher(object):
                                  modified_since=self.feed.last_updated_on)
         except RequestException:
             # Record any network error as 'Service Unavailable'
-            self.feed.last_status = HTTPServiceUnavailable.code
+            self.feed.last_status = exceptions.ServiceUnavailable.code
             self.feed.error_count += 1
             app.logger.warning(
                 "a network error occured while fetching %s, skipped"
@@ -181,7 +175,7 @@ class Fetcher(object):
             status = response.status_code
 
         try:
-            handler = getattr(self, 'handle_%d' % status, None)
+            handler = getattr(self, f'handle_{status}', None)
             if handler:
                 app.logger.debug("got status %s from server" % status)
                 handler(response)
@@ -191,11 +185,7 @@ class Fetcher(object):
                     "%s replied with unhandled status %d, aborted" % (
                         self.netloc, status))
                 return
-            self._parse_feed(response.text)
-            self._fetch_icon()
-        except HTTPNotModified:
-            pass  # Nothing to do
-        except (HTTPError, DuplicatedFeedError):
+        except exceptions.HTTPException:
             self.check_feed_health()
         finally:
             self.feed.save()
@@ -279,9 +269,9 @@ class Fetcher(object):
             })
                 # Just replace older values
                 .on_conflict_replace()
-                .execute())
+                .execute())            
 
-            app.logger.debug("parsed entry %s from %s" % (guid, self.netloc))
+            app.logger.debug("added entry %s from %s" % (guid, self.netloc))
 
     def _fetch_icon(self):
 
@@ -375,13 +365,9 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
 # ------------------------------------------------------
 
 
-class DuplicatedFeedError(Exception):
+class DuplicatedFeed(exceptions.HTTPException):
     code = 900
-    title = 'Duplicated feed'
-    explanation = ('Feed address matches another already present in the'
-                   ' database.')
+    description = 'Feed address matches another already present in the database'
 
-
-# Update WebOb status codes map
-for klass in (DuplicatedFeedError,):
-    status_map[klass.code] = klass
+# Update Werkzeug status codes map
+http.HTTP_STATUS_CODES[DuplicatedFeed.code] = "Duplicated feed"

@@ -3,8 +3,7 @@ Custom Jinja Filters
 '''
 
 from flask import current_app as app
-
-from webob.exc import status_map
+from werkzeug import http
 from . import utilities
 
 
@@ -61,7 +60,7 @@ def epoch(value):
 def status_title(code):
     title = 'Unknown (%s)' % code
     try:
-        return status_map[code].title
+        return http.HTTP_STATUS_CODES[code]
     except KeyError:
         pass
     return title

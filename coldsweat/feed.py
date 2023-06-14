@@ -178,7 +178,6 @@ def add_feed(feed, fetch_data=False):
 
     feed.save()
     # FTS is sqlite only for now
-    # @@TODO if isinstance(db_wrapper.database, SqliteDatabase):
     (FeedIndex.insert({
         FeedIndex.rowid: feed.id,
         FeedIndex.title: feed.title,

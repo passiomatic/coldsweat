@@ -13,7 +13,7 @@ from requests.exceptions import RequestException
 from peewee import SqliteDatabase
 import werkzeug.exceptions as exceptions
 from werkzeug import http
-from .models import (Entry, EntryIndex, Feed, FeedIndex)
+from .models import (Entry, EntryIndex, Feed)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
                         format_http_datetime,
@@ -262,7 +262,6 @@ class Fetcher(object):
             entry.save()
 
             # FTS is sqlite-only
-            #if isinstance(EntryIndex._meta.database.obj, SqliteDatabase):
             (EntryIndex.insert({
                 EntryIndex.rowid: entry.id,
                 EntryIndex.content: entry.text_content

@@ -1,8 +1,6 @@
-# Coldsweat is not maintaned anymore
+# Coldsweat 
 
-However, Oz Tiram has ported Coldsweat to Python 3. Please check the `dev` branch at:
-
-https://github.com/oz123/coldsweat/tree/dev
+**Note**: After years of pause I'm rewriting Coldsweat using Python 3 and Flask. Work is done in a [dedicated 0.10 branch][dev-branch].
 
 * * * 
 
@@ -63,3 +61,4 @@ Coldsweat started in July 2013 as a fork of [Bottle Fever][b] by Rui Carmo. By n
 [ff]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-features
 [setup]: https://github.com/passiomatic/coldsweat/wiki/Setup
 [plugin]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-Plugin-Interface
+[dev-branch]: https://github.com/passiomatic/coldsweat/tree/0.10-wip

@@ -29,14 +29,15 @@ def create_app(config_class=None):
     app = flask.Flask(__name__, instance_relative_config=True)
     # Create an instance dir if needed
     os.makedirs(app.instance_path, exist_ok=True)
-    
+    app.logger.debug(f"Flask instance_path is {app.instance_path}")
+
     if config_class:    
         app.config.from_object(config_class)
     else:
         if app.config.from_file("config.toml", load=toml.load, text=False, silent=True):
             app.logger.info(f"Using config.toml file found in {app.instance_path}")
         else:
-            # Attempt to load settings from up env. vars
+            # Attempt to load settings from env. vars
             app.config.from_prefixed_env()
 
         if 'DATABASE_URL' in app.config:
@@ -46,7 +47,6 @@ def create_app(config_class=None):
             # Fallback to sqlite db and dev secret key
             default_database_url = f"sqlite:///{os.path.join(app.instance_path, 'coldsweat.db')}"
             #@@TODO Specify foreign_keys=1 journal_mode=WAL"
-            # See https://flask.palletsprojects.com/en/2.3.x/config/#SECRET_KEY on how to set a proper secret key
             app.logger.debug(f"DATABASE_URL not found in configuration settings, using default {default_database_url}")
             app.config['SECRET_KEY'] = "Secret key for dev purposes only"
             app.config['DATABASE_URL'] = default_database_url

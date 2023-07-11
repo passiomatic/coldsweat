@@ -72,7 +72,7 @@ Upgrade to the latest Coldsweat version with:
 
     $ pip install -U coldsweat
 
-**Note**: there's no upgrade path from previous 0.9.x releases. Your best best if to export OPML subscriptions and import them in the new 0.10 release.    
+**Note**: there's no upgrade path from previous 0.9.x releases. Your best bet if to export OPML subscriptions and import them in the new 0.10 release.    
 
 ## Contributing
 

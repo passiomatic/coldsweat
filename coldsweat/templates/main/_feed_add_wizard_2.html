@@ -1,0 +1,27 @@
+<form action="{{ url_for('main.feed_add_2') }}" data-ajax-post method="POST">
+  <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>
+    <h3>Add Feed Subscription</h3>
+  </div>
+  {% if links %}
+      <div class="modal-body">          
+            <p>Coldsweat found the following feed(s) for {{self_link|friendly_url}}:</p>
+            {% for url, title in links %}
+                <label>
+                    <input type="radio" {%if loop.first %}checked{% endif %} name="self_link" value="{{url}}"> {{title}} <code>{{url}}</code>
+                </label>             
+            {% endfor %}
+            <input type="hidden" name="group" value="{{group_id}}">
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </div>
+  {% else %}
+      <div class="modal-body">          
+            <p>Coldsweat could not find any feed for {{self_link|friendly_url}}.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+      </div>
+  {% endif %}        
+</form>

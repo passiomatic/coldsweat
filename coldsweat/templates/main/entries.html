@@ -1,0 +1,64 @@
+
+
+{% macro render_entries() %}
+    {% set ns = namespace(prev_date = '') %}
+    {% for e in entries %}
+        {% set date = e.published_on|since_today %}
+        {% if date != ns.prev_date %}
+            <li class="heading">
+                <div class="toolbar dim">
+                    {% if count and (filter_class in ['unread']) %}
+                        <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{ url_for('main.entry_list_mark', all='') }}" data-remote-modal><i class="fa fa-check-square"></i></a>
+                    {% elif count and feed_id and filter_class in ['feeds'] %}
+                        <a class="popover-trigger" data-container="body" href="#popover-content"><i class="fa fa-cog"></i> Manage</a>
+                    {% endif %}                  
+                </div>
+                <h2><span>{{panel_title}} › </span><time>{{date}}</time></h2>
+            </li>            
+        {% endif %}
+        <li data-entry="{{e.id}}" class="entry {% if e.id in saved_ids %}status-saved{% endif %} {%if e.id in read_ids %}status-read{% endif %}">
+            <div class="item-inner">
+                <h3 class="h4">
+                    <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*"><a href="{{ url_for('main.entry', entry_id=e.id, filter=filter_name ) }}">{{e.title}}</a>
+                </h3>
+                <div class="meta dim">
+                    <span class="feed">{{e.feed.title}}</span>
+                    <span class="actions">
+                        {% if e.id in saved_ids %}<i class="save-trigger icon-saved fa" title="Unsave"></i>{% else %}<i class="save-trigger icon-unsaved fa" title="Save"></i>{%endif%}{% if e.id in read_ids %}<i class="read-trigger icon-read fa" title="Make as unread"></i>{%else%}<i class="read-trigger icon-unread fa" title="Mark as read"></i>{%endif%}                    
+                    </span>
+                </div>                  
+            </div>
+        </li>
+        {% set ns.prev_date = date  %}
+    {% endfor %}
+    {% if offset < count %}
+        <li class="more">
+            <a href="{{ url_for('main.entry_list', filter=filter_name, offset=offset, prev_date=prev_date, xhr=1) }}">More</a>
+        </li>
+    {% endif %}
+    <script id="popover-content" type="text/html">
+        <a class="btn btn-small btn-default" href="{{ url_for('main.entry_list_mark', feed=feed_id ) }}" data-remote-modal>Mark as Read</a>
+        <a class="btn btn-small btn-default" href="{{ url_for('main.feed_edit', feed=feed_id ) }}" data-remote-modal="modal-feed-edit">About</a>
+        <a class="btn btn-small btn-error" href="{{ url_for('main.feed_remove', feed=feed_id ) }}" data-remote-modal>Remove</a>
+    </script>    
+{% endmacro %}
+
+{% if is_xhr %}
+    {{render_entries()}}
+{% else %}
+    {% extends "main/index.html" %}
+    {% block panel_block %}
+        {% if count %}
+            <div class="panel-content">
+                <ul class="view list-view">                      
+                    {{render_entries()}}
+                </ul>
+            </div>
+        {% else %}
+            <div class="notice">
+                <i class="fa fa-tint fa-4x"></i>
+                No entries found.
+            </div>
+        {% endif %}
+    {% endblock %}
+{% endif %}

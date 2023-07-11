@@ -1,0 +1,60 @@
+{% macro feed_status(feed, threshold) %}
+    {% if not feed.enabled %}
+        status-disabled
+    {% endif %}          
+    {% if threshold and feed.error_count > (threshold * 0.80) %}
+        status-sick
+    {% endif %}          
+{% endmacro %}
+
+{% macro render_feeds() %}
+    {% for f in feeds %}
+        <li class="feed {% if loop.first %}current{% endif %} {{feed_status(f, max_errors)}}">
+            <div class="item-inner">
+                <h3 class="h4">
+                    <img class="favicon" src="{{f.icon_url}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{ url_for('main.entry_list', filter='feed', id=f.id) }}">{{f.title}}</a>
+                </h3>
+                <div class="meta dim">
+                    <span class="feed">
+                        {%if f.entry_count%}{{f.entry_count }}{% else %}No{% endif %} entries
+                    </span>
+                    <span class="actions">
+<a href="{{ url_for('main.feed_edit', feed=f.id ) }}" data-remote-modal="modal-feed-edit">About</a>&ensp;&middot;&ensp;
+<a href="{{ url_for('main.feed_remove', feed=f.id)}}" data-remote-modal>Remove</a>
+{% if not f.enabled %}&ensp;&middot;&ensp;<a href="{{ url_for('main.feed_enable', feed=f.id)}}" data-remote-modal>Enable Again</a>{% endif %}
+                    </span>
+                </div>                                              
+            </div>
+        </li>
+    {% endfor %}
+    {% if offset < count %}
+        <li class="more">
+            <a href="{{ url_for('main.feed_list', offset=offset, xhr=1) }}">More</a>
+        </li>
+    {% endif %}            
+{% endmacro %}
+
+ 
+{% if is_xhr %}
+    {{render_feeds()}}
+{% else %}
+    {% extends "main/index.html" %}
+    {% block panel_block %}
+        {% if count %}
+            <div class="panel-content">
+                <ul class="view list-view">                    
+                        <li class="heading">
+                            <h2>Feeds</h2>
+                        </li>                       
+                    {{render_feeds()}}
+                </ul>
+            </div>
+        {% else %}
+            <div class="notice">
+                <p><i class="fa fa-tint fa-4x"></i>
+                No feeds found.</p>
+                <a class="btn btn-small btn-default" href="{{ url_for('main.feed_add_1', xhr=1) }}" data-remote-modal="modal-add-subscription">Add Feed Subscription</a>
+            </div>
+        {% endif %}
+    {% endblock %}
+{% endif %}

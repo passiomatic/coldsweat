@@ -1,0 +1,56 @@
+{{inherit "base.html"}}
+
+{{def container_block}}
+
+<hr>
+
+<section class="module">
+    <div class="well well--large">
+        <h2>Welcome to Coldsweat</h2>
+        <p>Enter your account credentials to proceed.</p>
+        <form action="{{application_url}}/login" class="form-inline" method="POST">        
+            <input type="hidden" name="from" value="{{from_url}}">
+            <fieldset>
+                <input autofocus type="text" id="username" name="username" placeholder="Username or e-mail" class="input-large"  value="{{username}}" size="30">                
+                <input type="password" id="password" name="password" placeholder="Password" class="input-large" value="" size="30">
+            </fieldset>
+            <fieldset>
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </fieldset> 
+        </form>
+    </div>
+</section>
+
+<section class="module">
+    <div class="well well--large well--dim">
+        <h2>Current Status</h2>
+        <table class="table">
+          <tbody>
+              <tr>
+                  <td>Last fetch</td>
+                  <td class="">{{last_checked_on}} <abbr title="Coordinated Universal Time">UTC</abbr></td>
+              </tr>                        
+
+              <tr>
+                  <td>Active feeds</td>
+                  <td><b>{{active_feed_count}}</b> of {{feed_count}}</td>
+              </tr>                        
+
+              <tr>
+                  <td>Unread entries</td>
+                  <td><b>{{unread_entry_count}}</b> of {{entry_count}}</td>
+              </tr>                        
+          </tbody>        
+        </table>  
+    </div>                      
+</section>
+
+<section class="module">
+    <div class="well well--large well--dim">
+        <h2>Sync with Your Reader</h2>
+        <p>Configure your favorite feed reader using this web address:</p>            
+        <p><pre><code>{{request.root_url}}feverfever</code></pre></p>
+    </div>
+</section>
+
+{{enddef}}

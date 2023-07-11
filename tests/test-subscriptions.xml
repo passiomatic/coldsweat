@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<opml version="2.0">
+    <head>
+        <title>Test subscriptions</title>
+		<dateCreated>Mon, 11 Nov 2013 17:07:00 GMT</dateCreated>
+    </head>
+    <body>        
+        <outline title="Tests" text="Tests">
+            <outline text="404 Test" title="404 Test"
+                type="rss" xmlUrl="https://lab.passiomatic.com/coldsweat/tests/wrong-feed.xml" htmlUrl="https://lab.passiomatic.com/coldsweat/"/>
+        </outline>
+        <outline title="Graphics" text="Graphics">
+            <outline text="500px: Editor’s Choice" title="500px: Editor’s Choice"
+                type="rss" xmlUrl="https://lab.passiomatic.com/coldsweat/tests/feed1.xml" htmlUrl="http://500px.com/editors"/>
+        </outline>
+        <outline title="Tech News &amp; Reviews" text="Tech News &amp; Reviews">
+            <outline text="Ars Technica" title="Ars Technica"
+                type="rss" xmlUrl="https://lab.passiomatic.com/coldsweat/tests/feed2.xml" htmlUrl="http://arstechnica.com"/>
+            <outline text="Polygon" title="Polygon"
+                type="rss" xmlUrl="https://lab.passiomatic.com/coldsweat/tests/feed3.xml" htmlUrl="http://www.polygon.com/"/>
+            <outline text="Daring Fireball" title="Daring Fireball"
+                type="rss" xmlUrl="https://lab.passiomatic.com/coldsweat/tests/feed5.xml" htmlUrl="http://daringfireball.net/"/>
+        </outline>
+        <!-- This goes into the "default" group -->
+        <outline text="Reddit Italy" title="Reddit Italy"
+                type="rss" xmlUrl="https://lab.passiomatic.com/coldsweat/tests/feed4.xml" htmlUrl="http://www.reddit.com/"/> 
+    </body>
+</opml>

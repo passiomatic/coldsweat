@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+<head>
+<title>Sample subscriptions</title>
+</head>
+<body>        
+<outline htmlUrl="http://www.erickarjaluoto.com" type="rss" title="Eric Karjaluoto" xmlUrl="http://www.erickarjaluoto.com/feed/" text="Eric Karjaluoto" />
+<outline htmlUrl="https://bjango.com/articles/" title="Bjango Articles" type="rss" text="Bjango Articles" xmlUrl="https://bjango.com/rss/articles.xml" />
+<outline htmlUrl="https://panic.com/blog" type="rss" title="Panic Blog" xmlUrl="https://panic.com/blog/feed/" text="Panic Blog" />
+<outline title="A List Apart: The Full Feed" type="rss" text="A List Apart: The Full Feed" htmlUrl="https://alistapart.com" xmlUrl="https://alistapart.com/main/feed/" />
+<outline title="The Pudding" text="The Pudding" type="rss" htmlUrl="https://pudding.cool" xmlUrl="https://feeds.feedburner.com/pudding/feed" />
+<outline title="Computers &amp; Technology" text="Computers &amp; Technology">
+    <outline xmlUrl="https://ericasadun.com/feed/" htmlUrl="https://ericasadun.com" type="rss" text="Erica Sadun" title="Erica Sadun" />
+    <outline type="rss" htmlUrl="https://daringfireball.net/" xmlUrl="https://daringfireball.net//feeds/serve?feed=combo" title="Daring Fireball" text="Daring Fireball" />
+    <outline type="rss" title="Coding Horror" xmlUrl="https://blog.codinghorror.com/rss/" text="Coding Horror" htmlUrl="https://blog.codinghorror.com/" />
+    <outline text="as days pass by" title="as days pass by" type="rss" htmlUrl="https://www.kryogenix.org/days/" xmlUrl="https://kryogenix.org/days/feed" />
+    <outline text="Hacker News" title="Hacker News" type="rss" htmlUrl="https://news.ycombinator.com" xmlUrl="https://news.ycombinator.com/rss" />
+</outline>
+<outline title="Visual Arts and Design" text="Visual Arts and Design">
+    <outline title="Brad Frost" htmlUrl="https://bradfrost.com" xmlUrl="http://feeds.feedburner.com/brad-frosts-blog" text="Brad Frost" type="rss" />
+    <outline type="rss" title="ignorethecode.net" xmlUrl="http://ignorethecode.net/blog/rss/" text="ignorethecode.net" htmlUrl="http://ignorethecode.net" />
+    <outline htmlUrl="https://mikeindustries.com/blog" xmlUrl="https://mikeindustries.com/blog/feed/atom" text="Mike Industries" type="rss" title="Mike Industries" />
+    <outline htmlUrl="https://stopdesign.com/" title="Stopdesign" text="Stopdesign" type="rss" xmlUrl="http://stopdesign.com/feed/atom" />
+    <outline text="Fonts In Use: Blog Only" title="Fonts In Use: Blog Only" htmlUrl="https://fontsinuse.com" xmlUrl="https://feeds.feedburner.com/FontsInUseAll" type="rss" />
+    <outline text="MAC ART" xmlUrl="http://mac-arte.blogspot.com/feeds/posts/default" type="rss" title="MAC ART" htmlUrl="http://mac-arte.blogspot.com/" />
+    <outline xmlUrl="http://1041uuu.tumblr.com/rss" text="1041uuu" htmlUrl="https://1041uuu.tumblr.com/" title="1041uuu" type="rss" />
+    <outline title="Identity Designed" type="rss" xmlUrl="http://identitydesigned.com/feed/" htmlUrl="https://identitydesigned.com/" text="Identity Designed" />
+    <outline title="iA" xmlUrl="http://feeds.feedburner.com/InformationArchitectsJapan" type="rss" text="iA" htmlUrl="https://ia.net" />
+</outline>
+</body>
+</opml>

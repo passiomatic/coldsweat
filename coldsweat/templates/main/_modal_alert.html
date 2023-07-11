@@ -1,0 +1,20 @@
+<form action="{{url}}" method="POST">
+    {% for name, value in params %}
+        <input type="hidden" name="{{name}}" value="{{value}}">
+    {% endfor %}
+    {% if title %}
+        <div class="modal-header">
+            <h3>{{title|safe}}</h3>
+        </div>
+    {% endif %}
+    {% if body %}
+        <div class="modal-body">          
+            {{body}}
+        </div>
+    {% endif %}
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">{{button_text}}</button>
+        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+    </div>
+</form>
+

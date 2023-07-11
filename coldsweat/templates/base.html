@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- 
+Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{page_title}} • Coldsweat</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel='stylesheet' href='{{ url_for("static", filename="all.css") }}'>
+<link rel="shortcut icon" href='{{ url_for("static", filename="favicon.ico") }}'>
+<link rel="shortcut icon" href='{{ url_for("static", filename="favicon.png") }}' sizes="32x32">
+<link rel="apple-touch-icon" sizes="152x152" href='{{ url_for("static", filename="images/apple-touch-icon.png") }}'>
+<meta name="apple-mobile-web-app-title" content="Coldsweat">
+<script src='{{ url_for("static", filename="javascripts/vendor/head.load.min.js") }}'></script>
+{% block head_block %}{% endblock %}
+</head>
+<body>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert--{{ category }}">{{ message|safe }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block container_block %}{% endblock %}
+</div><!-- container -->
+
+<script>
+window.applicationURL = '{{request.root_url}}';
+head.js(
+// Libraries
+'{{ url_for("static", filename="javascripts/vendor/jquery-min.js") }}',
+
+// Load bootstrap-transition first so that nice glides/fades 
+// etc for the other bootstrap plugins work
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-transition.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-tooltip.js") }}',
+
+// Popover has a dependency on tooltip, so make sure and include 
+// bootstrap-tooltip regardless in order for popovers to work
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-popover.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-modal.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-collapse.js") }}',
+'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-dropdown.js") }}',
+
+// Plugins
+'{{ url_for("static", filename="javascripts/plugins.js") }}',
+
+// App scripts
+'{{ url_for("static", filename="javascripts/app.js") }}',
+
+function() {    
+    // Do something when we are ready
+    {% block page_script_block %}{% endblock %}    
+});
+</script>
+
+</body>
+</html>
+
+
+
+
+
+

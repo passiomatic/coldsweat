@@ -1,0 +1,40 @@
+{% macro render_groups() %}
+    {% for group in groups %}
+        <li class="group {% if loop.first %}current{% endif %}">
+            <div class="item-inner">
+                <h3 class="h4">
+                        <i class="favicon fa fa-folder-o fa-fw"></i><a title="Show all entries for group" href="{{ url_for('main.entry_list', filter='group', id=group.id) }}">{{group.title}}</a>
+                </h3>
+            </div>
+        </li>
+    {% endfor %}
+    {% if offset < count %}
+        <li class="more">
+            <a href="{{url_for('main.group_list', offset=offset, xhr=1) }}">More</a>
+        </li>
+    {% endif %}       
+{% endmacro %}
+
+{% if is_xhr %}
+    {{render_groups()}}
+{% else %}
+    {% extends "main/index.html" %}
+    {% block panel_block %}
+        {% if count %}
+            <div class="panel-content">
+                <ul class="view list-view">       
+                    <li class="heading">
+                        <h2>Groups</h2>
+                    </li>                               
+                    {{render_groups()}}
+                </ul>
+            </div>
+        {% else %}
+            <div class="notice">
+                <p><i class="fa fa-tint fa-4x"></i>
+                No groups found.</p>
+            </div>
+        {% endif %}
+    {% endblock %}
+{% endif %}
+ 

@@ -1,0 +1,19 @@
+<form action="{{ url_for('main.profile') }}" data-ajax-post method="POST">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>  
+    <h3>Your Profile</h3>
+  </div>
+  <div class="modal-body">          
+        <p>You are logged in as <b>{{user.display_name or user.email}}</b>.</p>
+        <fieldset> 
+          <label for="display_name">Your name</label> 
+          <input id="display_name" required type="text" maxlength="40" name="display_name" size="40" value="{{user.display_name}}">
+
+          <label>E-mail</label> 
+          <input id="email_" required type="email" name="email" size="40" value="{{user.email}}">
+        </fieldset>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </div>
+</form>

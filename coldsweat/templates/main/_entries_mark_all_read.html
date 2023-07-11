@@ -1,0 +1,10 @@
+<form action="{{ url_for('main.entry_list_mark', all='') }}" data-ajax-post  method="POST">
+  <input type="hidden"  name="before" value="{{now|epoch}}">
+  <div class="modal-header">
+    <h3>Mark all entries as read?</h3>
+  </div>
+  <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Mark as Read</button>
+        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+  </div>
+</form>

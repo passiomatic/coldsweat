@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block container_block %}
+ 
+<hr>
+
+<section class="module">
+    <div class="well well--large">
+        <h2>Welcome to Coldsweat</h2>
+        <p>Enter your account credentials to proceed.</p>
+        <form action="login" class="" method="POST">        
+            <fieldset>
+                <label>E-mail</label>
+                <input autofocus type="email" required name="email" maxlength="60" class="input-large" size="30">                
+                <label>Password</label>
+                <input type="password" required name="password" maxlength="60" class="input-large" size="30">
+            </fieldset>
+            <fieldset>
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </fieldset> 
+            <input type="hidden" name="next" value="{{next}}">
+        </form>
+    </div>
+</section>
+
+<section class="module">
+    <div class="well well--large well--dim">
+        <h2>Current Status</h2>
+        <table class="table">
+          <tbody>
+              <tr>
+                  <td>Last fetch</td>
+                  <td class="">{{stats.last_checked_on}} <abbr title="Coordinated Universal Time">UTC</abbr></td>
+              </tr>                        
+
+              <tr>
+                  <td>Active feeds</td>
+                  <td><b>{{stats.active_feed_count}}</b> of {{stats.feed_count}}</td>
+              </tr>                        
+
+              <tr>
+                  <td>Unread entries</td>
+                  <td><b>{{stats.unread_entry_count}}</b> of {{stats.entry_count}}</td>
+              </tr>                        
+          </tbody>        
+        </table>  
+    </div>                      
+</section>
+
+<section class="module">
+    <div class="well well--large well--dim">
+        <h2>Sync with Your Reader</h2>
+        <p>Configure your favorite feed reader using this web address:</p>            
+        <p><pre><code>{{request.root_url}}fever</code></pre></p>
+    </div>
+</section>
+
+{% endblock %}
+
+
+ 

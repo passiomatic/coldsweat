@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block container_block %} 
+    <section class="panel">
+        {% block panel_block %} 
+        {% endblock %}
+        <footer role="contentinfo">    
+            <div class="dim">Coldsweat&ensp;<i title="Loves" class="fa fa-heart"></i>&ensp;Your Feeds&ensp;&middot;&ensp;<a data-remote-modal href="{{ url_for('main.cheatsheet') }}">Cheatsheet</a>
+            </div>
+        </footer>
+    </section>
+
+    <nav role="navigation">
+        <ul class="{{filter_class}}">
+            <li class="branding">
+                <i class="fa fa-tint fa-fw"></i>
+            </li>
+            <li class="filter-unread"><a data-toggle="tooltip" data-placement="right" title="Unread entries (1 key)" href="{{ url_for('main.entry_list', filter='unread') }}"><i class="fa fa-circle fa-fw"></i></a></li>
+            <li class="filter-saved"><a data-toggle="tooltip" data-placement="right" title="Saved entries (2 key)" href="{{ url_for('main.entry_list', filter='saved') }}"><i class="fa fa-star fa-fw"></i></a></li>
+            <li class="filter-all"><a data-toggle="tooltip" data-placement="right" title="All entries (3 key)" href="{{ url_for('main.entry_list', filter='all') }}"><i class="fa fa-archive fa-fw"></i></a></li>
+            {% if groups | length  > 1 %}
+                <li class="filter-group"><a  data-toggle="tooltip" data-placement="right" title="All groups (4 key)"  href="{{ url_for('main.group_list') }}"><i class="fa fa-folder fa-fw"></i></a>
+                </li>
+            {% endif %}
+            <li class="sep filter-feeds"><a data-toggle="tooltip" data-placement="right" title="Subscribed feeds (5 key)" href="{{ url_for('main.feed_list') }}"><i class="fa fa-rss fa-fw"></i></a></li>
+            <li><a data-toggle="tooltip" class="add-trigger" href="{{ url_for('main.feed_add_1', xhr=1) }}" data-placement="right" title="Add feed subscription" data-remote-modal="modal-add-subscription"><i class="fa fa-plus-square fa-fw"></i></a></li>                                    
+            <li class="sep"><li class="dropdown"><a data-toggle="dropdown" href="#"><i class="fa fa-user fa-fw"></i></a>   
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="{{ url_for('main.profile') }}" data-remote-modal>Your profile</a>
+                    <li><a href="{{ url_for('auth.logout') }}">Log out</a>
+                </ul>
+            </li>
+        </ul>
+    </nav>  
+{% endblock %}
+

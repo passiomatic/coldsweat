@@ -1,0 +1,62 @@
+{% extends "main/index.html" %}
+
+{% macro render_entries(entries)%}
+    {%for e in  entries %}
+        <li class="entry {%if e.id in saved_ids %}status-saved{% endif %} {% if e.id in read_ids %}status-read{% endif %}">
+            <div class="item-inner">
+                <h3 class="h4">
+                    <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt=""><a rel="next" href="{{ url_for('main.entry', entry_id=e.id, filter=filter_name) }}">{{e.title}}</a>
+                </h3>
+                <div class="meta dim">
+                    <a title="Show more entries for this feed" href="{{ url_for('main.entry_list', feed=e.feed.id, filter=filter_name) }}">{{e.feed.title}}</a>
+                </div>                  
+            </div>
+        </li>
+    {% endfor %}
+{% endmacro %}
+     
+{% block panel_block %}
+
+<div class="panel-content">
+    <ul class="view list-view">                      
+        <li data-entry="{{entry.id}}" class="entry expanded {%if entry.id in saved_ids%}status-saved{% endif %} {%if entry.id in read_ids %}status-read{% endif %}">
+            <div class="item-inner">
+                <article>
+                    <div class="meta dim">
+                        <span class="feed"><a title="Show more entries for this feed" href="{{ url_for('main.entry_list', feed=entry.feed.id, filter=filter_name) }}">{{entry.feed.title}}</a></span>
+                        <span class="actions">
+                            {%if entry.id in saved_ids%}<i class="save-trigger icon-saved fa fa-star" title="Unsave (S key)"></i>{% else %}<i class="save-trigger icon-unsaved fa fa-star-o" title="Save (S key)"></i>{% endif %}{%if entry.id in read_ids %}<i class="read-trigger icon-read fa fa-circle-o" title="Mark as unread (M key)"></i>{% else %}<i class="read-trigger icon-unread fa fa-circle" title="Mark as read (M key)"></i>{% endif %}                    
+                        </span>
+                    </div>
+                    <h1 class="">{{entry.title}}</h1>        
+                    {%if entry.content %} 
+                        <div class="content">
+                            {{entry.content|safe}}
+                            {%if entry.link %}
+                                <div class="continue"><a class="btn btn-small btn-visit" rel="noreferrer" title="View entry on {{entry.link}} (V key)" target="_blank" href="{{entry.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
+                            {% endif %}
+                        </div>            
+                        <hr class="halved">
+                    {% endif %}
+                    <div class="meta dim">    
+                        <i class="fa fa-info-circle"></i> Posted {{entry.published_on|datetime }} {%if entry.author %} by {{ entry.author }}{% endif %}
+                        {%if entry.link %}&emsp;<i class="fa fa-twitter"></i> <a title="Share on Twitter" target="_blank" href="http://twitter.com/home?status={{entry.title|urlencode}}%20%E2%80%94%20{{entry.link|urlencode}}">Twitter</a>{% endif %}                                                
+                    </div>
+                </article>    
+            </div>
+        </li>
+    
+        {% if next_entries | length %}
+            <li class="heading">
+                <h2>Next in {{panel_title}}</h2>
+            </li>
+            {{render_entries(next_entries)}}
+        {% endif %}
+
+    </ul>
+</div>
+
+{% endblock %}
+
+
+

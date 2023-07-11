@@ -1,0 +1,54 @@
+<form action="{{ url_for('main.feed_edit', feed=feed.id) }}" data-ajax-post method="POST">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>  
+    <h3><img class="favicon" src="{{feed.icon_url}}" width="16" height="16"  alt="*"> {{feed.title}}</h3>
+  </div>
+  <div class="modal-body">          
+        <label for="field-title">Title</label> 
+        <input type="text" required id="field-title" name="title" size="40" value="{{title}}">
+
+        <label for="field-self-link">Web address (URL)</label> 
+        <input type="text" id="field-self-link" name="self_link" readonly size="40" value="{{feed.self_link}}">
+
+        <table class="table">
+          <tbody>
+            {% if feed.alternate_link %}
+              <tr>
+                  <th><i class="fa fa-globe fa-fw"></i> Web page</th>
+                  <td><a target="_blank" title="Visit feed web page" href="{{feed.alternate_link}}">{{feed.alternate_link|friendly_url}}</a></td>
+              </tr>                        
+            {% endif %}
+
+            <tr>
+                <th><i class="fa fa-folder fa-fw"></i> Groups</th>
+                <td>{% for g in groups %}{{g.title}}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+            </tr>                        
+
+            <tr>
+                <th><i class="fa fa-check fa-fw"></i> Status</th>
+                {% if feed.enabled %}
+                  <td class="enabled">Enabled</td>
+                {% else %}
+                  <td class="disabled">Disabled</td>
+                {% endif %}
+            </tr>                        
+            
+            <tr>
+                <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
+                <td>{{feed.last_checked_on|datetime}}&ensp;<code>{{feed.last_status|status_title|capitalize}}</code></td>
+            </tr>                        
+            
+            {% if feed.error_count %}
+                <tr>
+                    <th><i class="fa fa-warning fa-fw"></i> Total errors</th>
+                    <td>{{feed.error_count}}
+                    </td>
+                </tr>                        
+            {% endif %}
+          </tbody>        
+        </table>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" name="button_save" value="1" class="btn btn-primary">Save Changes</button>
+  </div>
+</form>

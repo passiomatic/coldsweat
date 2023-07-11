@@ -1,64 +1,106 @@
-# Coldsweat 
+# Coldsweat
 
-**Note**: After years of pause I'm rewriting Coldsweat using Python 3 and Flask. Work is done in a [dedicated 0.10 branch][dev-branch].
-
-* * * 
-
-Coldsweat is a Python web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
+Coldsweat is a self-hosted Python 3 web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
 
 ![Screenshot](screenshots/coldsweat-0.9.6.jpg)
-
-## Motivation
-
-I'm fed up of online services that are here today and gone tomorrow. After the Google Reader shutdown is clear to me that the less we rely on external services the more the data we care about are preserved. With this in mind I'm writing Coldsweat. It is my personal take at consuming feeds today.
 
 ## Features
 
 * Web interface to read and add feeds
 * Compatible with existing Fever desktop and mobile clients
 * Multi-user support
-* Support for grouping of similar items
-* Multiprocessing for parallel feed fetching
+* Basic support for grouping of similar items
 
-## Setup
+## Installation and quick setup
 
-See _[setup]_ page.
+Let's see how you can take a peek at what Coldsweat offers running it on your machine.
+
+**Note**: you can install Coldsweat in the main Python environment of your machine or in a virtual environment, which is the recommended approach, since its dependencies may clash with packages you have already installed. [Learn more about virtual environments here][venv]. 
+
+### Install
+
+Coldsweat is [Flask application][flask] distributed as a Python wheel, hence you can install it from PyPI using the, hopefully familiar, `pip` utility:
+
+    $ pip install coldsweat
+
+### Create a user
+
+Once installed, create a new user specifing email and password with the `setup` command:
+
+    $ flask --app coldsweat setup john@example.com -p somepassword
+
+If you prefer you can enter the password interactively:
+
+    $ flask --app coldsweat setup john@example.com  
+    Enter password for user john@example.com: ************
+    Enter password (again): ************
+    Setup completed for john@example.com
+
+Email and password will be needed to access the web UI and use the Fever API sync with your favourite RSS client.
+
+### A little digression...
+
+It is quite tedius to keep writing `flask --app coldsweat...` everytime you need to run Coldsweat. To fix this Flask allows to specify the current app using an environment variable instead:
+
+    $ export FLASK_APP=coldsweat
+
+Once the `FLASK_APP` variable is set you can omit that information while launching the other application commands. More details about this can be found in the Flask documentation on [application discovery][disco].
+
+### Import your feeds
+
+Like other RSS software Coldsweat uses the OPML format to import multiple feeds with a single operation:
+
+    $ flask import /path/to/subscriptions.opml alice@example.com -f
+
+The `-f` option tells Coldsweat to fetch the feeds right after the import step.
+
+### Run the web UI
+
+Then you can run the Flask development web server and access the web UI: 
+
+    $ flask run 
+    * Serving Flask app 'coldsweat'
+    * Debug mode: off
+    * Running on http://127.0.0.1:5000
+    ...
+
+See _[setup]_ page for additional information.
 
 ## Upgrading from a previous version
 
-First, always make sure required third-party packages are up-to-date:
+Upgrade to the latest Coldsweat version with:
 
-    $ pip install -r requirements.txt
+    $ pip install -U coldsweat
 
-Second, make sure your database structure is up-to-date too: 
+**Note**: there's no upgrade path from previous 0.9.x releases. Your best best if to export OPML subscriptions and import them in the new 0.10 release.    
 
-    $ python sweat.py upgrade
+## Contributing
 
-### Notable changes from previous releases
+See _[contributing]_ page.
 
-* Version 0.9.6: the `etc/blacklist` file is no longer available, please use the config `scrubber_blacklist` option instead.
-* Version 0.9.5: older commands `update` and `refresh` are now respectively aliases of `upgrade` and `fetch`. The former names will most likely dropped with the 1.0.0 release.
+## 0.10 technical underpinnings
 
-## Technical underpinnings
-
-* Uses the industry standard Mark Pilgrim's [Universal Feed Parser][fp]
-* Is WSGI compatible - currently tested under CGI, FastCGI and Passenger environments
-* Uses SQLite, PostgreSQL and MySQL databases
+* Runs on Python 3.9 and up
+* Completely rebuilt using Flask web framework
+* Supports SQLite, PostgreSQL, and MySQL databases
 * [HTTP-friendly fetcher][ff]
-* [Plugin system][plugin] to easily extend fetcher capabilities
-* The Web reader has been tested with Safari 5+ and latest versions of Chrome and Firefox
+* Tested with latest versions of Chrome, Safari, and Firefox
 
-Coldsweat started in July 2013 as a fork of [Bottle Fever][b] by Rui Carmo. By now I revised most of the code and tested the feed fetcher code with hundreds of Atom and RSS feeds.
+## Motivation
 
+I'm fed up of online services that are here today and gone tomorrow. Years ago, after the Google Reader shutdown it was clear to me that the less we rely on external services the more the data we care about are preserved. With this in mind I'm writing Coldsweat. It is my personal take at consuming feeds today.
 
+Coldsweat started in July 2013 as a fork of [Bottle Fever][b] by Rui Carmo. After several years of pause I've restarted to develop Coldsweat using Python 3 and the latest crop of web technologies.
 
 [fp]: https://pypi.python.org/pypi/feedparser/
 [f]: http://www.feedafever.com/
 [s]: https://github.com/passiomatic/coldsweat
 [b]: https://github.com/rcarmo/bottle-fever
-[rk]: http://readkitapp.com/
-[r]: http://reederapp.com/
+[rk]: https://readkitapp.com/
+[r]: https://reederapp.com/
 [ff]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-features
 [setup]: https://github.com/passiomatic/coldsweat/wiki/Setup
-[plugin]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-Plugin-Interface
-[dev-branch]: https://github.com/passiomatic/coldsweat/tree/0.10-wip
+[contributing]: https://github.com/passiomatic/coldsweat/wiki/Contributing
+[venv]: https://docs.python.org/3/library/venv.html
+[flask]: https://flask.palletsprojects.com/en/2.3.x/
+[disco]: https://flask.palletsprojects.com/en/2.3.x/cli/#application-discovery

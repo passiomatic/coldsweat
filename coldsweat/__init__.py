@@ -1,75 +1,97 @@
-# -*- coding: utf-8 -*-
 '''
-Coldsweat - RSS aggregator and web reader compatible with the Fever API 
-
-Copyright (c) 2013—2016 Andrea Peltrin
-Portions are copyright (c) 2013 Rui Carmo
-License: MIT (see LICENSE for details)
+Coldsweat - RSS aggregator and web reader compatible with the Fever API
 '''
+__version__ = (0, 10, 0, '')
 
-__author__ = 'Andrea Peltrin and Rui Carmo'
-__version__ = (0, 9, 8, '')
-__license__ = 'MIT'
+import os 
+import flask_login
+import flask
+from flask_cdn import CDN
+from .auth import bp as auth_blueprint
+from .main import bp as main_blueprint
+from .fever import bp as fever_blueprint
+from .auth import SessionUser
+import coldsweat.cli as cli
+import coldsweat.models as models
 
-import os
-import logging
-from config import *
+try:
+    import tomllib as toml  # Python 3.11+
+except ImportError:
+    import tomli as toml
 
-# Define an informal API for plugin implementations
+cdn = CDN()
 
-__all__ = [
-    'VERSION_STRING',
-    'USER_AGENT',
-
-    # Synthesized entries and feed URI's 
-    'FEED_TAG_URI',
-    'ENTRY_TAG_URI',
+class TestingConfig(object):
+    DATABASE_URL = 'sqlite:///:memory:'   
+    TESTING = True
     
-    # Configuration
-    'installation_dir',
-    'template_dir',
-    'plugin_dir',
-    'config',
+def create_app(config_class=None):
+    app = flask.Flask(__name__, instance_relative_config=True)
+    # Create an instance dir if needed
+    os.makedirs(app.instance_path, exist_ok=True)
     
-    # Logging
-    'logger',
-]
+    if config_class:    
+        app.config.from_object(config_class)
+    else:
+        if app.config.from_file("config.toml", load=toml.load, text=False, silent=True):
+            app.logger.info(f"Using config.toml file found in {app.instance_path}")
+        else:
+            # Attempt to load settings from up env. vars
+            app.config.from_prefixed_env()
 
-VERSION_STRING  = '%d.%d.%d%s' % __version__
-USER_AGENT      = 'Coldsweat/%s Feed Fetcher <http://lab.passiomatic.com/coldsweat/>' % VERSION_STRING
+        if 'DATABASE_URL' in app.config:
+            app.logger.info(f"Using DATABASE_URL {app.config['DATABASE_URL']}")
+            pass
+        else:
+            # Fallback to sqlite db and dev secret key
+            default_database_url = f"sqlite:///{os.path.join(app.instance_path, 'coldsweat.db')}"
+            #@@TODO Specify foreign_keys=1 journal_mode=WAL"
+            # See https://flask.palletsprojects.com/en/2.3.x/config/#SECRET_KEY on how to set a proper secret key
+            app.logger.debug(f"DATABASE_URL not found in configuration settings, using default {default_database_url}")
+            app.config['SECRET_KEY'] = "Secret key for dev purposes only"
+            app.config['DATABASE_URL'] = default_database_url
 
-FEED_TAG_URI    = 'tag:lab.passiomatic.com,2017:coldsweat:feed:%s'         
-ENTRY_TAG_URI   = 'tag:lab.passiomatic.com,2017:coldsweat:entry:%s'
+    # Initialize Flask extensions here
+    
+    cdn.init_app(app)
+    
+    models.db_wrapper.init_app(app)
 
-# Figure out installation directory. This has 
-#  to work for the fetcher script too
-installation_dir, _ = os.path.split(os.path.dirname(os.path.abspath(__file__))) 
-template_dir        = os.path.join(installation_dir, 'coldsweat/templates')
-plugin_dir          = os.path.join(installation_dir, 'plugins')
+    login_manager = flask_login.LoginManager()
+    login_manager.login_view = "auth.login"
+    login_manager.init_app(app)
 
-# ------------------------------------------------------
-# Load up configuration settings
-# ------------------------------------------------------
+    @login_manager.user_loader
+    def user_loader(user_id):
+        user = models.User.get_or_none(models.User.id == int(user_id))
+        if not user:
+            return None
 
-config = load_config(os.path.join(installation_dir, 'etc/config'))
+        return SessionUser(user)
 
-# ------------------------------------------------------
-# Configure logger
-# ------------------------------------------------------
+    # @@TODO Use for API auth 
+    # @login_manager.request_loader
+    # def request_loader(request):
+    #     email = request.form.get('email')
+    #     user = models.User.get_or_none(email=email)
+    #     if not user:
+    #         return None
 
-# Shared logger instance
-logger = logging.getLogger()
+    #     return SessionUser(user)
 
-if config.log.filename:
-    logging.basicConfig(
-        filename    = config.log.filename,
-        level       = getattr(logging, config.log.level),
-        format      = '[%(asctime)s] %(process)d %(levelname)s %(message)s',
-    )
-    for module in 'peewee', 'requests':        
-        logging.getLogger(module).setLevel(logging.WARN)
-else:
-    # Silence is golden 
-    logger.addHandler(logging.NullHandler())
+    # Register auth routes
+    app.register_blueprint(auth_blueprint)
 
+    # Register main app routes
+    app.register_blueprint(main_blueprint)
 
+    # Register Fever API routes
+    app.register_blueprint(fever_blueprint)
+
+    # Add CLI support
+    cli.add_commands(app)
+
+    with app.app_context():
+        from . import filters  # noqa
+
+    return app

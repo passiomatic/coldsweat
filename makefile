@@ -55,10 +55,10 @@ check:
 	twine check dist/* 
 
 upload:
-	twine upload dist/*
+	twine upload -u passiomatic dist/*
 
 upload-test:
-	twine upload -r testpypi dist/*
+	twine upload -u passiomatic -r testpypi dist/*
 
 clean:
 	rm -rf dist/ build/ .parcel-cache/

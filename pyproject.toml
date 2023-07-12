@@ -36,7 +36,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["coldsweat"]
+packages = ["coldsweat", "coldsweat.main", "coldsweat.auth", "coldsweat.fever" ]
 
 [tool.setuptools.package-data]
 coldsweat = ["static/*.*", "templates/*.html"]

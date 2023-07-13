@@ -54,6 +54,14 @@ Like other RSS software Coldsweat uses the OPML format to import multiple feeds 
 
 The `-f` option tells Coldsweat to fetch the feeds right after the import step.
 
+### Fetch feeds
+
+To update all the feeds run the `fetch` command:
+
+    $ flask fetch 
+
+You should use `cron` or similar utilities to shedule feed fetches periodically.
+
 ### Run the web UI
 
 Then you can run the Flask development web server and access the web UI: 

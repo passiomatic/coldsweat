@@ -34,6 +34,7 @@ class FeedTranslator(object):
                             Feed.MAX_TITLE_LENGTH)
         return ''
 
+IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif']
 
 class EntryTranslator(object):
 
@@ -87,7 +88,21 @@ class EntryTranslator(object):
         # app.logger.debug(u'no entry content found, using default')
         return default
 
-    # Nullable fields
+    def get_thumbnail_url(self):
+        #See https://www.rssboard.org/media-rss
+        if 'media_content' in self.entry_dict:
+            media_content = self.entry_dict['media_content'][0]
+            try:
+                image_type = media_content['type']
+            except KeyError:
+                image_type = None
+            if image_type in IMAGE_TYPES:
+                try:
+                    return media_content['url']
+                except KeyError:
+                    pass
+        # @@TODO: Try to get thumbnail[0] instead 
+        return ''
 
     def get_link(self):
         # Special case for FeedBurner entries

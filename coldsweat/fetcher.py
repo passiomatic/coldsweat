@@ -241,6 +241,7 @@ class Fetcher(object):
 
             timestamp = t.get_timestamp(default=self.instant)
             content_type, content = t.get_content(('text/plain', ''))
+            thumbnail_url = t.get_thumbnail_url()
 
             entry = {
                 'feed_id': self.feed.id,
@@ -250,6 +251,7 @@ class Fetcher(object):
                 'author': t.get_author() or feed_author,
                 'content': content,
                 'content_type': content_type,
+                'thumbnail_url': thumbnail_url,
                 'published_on': timestamp
             }
             new_entries.append(entry)
@@ -270,7 +272,7 @@ class Fetcher(object):
                     # MySQL doesn't support conlict targets, see:
                     # https://stackoverflow.com/questions/74691515/python-peewee-using-excluded-to-resolve-conflict-resolution
                     count += (Entry.insert_many(batch).on_conflict(
-                        # Pass down these new values only for certain values
+                        # Pass down these new values only for certain fields
                         preserve=[Entry.title, Entry.author, Entry.content, Entry.content_type])
                         .as_rowcount()
                         .execute())

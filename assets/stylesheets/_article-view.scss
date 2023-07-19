@@ -9,8 +9,8 @@ main {
 ul.view2 {
     list-style: none;
     @include zero;
-    //max-width: $list-view-width;
-    margin: 2rem 2rem;
+    max-width: 75ch;
+    margin: 2rem auto;
     
     > li {
         @include zero;
@@ -212,6 +212,8 @@ article {
         // Images
         
         img {
+            max-width : 100%;
+            height: auto;            
         }
         
         // Misc. 

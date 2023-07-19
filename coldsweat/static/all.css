@@ -3452,7 +3452,8 @@ main {
 }
 
 ul.view2 {
-  margin: 2rem;
+  max-width: 75ch;
+  margin: 2rem auto;
   padding: 0;
   list-style: none;
 }
@@ -3623,6 +3624,11 @@ article .content blockquote p:last-child {
 article .content li, article .content dd {
   margin: 0 0 .375em 24px;
   padding: 0;
+}
+
+article .content img {
+  max-width: 100%;
+  height: auto;
 }
 
 article .content hr {

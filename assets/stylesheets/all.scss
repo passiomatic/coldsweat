@@ -7,14 +7,14 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 
 $media-queries-supported: true;
 $list-view-width: 25em;
-$navwidth: 52px;
+
+@import 'theme';
 
 // Import all SASS Bootstrap imports
 @import 'imports';
 
-@import 'theme';
-
 // App views
+@import 'tree-view';
 @import 'list-view';
 @import 'article-view';
 
@@ -114,7 +114,6 @@ body {
 
 .panel {
     box-sizing: border-box;
-    //margin: $baselineheight/2 $gutterwidth/2 0 $navwidth + $gutterwidth/2; // Make room for left nav
 }
 
 
@@ -258,13 +257,7 @@ pre {
 
 
 nav {
-
-    // position: fixed;
-    // top: 0;
-    // bottom: 0;
-    // z-index: 3;
-
-    background: $navigationbackgroundcolor;
+    background: $color-neutral-300;
 
     a {
         color: $navigationlinkcolor;

@@ -20,7 +20,7 @@ width : device-width; }
 
 html {
 background : $bodycolor;
-font-size : 62.5%;
+//font-size : 62.5%;
 -webkit-overflow-scrolling : touch;
 -webkit-tap-highlight-color : $lightestneutralcolor;
 -webkit-text-size-adjust : 100%;
@@ -31,7 +31,7 @@ body {
 width : 100%;
 background-color : transparent;
 font-family : $basefontfamily;
-@include font-size($basefontsize);
+font-size: $font-size-base;
 line-height : $baselineheight;
 color : $textcolor; }
 

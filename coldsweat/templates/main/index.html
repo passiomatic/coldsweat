@@ -2,10 +2,35 @@
 
 {% block container_block %} 
     <nav role="navigation">
+        <div class="nav__branding">
+            <i class="fa fa-tint"></i>
+        </div>
+        <dl class="tree-view {{filter_class}}">
+            <dd>
+                <button class="btn-text btn-selected">
+                    <i class="fa fa-folder"></i> All Articles
+                </button>
+            </dd>
+            <dd>
+                <button class="btn-text">
+                    <i class="fa fa-folder"></i> Today
+                </button>
+            </dd>            
+            <dt>
+                FOLDERS                
+            </dt>
+            <dd>
+                <button class="btn-text">
+                    <i class="fa fa-folder"></i> Foo Bar Baz
+                </button>
+            </dd>
+            <dd>
+                <button class="btn-text">
+                    <i class="fa fa-folder"></i> Foo Bar Baz
+                </button>
+            </dd>            
+        </dl>
         <ul class="{{filter_class}}">
-            <li class="branding">
-                <i class="fa fa-tint fa-fw"></i>
-            </li>
             <li class="filter-unread"><a data-toggle="tooltip" data-placement="right" title="Unread entries (1 key)" href="{{ url_for('main.entry_list', filter='unread') }}"><i class="fa fa-circle fa-fw"></i></a></li>
             <li class="filter-saved"><a data-toggle="tooltip" data-placement="right" title="Saved entries (2 key)" href="{{ url_for('main.entry_list', filter='saved') }}"><i class="fa fa-star fa-fw"></i></a></li>
             <li class="filter-all"><a data-toggle="tooltip" data-placement="right" title="All entries (3 key)" href="{{ url_for('main.entry_list', filter='all') }}"><i class="fa fa-archive fa-fw"></i></a></li>

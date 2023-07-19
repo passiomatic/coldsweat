@@ -38,7 +38,6 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   background: #c6c2c2;
-  font-size: 62.5%;
 }
 
 body {
@@ -48,7 +47,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, Helvetica Neue, Arial, Helvetica, sans-serif;
-  font-size: 1.6rem;
+  font-size: 1rem;
   line-height: 1.5em;
 }
 
@@ -289,30 +288,6 @@ q {
 blockquote:before, blockquote:after, q:before, q:after {
   content: "";
   content: none;
-}
-
-dl, dd {
-  margin-bottom: 1.5em;
-}
-
-dt {
-  font-weight: normal;
-}
-
-.dl-horizontal:after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
-.dl-horizontal dt {
-  float: left;
-  clear: left;
-  width: 30.3887%;
-}
-
-.dl-horizontal dd {
-  margin-left: 32.9929%;
 }
 
 abbr[title] {
@@ -3292,6 +3267,40 @@ input.search-query {
   display: inline-block;
 }
 
+.tree-view {
+  margin: 0;
+  padding: 0;
+}
+
+.tree-view dt {
+  margin: 1.5rem 0 0;
+  padding: 0 .75rem;
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.tree-view dd {
+  margin: 0;
+  padding: 0;
+}
+
+.tree-view button {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  color: inherit;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: .75rem 1.5rem;
+  font-size: 1.25rem;
+  display: block;
+}
+
+.tree-view button:hover {
+  background: #bbb7b7;
+}
+
 ul.view {
   max-width: 25em;
   margin: 0 auto;
@@ -3641,16 +3650,6 @@ article .content .continue {
   margin: 1.5em 0 0;
 }
 
-:root {
-  --color-0: #f7f5f5;
-  --color-1: #ece9e9;
-  --color-2: #d9d5d5;
-  --color-3: #bbb7b7;
-  --color-4: #918e8e;
-  --color-5: #5e5c5c;
-  --color-6: #252424;
-}
-
 html, body {
   height: 100%;
   overflow-y: hidden;
@@ -3835,7 +3834,7 @@ pre {
 }
 
 nav {
-  background: #a9a2a2;
+  background: #918e8e;
 }
 
 nav a, nav a:visited {

@@ -137,25 +137,6 @@ q:after {
 content : '';
 content : none; }
 
-dl,
-dd {
-margin-bottom : $baselineheight;  }
-
-dt {
-font-weight : $basefontweight; }
-
-.dl-horizontal {
-@include clearfix;
-
-dt {
-float : left;
-clear : left;
-width : 30.38869258%; }
-
-dd {
-margin-left : 32.99289258%; }
-}
-
 abbr[title] {
 border-bottom : 1px dotted $bordercolor;
 cursor : help; }

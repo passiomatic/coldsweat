@@ -3635,6 +3635,16 @@ article .content .continue {
   margin: 1.5em 0 0;
 }
 
+:root {
+  --color-0: #f7f5f5;
+  --color-1: #ece9e9;
+  --color-2: #d9d5d5;
+  --color-3: #bbb7b7;
+  --color-4: #918e8e;
+  --color-5: #5e5c5c;
+  --color-6: #252424;
+}
+
 html, body {
   height: 100%;
   overflow-y: hidden;

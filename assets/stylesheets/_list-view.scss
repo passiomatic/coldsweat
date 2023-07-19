@@ -1,199 +1,205 @@
- 
+ // Common styles
 
-// Common styles
+ ul.view {
+     list-style: none;
+     @include zero;
+     max-width: $list-view-width;
+     margin: 0 auto;
 
-ul.view {
-    list-style: none;
-    @include zero;
-    max-width: $list-view-width;
-    margin: 0 auto;
-    
-    > li {
-        @include zero;
+     >li {
+         @include zero;
 
-        &.heading {
-            @include clearfix;
-            padding: $baselineheight/4 $gutterwidth*1.5;
-            background: $lightestneutralcolor;
+         &.heading {
+             @include clearfix;
+             padding: $baselineheight/4 $gutterwidth*1.5;
+             background: $lightestneutralcolor;
 
-            &:first-child {
-                border-top-left-radius: $borderradius;
-                border-top-right-radius: $borderradius;
-            }
+             &:first-child {
+                 border-top-left-radius: $borderradius;
+                 border-top-right-radius: $borderradius;
+             }
 
-            h2 {
-                @extend .h4;                    
-                //font-size: 1rem;
-                text-transform: uppercase;
-                color: $lightneutralcolor;
-                letter-spacing: 1px;
-                //span { display: none; }
-            }                
+             h2 {
+                 @extend .h4;
+                 //font-size: 1rem;
+                 text-transform: uppercase;
+                 color: $lightneutralcolor;
+                 letter-spacing: 1px;
+                 //span { display: none; }
+             }
 
-            // Show feed name on first heading only
-            &:first-child h2 span {
-                display: inline; 
-            }
-            
-            .toolbar {
-                float: right;
-                display: none;
-            }
-            
-            // Show on first heading only
-            &:first-child .toolbar {
-                display: block; 
-            }
-        }
-        
-        .item-inner {
-            background: $white;
-            //@include transition(background .1s ease-out);
-            padding: $baselineheight/4 $gutterwidth*1.5; 
+             // Show feed name on first heading only
+             &:first-child h2 span {
+                 display: inline;
+             }
 
-            // Title
-    
-            > h3 {
-                a { display: block; }
-            }
+             .toolbar {
+                 float: right;
+                 display: none;
+             }
 
-            .favicon {
-                float: left;
-                margin: 4px 0 0 (-$gutterwidth);
-            }
-        }        
+             // Show on first heading only
+             &:first-child .toolbar {
+                 display: block;
+             }
+         }
 
-        // Feeds
-        
-        &.status-disabled {
+         .item-inner {
+             background: $white;
+             //@include transition(background .1s ease-out);
+             padding: $baselineheight/4 $gutterwidth*1.5;
 
-            .item-inner {
-                background-color: lighten($secondarycolor, 57%);
-                h3 {
-                    text-decoration: line-through;
-                }
-            }                                
-        }
+             // Title
 
-        &.status-sick {
+             >h3 {
+                 a {
+                     display: block;
+                 }
+             }
 
-            .item-inner {
-                background-color: $warningcolor;
-            }                                
-        }
+             .favicon {
+                 float: left;
+                 margin: 4px 0 0 (-$gutterwidth);
+             }
+         }
+
+         // Feeds
+
+         &.status-disabled {
+
+             .item-inner {
+                 background-color: lighten($secondarycolor, 57%);
+
+                 h3 {
+                     text-decoration: line-through;
+                 }
+             }
+         }
+
+         &.status-sick {
+
+             .item-inner {
+                 background-color: $warningcolor;
+             }
+         }
 
 
-    }
+     }
 
-    .more {
-        clear:both;
-        text-align: center;
-        padding: $baselineheight/2 0;                           
-        a {
-            width: 100%;
-            display: inline-block;
-        }
-    }        
+     .more {
+         clear: both;
+         text-align: center;
+         padding: $baselineheight/2 0;
 
-}
+         a {
+             width: 100%;
+             display: inline-block;
+         }
+     }
 
-// List view
+ }
 
-ul.list-view {
+ // List view
 
-    //@include box-shadow(0 0 4px $lightneutralcolor);                        
-    overflow-y: auto;
-    height: 100vh;
-    
-    min-width: 35rem;
+ ul.list-view {
 
-    > li {  
-    
-        // &:not(.expanded) .actions {
-        //     opacity: 0;
-        //     @include visuallyhidden;                
-        //     @include transition(opacity .15s ease-out);
-        // }
+     //@include box-shadow(0 0 4px $lightneutralcolor);                        
+     overflow-y: auto;
+     height: 100vh;
 
-        &:hover {
-            // .actions {
-            //     opacity: 1;
-            //     @include visible;
-            // }            
-            // &:not(.expanded) .feed {
-            //     @include hidden;              
-            // }
-        }    
-        
-        .item-inner {
-            border-bottom: 1px solid $lightestneutralcolor;                       
-        }
+     min-width: 35rem;
 
-        &.expanded .item-inner {
-            padding: $baselineheight $gutterwidth*1.5;    
-            border-bottom: none;                       
-        }
-                    
-        &:first-child .item-inner {
-            border-top-left-radius: $borderradius;
-            border-top-right-radius: $borderradius;
-        }
+     >li {
 
-        &:last-child .item-inner {
-            border-bottom-left-radius: $borderradius;
-            border-bottom-right-radius: $borderradius;
-        }
-        
-        // Read, unread, etc.
-        
-        .meta .icon-read {
-            display: none;
-            @extend .fa-circle-o;
-            margin-left: $gutterwidth/2;   
-        }
+         // &:not(.expanded) .actions {
+         //     opacity: 0;
+         //     @include visuallyhidden;                
+         //     @include transition(opacity .15s ease-out);
+         // }
 
-        .meta .icon-unread {
-            @extend .fa-circle;
-            margin-left: $gutterwidth/2;   
-        }
+         &:hover {
+             // .actions {
+             //     opacity: 1;
+             //     @include visible;
+             // }            
+             // &:not(.expanded) .feed {
+             //     @include hidden;              
+             // }
+         }
 
-        .meta .icon-saved {
-            display: none;
-            @extend .fa-star;
-        }
+         .item-inner {
+             border-bottom: 1px solid $lightestneutralcolor;
+         }
 
-        .meta .icon-unsaved {
-            @extend .fa-star-o;
-        }
-        
-        &.status-read {
-            h3 {
-                a:link {
-                    color: rgba($linkcolor, .7);
-                }
-                a:hover {
-                    color: $linkcolorhover;
-                }
-            }                    
-            .meta .icon-read {
-                display: inline-block;
-            }
-            .meta .icon-unread {
-                display: none;
-            }
-        }
+         &.expanded .item-inner {
+             padding: $baselineheight $gutterwidth*1.5;
+             border-bottom: none;
+         }
 
-        &.status-saved {
-            .meta .icon-saved {
-                display: inline-block;
-                @include transform(scale(1.3,1.3));
-            }
-            .meta .icon-unsaved {
-                display: none;
-            }
-        }
+         &:first-child .item-inner {
+             border-top-left-radius: $borderradius;
+             border-top-right-radius: $borderradius;
+         }
 
-/*
+         &:last-child .item-inner {
+             border-bottom-left-radius: $borderradius;
+             border-bottom-right-radius: $borderradius;
+         }
+
+         // Read, unread, etc.
+
+         .meta .icon-read {
+             display: none;
+             @extend .fa-circle-o;
+             margin-left: $gutterwidth/2;
+         }
+
+         .meta .icon-unread {
+             @extend .fa-circle;
+             margin-left: $gutterwidth/2;
+         }
+
+         .meta .icon-saved {
+             display: none;
+             @extend .fa-star;
+         }
+
+         .meta .icon-unsaved {
+             @extend .fa-star-o;
+         }
+
+         &.status-read {
+             h3 {
+                 a:link {
+                     color: rgba($linkcolor, .7);
+                 }
+
+                 a:hover {
+                     color: $linkcolorhover;
+                 }
+             }
+
+             .meta .icon-read {
+                 display: inline-block;
+             }
+
+             .meta .icon-unread {
+                 display: none;
+             }
+         }
+
+         &.status-saved {
+             .meta .icon-saved {
+                 display: inline-block;
+                 @include transform(scale(1.3, 1.3));
+             }
+
+             .meta .icon-unsaved {
+                 display: none;
+             }
+         }
+
+         /*
         &.current {
             .item-inner {                    
                 //background: #e1eef5 url(../images/rarr.png) left 14px  no-repeat;
@@ -208,15 +214,12 @@ ul.list-view {
 */
 
 
-    }
+     }
 
-    .more {
-        background: $lightestneutralcolor;            
-        border-bottom-left-radius: $borderradius;
-        border-bottom-right-radius: $borderradius;
-    }        
+     .more {
+         background: $lightestneutralcolor;
+         border-bottom-left-radius: $borderradius;
+         border-bottom-right-radius: $borderradius;
+     }
 
-}
-
- 
-
+ }

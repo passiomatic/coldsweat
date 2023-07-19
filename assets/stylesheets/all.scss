@@ -18,17 +18,6 @@ $navwidth: 52px;
 @import 'list-view';
 @import 'article-view';
 
-// Neutral colors
-// https://components.ai/color-scale/fZYdaX1TXadjlTxcJbKO?tab=editor
-:root {
-    --color-0: #f7f5f5;
-    --color-1: #ece9e9;
-    --color-2: #d9d5d5;
-    --color-3: #bbb7b7;
-    --color-4: #918e8e;
-    --color-5: #5e5c5c;
-    --color-6: #252424;
-}
 
 html,
 body {
@@ -41,40 +30,47 @@ body {
 }
 
 .dim {
-    color: $lightneutralcolor;    
+    color: $lightneutralcolor;
 
     a {
-    color: $lightneutralcolor;    
-    
-    &:visited {
-    color : $lightneutralcolor; }
-    
-    &:hover {
-    color : $linkcolorhover; }
-    
-    &:focus {
-    color : $linkcolorfocus; }
-    }    
+        color: $lightneutralcolor;
+
+        &:visited {
+            color: $lightneutralcolor;
+        }
+
+        &:hover {
+            color: $linkcolorhover;
+        }
+
+        &:focus {
+            color: $linkcolorfocus;
+        }
+    }
 }
 
 
 .meta {
     @include font-size(14);
+
     .actions {
-        .fa { cursor: pointer; }
+        .fa {
+            cursor: pointer;
+        }
     }
 
     .icon-saved {
-        color: #ebcd0c; 
+        color: #ebcd0c;
     }
-}             
+}
 
 .expanded {
     .meta {
         .feed {
             text-transform: uppercase;
             @extend .spaced;
-        }        
+        }
+
         .actions {
             float: right;
         }
@@ -87,22 +83,36 @@ body {
 }
 
 .tooltip {
-    white-space: nowrap;           
-    &.bottom { margin-bottom: 7px; }
+    white-space: nowrap;
+
+    &.bottom {
+        margin-bottom: 7px;
+    }
 }
 
 .popover-content {
-    .btn { display: block; margin: 0 0 $baselineheight / 3 0; }
-    .btn:last-child { margin-bottom: 0; }
+    .btn {
+        display: block;
+        margin: 0 0 $baselineheight / 3 0;
+    }
+
+    .btn:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .module {
-    max-width: $list-view-width; 
+    max-width: $list-view-width;
     margin: 0 auto $baselineheight auto;
-    h2 { margin-top: 0; } // Title
+
+    h2 {
+        margin-top: 0;
+    }
+
+    // Title
 }
 
-.panel  {
+.panel {
     box-sizing: border-box;
     //margin: $baselineheight/2 $gutterwidth/2 0 $navwidth + $gutterwidth/2; // Make room for left nav
 }
@@ -111,20 +121,21 @@ body {
 
 footer[role="contentinfo"] {
     @include zero;
-    margin: $baselineheight*3 0 $baselineheight 0; 
-    text-align: center;    
+    margin: $baselineheight*3 0 $baselineheight 0;
+    text-align: center;
+
     .fa-heart {
         cursor: help;
     }
 }
 
-.page {    
+.page {
     max-width: $list-view-width;
     margin: $baselineheight/2 auto 0 auto;
     background: $white;
-    padding: $baselineheight $gutterwidth*1.5;   
-    @include box-shadow(0 0 4px $lightneutralcolor);    
-    border-radius: $borderradius;            
+    padding: $baselineheight $gutterwidth*1.5;
+    @include box-shadow(0 0 4px $lightneutralcolor);
+    border-radius: $borderradius;
 }
 
 dl.shortcuts {
@@ -133,17 +144,17 @@ dl.shortcuts {
 
     dt {
         margin: $baselineheight 0 $baselineheight/2 0;
-        text-transform: uppercase;            
+        text-transform: uppercase;
         letter-spacing: 2px;
         color: $lightneutralcolor;
         font-weight: bold;
     }
-    
+
     dd {
         margin-bottom: $baselineheight/2 !important;
     }
 }
-    
+
 // A keyboard shortcut
 
 kbd {
@@ -151,8 +162,8 @@ kbd {
     padding: 2px 0;
     width: 2em;
     display: inline-block;
-    background: $lightestneutralcolor; 
-    text-align: center;                            
+    background: $lightestneutralcolor;
+    text-align: center;
     border-radius: $borderradius;
     color: $neutralcolor;
     text-transform: uppercase;
@@ -161,7 +172,7 @@ kbd {
 
 
 pre {
-    background: $lightestneutralcolor;    
+    background: $lightestneutralcolor;
     border-radius: $borderradius;
     padding: 8px 4px;
 }
@@ -176,14 +187,15 @@ pre {
 // Messages taking all panel height
 .notice {
     text-align: center;
-    margin: 25% 0 20% 0;    
-    @extend .dim;    
+    margin: 25% 0 20% 0;
+    @extend .dim;
+
     i {
         display: block;
         opacity: .6;
-        margin: $baselineheight 0 0;        
+        margin: $baselineheight 0 0;
     }
-    
+
 }
 
 
@@ -193,24 +205,24 @@ pre {
     position: fixed;
     top: 50%;
     left: 50%;
-    margin-left: -3em;    
-    margin-top: -3em;    
+    margin-left: -3em;
+    margin-top: -3em;
     z-index: 3;
     width: 6em;
     padding: $baselineheight*2 $gutterwidth*2;
 
-    border-radius: $borderradius;    
-    background: rgba($lightestneutralcolor, .85);        
-    text-align: center;    
+    border-radius: $borderradius;
+    background: rgba($lightestneutralcolor, .85);
+    text-align: center;
 }
 
 .loading {
-    text-align: center;    
+    text-align: center;
     color: $neutralcolor;
     //margin: $baselineheight/2 0;
 }
 
- 
+
 // Forms
 
 #modal-feed-edit {
@@ -220,55 +232,64 @@ pre {
     }
 
 
-    th, td {
-        border-top-color: $lighterneutralcolor; 
+    th,
+    td {
+        border-top-color: $lighterneutralcolor;
     }
 
-    .enabled { color: $successcolor; }
-    .disabled { color: $errorcolor; }
+    .enabled {
+        color: $successcolor;
+    }
+
+    .disabled {
+        color: $errorcolor;
+    }
 
     code {
-        background: $lightestneutralcolor;    
+        background: $lightestneutralcolor;
         border-radius: $borderradius;
-        padding: 2px 4px;        
-    }    
-    
+        padding: 2px 4px;
+    }
+
     .favicon {
         vertical-align: baseline;
     }
 }
 
 
-nav { 
-    
+nav {
+
     // position: fixed;
     // top: 0;
     // bottom: 0;
     // z-index: 3;
-    
+
     background: $navigationbackgroundcolor;
 
-     a {
-        color : $navigationlinkcolor;    
-        
+    a {
+        color: $navigationlinkcolor;
+
         &:visited {
-        color : $navigationlinkcolor; }
-        
+            color: $navigationlinkcolor;
+        }
+
         &:hover {
-        text-decoration : none;
-        color : $navigationlinkcolorhover; 
-        background: darken($navigationbackgroundcolor, 15%); }
-        
+            text-decoration: none;
+            color: $navigationlinkcolorhover;
+            background: darken($navigationbackgroundcolor, 15%);
+        }
+
         &:focus {
-        color : $navigationlinkcolorhover; }
+            color: $navigationlinkcolorhover;
+        }
     }
 
     ul {
 
         @include zero;
         list-style: none;
-                
-        > li {
+
+        >li {
             position: relative;
 
             &.sep {
@@ -277,14 +298,14 @@ nav {
 
             &.branding {
                 color: $white;
-                background: darken($primarycolor, 10%);                        
-                padding: $baselineheight/4 $baselineheight/1.5;   
+                background: darken($primarycolor, 10%);
+                padding: $baselineheight/4 $baselineheight/1.5;
                 @include font-size(16);
                 text-transform: uppercase;
-                letter-spacing: 2px;                
+                letter-spacing: 2px;
             }
-    
-            > a {
+
+            >a {
                 display: block;
                 @include font-size(16);
                 padding: $baselineheight/4 $baselineheight/1.5;
@@ -296,53 +317,60 @@ nav {
         &.unread li.filter-unread,
         &.saved li.filter-saved,
         &.feeds li.filter-feeds,
-        &.groups li.filter-group,        
+        &.groups li.filter-group,
         &.all li.filter-all {
-            > a {
+            >a {
                 color: $white;
-                background: $neutralcolor;                  
+                background: $neutralcolor;
             }
         }
     }
-  
-} // nav
+
+}
+
+// nav
 
 
 // Customized Bootstrap dropdown menu
 
 .dropdown {
-.dropdown-menu {
-    @include zero;
-    min-width: 12em;
-    position: absolute;
-    z-index: 4;
-    top: -3px;
-    left: 2.6em;
-    display: none;
-    background: $white;
-    border: 1px solid $bordercolor;
-    border-radius: $borderradius;
-    @include box-shadow(0 0 4px rgba($neutralcolor, .5));                        
+    .dropdown-menu {
+        @include zero;
+        min-width: 12em;
+        position: absolute;
+        z-index: 4;
+        top: -3px;
+        left: 2.6em;
+        display: none;
+        background: $white;
+        border: 1px solid $bordercolor;
+        border-radius: $borderradius;
+        @include box-shadow(0 0 4px rgba($neutralcolor, .5));
 
-    a {
-        @include font-size(14);   
-        white-space: nowrap;                 
-        border-bottom: 1px solid $bordercolor;
-        
-        &:hover {
-        color : $navigationlinkcolor; 
-        background: $lightestneutralcolor }
+        a {
+            @include font-size(14);
+            white-space: nowrap;
+            border-bottom: 1px solid $bordercolor;
+
+            &:hover {
+                color: $navigationlinkcolor;
+                background: $lightestneutralcolor
+            }
+        }
+
+        li:last-child a {
+            border-bottom: none;
+        }
     }
 
-    li:last-child a { border-bottom: none; }
+    &.open {
+        background: darken($navigationbackgroundcolor, 15%); // Like hover
+
+        // Show 
+        .dropdown-menu {
+            display: block;
+        }
+    }
 }
-&.open {
-    background: darken($navigationbackgroundcolor, 15%); // Like hover
-    // Show 
-    .dropdown-menu { display: block; }
-}
-} // dropdown
 
-
-
-
+// dropdown

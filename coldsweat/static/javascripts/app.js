@@ -1,5 +1,3 @@
-// Put app scripts here
-    
 $(document).ready(function() {
     "use strict";
 
@@ -201,5 +199,3 @@ $(document).ready(function() {
     setup();
     
 });
-
-

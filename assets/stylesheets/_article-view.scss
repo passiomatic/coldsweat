@@ -1,0 +1,232 @@
+main {
+    //min-width: max-content;
+    flex-grow: 1;
+    overflow-y: auto;
+    height: 100vh;    
+}
+
+
+ul.view2 {
+    list-style: none;
+    @include zero;
+    //max-width: $list-view-width;
+    margin: 2rem 2rem;
+    
+    > li {
+        @include zero;
+
+        &.heading {
+            @include clearfix;
+            padding: $baselineheight/4 $gutterwidth*1.5;
+            background: $lightestneutralcolor;
+
+            &:first-child {
+                border-top-left-radius: $borderradius;
+                border-top-right-radius: $borderradius;
+            }
+
+            h2 {
+                @extend .h4;                    
+                //font-size: 1rem;
+                text-transform: uppercase;
+                color: $lightneutralcolor;
+                letter-spacing: 1px;
+                //span { display: none; }
+            }                
+
+            // Show feed name on first heading only
+            &:first-child h2 span {
+                display: inline; 
+            }
+            
+            .toolbar {
+                float: right;
+                display: none;
+            }
+            
+            // Show on first heading only
+            &:first-child .toolbar {
+                display: block; 
+            }
+        }
+        
+        .item-inner {
+            background: $white;
+            //@include transition(background .1s ease-out);
+            padding: $baselineheight/4 $gutterwidth*1.5; 
+            @include box-shadow(0 0 4px $lightneutralcolor);    
+
+            // Title
+    
+            > h3 {
+                a { display: block; }
+            }
+
+            .favicon {
+                float: left;
+                margin: 4px 0 0 (-$gutterwidth);
+            }
+        }        
+
+        // Feeds
+        
+        &.status-disabled {
+
+            .item-inner {
+                background-color: lighten($secondarycolor, 57%);
+                h3 {
+                    text-decoration: line-through;
+                }
+            }                                
+        }
+
+        &.status-sick {
+
+            .item-inner {
+                background-color: $warningcolor;
+            }                                
+        }
+
+
+        .item-inner {
+            border-bottom: 1px solid $lightestneutralcolor;                       
+        }
+
+        &.expanded .item-inner {
+            padding: $baselineheight $gutterwidth*1.5;    
+            border-bottom: none;                       
+        }
+                    
+        &:first-child .item-inner {
+            border-top-left-radius: $borderradius;
+            border-top-right-radius: $borderradius;
+        }
+
+        &:last-child .item-inner {
+            border-bottom-left-radius: $borderradius;
+            border-bottom-right-radius: $borderradius;
+        }
+        
+        // Read, unread, etc.
+        
+        .meta .icon-read {
+            display: none;
+            @extend .fa-circle-o;
+            margin-left: $gutterwidth/2;   
+        }
+
+        .meta .icon-unread {
+            @extend .fa-circle;
+            margin-left: $gutterwidth/2;   
+        }
+
+        .meta .icon-saved {
+            display: none;
+            @extend .fa-star;
+        }
+
+        .meta .icon-unsaved {
+            @extend .fa-star-o;
+        }
+        
+        &.status-read {
+            h3 {
+                a:link {
+                    color: rgba($linkcolor, .7);
+                }
+                a:hover {
+                    color: $linkcolorhover;
+                }
+            }                    
+            .meta .icon-read {
+                display: inline-block;
+            }
+            .meta .icon-unread {
+                display: none;
+            }
+        }
+
+        &.status-saved {
+            .meta .icon-saved {
+                display: inline-block;
+                @include transform(scale(1.3,1.3));
+            }
+            .meta .icon-unsaved {
+                display: none;
+            }
+        }
+        
+
+    }
+
+    .more {
+        clear:both;
+        text-align: center;
+        padding: $baselineheight/2 0;                           
+        a {
+            width: 100%;
+            display: inline-block;
+        }
+    }        
+
+}
+
+
+
+// =entry ================================
+
+article {
+    @include clearfix;
+    .content {        
+
+    
+        // Headings
+
+        h1 { border: none; }
+        
+        // Other block-level elements 
+        
+        p, blockquote, figure, table, ul, ol, dl {
+            @include zero;
+            margin: $baselineheight/2 0;        
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+        
+        blockquote { 
+            color: $secondarycolor;        
+            padding: 0 $gutterwidth;
+            p:last-child {
+                margin-bottom: 0;
+            }
+        }
+    
+        // List items 
+        
+        li, dd {
+            @include zero;
+            margin: 0 0 $baselineheight/4 $gutterwidth;                
+        }
+    
+        // Images
+        
+        img {
+        }
+        
+        // Misc. 
+        
+        hr {
+            margin: $baselineheight 0;        
+        }
+        
+        .continue {
+            text-align: center;
+            clear: both;
+            margin: $baselineheight 0 0 0;
+        }
+        
+    }
+    
+}
+        

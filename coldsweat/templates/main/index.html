@@ -1,15 +1,6 @@
 {% extends "base.html" %}
 
 {% block container_block %} 
-    <section class="panel">
-        {% block panel_block %} 
-        {% endblock %}
-        <footer role="contentinfo">    
-            <div class="dim">Coldsweat&ensp;<i title="Loves" class="fa fa-heart"></i>&ensp;Your Feeds&ensp;&middot;&ensp;<a data-remote-modal href="{{ url_for('main.cheatsheet') }}">Cheatsheet</a>
-            </div>
-        </footer>
-    </section>
-
     <nav role="navigation">
         <ul class="{{filter_class}}">
             <li class="branding">
@@ -31,6 +22,20 @@
                 </ul>
             </li>
         </ul>
-    </nav>  
+    </nav>
+    <section class="panel">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert--{{ category }}">{{ message|safe }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block panel_block %} 
+        {% endblock %}
+    </section>
+    <main id="main">
+        Select an entry.
+    </main>
 {% endblock %}
 

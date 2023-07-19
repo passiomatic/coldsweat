@@ -48,7 +48,7 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 //@import "partials/bootstrap-breadcrumbs";
 //@import "partials/bootstrap-carousel";
 //@import "partials/bootstrap-hero";
-@import "partials/bootstrap-media";
+//@import "partials/bootstrap-media";
 @import "partials/bootstrap-modal";
 //@import "partials/bootstrap-navs";
 //@import "partials/bootstrap-navbar";
@@ -65,12 +65,12 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 @import "partials/bootstrap-form-buttons";
 
 
-@media print {
-@import "partials/print"; }
+// @media print {
+// @import "partials/print"; }
 
-// 2x
-@media
-only screen and (-webkit-min-device-pixel-ratio: 1.5),
-only screen and (min--moz-device-pixel-ratio: 1.5),
-only screen and (min-device-pixel-ratio: 1.5) {
-@import "partials/2x"; }
+// // 2x
+// @media
+// only screen and (-webkit-min-device-pixel-ratio: 1.5),
+// only screen and (min--moz-device-pixel-ratio: 1.5),
+// only screen and (min-device-pixel-ratio: 1.5) {
+// @import "partials/2x"; }

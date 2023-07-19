@@ -13,22 +13,12 @@ Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
 <link rel="shortcut icon" href='{{ url_for("static", filename="favicon.png") }}' sizes="32x32">
 <link rel="apple-touch-icon" sizes="152x152" href='{{ url_for("static", filename="images/apple-touch-icon.png") }}'>
 <meta name="apple-mobile-web-app-title" content="Coldsweat">
+<script defer src='{{ url_for("static", filename="javascripts/app2.js") }}'></script>
 <script src='{{ url_for("static", filename="javascripts/vendor/head.load.min.js") }}'></script>
 {% block head_block %}{% endblock %}
 </head>
 <body>
-
-<div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert--{{ category }}">{{ message|safe }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     {% block container_block %}{% endblock %}
-</div><!-- container -->
-
 <script>
 window.applicationURL = '{{request.root_url}}';
 head.js(
@@ -51,7 +41,7 @@ head.js(
 '{{ url_for("static", filename="javascripts/plugins.js") }}',
 
 // App scripts
-'{{ url_for("static", filename="javascripts/app.js") }}',
+//'{{ url_for("static", filename="javascripts/app.js") }}',
 
 function() {    
     // Do something when we are ready

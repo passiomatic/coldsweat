@@ -13,8 +13,8 @@ import coldsweat.markup as markup
 from . import bp
 import coldsweat.utilities as utilities
 
-ENTRIES_PER_PAGE = 30
-FEEDS_PER_PAGE = 60
+ENTRIES_PER_PAGE = 50
+FEEDS_PER_PAGE = 50
 GROUPS_PER_PAGE = 30
 
 
@@ -43,7 +43,7 @@ def entry_list():
         'is_xhr': flask.request.args.get('xhr', 0, type=int)
     })
 
-    return flask.render_template("main/entries.html", **view_variables)
+    return flask.render_template("main/entries2.html", **view_variables)
 
 
 @bp.route('/entries/<int:entry_id>')

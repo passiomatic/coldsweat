@@ -1,0 +1,69 @@
+// Typography
+
+$font-size-small: 0.875rem;
+$font-size-base: 1rem;
+$font-size-large: 1.25rem;
+$font-size-xlarge: 1.5rem;
+$font-size-xxlarge: 2rem;
+
+$line-height-small: 1.1;
+$line-height: 1.5;
+
+
+// Now define your design’s typography by setting a base typeface and size
+$font-family: system-ui, -apple-system, "Helvetica Neue", Arial, Helvetica, sans-serif;
+$font-family-alt : $font-family;
+$font-family-code: Consolas, Menlo, Monaco, "Courier New", monospace;
+
+$font-weight: normal;
+
+// Your headings may inherit the base typeface, or you may set a different font stack
+//$baseheadingfont : inherit;
+
+// Choose between normal, bold or set a font-weight number (eg: 700) for your headings
+$font-weight-heading : 500;
+
+// Your headings may inherit the $textcolor, or you may set a different colour
+$heading-color : inherit;
+
+
+// Colors 
+
+$color-neutral-700: #f7f5f5;
+$color-neutral-600: #ece9e9;
+$color-neutral-500: #d9d5d5;
+$color-neutral-400: #bbb7b7;
+$color-neutral-300: #918e8e;
+$color-neutral-200: #5e5c5c;
+$color-neutral-100: #252424;
+
+$color-primary-400: #d5e1e9;
+$color-primary-300: #72a3bf;
+$color-primary-200: #26729e;
+$color-primary-100: #175b82;
+
+$color-primary : $color-primary-100;
+$color-secondary : #9c1c1e;
+
+
+// Body 
+
+$body-color: $color-neutral-400;
+$text-color: $color-neutral-100;
+
+
+// Links
+
+$link-color: $color-primary;
+$link-color-hover: $link-color;
+$link-color-visited: darken($link-color, 10);
+$link-color-focus: $link-color-hover;
+
+
+// Alerts 
+
+$alert-color: darken(#e6eff5, 15%);
+$error-color: $color-secondary;
+$info-color: darken(#e6eff5, 15%);
+$success-color: #5eb337;
+$warning-color: #f7ea9c;

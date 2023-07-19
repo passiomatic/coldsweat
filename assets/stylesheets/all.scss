@@ -12,6 +12,8 @@ $navwidth: 52px;
 // Import all SASS Bootstrap imports
 @import 'imports';
 
+@import 'theme';
+
 // App views
 @import 'list-view';
 @import 'article-view';

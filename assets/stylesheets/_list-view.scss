@@ -18,8 +18,9 @@
 
              h2 {
                  text-transform: uppercase;
-                 color: $lightneutralcolor;
+                 color: $text-color-muted;
                  letter-spacing: 1px;
+                 font-size: $font-size-small;
              }
          }
 
@@ -211,6 +212,7 @@
 
 .panel-content {
     position: relative;
+    border-right: 1px solid $border-color;
 }
 
 .entry__filter {

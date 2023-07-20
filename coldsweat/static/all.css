@@ -2779,8 +2779,9 @@ ul.view > li.heading {
 
 ul.view > li.heading h2 {
   text-transform: uppercase;
-  color: #898080;
+  color: #918e8e;
   letter-spacing: 1px;
+  font-size: .875rem;
 }
 
 ul.view > li .item-inner {
@@ -2896,6 +2897,7 @@ ul.list-view .more {
 }
 
 .panel-content {
+  border-right: 1px solid #bbb7b7;
   position: relative;
 }
 

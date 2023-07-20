@@ -54,6 +54,11 @@
             </template>
         </li>
         {% set ns.prev_date = date  %}
+    {% else %}
+        <div class="notice">
+            <i class="fa fa-tint fa-4x"></i>
+            No entries found.
+        </div>    
     {% endfor %}
     {% if offset < count %}
         <li class="more">
@@ -88,13 +93,16 @@
 
                     <div class="radio-switch">
                         <label class="radio-switch__label radio-switch__label--selected">
-                            <input type="radio" name="status" value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
+                            {% set request_url_1 = url_for('main.entry_list', filter='unread', xhr=1) %}
+                            <input type="radio" name="status" onclick="Sweat.loadFolder('{{request_url_1}}')" value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
                         </label>
                         <label class="radio-switch__label">
-                            <input type="radio" name="status" value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
+                            {% set request_url_2 = url_for('main.entry_list', filter='saved', xhr=1) %}
+                            <input type="radio" name="status" onclick="Sweat.loadFolder('{{request_url_2}}')" value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
                         </label>
                         <label class="radio-switch__label">
-                            <input type="radio" name="status" value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
+                            {% set request_url_3 = url_for('main.entry_list', filter='all', xhr=1) %}
+                            <input type="radio" name="status" onclick="Sweat.loadFolder('{{request_url_3}}')" value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
                         </label>
                     </div>
 

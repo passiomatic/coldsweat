@@ -26,7 +26,7 @@ ul.view2 {
             }
 
             h2 {
-                @extend .h4;
+                //@extend .h4;
                 //font-size: 1rem;
                 text-transform: uppercase;
                 color: $lightneutralcolor;
@@ -186,6 +186,14 @@ ul.view2 {
 article {
     @include clearfix;
 
+    .article__title {
+        font-size: $font-size-xlarge;     
+        font-weight: 600;
+        padding-bottom: 1rem;     
+        margin-bottom: 1rem;
+        border-bottom: 5px double $bordercolor;
+    }
+
     .content {
 
 
@@ -219,6 +227,12 @@ article {
             p:last-child {
                 margin-bottom: 0;
             }
+        }
+
+        figcaption {
+            font-size: $font-size-small;
+            font-style: italic;
+            color: $text-color-muted;
         }
 
         // List items 

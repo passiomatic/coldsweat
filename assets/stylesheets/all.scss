@@ -23,6 +23,10 @@ html,
 body {
     height: 100%;
     overflow-y: hidden;
+    // Keep browser default font size and scaled everythign accordingly 
+    font: normal 1em/#{$line-height} $font-family;
+    color: $text-color;
+    background : $body-background;
 }
 
 body {
@@ -51,8 +55,8 @@ body {
 
 
 .meta {
-    @include font-size(14);
-
+    font-size: $font-size-small;
+    
     .actions {
         .fa {
             cursor: pointer;
@@ -68,7 +72,7 @@ body {
     .meta {
         .feed {
             text-transform: uppercase;
-            @extend .spaced;
+            //@extend .spaced;
         }
 
         .actions {

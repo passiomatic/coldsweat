@@ -1,12 +1,13 @@
 // Typography
 
+$font-size-xsmall: 0.75rem;
 $font-size-small: 0.875rem;
 $font-size-base: 1rem;
 $font-size-large: 1.25rem;
 $font-size-xlarge: 1.5rem;
 $font-size-xxlarge: 2rem;
 
-$line-height-small: 1.1;
+$line-height-small: 1.2;
 $line-height: 1.5;
 
 
@@ -50,8 +51,9 @@ $color-secondary : #9c1c1e;
 // Body 
 
 $body-color: $color-neutral-400;
+$body-background: #C6C2C2;  
 $text-color: $color-neutral-100;
-
+$text-color-muted: $color-neutral-300;
 
 // Links
 

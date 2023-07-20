@@ -20,7 +20,7 @@
              }
 
              h2 {
-                 @extend .h4;
+                 //@extend .h4;
                  //font-size: 1rem;
                  text-transform: uppercase;
                  color: $lightneutralcolor;
@@ -48,6 +48,12 @@
              background: $white;
              //@include transition(background .1s ease-out);
              padding: $baselineheight/4 $gutterwidth*1.5;
+
+             .feed {
+                font-size: $font-size-xsmall;
+                font-weight: normal;
+                text-transform: uppercase;
+             }
 
              // Title
 

@@ -8,12 +8,12 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 $media-queries-supported: true;
 $list-view-width: 25em;
 
+// Theme vars
 @import 'theme';
 
 // Import all SASS Bootstrap imports
 @import 'imports';
-
-// App views
+@import 'buttons';
 @import 'tree-view';
 @import 'list-view';
 @import 'article-view';
@@ -340,14 +340,14 @@ nav {
         left: 2.6em;
         display: none;
         background: $white;
-        border: 1px solid $bordercolor;
+        border: 1px solid $border-color;
         border-radius: $borderradius;
         @include box-shadow(0 0 4px rgba($neutralcolor, .5));
 
         a {
             @include font-size(14);
             white-space: nowrap;
-            border-bottom: 1px solid $bordercolor;
+            border-bottom: 1px solid $border-color;
 
             &:hover {
                 color: $navigationlinkcolor;
@@ -371,3 +371,29 @@ nav {
 }
 
 // dropdown
+
+.radio-switch {
+    background-color: $color-neutral-500;
+    border-radius: .5rem;
+    display: inline-flex;
+    padding: 0.25rem;
+    gap: .75rem;
+}
+
+.radio-switch__label {
+    border-radius: .35rem;
+    cursor: pointer;
+    width: 1.5rem;
+    padding: 0.25rem .5rem;
+    text-align: center;
+}
+
+.radio-switch__label--selected {
+    /* For selected radio only */
+    background-color: $color-primary-200;
+    color: $white;
+}
+
+.radio-switch__input {
+    display: none;
+}

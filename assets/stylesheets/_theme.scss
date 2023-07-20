@@ -10,8 +10,6 @@ $font-size-xxlarge: 2rem;
 $line-height-small: 1.2;
 $line-height: 1.5;
 
-
-// Now define your design’s typography by setting a base typeface and size
 $font-family: system-ui, -apple-system, "Helvetica Neue", Arial, Helvetica, sans-serif;
 $font-family-alt : $font-family;
 $font-family-code: Consolas, Menlo, Monaco, "Courier New", monospace;
@@ -29,6 +27,10 @@ $heading-color : inherit;
 
 
 // Colors 
+
+$white: #fff;
+$black: #000;
+
 // See https://components.ai/color-scale/fZYdaX1TXadjlTxcJbKO?tab=editor
 
 $color-neutral-700: #f7f5f5;
@@ -51,9 +53,10 @@ $color-secondary : #9c1c1e;
 // Body 
 
 $body-color: $color-neutral-400;
-$body-background: #C6C2C2;  
+$body-background: $color-neutral-500;
 $text-color: $color-neutral-100;
 $text-color-muted: $color-neutral-300;
+
 
 // Links
 
@@ -70,3 +73,7 @@ $error-color: $color-secondary;
 $info-color: darken(#e6eff5, 15%);
 $success-color: #5eb337;
 $warning-color: #f7ea9c;
+
+// Misc.
+
+$border-color : $color-neutral-400;

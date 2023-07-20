@@ -10,49 +10,28 @@
          @include zero;
 
          &.heading {
-             @include clearfix;
+             //@include clearfix;
              padding: $baselineheight/4 $gutterwidth*1.5;
              background: $lightestneutralcolor;
-
-             &:first-child {
-                 border-top-left-radius: $borderradius;
-                 border-top-right-radius: $borderradius;
-             }
+             position: sticky;
+             top: 0;
 
              h2 {
-                 //@extend .h4;
-                 //font-size: 1rem;
                  text-transform: uppercase;
                  color: $lightneutralcolor;
                  letter-spacing: 1px;
-                 //span { display: none; }
-             }
-
-             // Show feed name on first heading only
-             &:first-child h2 span {
-                 display: inline;
-             }
-
-             .toolbar {
-                 float: right;
-                 display: none;
-             }
-
-             // Show on first heading only
-             &:first-child .toolbar {
-                 display: block;
              }
          }
 
          .item-inner {
              background: $white;
              //@include transition(background .1s ease-out);
-             padding: $baselineheight/4 $gutterwidth*1.5;
+             padding: $baselineheight/2 $gutterwidth*1.5;
 
              .feed {
-                font-size: $font-size-xsmall;
-                font-weight: normal;
-                text-transform: uppercase;
+                 font-size: $font-size-xsmall;
+                 font-weight: normal;
+                 text-transform: uppercase;
              }
 
              // Title
@@ -229,3 +208,21 @@
      }
 
  }
+
+.panel-content {
+    position: relative;
+}
+
+.entry__filter {
+    background-color: rgba($color-neutral-400, .7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem 0;
+}

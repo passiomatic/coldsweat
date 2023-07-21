@@ -2820,13 +2820,21 @@ ul.view > li.heading h2 {
 
 ul.view > li .item-inner {
   background: #fff;
-  padding: .75em 36px;
+  padding: .75em .75rem;
+}
+
+ul.view > li .item-inner .read-status {
+  color: #175b82;
+  font-size: .75rem;
 }
 
 ul.view > li .item-inner .feed {
   text-transform: uppercase;
+  align-items: center;
+  gap: .25rem;
   font-size: .75rem;
   font-weight: normal;
+  display: flex;
 }
 
 ul.view > li .item-inner .entry__title {
@@ -2835,11 +2843,6 @@ ul.view > li .item-inner .entry__title {
 
 ul.view > li .item-inner .entry__title a {
   display: block;
-}
-
-ul.view > li .item-inner .favicon {
-  float: left;
-  margin: 4px 0 0 -24px;
 }
 
 ul.view > li.status-disabled .item-inner {

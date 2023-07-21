@@ -11,17 +11,26 @@
         {% endif %}
         <li data-entry="{{e.id}}" class="entry {% if e.id in saved_ids %}status-saved{% endif %} {%if e.id in read_ids %}status-read{% endif %}">
             <div class="item-inner">
-                <h4 class="feed">
-                    <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*">{{e.feed.title}}
-                </h4>
-                <h3 class="entry__title">
-                    <a onclick="Sweat.replaceElement('template-{{e.id}}', 'main', event)" href="{{ url_for('main.entry', entry_id=e.id, filter=filter_name ) }}">{{e.title}}</a>
-                </h3>
-                <!-- <div class="meta dim">
+                <div style="display: flex; align-items: center; gap: .5rem">
+                    <div class="read-status">
+                        <i class="fa fa-circle"></i>
+                    </div>
+                    <div>
+                        <h4 class="feed">
+                            <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*">{{e.feed.title}}
+                        </h4>
+                        <h3 class="entry__title">
+                            <a onclick="Sweat.replaceElement('template-{{e.id}}', 'main', event)" href="{{ url_for('main.entry', entry_id=e.id, filter=filter_name ) }}">{{e.title}}</a>
+                        </h3>
+                    </div>
+                </div>
+                <!-- 
+                <div class="meta dim">
                     <span class="actions">
                         {% if e.id in saved_ids %}<i class="save-trigger icon-saved fa" title="Unsave"></i>{% else %}<i class="save-trigger icon-unsaved fa" title="Save"></i>{%endif%}{% if e.id in read_ids %}<i class="read-trigger icon-read fa" title="Make as unread"></i>{%else%}<i class="read-trigger icon-unread fa" title="Mark as read"></i>{%endif%}                    
                     </span>
-                </div>                  -->
+                </div>
+                -->
             </div>
             <template id="template-{{e.id}}">             
                 <ul class="view2">                      
@@ -107,7 +116,11 @@
                     </div>
 
                     <div>
-                        <!-- placeholder-->
+                        {% if feed_id and filter_class in ['feeds'] %}
+                            <a class="btn-text" href="{{ url_for('main.feed_edit', feed=feed_id ) }}" data-remote-modal="modal-feed-edit">
+                                <i class="fa fa-cog"></i>
+                            </a>
+                        {% endif %}   
                     </div>
                 </div>
             </div>

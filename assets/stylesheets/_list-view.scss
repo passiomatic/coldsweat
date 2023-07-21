@@ -27,12 +27,20 @@
          .item-inner {
              background: $white;
              //@include transition(background .1s ease-out);
-             padding: $baselineheight/2 $gutterwidth*1.5;
+             padding: $baselineheight/2 .75rem;
+
+            .read-status {
+                color: $color-primary;        
+                font-size: .75rem;
+            }
 
              .feed {
                  font-size: $font-size-xsmall;
                  font-weight: normal;
                  text-transform: uppercase;
+                 display: flex;
+                 align-items: center;
+                 gap: .25rem;
              }
 
              // Title
@@ -45,8 +53,8 @@
              }
 
              .favicon {
-                 float: left;
-                 margin: 4px 0 0 (-$gutterwidth);
+                 //float: left;
+                 //margin: 4px 0 0 (-$gutterwidth);
              }
          }
 

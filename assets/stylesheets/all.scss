@@ -261,68 +261,9 @@ pre {
 
 
 nav {
-    background: $color-neutral-300;
-
-    a {
-        color: $navigationlinkcolor;
-
-        &:visited {
-            color: $navigationlinkcolor;
-        }
-
-        &:hover {
-            text-decoration: none;
-            color: $navigationlinkcolorhover;
-            background: darken($navigationbackgroundcolor, 15%);
-        }
-
-        &:focus {
-            color: $navigationlinkcolorhover;
-        }
-    }
-
-    ul {
-
-        @include zero;
-        list-style: none;
-
-        >li {
-            position: relative;
-
-            &.sep {
-                margin-top: $baselineheight/2;
-            }
-
-            &.branding {
-                color: $white;
-                background: darken($primarycolor, 10%);
-                padding: $baselineheight/4 $baselineheight/1.5;
-                @include font-size(16);
-                text-transform: uppercase;
-                letter-spacing: 2px;
-            }
-
-            >a {
-                display: block;
-                @include font-size(16);
-                padding: $baselineheight/4 $baselineheight/1.5;
-                text-transform: capitalize;
-            }
-
-        }
-
-        &.unread li.filter-unread,
-        &.saved li.filter-saved,
-        &.feeds li.filter-feeds,
-        &.groups li.filter-group,
-        &.all li.filter-all {
-            >a {
-                color: $white;
-                background: $neutralcolor;
-            }
-        }
-    }
-
+    background: $color-neutral-400;
+    height: 100vh;
+    overflow-y: scroll;
 }
 
 // nav

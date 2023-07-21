@@ -17,8 +17,9 @@
         //margin-bottom: .75rem;
 
         ul {
+            list-style: none;                        
             li {
-                
+                @include zero;
             }
         }
         
@@ -59,11 +60,12 @@
         color: inherit;        
 
         &:hover {
-            background: $color-neutral-400;
+            background: $color-neutral-500;
         }
     }
 
     .btn-item {
+        font-size: $font-size-xsmall;
         padding: .5rem 1.5rem .5rem 1.5rem;
     }
 }

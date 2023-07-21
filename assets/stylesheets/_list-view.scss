@@ -37,10 +37,11 @@
 
              // Title
 
-             >h3 {
-                 a {
-                     display: block;
-                 }
+            .entry__title {
+                font-weight: 500;
+                a {
+                    display: block;
+                }
              }
 
              .favicon {

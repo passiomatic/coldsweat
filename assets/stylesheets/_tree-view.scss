@@ -15,10 +15,40 @@
         @include zero;
 
         //margin-bottom: .75rem;
+
+        ul {
+            li {
+                
+            }
+        }
+        
+        // Arrows
+        
+        details summary::-webkit-details-marker {
+            display: none; // Hides marker on Safari 
+        }
+        
+        details summary {
+            list-style: none; // Other browsers
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        details summary:after {
+            //@include icon('\e920'); // Angle down
+            content: '^';
+        }
+        
+        details[open] summary:after {
+            transform: rotate(180deg);
+        }        
     }
 
-    button {
-        display: block;
+    .btn-item,
+    .btn-folder {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
         appearance: none;
         @include zero;
         padding: .5rem 1.5rem .5rem .75rem;
@@ -26,11 +56,17 @@
         border: 0;
         font-size: $font-size-small;
         cursor: pointer;
-        color: inherit;
+        color: inherit;        
 
         &:hover {
             background: $color-neutral-400;
         }
     }
+
+    .btn-item {
+        padding: .5rem 1.5rem .5rem 1.5rem;
+    }
 }
+
+
 

@@ -1,4 +1,5 @@
 from datetime import datetime
+import itertools
 import flask
 import flask_login
 from flask import current_app as app
@@ -11,6 +12,7 @@ import coldsweat.feed as feed
 import coldsweat.fetcher as fetcher
 import coldsweat.markup as markup
 from . import bp
+from . import queries
 import coldsweat.utilities as utilities
 
 ENTRIES_PER_PAGE = 50
@@ -411,6 +413,8 @@ def _make_view_variables(user):
                                                   user)).objects()
     read_ids = dict((i.id, None) for i in r)
     saved_ids = dict((i.id, None) for i in s)
+
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(flask_login.current_user.db_user), lambda q: (q.group_id, q.group_title))
 
     filter = flask.request.args.get('filter', 'unread')
     if filter == 'saved':

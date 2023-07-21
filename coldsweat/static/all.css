@@ -2741,21 +2741,45 @@ input.search-query {
   padding: 0;
 }
 
-.tree-view button {
+.tree-view dd details summary::-webkit-details-marker {
+  display: none;
+}
+
+.tree-view dd details summary {
+  justify-content: space-between;
+  list-style: none;
+  display: flex;
+}
+
+.tree-view dd details summary:after {
+  content: "^";
+}
+
+.tree-view dd details[open] summary:after {
+  transform: rotate(180deg);
+}
+
+.tree-view .btn-item, .tree-view .btn-folder {
   -webkit-appearance: none;
   appearance: none;
   cursor: pointer;
   color: inherit;
   background: none;
   border: 0;
+  align-items: center;
+  gap: .25rem;
   margin: 0;
   padding: .5rem 1.5rem .5rem .75rem;
   font-size: .875rem;
-  display: block;
+  display: flex;
 }
 
-.tree-view button:hover {
+.tree-view .btn-item:hover, .tree-view .btn-folder:hover {
   background: #bbb7b7;
+}
+
+.tree-view .btn-item {
+  padding: .5rem 1.5rem;
 }
 
 ul.view {

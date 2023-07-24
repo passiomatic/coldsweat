@@ -25,32 +25,9 @@
          }
 
          .item-inner {
-             background: $white;
-             //@include transition(background .1s ease-out);
-             padding: $baselineheight/2 .75rem;
 
-            .read-status {
-                color: $color-primary;        
-                font-size: .75rem;
-            }
 
-             .feed {
-                 font-size: $font-size-xsmall;
-                 font-weight: normal;
-                 text-transform: uppercase;
-                 display: flex;
-                 align-items: center;
-                 gap: .25rem;
-             }
 
-             // Title
-
-            .entry__title {
-                font-weight: 500;
-                a {
-                    display: block;
-                }
-             }
 
              .favicon {
                  //float: left;
@@ -106,6 +83,10 @@
 
      >li {
 
+        &.entry {
+            border-bottom: 1px dotted $border-color;
+        }
+
          // &:not(.expanded) .actions {
          //     opacity: 0;
          //     @include visuallyhidden;                
@@ -120,25 +101,6 @@
              // &:not(.expanded) .feed {
              //     @include hidden;              
              // }
-         }
-
-         .item-inner {
-             border-bottom: 1px solid $lightestneutralcolor;
-         }
-
-         &.expanded .item-inner {
-             padding: $baselineheight $gutterwidth*1.5;
-             border-bottom: none;
-         }
-
-         &:first-child .item-inner {
-             border-top-left-radius: $borderradius;
-             border-top-right-radius: $borderradius;
-         }
-
-         &:last-child .item-inner {
-             border-bottom-left-radius: $borderradius;
-             border-bottom-right-radius: $borderradius;
          }
 
          // Read, unread, etc.
@@ -237,3 +199,64 @@
     align-items: center;
     padding: .5rem 0;
 }
+
+// Card 
+
+.entry-card label {
+    display: flex; 
+    align-items: center; 
+    gap: .5rem;
+
+    background-color: $white;
+    padding: $baselineheight/2 .75rem;
+
+    transition: background-color .1s ease-out;
+    cursor: pointer;
+    &:hover {
+        background-color: $color-neutral-700;
+    }
+}
+
+.entry-card__title {
+    font-weight: 500;
+    color: $color-primary;
+}
+
+.read-status {
+    color: $color-primary;        
+    font-size: .75rem;
+}
+
+.feed {
+    font-size: $font-size-xsmall;
+    font-weight: normal;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+}
+
+.entry-card input {
+    position: absolute;
+    //left: -9999px; // Doesn't work on mobile
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    //height: 48px; // Height for label
+  }
+
+  .entry-card label {
+    //outline: $btn-focus-ring;
+  }
+
+  // Radio button
+
+  .entry-card input:focus-visible ~ label {
+    //outline: $btn-focus-ring;
+  }
+
+  .entry-card input:checked
+    ~ label {
+        background: $color-primary-400;
+    }

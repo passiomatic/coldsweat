@@ -2818,33 +2818,6 @@ ul.view > li.heading h2 {
   font-size: .875rem;
 }
 
-ul.view > li .item-inner {
-  background: #fff;
-  padding: .75em .75rem;
-}
-
-ul.view > li .item-inner .read-status {
-  color: #175b82;
-  font-size: .75rem;
-}
-
-ul.view > li .item-inner .feed {
-  text-transform: uppercase;
-  align-items: center;
-  gap: .25rem;
-  font-size: .75rem;
-  font-weight: normal;
-  display: flex;
-}
-
-ul.view > li .item-inner .entry__title {
-  font-weight: 500;
-}
-
-ul.view > li .item-inner .entry__title a {
-  display: block;
-}
-
 ul.view > li.status-disabled .item-inner {
   background-color: #fae1e1;
 }
@@ -2874,23 +2847,8 @@ ul.list-view {
   overflow-y: auto;
 }
 
-ul.list-view > li .item-inner {
-  border-bottom: 1px solid #e4e2e2;
-}
-
-ul.list-view > li.expanded .item-inner {
-  border-bottom: none;
-  padding: 1.5em 36px;
-}
-
-ul.list-view > li:first-child .item-inner {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-
-ul.list-view > li:last-child .item-inner {
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+ul.list-view > li.entry {
+  border-bottom: 1px dotted #bbb7b7;
 }
 
 ul.list-view > li .meta .icon-read {
@@ -2955,6 +2913,51 @@ ul.list-view .more {
   display: flex;
   position: absolute;
   bottom: 0;
+}
+
+.entry-card label {
+  cursor: pointer;
+  background-color: #fff;
+  align-items: center;
+  gap: .5rem;
+  padding: .75em .75rem;
+  transition: background-color .1s ease-out;
+  display: flex;
+}
+
+.entry-card label:hover {
+  background-color: #f7f5f5;
+}
+
+.entry-card__title {
+  color: #175b82;
+  font-weight: 500;
+}
+
+.read-status {
+  color: #175b82;
+  font-size: .75rem;
+}
+
+.feed {
+  text-transform: uppercase;
+  align-items: center;
+  gap: .25rem;
+  font-size: .75rem;
+  font-weight: normal;
+  display: flex;
+}
+
+.entry-card input {
+  opacity: 0;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.entry-card input:checked ~ label {
+  background: #d5e1e9;
 }
 
 main {

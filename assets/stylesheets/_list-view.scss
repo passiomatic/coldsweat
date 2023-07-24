@@ -58,17 +58,6 @@
 
      }
 
-     .more {
-         clear: both;
-         text-align: center;
-         padding: $baselineheight/2 0;
-
-         a {
-             width: 100%;
-             display: inline-block;
-         }
-     }
-
  }
 
  // List view
@@ -174,9 +163,17 @@
      }
 
      .more {
-         background: $lightestneutralcolor;
-         border-bottom-left-radius: $borderradius;
-         border-bottom-right-radius: $borderradius;
+        //text-align: center;
+        background: $lightestneutralcolor;
+        // border-bottom-left-radius: $borderradius;
+        // border-bottom-right-radius: $borderradius;
+        margin-bottom: 3.5rem;
+
+        button {
+            display: block;
+            width: 100%;
+            padding: .5rem 0;
+        }
      }
 
  }

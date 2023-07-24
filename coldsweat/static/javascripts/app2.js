@@ -52,15 +52,16 @@ window.addEventListener("DOMContentLoaded", (event) => {
             fetch(url)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(`Server returned error ${response.status} while handling tag pagination`);
+                        throw new Error(`Server returned error ${response.status} while handling pagination`);
                     }
                     response.text().then((text) => {
-                        var button = wrapper.querySelector("button");
+                        var button = wrapper.querySelector(".more");
                         button.remove();
                         var template = document.createElement('template');
-                        template.innerHTML = text;                        
-                        //var child = wrapper.appendChild(template.content.childNodes);
-                        var children = wrapper.append(template.content.childNodes)
+                        template.innerHTML = text;                                            
+                        template.content.childNodes.forEach((child) => {
+                            wrapper.appendChild(child.cloneNode(true));
+                        })
                         //child.scrollIntoView({ behavior: "smooth", block: "start" })
                     });
                 });

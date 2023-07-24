@@ -2832,17 +2832,6 @@ ul.view > li.status-sick .item-inner {
   background-color: #f7ea9c;
 }
 
-ul.view .more {
-  clear: both;
-  text-align: center;
-  padding: .75em 0;
-}
-
-ul.view .more a {
-  width: 100%;
-  display: inline-block;
-}
-
 ul.list-view {
   height: 100vh;
   min-width: 35rem;
@@ -2893,8 +2882,13 @@ ul.list-view > li.status-saved .meta .icon-unsaved {
 
 ul.list-view .more {
   background: #e4e2e2;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  margin-bottom: 3.5rem;
+}
+
+ul.list-view .more button {
+  width: 100%;
+  padding: .5rem 0;
+  display: block;
 }
 
 .panel-content {

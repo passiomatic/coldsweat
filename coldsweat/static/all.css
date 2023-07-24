@@ -2755,17 +2755,23 @@ input.search-query {
 }
 
 .tree-view dd details summary {
-  justify-content: space-between;
+  align-items: center;
   list-style: none;
   display: flex;
 }
 
-.tree-view dd details summary:after {
-  content: "^";
+.tree-view dd details summary:before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23252424' viewBox='0 0 256 256'%3E%3Cpath d='M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  margin: 0 0 0 .25rem;
 }
 
-.tree-view dd details[open] summary:after {
-  transform: rotate(180deg);
+.tree-view dd details[open] summary:before {
+  transform: rotate(90deg);
 }
 
 .tree-view .btn-item, .tree-view .btn-folder {
@@ -2778,13 +2784,9 @@ input.search-query {
   align-items: center;
   gap: .25rem;
   margin: 0;
-  padding: .5rem 1.5rem .5rem .75rem;
+  padding: .5rem;
   font-size: .875rem;
   display: flex;
-}
-
-.tree-view .btn-item:hover, .tree-view .btn-folder:hover {
-  background: #d9d5d5;
 }
 
 .tree-view .btn-item {

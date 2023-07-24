@@ -21,8 +21,8 @@
             </dt>
             {% if groups_feeds %}
                 {% for (group_id, group_title), feeds in groups_feeds %}
-                    <dd class="">
-                        <details open>
+                    <dd>
+                        <details>
                             <summary>
                                 {% set request_url = url_for('main.entry_list', filter='group', id=group_id, xhr=1) %}
                                 <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}')">

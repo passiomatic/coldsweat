@@ -9,6 +9,14 @@ window.addEventListener("DOMContentLoaded", (event) => {
         }
         return null;
     }
+    
+    function makeEndpointURL(pathname) {
+        var segments = [
+            window.applicationURL,
+            pathname
+        ]                          
+        return segments.join('')
+    }    
 
     var listViewEl = document.getElementById("entry-list");
 
@@ -25,7 +33,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     prevCard = li.previousElementSibling;
                     var prevCardInput = prevCard.querySelector(".entry-card input");
                     if(prevCardInput) {
-                        prevCardInput.checked = true;                                     
+                        prevCardInput.checked = true;                       
+                        Sweat.mark(prevCardInput.value, 'read')              
                     } else {
                         // Top
                         console.log("Top")
@@ -45,7 +54,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     nextCard = li.nextElementSibling;
                     var nextCardInput = nextCard.querySelector(".entry-card input");
                     if(nextCardInput) {
-                        nextCardInput.checked = true;                                     
+                        nextCardInput.checked = true;          
+                        Sweat.mark(nextCardInput.value, 'read')
                     } else {
                         // Bottom
                         console.log("Bottom")
@@ -91,6 +101,20 @@ window.addEventListener("DOMContentLoaded", (event) => {
             dialog.showModal();         
             dialog.classList.add("in"); 
             return dialog;
+        },
+
+        mark: function(id, status) {
+            var formData = new FormData();
+            formData.append('mark', '')
+            formData.append('as', status)
+            fetch(makeEndpointURL(`/entries/${id}`), { method: 'POST', body: formData })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned error ${response.status} while handing POST request`);
+                    }
+                    response.text().then((text) => {
+                    });
+                });
         },
 
         loadMore: function(url) {

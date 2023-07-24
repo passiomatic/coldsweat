@@ -13,6 +13,7 @@ Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
 <link rel="shortcut icon" href='{{ url_for("static", filename="favicon.png") }}' sizes="32x32">
 <link rel="apple-touch-icon" sizes="152x152" href='{{ url_for("static", filename="images/apple-touch-icon.png") }}'>
 <meta name="apple-mobile-web-app-title" content="Coldsweat">
+<script defer src='{{ url_for("static", filename="javascripts/vendor/hotkeys.min.js") }}'></script>
 <script defer src='{{ url_for("static", filename="javascripts/app2.js") }}'></script>
 <script src='{{ url_for("static", filename="javascripts/vendor/head.load.min.js") }}'></script>
 {% block head_block %}{% endblock %}
@@ -27,15 +28,15 @@ head.js(
 
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
-'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-transition.js") }}',
-'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-tooltip.js") }}',
+//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-transition.js") }}',
+//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-tooltip.js") }}',
 
 // Popover has a dependency on tooltip, so make sure and include 
 // bootstrap-tooltip regardless in order for popovers to work
-'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-popover.js") }}',
-'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-modal.js") }}',
-'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-collapse.js") }}',
-'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-dropdown.js") }}',
+//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-popover.js") }}',
+//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-modal.js") }}',
+//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-collapse.js") }}',
+//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-dropdown.js") }}',
 
 // Plugins
 '{{ url_for("static", filename="javascripts/plugins.js") }}',

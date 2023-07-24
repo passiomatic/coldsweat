@@ -10,7 +10,53 @@ window.addEventListener("DOMContentLoaded", (event) => {
         return null;
     }
 
+    var listViewEl = document.getElementById("entry-list");
+
     const Sweat = {
+
+
+        setup: function() { 
+            // Prev
+            hotkeys('j', function(event, handler){
+                var currentCardInput = listViewEl.querySelector(".entry .entry-card input:checked");
+                var nextCard = null;
+                if(currentCardInput) {
+                    var li = currentCardInput.parentNode.parentNode;
+                    prevCard = li.previousElementSibling;
+                    var prevCardInput = prevCard.querySelector(".entry-card input");
+                    if(prevCardInput) {
+                        prevCardInput.checked = true;                                     
+                    } else {
+                        // Top
+                        console.log("Top")
+                    }                    
+                } else {
+                    // Find first
+                    nextCard = listViewEl.querySelector(".entry .entry-card input");
+                    nextCard.checked = true;      
+                } 
+            });
+            // Next
+            hotkeys('k', function(event, handler){
+                var currentCardInput = listViewEl.querySelector(".entry .entry-card input:checked");
+                var nextCard = null;
+                if(currentCardInput) {
+                    var li = currentCardInput.parentNode.parentNode;
+                    nextCard = li.nextElementSibling;
+                    var nextCardInput = nextCard.querySelector(".entry-card input");
+                    if(nextCardInput) {
+                        nextCardInput.checked = true;                                     
+                    } else {
+                        // Bottom
+                        console.log("Bottom")
+                    }
+                } else {
+                    // Find first
+                    nextCard = listViewEl.querySelector(".entry .entry-card input");
+                    nextCard.checked = true;       
+                } 
+            });            
+        },
 
         replaceElement: function(sourceId, targetId, event) {
             var sourceEl = document.getElementById(sourceId);
@@ -68,5 +114,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         }
     }
 
+    Sweat.setup();
     window.Sweat = Sweat;
+
 })

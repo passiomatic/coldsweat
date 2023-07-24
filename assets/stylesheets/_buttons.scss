@@ -11,10 +11,87 @@
     cursor: pointer;
 }
 
-.btn-text.btn--large {
+.btn--large {
     font-size: $font-size-large;
 }
 
-.btn-text.btn-text--small {
+.btn-text--small {
     font-size: $font-size-small;
 }
+
+.btn {
+    display: inline-block;
+    padding: $buttonpadding;
+    margin-bottom: 0;
+    //@include font-size($buttonfontsize);
+    line-height: $baselineheight;
+    color: $buttoncolor;
+    text-align: center;
+    vertical-align: middle;
+    background-color: $buttonbackgroundcolor;
+    border: $buttonborderwidth $buttonborderstyle $buttonbordercolor;
+    border-bottom-color: $buttonbottombordercolor;
+    border-radius: $buttonborderradius;
+    cursor: pointer;
+
+    &:visited,
+    &:hover,
+    &:active {
+        color: darken($buttoncolor, 20%);
+        text-decoration: none;
+    }
+
+}
+
+/*btn*/
+
+.btn-disabled {
+    opacity: .5;
+    cursor: default;
+}
+
+
+.btn-primary {
+    background-color: $primarycolor;
+
+    // @include primarygrad;
+    border : {
+        color: $buttonbordercolorprimary;
+        bottom-color: darken($buttonbordercolorprimary, 10%);
+    }
+
+    color : $buttoncolorprimary;
+
+    &:visited,
+    &:active,
+    &:hover {
+        background-color: darken($primarycolor, 3%);
+        color: darken($buttoncolorprimary, 5%);
+    }
+}
+
+.btn-danger {
+    background-color: $errorcolor;
+
+    // @include errorgrad;
+    border : {
+        color: $buttonbordercolorerror;
+        bottom-color: darken($buttonbordercolorerror, 10%);
+    }
+
+    color : $buttoncolorerror;
+
+    &:visited,
+    &:active,
+    &:hover {
+        background-color: darken($errorcolor, 10%);
+        color: darken($buttoncolorerror, 5%);
+    }
+}
+ 
+
+
+
+
+
+

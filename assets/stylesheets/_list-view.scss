@@ -1,168 +1,117 @@
- // Common styles
+// List view
 
- ul.view {
-     list-style: none;
-     @include zero;
-     max-width: $list-view-width;
-     margin: 0 auto;
+ul.list-view {
 
-     >li {
-         @include zero;
+    list-style: none;
+    @include zero;
+    max-width: $list-view-width;
+    margin: 0 auto;
 
-         &.heading {
-             //@include clearfix;
-             padding: $baselineheight/4 $gutterwidth*1.5;
-             background: $lightestneutralcolor;
-             position: sticky;
-             top: 0;
+    //@include box-shadow(0 0 4px $lightneutralcolor);                        
+    overflow-y: auto;
+    height: 100vh;
 
-             h2 {
-                 text-transform: uppercase;
-                 color: $text-color-muted;
-                 letter-spacing: 1px;
-                 font-size: $font-size-small;
-             }
-         }
+    min-width: 35rem;
 
-         .item-inner {
+    >li {
 
-
-
-
-             .favicon {
-                 //float: left;
-                 //margin: 4px 0 0 (-$gutterwidth);
-             }
-         }
-
-         // Feeds
-
-         &.status-disabled {
-
-             .item-inner {
-                 background-color: lighten($secondarycolor, 57%);
-
-                 h3 {
-                     text-decoration: line-through;
-                 }
-             }
-         }
-
-         &.status-sick {
-
-             .item-inner {
-                 background-color: $warningcolor;
-             }
-         }
-
-
-     }
-
- }
-
- // List view
-
- ul.list-view {
-
-     //@include box-shadow(0 0 4px $lightneutralcolor);                        
-     overflow-y: auto;
-     height: 100vh;
-
-     min-width: 35rem;
-
-     >li {
+        @include zero;
 
         &.entry {
             border-bottom: 1px dotted $border-color;
         }
 
-         // &:not(.expanded) .actions {
-         //     opacity: 0;
-         //     @include visuallyhidden;                
-         //     @include transition(opacity .15s ease-out);
-         // }
 
-         &:hover {
-             // .actions {
-             //     opacity: 1;
-             //     @include visible;
-             // }            
-             // &:not(.expanded) .feed {
-             //     @include hidden;              
-             // }
-         }
+        &.heading {
+            padding: $baselineheight/4 $gutterwidth*1.5;
+            background: $lightestneutralcolor;
+            position: sticky;
+            top: 0;
 
-         // Read, unread, etc.
-
-         .meta .icon-read {
-             display: none;
-             @extend .fa-circle-o;
-             margin-left: $gutterwidth/2;
-         }
-
-         .meta .icon-unread {
-             @extend .fa-circle;
-             margin-left: $gutterwidth/2;
-         }
-
-         .meta .icon-saved {
-             display: none;
-             @extend .fa-star;
-         }
-
-         .meta .icon-unsaved {
-             @extend .fa-star-o;
-         }
-
-         &.status-read {
-             h3 {
-                 a:link {
-                     color: rgba($linkcolor, .7);
-                 }
-
-                 a:hover {
-                     color: $linkcolorhover;
-                 }
-             }
-
-             .meta .icon-read {
-                 display: inline-block;
-             }
-
-             .meta .icon-unread {
-                 display: none;
-             }
-         }
-
-         &.status-saved {
-             .meta .icon-saved {
-                 display: inline-block;
-                 @include transform(scale(1.3, 1.3));
-             }
-
-             .meta .icon-unsaved {
-                 display: none;
-             }
-         }
-
-         /*
-        &.current {
-            .item-inner {                    
-                //background: #e1eef5 url(../images/rarr.png) left 14px  no-repeat;
-                background: #e1eef5;
+            h2 {
+                text-transform: uppercase;
+                color: $text-color-muted;
+                letter-spacing: 1px;
+                font-size: $font-size-small;
             }
+        }
+
+        // Read, unread, etc.
+
+        .meta .icon-read {
+            display: none;
+            @extend .fa-circle-o;
+            margin-left: $gutterwidth/2;
+        }
+
+        .meta .icon-unread {
+            @extend .fa-circle;
+            margin-left: $gutterwidth/2;
+        }
+
+        .meta .icon-saved {
+            display: none;
+            @extend .fa-star;
+        }
+
+        .meta .icon-unsaved {
+            @extend .fa-star-o;
+        }
+
+        &.status-read {
             h3 {
-                a {
-                    color: $secondarycolor;
+                a:link {
+                    color: rgba($linkcolor, .7);
+                }
+
+                a:hover {
+                    color: $linkcolorhover;
+                }
+            }
+
+            .meta .icon-read {
+                display: inline-block;
+            }
+
+            .meta .icon-unread {
+                display: none;
+            }
+        }
+
+        &.status-saved {
+            .meta .icon-saved {
+                display: inline-block;
+                @include transform(scale(1.3, 1.3));
+            }
+
+            .meta .icon-unsaved {
+                display: none;
+            }
+        }
+
+        // Feeds
+
+        &.status-disabled {
+
+            .item-inner {
+                background-color: lighten($secondarycolor, 57%);
+
+                h3 {
+                    text-decoration: line-through;
                 }
             }
         }
-*/
 
+        &.status-sick {
 
-     }
+            .item-inner {
+                background-color: $warningcolor;
+            }
+        }
 
-     .more {
+    }
+
+    .more {
         //text-align: center;
         background: $lightestneutralcolor;
         // border-bottom-left-radius: $borderradius;
@@ -174,9 +123,9 @@
             width: 100%;
             padding: .5rem 0;
         }
-     }
+    }
 
- }
+}
 
 .panel-content {
     position: relative;
@@ -200,8 +149,8 @@
 // Card 
 
 .entry-card label {
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     gap: .5rem;
 
     background-color: $white;
@@ -209,6 +158,7 @@
 
     transition: background-color .1s ease-out;
     cursor: pointer;
+
     &:hover .entry-card__title {
         text-decoration: underline;
     }
@@ -226,7 +176,7 @@
 
 .status-unread .entry-card__status {
     opacity: 1;
-    color: $color-primary;        
+    color: $color-primary;
 }
 
 .feed {
@@ -246,19 +196,18 @@
     opacity: 0;
     width: 100%;
     //height: 48px; // Height for label
-  }
+}
 
-  .entry-card label {
+.entry-card label {
     //outline: $btn-focus-ring;
-  }
+}
 
-  // Radio button
+// Radio button
 
-  .entry-card input:focus-visible ~ label {
+.entry-card input:focus-visible~label {
     //outline: $btn-focus-ring;
-  }
+}
 
-  .entry-card input:checked
-    ~ label {
-        background: $color-primary-400;
-    }
+.entry-card input:checked~label {
+    background: $color-primary-400;
+}

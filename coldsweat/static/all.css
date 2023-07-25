@@ -2686,52 +2686,37 @@ input.search-query {
   font-size: .75rem;
 }
 
-ul.view {
+ul.list-view {
   max-width: 25em;
+  height: 100vh;
+  min-width: 35rem;
   margin: 0 auto;
   padding: 0;
   list-style: none;
+  overflow-y: auto;
 }
 
-ul.view > li {
+ul.list-view > li {
   margin: 0;
   padding: 0;
 }
 
-ul.view > li.heading {
+ul.list-view > li.entry {
+  border-bottom: 1px dotted #bbb7b7;
+}
+
+ul.list-view > li.heading {
   background: #e4e2e2;
   padding: .375em 36px;
   position: sticky;
   top: 0;
 }
 
-ul.view > li.heading h2 {
+ul.list-view > li.heading h2 {
   text-transform: uppercase;
   color: #918e8e;
   letter-spacing: 1px;
   font-size: .875rem;
-}
-
-ul.view > li.status-disabled .item-inner {
-  background-color: #fae1e1;
-}
-
-ul.view > li.status-disabled .item-inner h3 {
-  text-decoration: line-through;
-}
-
-ul.view > li.status-sick .item-inner {
-  background-color: #f7ea9c;
-}
-
-ul.list-view {
-  height: 100vh;
-  min-width: 35rem;
-  overflow-y: auto;
-}
-
-ul.list-view > li.entry {
-  border-bottom: 1px dotted #bbb7b7;
 }
 
 ul.list-view > li .meta .icon-read {
@@ -2770,6 +2755,18 @@ ul.list-view > li.status-saved .meta .icon-saved {
 
 ul.list-view > li.status-saved .meta .icon-unsaved {
   display: none;
+}
+
+ul.list-view > li.status-disabled .item-inner {
+  background-color: #fae1e1;
+}
+
+ul.list-view > li.status-disabled .item-inner h3 {
+  text-decoration: line-through;
+}
+
+ul.list-view > li.status-sick .item-inner {
+  background-color: #f7ea9c;
 }
 
 ul.list-view .more {

@@ -2817,9 +2817,14 @@ ul.list-view .more button {
   font-weight: 500;
 }
 
-.read-status {
-  color: #175b82;
+.entry-card__status {
+  opacity: 0;
   font-size: .75rem;
+}
+
+.status-unread .entry-card__status {
+  opacity: 1;
+  color: #175b82;
 }
 
 .feed {

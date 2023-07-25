@@ -219,9 +219,14 @@
     color: $color-primary;
 }
 
-.read-status {
-    color: $color-primary;        
+.entry-card__status {
+    opacity: 0;
     font-size: .75rem;
+}
+
+.status-unread .entry-card__status {
+    opacity: 1;
+    color: $color-primary;        
 }
 
 .feed {

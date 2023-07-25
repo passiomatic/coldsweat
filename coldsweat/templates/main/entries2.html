@@ -9,11 +9,11 @@
                 <h2><time>{{date}}</time></h2>
             </li>            
         {% endif %}
-        <li class="entry {% if e.id in saved_ids %}status-saved{% endif %} {%if e.id in read_ids %}status-read{% endif %}">
+        <li class="entry {% if e.id in saved_ids %}status-saved{% endif %} {%if e.id in read_ids %}status-read{% else %}status-unread{% endif %}">
             <div class="entry-card">
                 <input onchange="Sweat.replaceElement('template-{{e.id}}', 'main', event)" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
                 <label for="c-{{e.id}}">
-                    <div class="read-status">
+                    <div class="entry-card__status">
                         <i class="fa fa-circle"></i>
                     </div>
                     <div>

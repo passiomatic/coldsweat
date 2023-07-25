@@ -2668,12 +2668,17 @@ input.search-query {
   color: inherit;
   background: none;
   border: 0;
+  flex-grow: 1;
   align-items: center;
   gap: .25rem;
   margin: 0;
   padding: .5rem;
   font-size: .875rem;
   display: flex;
+}
+
+.tree-view .btn-item:hover, .tree-view .btn-folder:hover {
+  text-decoration: underline;
 }
 
 .tree-view .btn-item {
@@ -2808,8 +2813,8 @@ ul.list-view .more button {
   display: flex;
 }
 
-.entry-card label:hover {
-  background-color: #f7f5f5;
+.entry-card label:hover .entry-card__title {
+  text-decoration: underline;
 }
 
 .entry-card__title {

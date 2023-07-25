@@ -65,21 +65,21 @@
         border: 0;
         font-size: $font-size-small;
         cursor: pointer;
-        color: inherit;        
-
-        // &:hover {
-        //     background: $color-neutral-500;
-        // }
+        color: inherit;    
+        flex-grow: 1;    
+        
+        &:hover {
+            // color: $color-neutral-700;
+            // transition: color .1s ease-out;
+            text-decoration: underline;
+        }   
     }
 
     .btn-item {
         font-size: $font-size-xsmall;
         padding: .5rem 1.5rem .5rem 1.5rem;
 
-        &:hover {
-            // color: $color-neutral-700;
-            // transition: color .1s ease-out;
-        }        
+     
     }
 }
 

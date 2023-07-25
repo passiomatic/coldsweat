@@ -68,6 +68,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
             });            
         },
 
+        loadEntry: function(id, event) {
+            Sweat.replaceElement(`template-${id}`, 'main', event);
+            Sweat.mark(id, 'read');
+        },
+
         replaceElement: function(sourceId, targetId, event) {
             var sourceEl = document.getElementById(sourceId);
             var targetEl = document.getElementById(targetId);

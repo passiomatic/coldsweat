@@ -3309,7 +3309,7 @@ nav {
   padding: .25rem .5rem;
 }
 
-.radio-switch__label--selected {
+.radio-switch__label:has(input:checked) {
   color: #fff;
   background-color: #26729e;
 }

@@ -103,17 +103,17 @@
                     {% endif %}  
 
                     <div class="radio-switch">
-                        <label class="radio-switch__label radio-switch__label--selected">
+                        <label class="radio-switch__label">
                             {% set request_url_1 = url_for('main.entry_list', filter='unread', xhr=1) %}
-                            <input type="radio" name="status" onclick="Sweat.loadFolder('{{request_url_1}}')" value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
+                            <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_1}}')" checked value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
                         </label>
                         <label class="radio-switch__label">
                             {% set request_url_2 = url_for('main.entry_list', filter='saved', xhr=1) %}
-                            <input type="radio" name="status" onclick="Sweat.loadFolder('{{request_url_2}}')" value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
+                            <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_2}}')" value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
                         </label>
                         <label class="radio-switch__label">
                             {% set request_url_3 = url_for('main.entry_list', filter='all', xhr=1) %}
-                            <input type="radio" name="status" onclick="Sweat.loadFolder('{{request_url_3}}')" value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
+                            <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}')" value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
                         </label>
                     </div>
 

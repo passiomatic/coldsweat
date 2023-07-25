@@ -329,8 +329,8 @@ nav {
     text-align: center;
 }
 
-.radio-switch__label--selected {
-    /* For selected radio only */
+// Selected 
+.radio-switch__label:has(input:checked){
     background-color: $color-primary-200;
     color: $white;
 }

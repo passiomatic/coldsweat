@@ -4,12 +4,16 @@ HTML parsers and manipulation functions
 
 from html.parser import HTMLParser
 import urllib.parse as urlparse
+from feedparser.sanitizer import _HTMLSanitizer
 # from flask import current_app as app
 import markupsafe
 
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
 HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
 
+
+# Allow iframe elements in FeedParser 
+#_HTMLSanitizer.acceptable_elements.add("iframe")
 
 def _normalize_attrs(attrs):
     '''

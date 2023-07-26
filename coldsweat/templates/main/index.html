@@ -6,15 +6,32 @@
             <i class="fa fa-tint"></i>
         </div>
         <dl class="tree-view {{filter_class}}">
+            <dt>
+                EXPLORE                
+            </dt>            
             <dd>
-                <button class="btn-folder btn-selected">
-                    <i class="fa fa-folder"></i> All Articles
-                </button>
+                <details>
+                    <summary>
+                        {% set request_url = '' %}
+                        <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}')">
+                            <i class="fa fa-list-ul"></i> All Articles
+                        </button>
+                    </summary>
+                    <ul class="">
+                    </ul>
+                </details>
             </dd>
             <dd>
-                <button class="btn-folder">
-                    <i class="fa fa-folder"></i> Today
-                </button>
+                <details>
+                    <summary>
+                        {% set request_url = '' %}
+                        <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}')">
+                            <i class="fa fa-calendar-o"></i> Today
+                        </button>
+                    </summary>
+                    <ul class="">
+                    </ul>
+                </details>
             </dd>            
             <dt>
                 FOLDERS                

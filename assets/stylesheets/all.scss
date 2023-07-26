@@ -259,6 +259,7 @@ pre {
     }
 }
 
+// nav
 
 nav {
     background: $color-neutral-400;
@@ -266,7 +267,11 @@ nav {
     overflow-y: scroll;
 }
 
-// nav
+.nav__branding  {
+    margin: .75rem 0 0 .75rem;
+    font-size: 2rem;
+    color: $color-primary;
+}
 
 
 // Customized Bootstrap dropdown menu

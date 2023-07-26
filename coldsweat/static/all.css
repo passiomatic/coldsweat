@@ -3252,6 +3252,12 @@ nav {
   overflow-y: scroll;
 }
 
+.nav__branding {
+  color: #175b82;
+  margin: .75rem 0 0 .75rem;
+  font-size: 2rem;
+}
+
 .dropdown .dropdown-menu {
   min-width: 12em;
   z-index: 4;

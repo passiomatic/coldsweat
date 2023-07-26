@@ -68,6 +68,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
             });            
         },
 
+        openRemoteModal: function(url, event) {
+
+        },
+
         loadEntry: function(id, event) {
             Sweat.replaceElement(`template-${id}`, 'main', event);
             Sweat.mark(id, 'read');

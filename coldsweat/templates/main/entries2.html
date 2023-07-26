@@ -119,9 +119,14 @@
 
                     <div>
                         {% if feed_id and filter_class in ['feeds'] %}
-                            <a class="btn-text" href="{{ url_for('main.feed_edit', feed=feed_id ) }}" data-remote-modal="modal-feed-edit">
+                            {% set feed_edit_url = url_for('main.feed_edit', feed=feed_id ) %}
+                            <button class="btn-text" onclick="Sweat.openRemoteModal('{{feed_edit_url}}', event)" data-remote-modal="modal-feed-edit">
                                 <i class="fa fa-cog"></i>
-                            </a>
+                            </button>
+                        {% elif filter_class in ['groups'] %}
+                            <button onclick="" class="btn-text" data-remote-modal="modal-group-edit">
+                                <i class="fa fa-cog"></i>
+                            </button>
                         {% endif %}   
                     </div>
                 </div>

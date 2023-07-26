@@ -67,9 +67,11 @@
         {% set ns.prev_date = date  %}
     {% else %}
         <div class="notice">
-            <i class="fa fa-tint fa-4x"></i>
-            No entries found.
-        </div>    
+            <div>
+                <i class="fa fa-tint fa-4x"></i>
+                <p>No entries found.</p>
+            </div>
+        </div>  
     {% endfor %}
     {% if offset < count %}
         <li class="more">
@@ -133,8 +135,10 @@
             </div>
         {% else %}
             <div class="notice">
-                <i class="fa fa-tint fa-4x"></i>
-                No entries found.
+                <div>
+                    <i class="fa fa-tint fa-4x"></i>
+                    <p>No entries found.</p>
+                </div>
             </div>
         {% endif %}
     {% endblock %}

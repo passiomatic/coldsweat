@@ -190,7 +190,10 @@ pre {
 // Messages taking all panel height
 .notice {
     text-align: center;
-    margin: 25% 0 20% 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     @extend .dim;
 
     i {

@@ -3187,7 +3187,10 @@ pre {
 
 .notice {
   text-align: center;
-  margin: 25% 0 20%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 
 .notice i {

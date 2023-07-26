@@ -44,8 +44,10 @@ def entry_list():
         'prev_date': flask.request.args.get('prev_date', None),
         'is_xhr': flask.request.args.get('xhr', 0, type=int)
     })
-
-    return flask.render_template("main/entries2.html", **view_variables)
+    if offset:
+        return flask.render_template("main/entries-more.html", **view_variables)
+        
+    return flask.render_template("main/entries.html", **view_variables)
 
 
 @bp.route('/entries/<int:entry_id>')

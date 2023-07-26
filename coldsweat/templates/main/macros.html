@@ -1,6 +1,4 @@
-
-
-{% macro render_entries() %}
+{% macro render_entries(entries, count, offset) %}
     {% set ns = namespace(prev_date = '') %}
     {% for e in entries %}
         {% set date = e.published_on|since_today %}
@@ -69,7 +67,7 @@
         <div class="notice">
             <div>
                 <i class="fa fa-tint fa-4x"></i>
-                <p>No entries found.</p>
+                <p>No articles found.</p>
             </div>
         </div>  
     {% endfor %}
@@ -85,61 +83,3 @@
         <a class="btn btn-small btn-error" href="{{ url_for('main.feed_remove', feed=feed_id ) }}" data-remote-modal>Remove</a>
     </script>    
 {% endmacro %}
-
-{% if is_xhr %}
-    {{render_entries()}}
-{% else %}
-    {% extends "main/index.html" %}
-    {% block panel_block %}
-        {% if count %}
-            <div class="panel-content">
-                <ul id="entry-list" class="view list-view">                      
-                    {{render_entries()}}
-                </ul>
-                <div class="entry__filter">
-
-                    {% if count and (filter_class in ['unread']) %}
-                        <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{ url_for('main.entry_list_mark', all='') }}" data-remote-modal><i class="fa fa-check-square"></i></a>
-                    {% elif count and feed_id and filter_class in ['feeds'] %}
-                        <a class="popover-trigger" data-container="body" href="#popover-content"><i class="fa fa-cog"></i> Manage</a>
-                    {% endif %}  
-
-                    <div class="radio-switch">
-                        <label class="radio-switch__label">
-                            {% set request_url_1 = url_for('main.entry_list', filter='unread', xhr=1) %}
-                            <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_1}}')" checked value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
-                        </label>
-                        <label class="radio-switch__label">
-                            {% set request_url_2 = url_for('main.entry_list', filter='saved', xhr=1) %}
-                            <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_2}}')" value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
-                        </label>
-                        <label class="radio-switch__label">
-                            {% set request_url_3 = url_for('main.entry_list', filter='all', xhr=1) %}
-                            <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}')" value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
-                        </label>
-                    </div>
-
-                    <div>
-                        {% if feed_id and filter_class in ['feeds'] %}
-                            {% set feed_edit_url = url_for('main.feed_edit', feed=feed_id ) %}
-                            <button class="btn-text" onclick="Sweat.openRemoteModal('{{feed_edit_url}}', event)" data-remote-modal="modal-feed-edit">
-                                <i class="fa fa-cog"></i>
-                            </button>
-                        {% elif filter_class in ['groups'] %}
-                            <button onclick="" class="btn-text" data-remote-modal="modal-group-edit">
-                                <i class="fa fa-cog"></i>
-                            </button>
-                        {% endif %}   
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="notice">
-                <div>
-                    <i class="fa fa-tint fa-4x"></i>
-                    <p>No entries found.</p>
-                </div>
-            </div>
-        {% endif %}
-    {% endblock %}
-{% endif %}

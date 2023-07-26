@@ -92,7 +92,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         throw new Error(`Server returned error ${response.status} while handling request ${url}`);
                     }
                     response.text().then((text) => {
-                        var entryListEl = document.getElementById('entry-list');
+                        var entryListEl = document.getElementById('panel-content');
                         entryListEl.innerHTML = text;
                     });
                 });              

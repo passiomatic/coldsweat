@@ -4,14 +4,13 @@ ul.list-view {
 
     list-style: none;
     @include zero;
-    max-width: $list-view-width;
     margin: 0 auto;
 
     //@include box-shadow(0 0 4px $lightneutralcolor);                        
     overflow-y: auto;
     height: 100vh;
 
-    min-width: 35rem;
+    //min-width: 35rem;
 
     >li {
 
@@ -130,6 +129,7 @@ ul.list-view {
 .panel-content {
     position: relative;
     border-right: 1px solid $border-color;
+    max-width: 30em;    
 }
 
 .entry__filter {
@@ -137,8 +137,10 @@ ul.list-view {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     position: absolute;
+    left: 0;
     bottom: 0;
-    width: 100%;
+    right: 0;
+    //width: 100%;
     z-index: 2;
     display: flex;
     justify-content: space-between;

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block container_block %} 
-    <nav role="navigation">
+    <nav class="nav">
         <div class="nav__branding">
             <i class="fa fa-tint"></i>
         </div>
@@ -73,18 +73,22 @@
         </ul> -->
     </nav>
     <section class="panel">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert--{{ category }}">{{ message|safe }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
         {% block panel_block %} 
         {% endblock %}
     </section>
+    <!-- ARTICLE -->
     <main id="main">
-        Select an entry.
+        Select an article.
     </main>
+    <!-- ALERTS -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alerts">
+                {% for category, message in messages %}
+                    <div class="alert alert--{{ category }}">{{ message|safe }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 {% endblock %}
 

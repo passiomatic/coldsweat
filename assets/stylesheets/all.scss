@@ -6,7 +6,6 @@ URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
 */
 
 $media-queries-supported: true;
-$list-view-width: 25em;
 
 // Theme vars
 @import 'theme';
@@ -105,23 +104,6 @@ body {
     }
 }
 
-.module {
-    max-width: $list-view-width;
-    margin: 0 auto $baselineheight auto;
-
-    h2 {
-        margin-top: 0;
-    }
-
-    // Title
-}
-
-.panel {
-    box-sizing: border-box;
-}
-
-
-
 footer[role="contentinfo"] {
     @include zero;
     margin: $baselineheight*3 0 $baselineheight 0;
@@ -133,7 +115,6 @@ footer[role="contentinfo"] {
 }
 
 .page {
-    max-width: $list-view-width;
     margin: $baselineheight/2 auto 0 auto;
     background: $white;
     padding: $baselineheight $gutterwidth*1.5;
@@ -345,4 +326,12 @@ nav {
 
 .radio-switch__input {
     display: none;
+}
+
+
+.alerts {
+    position: absolute;
+    bottom: 3rem;
+    z-index: 1;
+    max-width: 80%;
 }

@@ -67,7 +67,14 @@
         cursor: pointer;
         color: inherit;    
         flex-grow: 1;    
-        
+
+
+        h2 {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
         &:hover {
             // color: $color-neutral-700;
             // transition: color .1s ease-out;

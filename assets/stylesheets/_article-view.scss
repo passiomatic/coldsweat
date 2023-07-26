@@ -6,165 +6,161 @@ main {
 }
 
 
-ul.view2 {
+.view2 {
     list-style: none;
     @include zero;
     max-width: 75ch;
     margin: 2rem auto;
 
-    >li {
-        @include zero;
 
-        &.heading {
-            @include clearfix;
-            padding: $baselineheight/4 $gutterwidth*1.5;
-            background: $lightestneutralcolor;
+    &.heading {
+        @include clearfix;
+        padding: $baselineheight/4 $gutterwidth*1.5;
+        background: $lightestneutralcolor;
 
-            &:first-child {
-                border-top-left-radius: $borderradius;
-                border-top-right-radius: $borderradius;
-            }
-
-            h2 {
-                //@extend .h4;
-                //font-size: 1rem;
-                text-transform: uppercase;
-                color: $lightneutralcolor;
-                letter-spacing: 1px;
-                //span { display: none; }
-            }
-
-            // Show feed name on first heading only
-            &:first-child h2 span {
-                display: inline;
-            }
-
-            .toolbar {
-                float: right;
-                display: none;
-            }
-
-            // Show on first heading only
-            &:first-child .toolbar {
-                display: block;
-            }
-        }
-
-        .item-inner {
-            background: $white;
-            //@include transition(background .1s ease-out);
-            padding: $baselineheight/4 $gutterwidth*1.5;
-            @include box-shadow(0 0 4px $lightneutralcolor);
-
-            // Title
-
-            >h3 {
-                a {
-                    display: block;
-                }
-            }
-
-            .favicon {
-                float: left;
-                margin: 4px 0 0 (-$gutterwidth);
-            }
-        }
-
-        // Feeds
-
-        &.status-disabled {
-
-            .item-inner {
-                background-color: lighten($secondarycolor, 57%);
-
-                h3 {
-                    text-decoration: line-through;
-                }
-            }
-        }
-
-        &.status-sick {
-
-            .item-inner {
-                background-color: $warningcolor;
-            }
-        }
-
-
-        .item-inner {
-            border-bottom: 1px solid $lightestneutralcolor;
-        }
-
-        &.expanded .item-inner {
-            padding: $baselineheight $gutterwidth*1.5;
-            border-bottom: none;
-        }
-
-        &:first-child .item-inner {
+        &:first-child {
             border-top-left-radius: $borderradius;
             border-top-right-radius: $borderradius;
         }
 
-        &:last-child .item-inner {
-            border-bottom-left-radius: $borderradius;
-            border-bottom-right-radius: $borderradius;
+        h2 {
+            //@extend .h4;
+            //font-size: 1rem;
+            text-transform: uppercase;
+            color: $lightneutralcolor;
+            letter-spacing: 1px;
+            //span { display: none; }
         }
 
-        // Read, unread, etc.
+        // Show feed name on first heading only
+        &:first-child h2 span {
+            display: inline;
+        }
+
+        .toolbar {
+            float: right;
+            display: none;
+        }
+
+        // Show on first heading only
+        &:first-child .toolbar {
+            display: block;
+        }
+    }
+
+    .item-inner {
+        background: $white;
+        //@include transition(background .1s ease-out);
+        padding: $baselineheight * 1.5;
+        @include box-shadow(0 0 4px $lightneutralcolor);
+
+        // Title
+
+        >h3 {
+            a {
+                display: block;
+            }
+        }
+
+        .favicon {
+            float: left;
+            margin: 4px 0 0 (-$gutterwidth);
+        }
+    }
+
+    // Feeds
+
+    &.status-disabled {
+
+        .item-inner {
+            background-color: lighten($secondarycolor, 57%);
+
+            h3 {
+                text-decoration: line-through;
+            }
+        }
+    }
+
+    &.status-sick {
+
+        .item-inner {
+            background-color: $warningcolor;
+        }
+    }
+
+
+    .item-inner {
+        border-bottom: 1px solid $lightestneutralcolor;
+    }
+
+    &.expanded .item-inner {
+        padding: $baselineheight $gutterwidth*1.5;
+        border-bottom: none;
+    }
+
+    &:first-child .item-inner {
+        border-top-left-radius: $borderradius;
+        border-top-right-radius: $borderradius;
+    }
+
+    &:last-child .item-inner {
+        border-bottom-left-radius: $borderradius;
+        border-bottom-right-radius: $borderradius;
+    }
+
+    // Read, unread, etc.
+
+    .meta .icon-read {
+        display: none;
+        @extend .fa-circle-o;
+        margin-left: $gutterwidth/2;
+    }
+
+    .meta .icon-unread {
+        @extend .fa-circle;
+        margin-left: $gutterwidth/2;
+    }
+
+    .meta .icon-saved {
+        display: none;
+        @extend .fa-star;
+    }
+
+    .meta .icon-unsaved {
+        @extend .fa-star-o;
+    }
+
+    &.status-read {
+        h3 {
+            a:link {
+                color: rgba($linkcolor, .7);
+            }
+
+            a:hover {
+                color: $linkcolorhover;
+            }
+        }
 
         .meta .icon-read {
-            display: none;
-            @extend .fa-circle-o;
-            margin-left: $gutterwidth/2;
+            display: inline-block;
         }
 
         .meta .icon-unread {
-            @extend .fa-circle;
-            margin-left: $gutterwidth/2;
-        }
-
-        .meta .icon-saved {
             display: none;
-            @extend .fa-star;
+        }
+    }
+
+    &.status-saved {
+        .meta .icon-saved {
+            display: inline-block;
+            @include transform(scale(1.3, 1.3));
         }
 
         .meta .icon-unsaved {
-            @extend .fa-star-o;
+            display: none;
         }
-
-        &.status-read {
-            h3 {
-                a:link {
-                    color: rgba($linkcolor, .7);
-                }
-
-                a:hover {
-                    color: $linkcolorhover;
-                }
-            }
-
-            .meta .icon-read {
-                display: inline-block;
-            }
-
-            .meta .icon-unread {
-                display: none;
-            }
-        }
-
-        &.status-saved {
-            .meta .icon-saved {
-                display: inline-block;
-                @include transform(scale(1.3, 1.3));
-            }
-
-            .meta .icon-unsaved {
-                display: none;
-            }
-        }
-
-
     }
+
 
     .more {
         clear: both;
@@ -193,8 +189,7 @@ article {
         margin-bottom: 1rem;
         border-bottom: 5px double $border-color;
     }
-
-    .content {
+    .article__content {
 
 
         // Headings

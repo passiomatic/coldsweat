@@ -35,8 +35,8 @@
                 -->
             </div>
             <template id="template-{{e.id}}">             
-                <ul class="view2">                      
-                    <li data-entry="{{e.id}}" class="entry expanded {%if e.id in saved_ids%}status-saved{% endif %} {%if e.id in read_ids %}status-read{% endif %}">
+                <div class="view2">                      
+                    <div class="entry expanded {%if e.id in saved_ids%}status-saved{% endif %} {%if e.id in read_ids %}status-read{% endif %}">
                         <div class="item-inner">
                             <article>
                                 <div class="meta dim">
@@ -47,7 +47,7 @@
                                 </div>
                                 <h1 class="article__title">{{e.title}}</h1>        
                                 {%if e.content %} 
-                                    <div class="content">
+                                    <div class="article__content">
                                         {{e.content|safe}}
                                         {%if e.link %}
                                             <div class="continue"><a class="btn btn-small btn-visit" rel="noreferrer" title="View entry on {{e.link}} (V key)" target="_blank" href="{{e.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
@@ -60,8 +60,8 @@
                                 </div>
                             </article>    
                         </div>
-                    </li>
-                </ul>                                      
+                    </div>
+                </div>                                      
             </template>
         </li>
         {% set ns.prev_date = date  %}

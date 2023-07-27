@@ -2575,6 +2575,7 @@ input.search-query {
   border-radius: 3px;
   margin-bottom: 0;
   padding: 6px 11px;
+  font-size: 1rem;
   line-height: 1.5em;
   display: inline-block;
 }
@@ -3315,6 +3316,44 @@ nav {
   max-width: 80%;
   position: absolute;
   bottom: 3rem;
+}
+
+dialog {
+  opacity: 0;
+  width: 100vw;
+  height: 100vh;
+  color: #252424;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  transition: transform .3s ease-out, opacity .3s ease-out;
+  transform: translate(0%, -5%);
+}
+
+dialog.in {
+  opacity: 1;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  transform: translate(0%);
+}
+
+dialog::backdrop {
+  background: #d9d5d5bf;
+}
+
+dialog button[name="close"] {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.dialog-content {
+  background: #fff;
+  border-radius: .75rem;
+  padding: 2rem;
 }
 
 /*# sourceMappingURL=all.css.map */

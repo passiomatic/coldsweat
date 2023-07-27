@@ -23,7 +23,7 @@
     display: inline-block;
     padding: $buttonpadding;
     margin-bottom: 0;
-    //@include font-size($buttonfontsize);
+    font-size: $font-size-base;
     line-height: $baselineheight;
     color: $buttoncolor;
     text-align: center;

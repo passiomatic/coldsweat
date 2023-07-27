@@ -53,26 +53,26 @@ def entry_list():
     return response
 
 
-@bp.route('/entries/<int:entry_id>')
-@flask_login.login_required
-def entry(entry_id):
-    entry = get_object_or_404(Entry, (Entry.id == entry_id))
+# @bp.route('/entries/<int:entry_id>')
+# @flask_login.login_required
+# def entry(entry_id):
+#     entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
-    user = flask_login.current_user.db_user
+#     user = flask_login.current_user.db_user
 
-    feed.mark_entry(user, entry, 'read')
-    query, view_variables = _make_view_variables(user)
-    n = query.where(Entry.published_on < entry.published_on).order_by(
-        Entry.published_on.desc()).limit(1)
+#     feed.mark_entry(user, entry, 'read')
+#     query, view_variables = _make_view_variables(user)
+#     n = query.where(Entry.published_on < entry.published_on).order_by(
+#         Entry.published_on.desc()).limit(1)
 
-    view_variables.update({
-        'entry': entry,
-        'page_title': entry.title,
-        'next_entries': n,
-        'count': 0  # Fake it
-    })
+#     view_variables.update({
+#         'entry': entry,
+#         'page_title': entry.title,
+#         'next_entries': n,
+#         'count': 0  # Fake it
+#     })
 
-    return flask.render_template('main/entry.html', **view_variables)
+#     return flask.render_template('main/entry.html', **view_variables)
 
 @bp.route('/entries/<int:entry_id>', methods=["POST"])
 @flask_login.login_required
@@ -137,7 +137,7 @@ def entry_list_mark():
     '''
     Mark feed|all entries as read
     '''
-    feed_id = flask.request.args.get('feed', 0, type=int)
+    feed_id = flask.request.args.get('feed_id', 0, type=int)
 
     if flask.request.method == 'GET':
         now = datetime.utcnow()
@@ -197,7 +197,7 @@ def entry_list_mark():
 @bp.route('/feeds/edit', methods=['GET', 'POST'])
 @flask_login.login_required
 def feed_edit():
-    feed_id = flask.request.args.get('feed', 0, type=int)
+    feed_id = flask.request.args.get('feed_id', 0, type=int)
 
     try:
         feed = Feed.get(Feed.id == feed_id)

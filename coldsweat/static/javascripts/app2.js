@@ -69,7 +69,18 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         openRemoteModal: function(url, event) {
+            var dialogEl = document.getElementById('dialog'); 
 
+            fetch(url)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned error ${response.status} while handling request ${url}`);
+                    }
+                    response.text().then((text) => {
+                        dialogEl.querySelector('.dialog-content').innerHTML = text;                        
+                        Sweat.openDialog(dialogEl, event)
+                    });
+                }); 
         },
 
         loadEntry: function(id, event) {
@@ -98,18 +109,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 });              
         },
 
-        closeDialog: function(event, dialogId) {
-            var dialog = document.querySelector(dialogId);                        
-            dialog.classList.remove("in"); 
-            dialog.close();        
-            event.preventDefault(); 
+        closeDialog: function(dialogEl, event) {
+            //var dialog = document.getElementById('dialog');                        
+            dialogEl.classList.remove("in"); 
+            dialogEl.close();        
+            //event.preventDefault(); 
         },
 
-        openDialog: function(event, dialogId) {
-            var dialog = document.querySelector(dialogId);                        
-            dialog.showModal();         
-            dialog.classList.add("in"); 
-            return dialog;
+        openDialog: function(dialogEl, event) {
+            dialogEl.showModal();         
+            dialogEl.classList.add("in"); 
+            return dialogEl;
         },
 
         mark: function(id, status) {

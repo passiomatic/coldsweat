@@ -25,7 +25,7 @@ body {
     // Keep browser default font size and scaled everythign accordingly 
     font: normal 1em/#{$line-height} $font-family;
     color: $text-color;
-    background : $body-background;
+    background: $body-background;
 }
 
 body {
@@ -55,7 +55,7 @@ body {
 
 .meta {
     font-size: $font-size-small;
-    
+
     .actions {
         .fa {
             cursor: pointer;
@@ -251,7 +251,7 @@ nav {
     overflow-y: scroll;
 }
 
-.nav__branding  {
+.nav__branding {
     margin: .75rem 0 0 .75rem;
     font-size: 2rem;
     color: $color-primary;
@@ -319,7 +319,7 @@ nav {
 }
 
 // Selected 
-.radio-switch__label:has(input:checked){
+.radio-switch__label:has(input:checked) {
     background-color: $color-primary-200;
     color: $white;
 }
@@ -334,4 +334,45 @@ nav {
     bottom: 3rem;
     z-index: 1;
     max-width: 80%;
+}
+
+
+// Dialogs 
+
+dialog {
+    background: transparent;
+    border: 0;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    color: $text-color;
+    transition: transform .3s ease-out, opacity .3s ease-out;
+    transform: translate(0%, -5%);
+}
+/* dialog[open] doesn't work */
+dialog.in {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transform: translate(0%, 0%);
+}
+
+dialog::backdrop {
+    background: rgba($color-neutral-500, .75);
+}
+
+dialog button[name="close"] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.dialog-content {
+    padding: 2rem;    
+    background: $white;
+    border-radius: .75rem;
 }

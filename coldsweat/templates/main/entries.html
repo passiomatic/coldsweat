@@ -16,11 +16,12 @@
 
     <div class="entry__filter">
 
-        {% if count and (filter_class in ['unread']) %}
-            <a title="Mark all as read" data-toggle="tooltip" data-placement="bottom" href="{{ url_for('main.entry_list_mark', all='') }}" data-remote-modal><i class="fa fa-check-square"></i></a>
-        {% elif count and feed_id and filter_class in ['feeds'] %}
-            <a class="popover-trigger" data-container="body" href="#popover-content"><i class="fa fa-cog"></i> Manage</a>
-        {% endif %}  
+        {% if count %}
+            {% set mark_all_url = url_for('main.entry_list_mark', all='') %}
+            <button title="Mark all as read" class="btn-text" onclick="Sweat.openRemoteModal('{{mark_all_url}}', event)">
+                <i class="fa fa-check-square"></i>
+            </button>
+        {% endif %}
 
         <div class="radio-switch">
             <label class="radio-switch__label">
@@ -37,13 +38,13 @@
             </label>
         </div>
         <div>
-            {% if feed_id and filter_class in ['feeds'] %}
-                {% set feed_edit_url = url_for('main.feed_edit', feed=feed_id ) %}
-                <button class="btn-text" onclick="Sweat.openRemoteModal('{{feed_edit_url}}', event)" data-remote-modal="modal-feed-edit">
+            {% if feed_id  %}
+                {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
+                <button class="btn-text" onclick="Sweat.openRemoteModal('{{feed_edit_url}}', event)">
                     <i class="fa fa-cog"></i>
                 </button>
-            {% elif filter_class in ['groups'] %}
-                <button onclick="" class="btn-text" data-remote-modal="modal-group-edit">
+            {% elif group_id %}
+                <button onclick="" class="btn-text">
                     <i class="fa fa-cog"></i>
                 </button>
             {% endif %}

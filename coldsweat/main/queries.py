@@ -25,13 +25,15 @@ def get_group_entries(user, group_id):
 
 
 def get_feed_entries(user, feed_id): 
+    # Force distinct for entries from feed in multiple groups
     q = (Entry.select()
         .join(Feed)
         .join(Subscription)
-        .where((Subscription.user == user) & (Feed.id == feed_id)))
+        .where((Subscription.user == user) & (Feed.id == feed_id))).distinct()
     return q
 
 
 def get_all_entries(user):
-    q = Entry.select().join(Feed).join(Subscription).where(Subscription.user == user)
+    # Force distinct for entries from feed in multiple groups
+    q = Entry.select().join(Feed).join(Subscription).where(Subscription.user == user).distinct()
     return q

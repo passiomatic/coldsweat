@@ -2785,8 +2785,11 @@ ul.list-view .more button {
   display: block;
 }
 
+.panel {
+  flex-basis: 30em;
+}
+
 .panel-content {
-  max-width: 30em;
   border-right: 1px solid #bbb7b7;
   position: relative;
 }
@@ -3239,6 +3242,7 @@ pre {
 nav {
   height: 100vh;
   background: #bbb7b7;
+  flex-basis: 15rem;
   overflow-y: scroll;
 }
 

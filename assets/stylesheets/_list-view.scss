@@ -126,10 +126,13 @@ ul.list-view {
 
 }
 
+.panel{
+    flex-basis: 30em;  
+}
+
 .panel-content {
     position: relative;
-    border-right: 1px solid $border-color;
-    max-width: 30em;    
+    border-right: 1px solid $border-color;  
 }
 
 .entry__filter {

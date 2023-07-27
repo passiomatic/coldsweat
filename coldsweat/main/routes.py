@@ -82,7 +82,8 @@ def entry_list():
         return flask.render_template("main/entries-more.html", **view_variables)
     
     response = flask.make_response(flask.render_template("main/entries.html", **view_variables))
-    #response.set_cookie('TestCookie', 'The value')
+    # Remember last used filter across requests
+    response.set_cookie('filter', filter)
     return response
 
 

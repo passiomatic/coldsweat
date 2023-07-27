@@ -3,7 +3,7 @@
 {% macro render_panel() %}
     {% if count %}
         <ul id="entry-list" class="view list-view">                      
-            {{ macros.render_entries(entries, count, offset, feed_id, group_id) }}
+            {{ macros.render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) }}
         </ul>
     {% else %}
         <div class="notice">

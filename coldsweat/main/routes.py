@@ -34,17 +34,50 @@ def entry_list():
         unread, saved, group or feed
     '''
     offset = flask.request.args.get('offset', 0, type=int)
-    query, view_variables = _make_view_variables(flask_login.current_user.db_user)
+    group_id = flask.request.args.get('group_id',  0, type=int)
+    feed_id = flask.request.args.get('feed_id', 0, type=int)
 
-    view_variables.update({
+    user = flask_login.current_user.db_user
+
+    r = Entry.select(Entry.id).join(Read).where((Read.user ==
+                                                 user)).objects()
+    s = Entry.select(Entry.id).join(Saved).where((Saved.user ==
+                                                  user)).objects()
+    read_ids = dict((i.id, None) for i in r)
+    saved_ids = dict((i.id, None) for i in s)
+
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(flask_login.current_user.db_user), lambda q: (q.group_id, q.group_title))
+
+    if group_id:
+        query = queries.get_group_entries(user, group_id)
+    elif feed_id: 
+        query = queries.get_feed_entries(user, feed_id)
+    else:
+        query = queries.get_all_entries(user)
+
+    filter = flask.request.args.get('filter', 'unread')
+    if filter == 'saved':
+        query = query.where(Entry.id << Saved.select(Saved.entry).where(Saved.user == user))
+    elif filter == 'unread':
+        query = query.where(~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
+    else:
+        pass
+
+    view_variables = {
         'entries': query.order_by(
             Entry.published_on.desc()
         ).offset(offset).limit(ENTRIES_PER_PAGE),
+        'read_ids': read_ids,
+        'saved_ids': saved_ids,
+        'feed_id': feed_id,
+        'group_id': group_id,
         'count': query.count(),
         'offset': offset + ENTRIES_PER_PAGE,
         'prev_date': flask.request.args.get('prev_date', None),
-        'is_xhr': flask.request.args.get('xhr', 0, type=int)
-    })
+        'is_xhr': flask.request.args.get('xhr', 0, type=int),
+        'filter': filter,
+        'groups_feeds': groups_feeds
+    }
     if offset:
         return flask.render_template("main/entries-more.html", **view_variables)
     
@@ -430,7 +463,7 @@ def _make_view_variables(user):
     else:
         query = queries.get_all_entries(user)
 
-    filter = flask.request.args.get('filter', 'archive')
+    filter = flask.request.args.get('filter', 'unread')
     if filter == 'saved':
         query = query.where(Entry.id << Saved.select(Saved.entry).where(Saved.user == user))
     elif filter == 'unread':

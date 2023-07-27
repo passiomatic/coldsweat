@@ -1,4 +1,4 @@
-{% macro render_entries(entries, count, offset, feed_id, group_id) %}
+{% macro render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) %}
     {% set ns = namespace(prev_date = '') %}
     {% for e in entries %}
         {% set date = e.published_on|since_today %}

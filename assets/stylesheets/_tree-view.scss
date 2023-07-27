@@ -20,6 +20,7 @@
             list-style: none;                        
             li {
                 @include zero;
+                display: flex;
             }
         }
         
@@ -68,12 +69,17 @@
         color: inherit;    
         flex-grow: 1;    
 
+        // https://css-tricks.com/snippets/css/truncate-string-with-ellipsis/
+        flex: 1;
+        min-width: 0;
 
-        h2 {
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+        // Label 
+        span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+ 
 
         &:hover {
             // color: $color-neutral-700;

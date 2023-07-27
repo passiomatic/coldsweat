@@ -2636,6 +2636,7 @@ input.search-query {
 .tree-view dd ul li {
   margin: 0;
   padding: 0;
+  display: flex;
 }
 
 .tree-view dd details summary::-webkit-details-marker {
@@ -2667,9 +2668,10 @@ input.search-query {
   appearance: none;
   cursor: pointer;
   color: inherit;
+  min-width: 0;
   background: none;
   border: 0;
-  flex-grow: 1;
+  flex: 1;
   align-items: center;
   gap: .25rem;
   margin: 0;
@@ -2678,7 +2680,7 @@ input.search-query {
   display: flex;
 }
 
-.tree-view .btn-item h2, .tree-view .btn-folder h2 {
+.tree-view .btn-item span, .tree-view .btn-folder span {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;

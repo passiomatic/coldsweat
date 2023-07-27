@@ -1,4 +1,4 @@
-{% macro render_entries(entries, count, offset) %}
+{% macro render_entries(entries, count, offset, feed_id, group_id) %}
     {% set ns = namespace(prev_date = '') %}
     {% for e in entries %}
         {% set date = e.published_on|since_today %}
@@ -38,7 +38,7 @@
                         <div class="item-inner">
                             <article>
                                 <div class="meta dim">
-                                    <span class="feed"><a title="Show more entries for this feed" href="{{ url_for('main.entry_list', feed=e.feed.id, filter=filter_name) }}">{{e.feed.title}}</a></span>
+                                    <span class="feed"><a title="Show more entries for this feed" href="{{ url_for('main.entry_list', feed_id=e.feed.id) }}">{{e.feed.title}}</a></span>
                                     <span class="actions">
                                         {%if e.id in saved_ids%}<i class="save-trigger icon-saved fa fa-star" title="Unsave (S key)"></i>{% else %}<i class="save-trigger icon-unsaved fa fa-star-o" title="Save (S key)"></i>{% endif %}{%if e.id in read_ids %}<i class="read-trigger icon-read fa fa-circle-o" title="Mark as unread (M key)"></i>{% else %}<i class="read-trigger icon-unread fa fa-circle" title="Mark as read (M key)"></i>{% endif %}                    
                                     </span>
@@ -73,7 +73,13 @@
     {% endfor %}
     {% if offset < count %}
         <li class="more">
-            {% set request_url = url_for('main.entry_list', filter=filter_name, offset=offset, prev_date=prev_date, xhr=1) %}
+            {% if feed_id %}
+                {% set request_url = url_for('main.entry_list', feed_id=feed_id, offset=offset, prev_date=prev_date, xhr=1) %}
+            {% elif group_id %}
+                {% set request_url = url_for('main.entry_list', group_id=group_id, offset=offset, prev_date=prev_date, xhr=1) %}
+            {% else %}
+                {% set request_url = url_for('main.entry_list', offset=offset, prev_date=prev_date, xhr=1) %}
+            {% endif %}
             <button class="btn-text" onclick="Sweat.loadMore('{{request_url}}')">More</button>
         </li>
     {% endif %}

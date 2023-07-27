@@ -101,21 +101,6 @@ def get_all_entries(user, *select):
     return q
 
 
-def get_group_entries(user, group, *select):
-    # @@TODO: include read and saved information
-    q = _q(*select).where(
-        (Subscription.user == user) &
-        (Subscription.group == group))
-    return q
-
-
-def get_feed_entries(user, feed, *select):
-    # @@TODO: include read and saved informatio
-    q = _q(*select).where(
-        (Subscription.user == user) &
-        (Subscription.feed == feed)).distinct()
-    return q
-
 # ------------------------------------------------------
 # Feeds queries
 # ------------------------------------------------------

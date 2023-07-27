@@ -3,7 +3,7 @@
 {% macro render_panel() %}
     {% if count %}
         <ul id="entry-list" class="view list-view">                      
-            {{ macros.render_entries(entries, count, offset) }}
+            {{ macros.render_entries(entries, count, offset, feed_id, group_id) }}
         </ul>
     {% else %}
         <div class="notice">
@@ -24,16 +24,16 @@
 
         <div class="radio-switch">
             <label class="radio-switch__label">
-                {% set request_url_1 = url_for('main.entry_list', filter='unread', xhr=1) %}
+                {% set request_url_1 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1) %}
                 <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_1}}')" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
             </label>
             <label class="radio-switch__label">
-                {% set request_url_2 = url_for('main.entry_list', filter='saved', xhr=1) %}
+                {% set request_url_2 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1) %}
                 <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_2}}')" {% if filter == 'saved' %}checked{% endif %}  value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
             </label>
             <label class="radio-switch__label">
-                {% set request_url_3 = url_for('main.entry_list', filter='all', xhr=1) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}')" {% if filter == 'all' %}checked{% endif %}  value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
+                {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1) %}
+                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}')" {% if filter == 'archive' %}checked{% endif %}  value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
             </label>
         </div>
         <div>

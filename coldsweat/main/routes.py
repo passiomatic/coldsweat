@@ -40,14 +40,17 @@ def entry_list():
         'entries': query.order_by(
             Entry.published_on.desc()
         ).offset(offset).limit(ENTRIES_PER_PAGE),
+        'count': query.count(),
         'offset': offset + ENTRIES_PER_PAGE,
         'prev_date': flask.request.args.get('prev_date', None),
         'is_xhr': flask.request.args.get('xhr', 0, type=int)
     })
     if offset:
         return flask.render_template("main/entries-more.html", **view_variables)
-        
-    return flask.render_template("main/entries.html", **view_variables)
+    
+    response = flask.make_response(flask.render_template("main/entries.html", **view_variables))
+    #response.set_cookie('TestCookie', 'The value')
+    return response
 
 
 @bp.route('/entries/<int:entry_id>')
@@ -405,10 +408,8 @@ def _render_modal(url, title='', body='', button='Close', params=None):
 
 def _make_view_variables(user):
 
-    count, group_id, feed_id, filter_name, \
-        filter_class, panel_title, page_title = 0, 0, 0, '', '', '', ''
+    count, filter_class, panel_title = 0, '', ''
 
-    groups = feed.get_groups(user)
     r = Entry.select(Entry.id).join(Read).where((Read.user ==
                                                  user)).objects()
     s = Entry.select(Entry.id).join(Saved).where((Saved.user ==
@@ -418,45 +419,26 @@ def _make_view_variables(user):
 
     groups_feeds = itertools.groupby(queries.get_groups_and_feeds(flask_login.current_user.db_user), lambda q: (q.group_id, q.group_title))
 
-    filter = flask.request.args.get('filter', 'unread')
+    # Build up query
+    group_id = flask.request.args.get('group_id',  0, type=int)
+    feed_id = flask.request.args.get('feed_id', 0, type=int)
+
+    if group_id:
+        query = queries.get_group_entries(user, group_id)
+    elif feed_id: 
+        query = queries.get_feed_entries(user, feed_id)
+    else:
+        query = queries.get_all_entries(user)
+
+    filter = flask.request.args.get('filter', 'archive')
     if filter == 'saved':
-        count = feed.get_saved_entries(user, Entry.id).count()
-        q = feed.get_saved_entries(user)
-        panel_title = 'Saved'
-        filter_class = filter_name = 'saved'
-        page_title = 'Saved'
-    elif filter ==  'group':
-        group_id = flask.request.args.get('id', type=int)
-        group = Group.get(Group.id == group_id)
-        count = feed.get_group_entries(user, group, Entry.id).count()
-        q = feed.get_group_entries(user, group)
-        panel_title = group.title
-        filter_class = 'groups'  # The same when listing group
-        filter_name = f'group={group_id}'
-        page_title = group.title
-    elif filter ==  'feed':
-        feed_id = flask.request.args.get('id', type=int)
-        feed_ = Feed.get(Feed.id == feed_id)
-        count = feed.get_feed_entries(user, feed_, Feed.id).count()
-        q = feed.get_feed_entries(user, feed_)
-        panel_title = feed_.title
-        filter_class = 'feeds'
-        filter_name = f'feed={feed_id}'
-        page_title = feed_.title
-    elif filter == 'all':
-        count = feed.get_all_entries(user, Entry.id).count()
-        q = feed.get_all_entries(user)
-        panel_title = 'All'
-        filter_class = filter_name = 'all'
-        page_title = 'All'
-    else:  # Default
-        count = feed.get_unread_entries(user, Entry.id).count()
-        q = feed.get_unread_entries(user)
-        panel_title = 'Unread'
-        filter_class = filter_name = 'unread'
-        page_title = 'Unread'
+        query = query.where(Entry.id << Saved.select(Saved.entry).where(Saved.user == user))
+    elif filter == 'unread':
+        query = query.where(~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
+    else:
+        pass
 
     # Cleanup namespace
     del r, s
 
-    return q, locals()
+    return query, locals()

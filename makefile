@@ -41,7 +41,7 @@ create-test-data:
 	sqlite3 ./instance/coldsweat-test.db ".dump" > tests/test-data.sql
 
 test:
-	python -m pytest
+	python -m pytest -s
 
 # Build Wheel/PyPI Support
 

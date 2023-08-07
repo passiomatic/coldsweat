@@ -13,7 +13,7 @@ HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
 
 
 # Allow iframe elements in FeedParser 
-#_HTMLSanitizer.acceptable_elements.add("iframe")
+_HTMLSanitizer.acceptable_elements.add("iframe")
 
 def _normalize_attrs(attrs):
     '''
@@ -46,6 +46,8 @@ class BaseParser(HTMLParser):
         pass
 
 
+DOMAIN_WHITELIST = set(["www.youtube.com", "www.youtube-nocookie.com", "player.vimeo.com"])
+
 class BaseProcessor(BaseParser):
     '''
     Parse and partially reconstruct the input document
@@ -58,6 +60,7 @@ class BaseProcessor(BaseParser):
 
     def __init__(self, xhtml_mode=False):
         BaseParser.__init__(self)
+        self.allowed_iframe = False
         self.xhtml_mode = xhtml_mode
 
     # @@NOTE: reset is called implicitly by base class
@@ -66,11 +69,29 @@ class BaseProcessor(BaseParser):
         BaseParser.reset(self)
         self.pieces = []
 
-    def output(self):
+    def get_output(self):
         '''
         Return processed HTML as a single string
         '''
         return ''.join(self.pieces)
+
+    def start_iframe(self, attrs):
+        d = dict(_normalize_attrs(attrs))
+        if self.is_allowed(d['src']):
+            # Reconstruct element
+            self.allowed_iframe = True
+            self.unknown_starttag('iframe', attrs)
+
+    def end_iframe(self):
+        if self.allowed_iframe:
+            self.allowed_iframe = False
+            self.unknown_endtag('iframe')
+
+    def is_allowed(self, url):
+        schema, netloc, path, params, query, fragment \
+            = urlparse.urlparse(url)
+
+        return (netloc in DOMAIN_WHITELIST)
 
     def unknown_starttag(self, tag, attrs):
         # Called for each unhandled tag, where attrs is a list of
@@ -274,7 +295,7 @@ def strip_html(data):
     '''
     p = Stripper()
     _parse(p, data)
-    return p.output()
+    return p.get_output()
 
 
 def scrub_html(data, blacklist):
@@ -283,4 +304,4 @@ def scrub_html(data, blacklist):
     '''
     p = Scrubber(blacklist)
     _parse(p, data)
-    return p.output()
+    return p.get_output()

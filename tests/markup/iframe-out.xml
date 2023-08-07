@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" version="2.0">
+   <channel>
+      <title>Red Punk</title>
+      <atom:link href="https://redpunk.com/feed/" rel="self" type="application/rss+xml" />
+      <link>https://redpunk.com</link>
+      <description>Me against the machine.</description>
+      <lastBuildDate>Mon, 07 Aug 2023 10:00:04 +0000</lastBuildDate>
+      <language>it-IT</language>
+      <sy:updatePeriod>hourly</sy:updatePeriod>
+      <sy:updateFrequency>1</sy:updateFrequency>
+      <generator>https://wordpress.org/?v=6.2.2</generator>
+      <item>
+         <title>Test YouTube Embed</title>
+         <link>https://redpunk.com/articoli/test-youtube-embed/</link>
+         <comments>https://redpunk.com/articoli/test-youtube-embed/#respond</comments>
+         <dc:creator><![CDATA[Andrea Peltrin]]></dc:creator>
+         <pubDate>Mon, 07 Aug 2023 09:57:28 +0000</pubDate>
+         <category><![CDATA[Internet]]></category>
+         <guid isPermaLink="false">https://redpunk.com/?p=1575</guid>
+         <description><![CDATA[Test :)]]></description>
+         <content:encoded><![CDATA[<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/jfKfPfyJRdk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>]]></content:encoded>
+         <wfw:commentRss>https://redpunk.com/articoli/test-youtube-embed/feed/</wfw:commentRss>
+         <slash:comments>0</slash:comments>
+      </item>
+   </channel>
+</rss>

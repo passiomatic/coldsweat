@@ -101,7 +101,11 @@ class EntryTranslator(object):
                     return media_content['url']
                 except KeyError:
                     pass
-        # @@TODO: Try to get thumbnail[0] instead 
+        if 'media_thumbnail' in self.entry_dict:
+            # "... If multiple thumbnails are included, and time coding is not at play, 
+            #  it is assumed that the images are in order of importance."
+            media_thumbnail = self.entry_dict['media_thumbnail'][0]
+            return media_thumbnail['url']
         return ''
 
     def get_link(self):

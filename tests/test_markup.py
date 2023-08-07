@@ -39,7 +39,8 @@ def test_stripping_html(value, wanted):
 
 
 @pytest.mark.parametrize("file_in, file_out", [
-    ('markup/in.xml', 'markup/out.xml')
+    ('markup/in.xml', 'markup/out.xml'),
+    ('markup/iframe-in.xml', 'markup/iframe-out.xml')
 ]
 )
 def test_processor(file_in, file_out):
@@ -52,4 +53,4 @@ def test_processor(file_in, file_out):
     entry_out = soup_out.entries[0]
     processor.reset()
     processor.feed(entry_in.content[0].value)
-    assert processor.output() == entry_out.content[0].value
+    assert processor.get_output() == entry_out.content[0].value

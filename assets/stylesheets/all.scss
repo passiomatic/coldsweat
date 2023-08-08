@@ -32,6 +32,15 @@ body {
     display: flex;
 }
 
+.sr-only {
+    position: absolute;
+    //left: 0;
+    left: -999px; // Note: Doesn't toggle on mobile
+    top: 0;
+    opacity: 0;
+    //width: 100%;
+}
+
 .dim {
     color: $lightneutralcolor;
 

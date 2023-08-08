@@ -2857,14 +2857,6 @@ ul.list-view .more button {
   display: flex;
 }
 
-.entry-card input {
-  opacity: 0;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
 .entry-card input:checked ~ label {
   background: #d5e1e9;
 }
@@ -3098,6 +3090,13 @@ html, body {
 
 body {
   display: flex;
+}
+
+.sr-only {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: -999px;
 }
 
 .dim, .notice, .dim a, .notice a, .dim a:visited, .notice a:visited {

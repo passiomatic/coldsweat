@@ -96,7 +96,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
             event.preventDefault();
         },
         
-        loadFolder: function(url){
+        loadFolder: function(url, event){
+            if(event) {
+                event.preventDefault();
+            }
             fetch(url)
                 .then((response) => {
                     if (!response.ok) {

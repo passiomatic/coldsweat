@@ -152,21 +152,6 @@ class BaseProcessor(BaseParser):
         pass  # Strip doctype declaration
 
 
-class Stripper(BaseProcessor):
-
-    def handle_starttag(self, tag, attrs):
-        pass
-
-    def handle_endtag(self, tag):
-        pass
-
-    def handle_charref(self, ref):
-        self.pieces.append(self.unescape("&#%s;" % ref))
-
-    def handle_entityref(self, ref):
-        self.pieces.append(self.unescape("&%s;" % ref))
-
-
 class FeedLinkFinder(BaseParser):
     '''
     Find the feeds for a web page. Code derived from Feedfinder,
@@ -289,13 +274,7 @@ def sniff_feed(data):
 
 
 def strip_html(data):
-    '''
-    Strip all HTML tags and convert all entities/charrefs, effectively
-      creating a plain text version of the input document
-    '''
-    p = Stripper()
-    _parse(p, data)
-    return p.get_output()
+    return markupsafe.Markup(data).striptags()
 
 
 def parse_html(data):

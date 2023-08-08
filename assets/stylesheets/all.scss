@@ -78,9 +78,9 @@ body {
 
 .expanded {
     .meta {
-        .feed {
+        .entry__feed {
             text-transform: uppercase;
-            //@extend .spaced;
+            font-size: $font-size-xsmall;
         }
 
         .actions {

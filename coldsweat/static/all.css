@@ -2851,6 +2851,7 @@ ul.list-view .more button {
 
 .entry-card__feed {
   text-transform: uppercase;
+  color: #918e8e;
   align-items: center;
   gap: .25rem;
   font-size: .75rem;
@@ -2927,7 +2928,7 @@ main {
 .view2 .item-inner {
   background: #fff;
   padding: 2.25em;
-  box-shadow: 0 0 4px #898080;
+  box-shadow: 0 1px .5rem #918e8ebf;
 }
 
 .view2 .item-inner > h3 a {
@@ -2960,14 +2961,8 @@ main {
   padding: 1.5em 36px;
 }
 
-.view2:first-child .item-inner {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-
-.view2:last-child .item-inner {
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+.view2 .item-inner {
+  border-radius: .5rem;
 }
 
 .view2 .meta .icon-read {
@@ -3037,12 +3032,12 @@ article .article__content h1 {
   border: none;
 }
 
-article .article__content p, article .article__content blockquote, article .article__content figure, article .article__content table, article .article__content ul, article .article__content ol, article .article__content dl {
+article .article__content p, article .article__content blockquote, article .article__content picture, article .article__content figure, article .article__content table, article .article__content ul, article .article__content ol, article .article__content dl {
   margin: .75em 0;
   padding: 0;
 }
 
-article .article__content p:first-child, article .article__content blockquote:first-child, article .article__content figure:first-child, article .article__content table:first-child, article .article__content ul:first-child, article .article__content ol:first-child, article .article__content dl:first-child {
+article .article__content p:first-child, article .article__content blockquote:first-child, article .article__content picture:first-child, article .article__content figure:first-child, article .article__content table:first-child, article .article__content ul:first-child, article .article__content ol:first-child, article .article__content dl:first-child {
   margin-top: 0;
 }
 
@@ -3124,8 +3119,9 @@ body {
   color: #ebcd0c;
 }
 
-.expanded .meta .feed {
+.expanded .meta .entry__feed {
   text-transform: uppercase;
+  font-size: .75rem;
 }
 
 .expanded .meta .actions {

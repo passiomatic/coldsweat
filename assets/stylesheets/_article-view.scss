@@ -52,7 +52,7 @@ main {
         background: $white;
         //@include transition(background .1s ease-out);
         padding: $baselineheight * 1.5;
-        @include box-shadow(0 0 4px $lightneutralcolor);
+        @include box-shadow(0 1px .5rem rgba($color-neutral-300, .75));
 
         // Title
 
@@ -98,14 +98,8 @@ main {
         border-bottom: none;
     }
 
-    &:first-child .item-inner {
-        border-top-left-radius: $borderradius;
-        border-top-right-radius: $borderradius;
-    }
-
-    &:last-child .item-inner {
-        border-bottom-left-radius: $borderradius;
-        border-bottom-right-radius: $borderradius;
+    .item-inner {
+        border-radius: .5rem;
     }
 
     // Read, unread, etc.
@@ -198,10 +192,11 @@ article {
             border: none;
         }
 
-        // Other block-level elements 
+        // Other common block-level elements 
 
         p,
         blockquote,
+        picture,
         figure,
         table,
         ul,

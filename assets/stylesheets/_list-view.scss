@@ -128,6 +128,7 @@ ul.list-view {
 
 .panel{
     flex-basis: 30em;  
+    max-width: 30rem;
 }
 
 .panel-content {
@@ -175,6 +176,7 @@ ul.list-view {
 
 .entry-card__title {
     font-weight: 500;
+    word-break: break-all;
     color: $color-primary;
 }
 
@@ -228,7 +230,8 @@ ul.list-view {
     margin: -0.75rem -0.75rem -0.75rem auto;
     overflow: hidden;
     width: 4rem;
-    height: 4rem; 
+    height: 4rem;
+    flex-shrink: 0; 
     img { 
         max-width: 100%;
         height: auto;

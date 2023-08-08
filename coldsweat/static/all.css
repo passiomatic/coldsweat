@@ -3262,7 +3262,9 @@ pre {
 nav {
   height: 100vh;
   background: #bbb7b7;
+  flex-direction: column;
   flex-basis: 15rem;
+  display: flex;
   overflow-y: scroll;
 }
 

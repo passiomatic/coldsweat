@@ -250,6 +250,8 @@ nav {
     height: 100vh;
     overflow-y: scroll;
     flex-basis: 15rem;
+    display: flex;
+    flex-direction: column;    
 }
 
 .nav__branding {

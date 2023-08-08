@@ -2835,11 +2835,16 @@ ul.list-view .more button {
 
 .entry-card__status {
   opacity: 0;
-  color: #175b82;
   font-size: .75rem;
 }
 
+.status-read .entry-card__status {
+  color: #918e8e;
+  opacity: .45;
+}
+
 .status-unread .entry-card__status {
+  color: #175b82;
   opacity: 1;
 }
 

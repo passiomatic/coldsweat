@@ -12,7 +12,11 @@
                 <input onchange="Sweat.loadEntry('{{e.id}}', event)" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
                 <label for="c-{{e.id}}">
                     <div class="entry-card__status">
-                        <i class="fa fa-circle"></i>
+                        {%if e.id in read_ids %}
+                            <i class="fa fa-circle-o"></i>
+                        {% else %}
+                            <i class="fa fa-circle"></i>
+                        {% endif %}
                     </div>
                     <div>
                         <h4 class="entry-card__feed">

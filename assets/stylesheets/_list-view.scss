@@ -183,10 +183,15 @@ ul.list-view {
 .entry-card__status {
     opacity: 0;
     font-size: .75rem;
-    color: $color-primary;
+}
+
+.status-read .entry-card__status {
+    color: $text-color-muted;
+    opacity: .45;
 }
 
 .status-unread .entry-card__status {
+    color: $color-primary;
     opacity: 1;
 }
 

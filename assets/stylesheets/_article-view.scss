@@ -252,6 +252,7 @@ article {
         }
 
         .continue {
+            clear: both; // Clear any floated content within article
             text-align: center;
             margin: $baselineheight 0 0 0;
         }

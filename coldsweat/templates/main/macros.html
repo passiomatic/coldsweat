@@ -23,6 +23,11 @@
                             {{e.title}}
                         </h3>
                     </div>
+                    {%if e.thumbnail_url %} 
+                        <div class="entry-card__thumbnail">
+                            <img loading="lazy" src="{{e.thumbnail_url}}" alt="">
+                        </div>
+                    {% endif %}                    
                 </label>
                 <!-- 
                 <div class="meta dim">
@@ -51,7 +56,7 @@
                                             <div class="continue"><a class="btn btn-small btn-visit" rel="noreferrer" title="View entry on {{e.link}} (V key)" target="_blank" href="{{e.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
                                         {% endif %}
                                     </div>            
-                                    <hr class="halved">
+                                    <hr style="clear: both" class="halved">
                                 {% endif %}
                                 <div class="meta dim">    
                                     <i class="fa fa-info-circle"></i> Posted {{e.published_on|datetime }} {%if e.author %} by {{ e.author }}{% endif %}                                              

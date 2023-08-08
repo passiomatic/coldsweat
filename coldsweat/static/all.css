@@ -2812,6 +2812,10 @@ ul.list-view .more button {
   right: 0;
 }
 
+.entry-card {
+  position: relative;
+}
+
 .entry-card label {
   cursor: pointer;
   background-color: #fff;
@@ -2860,6 +2864,19 @@ ul.list-view .more button {
 
 .entry-card input:checked ~ label {
   background: #d5e1e9;
+}
+
+.entry-card__thumbnail {
+  width: 4rem;
+  height: 4rem;
+  margin: -.75rem -.75rem -.75rem auto;
+  overflow: hidden;
+}
+
+.entry-card__thumbnail img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 main {
@@ -3062,6 +3079,7 @@ article .article__content hr {
 }
 
 article .article__content .continue {
+  clear: both;
   text-align: center;
   margin: 1.5em 0 0;
 }

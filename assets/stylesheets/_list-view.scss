@@ -153,6 +153,10 @@ ul.list-view {
 
 // Card 
 
+.entry-card {
+    position: relative;
+}
+
 .entry-card label {
     display: flex;
     align-items: center;
@@ -215,4 +219,19 @@ ul.list-view {
 
 .entry-card input:checked~label {
     background: $color-primary-400;
+}
+
+// Thumbnail 
+
+.entry-card__thumbnail {
+    // Push right
+    margin: -0.75rem -0.75rem -0.75rem auto;
+    overflow: hidden;
+    width: 4rem;
+    height: 4rem; 
+    img { 
+        max-width: 100%;
+        height: auto;
+        object-fit: contain; 
+    }
 }

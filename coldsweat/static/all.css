@@ -2812,10 +2812,6 @@ ul.list-view .more button {
   right: 0;
 }
 
-.entry-card {
-  position: relative;
-}
-
 .entry-card label {
   cursor: pointer;
   background-color: #fff;

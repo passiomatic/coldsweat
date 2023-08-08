@@ -298,6 +298,12 @@ def strip_html(data):
     return p.get_output()
 
 
+def parse_html(data):
+    p = BaseProcessor()
+    _parse(p, data)
+    return p.get_output()
+
+
 def scrub_html(data, blacklist):
     '''
     Remove blacklisted links and images from the input document

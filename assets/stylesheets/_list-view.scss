@@ -181,14 +181,14 @@ ul.list-view {
 .entry-card__status {
     opacity: 0;
     font-size: .75rem;
+    color: $color-primary;
 }
 
 .status-unread .entry-card__status {
     opacity: 1;
-    color: $color-primary;
 }
 
-.feed {
+.entry-card__feed {
     font-size: $font-size-xsmall;
     font-weight: normal;
     text-transform: uppercase;

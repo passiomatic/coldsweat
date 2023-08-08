@@ -2833,15 +2833,15 @@ ul.list-view .more button {
 
 .entry-card__status {
   opacity: 0;
+  color: #175b82;
   font-size: .75rem;
 }
 
 .status-unread .entry-card__status {
   opacity: 1;
-  color: #175b82;
 }
 
-.feed {
+.entry-card__feed {
   text-transform: uppercase;
   align-items: center;
   gap: .25rem;

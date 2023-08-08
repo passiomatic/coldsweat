@@ -245,6 +245,14 @@ article {
             height: auto;
         }
 
+        // Media
+
+        iframe, 
+        video,
+        embed {
+            width: 100%;
+        }
+
         // Misc. 
 
         hr {

@@ -2714,6 +2714,7 @@ ul.list-view > li.entry {
 
 ul.list-view > li.heading {
   background: #e4e2e2;
+  border-bottom: 1px dotted #bbb7b7;
   padding: .375em 36px;
   position: sticky;
   top: 0;
@@ -3068,6 +3069,10 @@ article .article__content li, article .article__content dd {
 article .article__content img {
   max-width: 100%;
   height: auto;
+}
+
+article .article__content iframe, article .article__content video, article .article__content embed {
+  width: 100%;
 }
 
 article .article__content hr {

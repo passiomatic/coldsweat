@@ -26,6 +26,7 @@ ul.list-view {
             background: $lightestneutralcolor;
             position: sticky;
             top: 0;
+            border-bottom: 1px dotted $border-color;
 
             h2 {
                 text-transform: uppercase;

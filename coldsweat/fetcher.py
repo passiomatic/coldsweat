@@ -13,6 +13,7 @@ import requests
 from requests.exceptions import RequestException
 import werkzeug.exceptions as exceptions
 from werkzeug import http
+from . import markup
 from .models import (Entry, Feed, db_wrapper)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
@@ -249,7 +250,7 @@ class Fetcher(object):
                 'link': link,
                 'title': t.get_title(default='Untitled'),
                 'author': t.get_author() or feed_author,
-                'content': content,
+                'content': markup.parse_html(content),
                 'content_type': content_type,
                 'thumbnail_url': thumbnail_url,
                 'published_on': timestamp

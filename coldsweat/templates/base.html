@@ -24,7 +24,7 @@ Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
 window.applicationURL = '{{request.root_url}}';
 head.js(
 // Libraries
-'{{ url_for("static", filename="javascripts/vendor/jquery-min.js") }}',
+//'{{ url_for("static", filename="javascripts/vendor/jquery-min.js") }}',
 
 // Load bootstrap-transition first so that nice glides/fades 
 // etc for the other bootstrap plugins work
@@ -39,7 +39,7 @@ head.js(
 //'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-dropdown.js") }}',
 
 // Plugins
-'{{ url_for("static", filename="javascripts/plugins.js") }}',
+//'{{ url_for("static", filename="javascripts/plugins.js") }}',
 
 // App scripts
 //'{{ url_for("static", filename="javascripts/app.js") }}',

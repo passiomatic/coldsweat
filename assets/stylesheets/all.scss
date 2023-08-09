@@ -93,6 +93,28 @@ body {
     //@extend abbr[title];
 }
 
+fieldset {
+    margin-bottom: .75rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: .375rem;
+}
+
+.form-field {
+    font-size: $font-size-base;
+    padding: .375rem;
+    border: 1px solid $border-color;
+    border-radius: .1875rem;
+    width: 100%;
+}
+
+small {
+    font-size: $font-size-small;
+    color: $text-color-muted;
+}
+
 .tooltip {
     white-space: nowrap;
 
@@ -380,4 +402,17 @@ dialog button[name="close"] {
     padding: 2rem;    
     background: $white;
     border-radius: .75rem;
+}
+
+
+// Forms 
+
+.form__title {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.form__buttons {
+    margin-top: 1rem;
 }

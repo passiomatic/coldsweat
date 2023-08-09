@@ -3068,6 +3068,28 @@ body {
   float: right;
 }
 
+fieldset {
+  margin-bottom: .75rem;
+}
+
+.form-label {
+  margin-bottom: .375rem;
+  display: block;
+}
+
+.form-field {
+  width: 100%;
+  border: 1px solid #bbb7b7;
+  border-radius: .1875rem;
+  padding: .375rem;
+  font-size: 1rem;
+}
+
+small {
+  color: #918e8e;
+  font-size: .875rem;
+}
+
 .tooltip {
   white-space: nowrap;
 }
@@ -3324,6 +3346,16 @@ dialog button[name="close"] {
   background: #fff;
   border-radius: .75rem;
   padding: 2rem;
+}
+
+.form__title {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
+.form__buttons {
+  margin-top: 1rem;
 }
 
 /*# sourceMappingURL=all.css.map */

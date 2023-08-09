@@ -68,6 +68,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
             });            
         },
 
+        submitRemoteForm: function(url, event) {
+            // @@TODO Do async request 
+            event.preventDefault();            
+        },
+
         openRemoteModal: function(url, event) {
             var dialogEl = document.getElementById('dialog'); 
 

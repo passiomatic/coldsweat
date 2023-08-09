@@ -28,46 +28,42 @@ window.addEventListener("DOMContentLoaded", (event) => {
             // Prev
             hotkeys('j', function(event, handler){
                 var currentCardInput = listViewEl.querySelector(".entry .entry-card input:checked");
-                var nextCard = null;
+                var prevCard = null;
+                var prevCardInput = null;
                 if(currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
                     // @@TODO Skip headings
                     prevCard = li.previousElementSibling;
-                    var prevCardInput = prevCard.querySelector(".entry-card input");
-                    if(prevCardInput) {
-                        prevCardInput.checked = true;                       
-                        Sweat.mark(prevCardInput.value, 'read')              
-                    } else {
-                        // Top
-                        //console.log("Top")
-                    }                    
+                    prevCardInput = prevCard.querySelector(".entry-card input");
                 } else {
                     // Select first
-                    nextCard = listViewEl.querySelector(".entry .entry-card input");
-                    nextCard.checked = true;      
+                    prevCardInput = listViewEl.querySelector(".entry .entry-card input");
                 } 
+                if(prevCardInput) {
+                    prevCardInput.checked = true;
+                    Sweat.mark(prevCardInput.value, 'read');
+                    Sweat.loadEntry(prevCardInput.value, event);
+                }                
             });
             // Next
             hotkeys('k', function(event, handler){
                 var currentCardInput = listViewEl.querySelector(".entry .entry-card input:checked");
                 var nextCard = null;
+                var nextCardInput = null;
                 if(currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
                     // @@TODO Skip headings
                     nextCard = li.nextElementSibling;
-                    var nextCardInput = nextCard.querySelector(".entry-card input");
-                    if(nextCardInput) {
-                        nextCardInput.checked = true;          
-                        Sweat.mark(nextCardInput.value, 'read')
-                    } else {
-                        // Bottom
-                        //console.log("Bottom")
-                    }
+                    nextCardInput = nextCard.querySelector(".entry-card input");
                 } else {
                     // Select first
-                    nextCard = listViewEl.querySelector(".entry .entry-card input");
-                    nextCard.checked = true;       
+                    nextCardInput = listViewEl.querySelector(".entry .entry-card input");
                 } 
+                if(nextCardInput) {
+                    nextCardInput.checked = true;       
+                    Sweat.mark(nextCardInput.value, 'read')
+                    Sweat.loadEntry(nextCardInput.value, event)
+                }
             });            
         },
 

@@ -9,7 +9,7 @@
 
             {% if count %}
                 {% set mark_all_url = url_for('main.entry_list_mark', all='') %}
-                <button title="Mark all as read" class="btn-text" onclick="Sweat.openRemoteModal('{{mark_all_url}}', event)">
+                <button title="Mark all as read" class="btn-text" onclick="Sweat.openRemoteDialog('{{mark_all_url}}', event)">
                     <i class="fa fa-check-square"></i>
                 </button>
             {% endif %}
@@ -31,7 +31,7 @@
             <div>
                 {% if feed_id  %}
                     {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
-                    <button class="btn-text" onclick="Sweat.openRemoteModal('{{feed_edit_url}}', event)">
+                    <button class="btn-text" onclick="Sweat.openRemoteDialog('{{feed_edit_url}}', event)">
                         <i class="fa fa-cog"></i>
                     </button>
                 {% elif group_id %}

@@ -18,7 +18,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
         return segments.join('')
     }    
 
-    var listViewEl = document.getElementById("entry-list");
+    // Find innermost element that does not get replaced
+    var listViewEl = document.getElementById("panel-content");
 
     const Sweat = {
 
@@ -30,6 +31,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 var nextCard = null;
                 if(currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
+                    // @@TODO Skip headings
                     prevCard = li.previousElementSibling;
                     var prevCardInput = prevCard.querySelector(".entry-card input");
                     if(prevCardInput) {
@@ -37,10 +39,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         Sweat.mark(prevCardInput.value, 'read')              
                     } else {
                         // Top
-                        console.log("Top")
+                        //console.log("Top")
                     }                    
                 } else {
-                    // Find first
+                    // Select first
                     nextCard = listViewEl.querySelector(".entry .entry-card input");
                     nextCard.checked = true;      
                 } 
@@ -51,6 +53,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 var nextCard = null;
                 if(currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
+                    // @@TODO Skip headings
                     nextCard = li.nextElementSibling;
                     var nextCardInput = nextCard.querySelector(".entry-card input");
                     if(nextCardInput) {
@@ -58,10 +61,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         Sweat.mark(nextCardInput.value, 'read')
                     } else {
                         // Bottom
-                        console.log("Bottom")
+                        //console.log("Bottom")
                     }
                 } else {
-                    // Find first
+                    // Select first
                     nextCard = listViewEl.querySelector(".entry .entry-card input");
                     nextCard.checked = true;       
                 } 
@@ -73,7 +76,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
             event.preventDefault();            
         },
 
-        openRemoteModal: function(url, event) {
+        openRemoteDialog: function(url, event) {
             var dialogEl = document.getElementById('dialog'); 
 
             fetch(url)

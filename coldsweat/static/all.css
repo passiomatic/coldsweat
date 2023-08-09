@@ -3329,7 +3329,10 @@ dialog[open] {
 }
 
 dialog::backdrop {
-  background: #d9d5d5bf;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  background: #5e5c5cbf;
 }
 
 dialog button[name="close"] {

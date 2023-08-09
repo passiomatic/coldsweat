@@ -375,16 +375,17 @@ dialog {
     width: 100vw;
     height: 100vh;
     color: $text-color;
-    transition: transform .3s ease-out, opacity .3s ease-out;
-    transform: translate(0%, -5%);
+    //transition: transform .3s ease-out, opacity .3s ease-out;
+    //transform: translate(0%, -5%);
 }
-/* dialog[open] doesn't work */
-dialog.in {
+
+//dialog.in {
+dialog[open] {
+    opacity: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 1;
-    transform: translate(0%, 0%);
+    //transform: translate(0%, 0%);
 }
 
 dialog::backdrop {

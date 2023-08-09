@@ -117,16 +117,15 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 });              
         },
 
-        closeDialog: function(dialogEl, event) {
-            //var dialog = document.getElementById('dialog');                        
-            dialogEl.classList.remove("in"); 
-            dialogEl.close();        
-            //event.preventDefault(); 
+        closeDialog: function(event) {
+            var dialog = document.getElementById('dialog');                        
+            //dialog.classList.remove("in"); 
+            dialog.close();  
         },
 
         openDialog: function(dialogEl, event) {
             dialogEl.showModal();         
-            dialogEl.classList.add("in"); 
+            //dialogEl.classList.add("in"); 
             return dialogEl;
         },
 

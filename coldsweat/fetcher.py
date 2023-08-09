@@ -130,6 +130,7 @@ class Fetcher(object):
         self._fetch_icon()        
 
     handle_307 = handle_200   # Alias
+    handle_303 = handle_200   # Alias
     handle_302 = handle_200   # Alias
 
     def update_feed(self):

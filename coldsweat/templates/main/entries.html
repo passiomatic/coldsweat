@@ -2,54 +2,57 @@
 
 {% macro render_panel() %}
     {% if count %}
-        <ul id="entry-list" class="view list-view">                      
+        <ul id="entry-list" class="list-view">                      
             {{ macros.render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) }}
         </ul>
-    {% else %}
-        <div class="notice">
-            <div>
-                <i class="fa fa-tint fa-4x"></i>
-                <p>No articles found.</p>
-            </div>
-        </div>
-    {% endif %}
+        <div class="entry__filter">
 
-    <div class="entry__filter">
-
-        {% if count %}
-            {% set mark_all_url = url_for('main.entry_list_mark', all='') %}
-            <button title="Mark all as read" class="btn-text" onclick="Sweat.openRemoteModal('{{mark_all_url}}', event)">
-                <i class="fa fa-check-square"></i>
-            </button>
-        {% endif %}
-
-        <div class="radio-switch">
-            <label class="radio-switch__label">
-                {% set request_url_1 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_1}}')" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
-            </label>
-            <label class="radio-switch__label">
-                {% set request_url_2 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_2}}')" {% if filter == 'saved' %}checked{% endif %}  value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
-            </label>
-            <label class="radio-switch__label">
-                {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}')" {% if filter == 'archive' %}checked{% endif %}  value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
-            </label>
-        </div>
-        <div>
-            {% if feed_id  %}
-                {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
-                <button class="btn-text" onclick="Sweat.openRemoteModal('{{feed_edit_url}}', event)">
-                    <i class="fa fa-cog"></i>
-                </button>
-            {% elif group_id %}
-                <button onclick="" class="btn-text">
-                    <i class="fa fa-cog"></i>
+            {% if count %}
+                {% set mark_all_url = url_for('main.entry_list_mark', all='') %}
+                <button title="Mark all as read" class="btn-text" onclick="Sweat.openRemoteModal('{{mark_all_url}}', event)">
+                    <i class="fa fa-check-square"></i>
                 </button>
             {% endif %}
-        </div>
-    </div>
+    
+            <div class="radio-switch">
+                <label class="radio-switch__label">
+                    {% set request_url_1 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1) %}
+                    <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_1}}')" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
+                </label>
+                <label class="radio-switch__label">
+                    {% set request_url_2 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1) %}
+                    <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_2}}')" {% if filter == 'saved' %}checked{% endif %}  value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
+                </label>
+                <label class="radio-switch__label">
+                    {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1) %}
+                    <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}')" {% if filter == 'archive' %}checked{% endif %}  value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
+                </label>
+            </div>
+            <div>
+                {% if feed_id  %}
+                    {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
+                    <button class="btn-text" onclick="Sweat.openRemoteModal('{{feed_edit_url}}', event)">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                {% elif group_id %}
+                    <button onclick="" class="btn-text">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                {% endif %}
+            </div>
+        </div>        
+    {% else %}
+        <ul id="entry-list" class="list-view">
+            <li class="h-100">
+                <div class="notice">
+                    <div>
+                        <i class="fa fa-tint fa-4x"></i>
+                        <p>No articles found.</p>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    {% endif %}
 
 {% endmacro %}
 

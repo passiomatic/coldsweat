@@ -449,11 +449,11 @@ a:hover, a:active {
   content: "";
 }
 
-.fa-star:before, .view2 .meta .icon-saved:before, ul.list-view > li .meta .icon-saved:before {
+.fa-star:before, .view2 .meta .icon-saved:before, .list-view > li .meta .icon-saved:before {
   content: "";
 }
 
-.fa-star-o:before, .view2 .meta .icon-unsaved:before, ul.list-view > li .meta .icon-unsaved:before {
+.fa-star-o:before, .view2 .meta .icon-unsaved:before, .list-view > li .meta .icon-unsaved:before {
   content: "";
 }
 
@@ -1389,7 +1389,7 @@ a:hover, a:active {
   content: "";
 }
 
-.fa-circle-o:before, .view2 .meta .icon-read:before, ul.list-view > li .meta .icon-read:before {
+.fa-circle-o:before, .view2 .meta .icon-read:before, .list-view > li .meta .icon-read:before {
   content: "";
 }
 
@@ -1405,7 +1405,7 @@ a:hover, a:active {
   content: "";
 }
 
-.fa-circle:before, .view2 .meta .icon-unread:before, ul.list-view > li .meta .icon-unread:before {
+.fa-circle:before, .view2 .meta .icon-unread:before, .list-view > li .meta .icon-unread:before {
   content: "";
 }
 
@@ -2695,7 +2695,7 @@ input.search-query {
   font-size: .75rem;
 }
 
-ul.list-view {
+.list-view {
   height: 100vh;
   margin: 0 auto;
   padding: 0;
@@ -2703,16 +2703,16 @@ ul.list-view {
   overflow-y: auto;
 }
 
-ul.list-view > li {
+.list-view > li {
   margin: 0;
   padding: 0;
 }
 
-ul.list-view > li.entry {
+.list-view > li.entry {
   border-bottom: 1px dotted #bbb7b7;
 }
 
-ul.list-view > li.heading {
+.list-view > li.heading {
   background: #e4e2e2;
   border-bottom: 1px dotted #bbb7b7;
   padding: .375em 36px;
@@ -2720,69 +2720,69 @@ ul.list-view > li.heading {
   top: 0;
 }
 
-ul.list-view > li.heading h2 {
+.list-view > li.heading h2 {
   text-transform: uppercase;
   color: #918e8e;
   letter-spacing: 1px;
   font-size: .875rem;
 }
 
-ul.list-view > li .meta .icon-read {
+.list-view > li .meta .icon-read {
   margin-left: 12px;
   display: none;
 }
 
-ul.list-view > li .meta .icon-unread {
+.list-view > li .meta .icon-unread {
   margin-left: 12px;
 }
 
-ul.list-view > li .meta .icon-saved {
+.list-view > li .meta .icon-saved {
   display: none;
 }
 
-ul.list-view > li.status-read h3 a:link {
+.list-view > li.status-read h3 a:link {
   color: #175b82b3;
 }
 
-ul.list-view > li.status-read h3 a:hover {
+.list-view > li.status-read h3 a:hover {
   color: #9c1c1e;
 }
 
-ul.list-view > li.status-read .meta .icon-read {
+.list-view > li.status-read .meta .icon-read {
   display: inline-block;
 }
 
-ul.list-view > li.status-read .meta .icon-unread {
+.list-view > li.status-read .meta .icon-unread {
   display: none;
 }
 
-ul.list-view > li.status-saved .meta .icon-saved {
+.list-view > li.status-saved .meta .icon-saved {
   display: inline-block;
   transform: scale(1.3);
 }
 
-ul.list-view > li.status-saved .meta .icon-unsaved {
+.list-view > li.status-saved .meta .icon-unsaved {
   display: none;
 }
 
-ul.list-view > li.status-disabled .item-inner {
+.list-view > li.status-disabled .item-inner {
   background-color: #fae1e1;
 }
 
-ul.list-view > li.status-disabled .item-inner h3 {
+.list-view > li.status-disabled .item-inner h3 {
   text-decoration: line-through;
 }
 
-ul.list-view > li.status-sick .item-inner {
+.list-view > li.status-sick .item-inner {
   background-color: #f7ea9c;
 }
 
-ul.list-view .more {
+.list-view .more {
   background: #e4e2e2;
   margin-bottom: 3.5rem;
 }
 
-ul.list-view .more button {
+.list-view .more button {
   width: 100%;
   padding: .5rem 0;
   display: block;
@@ -3097,6 +3097,14 @@ body {
   position: absolute;
   top: 0;
   left: -999px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
 }
 
 .dim, .notice, .dim a, .notice a, .dim a:visited, .notice a:visited {

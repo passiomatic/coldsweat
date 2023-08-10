@@ -6,12 +6,14 @@ __version__ = (0, 10, 0, '')
 import os 
 import flask_login
 import flask
+from flask.cli import FlaskGroup
+import click
 from flask_cdn import CDN
 from .auth import bp as auth_blueprint
 from .main import bp as main_blueprint
 from .fever import bp as fever_blueprint
 from .auth import SessionUser
-import coldsweat.cli as cli
+import coldsweat.commands as commands
 import coldsweat.models as models
 
 try:
@@ -89,9 +91,13 @@ def create_app(config_class=None):
     app.register_blueprint(fever_blueprint)
 
     # Add CLI support
-    cli.add_commands(app)
+    commands.add_commands(app)
 
     with app.app_context():
         from . import filters  # noqa
 
     return app
+
+@click.group(cls=FlaskGroup, create_app=create_app)
+def cli():
+    """Management script for the Coldsweat application."""

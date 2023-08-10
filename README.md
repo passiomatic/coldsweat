@@ -23,34 +23,28 @@ Coldsweat is [Flask application][flask] distributed as a Python wheel, hence you
 
     $ pip install coldsweat
 
+The install procedure will also create a `coldsweat` command, available in your terminal.
+
 ### Create a user
 
 Once installed, create a new user specifing email and password with the `setup` command:
 
-    $ flask --app coldsweat setup john@example.com -p somepassword
+    $ coldsweat setup john@example.com -p somepassword
 
 If you prefer you can enter the password interactively:
 
-    $ flask --app coldsweat setup john@example.com  
+    $ coldsweat setup john@example.com  
     Enter password for user john@example.com: ************
     Enter password (again): ************
     Setup completed for john@example.com
 
 Email and password will be needed to access the web UI and use the Fever API sync with your favourite RSS client.
 
-### A little digression...
-
-It is quite tedius to keep writing `flask --app coldsweat...` everytime you need to run Coldsweat. To fix this Flask allows to specify the current app using an environment variable instead:
-
-    $ export FLASK_APP=coldsweat
-
-Once the `FLASK_APP` variable is set you can omit that information while launching the other application commands. More details about this can be found in the Flask documentation on [application discovery][disco].
-
 ### Import your feeds
 
 Like other RSS software Coldsweat uses the OPML format to import multiple feeds with a single operation:
 
-    $ flask import /path/to/subscriptions.opml alice@example.com -f
+    $ coldsweat import /path/to/subscriptions.opml alice@example.com -f
 
 The `-f` option tells Coldsweat to fetch the feeds right after the import step.
 
@@ -58,7 +52,7 @@ The `-f` option tells Coldsweat to fetch the feeds right after the import step.
 
 To update all the feeds run the `fetch` command:
 
-    $ flask fetch 
+    $ coldsweat fetch 
 
 You should use `cron` or similar utilities to shedule feed fetches periodically.
 
@@ -66,7 +60,7 @@ You should use `cron` or similar utilities to shedule feed fetches periodically.
 
 Then you can run the Flask development web server and access the web UI: 
 
-    $ flask run 
+    $ coldsweat run 
     * Serving Flask app 'coldsweat'
     * Debug mode: off
     * Running on http://127.0.0.1:5000

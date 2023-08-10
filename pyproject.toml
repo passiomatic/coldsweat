@@ -40,3 +40,6 @@ packages = ["coldsweat", "coldsweat.main", "coldsweat.auth", "coldsweat.fever" ]
 
 [tool.setuptools.package-data]
 coldsweat = ["static/*.*", "templates/*.html"]
+
+[project.scripts]
+coldsweat = "coldsweat:cli"

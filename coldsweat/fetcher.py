@@ -268,7 +268,7 @@ class Fetcher(object):
                         .as_rowcount()
                         .execute())
                 else: 
-                    # MySQL doesn't support conlict targets, see:
+                    # MySQL doesn't support conflict targets, see:
                     # https://stackoverflow.com/questions/74691515/python-peewee-using-excluded-to-resolve-conflict-resolution
                     count += (Entry.insert_many(batch).on_conflict(
                         # Pass down these new values only for certain values

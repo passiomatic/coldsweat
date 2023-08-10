@@ -68,8 +68,33 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         submitRemoteForm: function(url, event) {
-            // @@TODO Do async request 
-            event.preventDefault();            
+            var dialogEl = document.getElementById('dialog'); 
+
+            // @@TODO Add spinner
+            var button = dialogEl.querySelector('button[type=submit]');
+            if(button) {
+                button.disabled = true;
+            }
+
+            event.preventDefault();                                 
+            var formData = new FormData(event.target);
+            fetch(makeEndpointURL(url), { method: 'POST', body: formData })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned error ${response.status} while handing POST request`);
+                    }
+                    response.text().then((text) => {
+                        const contentType = response.headers.get("content-type");
+                        console.log("contentType: " + contentType)
+                        if(contentType.startsWith('text/html')) {
+                            dialogEl.querySelector('.dialog-content').innerHTML = text;
+                        } else if (contentType.startsWith('text/javascript')) {
+                            eval(text);
+                        } 
+                    });                        
+
+                    
+                });
         },
 
         openRemoteDialog: function(url, event) {

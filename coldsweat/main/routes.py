@@ -419,7 +419,7 @@ def _add_subscription(feed_, group_id):
         flask.flash(f"Feed has been added to <i>{group.title}</i> group", category="info")
     else:
         flask.flash(f"Feed is already in <i>{group.title}</i> group'", category="info")
-    return _render_script('main/_modal_done.js', location=flask.url_for("main.entry_list", feed=feed_.id))
+    return _render_script('main/_dialog_done.js', location=flask.url_for("main.entry_list", feed=feed_.id))
 
 
 def _render_script(filename, location):

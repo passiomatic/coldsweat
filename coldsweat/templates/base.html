@@ -15,39 +15,12 @@ Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
 <meta name="apple-mobile-web-app-title" content="Coldsweat">
 <script defer src='{{ url_for("static", filename="javascripts/vendor/hotkeys.min.js") }}'></script>
 <script defer src='{{ url_for("static", filename="javascripts/app2.js") }}'></script>
-<script src='{{ url_for("static", filename="javascripts/vendor/head.load.min.js") }}'></script>
 {% block head_block %}{% endblock %}
 </head>
 <body>
     {% block container_block %}{% endblock %}
 <script>
-window.applicationURL = '{{request.root_url}}';
-head.js(
-// Libraries
-//'{{ url_for("static", filename="javascripts/vendor/jquery-min.js") }}',
-
-// Load bootstrap-transition first so that nice glides/fades 
-// etc for the other bootstrap plugins work
-//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-transition.js") }}',
-//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-tooltip.js") }}',
-
-// Popover has a dependency on tooltip, so make sure and include 
-// bootstrap-tooltip regardless in order for popovers to work
-//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-popover.js") }}',
-//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-modal.js") }}',
-//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-collapse.js") }}',
-//'{{ url_for("static", filename="javascripts/vendor/bootstrap/bootstrap-dropdown.js") }}',
-
-// Plugins
-//'{{ url_for("static", filename="javascripts/plugins.js") }}',
-
-// App scripts
-//'{{ url_for("static", filename="javascripts/app.js") }}',
-
-function() {    
-    // Do something when we are ready
-    {% block page_script_block %}{% endblock %}    
-});
+    window.applicationURL = '{{request.root_url}}';
 </script>
 
 <dialog id="dialog">

@@ -23,7 +23,7 @@
             <div class="item-inner">
                 <article>
                     <div class="meta dim">
-                        <span class="feed"><a title="Show more entries for this feed" href="{{ url_for('main.entry_list', feed=entry.feed.id, filter=filter_name) }}">{{entry.feed.title}}</a></span>
+                        <span class="feed"><a title="Show more entries for this feed" href="{{ url_for('main.entry_list', id=entry.feed.id, filter='feed') }}">{{entry.feed.title}}</a></span>
                         <span class="actions">
                             {%if entry.id in saved_ids%}<i class="save-trigger icon-saved fa fa-star" title="Unsave (S key)"></i>{% else %}<i class="save-trigger icon-unsaved fa fa-star-o" title="Save (S key)"></i>{% endif %}{%if entry.id in read_ids %}<i class="read-trigger icon-read fa fa-circle-o" title="Mark as unread (M key)"></i>{% else %}<i class="read-trigger icon-unread fa fa-circle" title="Mark as read (M key)"></i>{% endif %}                    
                         </span>

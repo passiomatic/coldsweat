@@ -54,7 +54,7 @@ To update all the feeds run the `fetch` command:
 
     $ coldsweat fetch 
 
-You should use `cron` or similar utilities to shedule feed fetches periodically.
+You should use `cron` or similar utilities to schedule feed fetches periodically.
 
 ### Run the web UI
 
@@ -66,7 +66,7 @@ Then you can run the Flask development web server and access the web UI:
     * Running on http://127.0.0.1:5000
     ...
 
-See _[setup]_ page for additional information.
+See [Setup] and [Deploy] pages for additional information.
 
 ## Upgrading from a previous version
 
@@ -78,7 +78,7 @@ Upgrade to the latest Coldsweat version with:
 
 ## Contributing
 
-See _[contributing]_ page.
+See [Contributing] page.
 
 ## 0.10 technical underpinnings
 
@@ -101,8 +101,9 @@ Coldsweat started in July 2013 as a fork of [Bottle Fever][b] by Rui Carmo. Afte
 [rk]: https://readkitapp.com/
 [r]: https://reederapp.com/
 [ff]: https://github.com/passiomatic/coldsweat/wiki/Fetcher-features
-[setup]: https://github.com/passiomatic/coldsweat/wiki/Setup
-[contributing]: https://github.com/passiomatic/coldsweat/wiki/Contributing
+[Setup]: https://github.com/passiomatic/coldsweat/wiki/Setup
+[Deploy]: https://github.com/passiomatic/coldsweat/wiki/Deploy
+[Contributing]: https://github.com/passiomatic/coldsweat/wiki/Contributing
 [venv]: https://docs.python.org/3/library/venv.html
 [flask]: https://flask.palletsprojects.com/en/2.3.x/
 [disco]: https://flask.palletsprojects.com/en/2.3.x/cli/#application-discovery

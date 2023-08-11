@@ -13,6 +13,7 @@ import requests
 from requests.exceptions import RequestException
 import werkzeug.exceptions as exceptions
 from werkzeug import http
+from . import markup
 from .models import (Entry, Feed, db_wrapper)
 from .translators import EntryTranslator, FeedTranslator
 from .utilities import (datetime_as_epoch,
@@ -242,6 +243,7 @@ class Fetcher(object):
 
             timestamp = t.get_timestamp(default=self.instant)
             content_type, content = t.get_content(('text/plain', ''))
+            thumbnail_url = t.get_thumbnail_url()
 
             entry = {
                 'feed_id': self.feed.id,
@@ -249,8 +251,9 @@ class Fetcher(object):
                 'link': link,
                 'title': t.get_title(default='Untitled'),
                 'author': t.get_author() or feed_author,
-                'content': content,
+                'content': markup.parse_html(content),
                 'content_type': content_type,
+                'thumbnail_url': thumbnail_url,
                 'published_on': timestamp
             }
             new_entries.append(entry)
@@ -271,7 +274,7 @@ class Fetcher(object):
                     # MySQL doesn't support conflict targets, see:
                     # https://stackoverflow.com/questions/74691515/python-peewee-using-excluded-to-resolve-conflict-resolution
                     count += (Entry.insert_many(batch).on_conflict(
-                        # Pass down these new values only for certain values
+                        # Pass down these new values only for certain fields
                         preserve=[Entry.title, Entry.author, Entry.content, Entry.content_type])
                         .as_rowcount()
                         .execute())

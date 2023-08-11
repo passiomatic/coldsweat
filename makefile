@@ -41,7 +41,7 @@ create-test-data:
 	sqlite3 ./instance/coldsweat-test.db ".dump" > tests/test-data.sql
 
 test:
-	python -m pytest
+	python -m pytest -s
 
 # Build Wheel/PyPI Support
 
@@ -62,6 +62,14 @@ upload-test:
 
 clean:
 	rm -rf dist/ build/ .parcel-cache/
+
+# Test deploy servers
+
+run-gunicorn:
+	gunicorn -w 8 'coldsweat:create_app()' --bind 127.0.0.1:5000
+
+run-waitress:
+	waitress-serve --host 127.0.0.1 --port 5000 --threads=8 --call coldsweat:create_app
 
 # Database 
 

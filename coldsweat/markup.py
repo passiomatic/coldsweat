@@ -4,12 +4,16 @@ HTML parsers and manipulation functions
 
 from html.parser import HTMLParser
 import urllib.parse as urlparse
+from feedparser.sanitizer import _HTMLSanitizer
 # from flask import current_app as app
 import markupsafe
 
 HTML_RESERVED_CHARREFS = 38, 60, 62, 34
 HTML_RESERVED_ENTITIES = 'amp', 'lt', 'gt', 'quot'
 
+
+# Allow iframe elements in FeedParser 
+_HTMLSanitizer.acceptable_elements.add("iframe")
 
 def _normalize_attrs(attrs):
     '''
@@ -42,6 +46,8 @@ class BaseParser(HTMLParser):
         pass
 
 
+DOMAIN_WHITELIST = set(["www.youtube.com", "www.youtube-nocookie.com", "player.vimeo.com"])
+
 class BaseProcessor(BaseParser):
     '''
     Parse and partially reconstruct the input document
@@ -54,6 +60,7 @@ class BaseProcessor(BaseParser):
 
     def __init__(self, xhtml_mode=False):
         BaseParser.__init__(self)
+        self.allowed_iframe = False
         self.xhtml_mode = xhtml_mode
 
     # @@NOTE: reset is called implicitly by base class
@@ -62,11 +69,29 @@ class BaseProcessor(BaseParser):
         BaseParser.reset(self)
         self.pieces = []
 
-    def output(self):
+    def get_output(self):
         '''
         Return processed HTML as a single string
         '''
         return ''.join(self.pieces)
+
+    def start_iframe(self, attrs):
+        d = dict(_normalize_attrs(attrs))
+        if self.is_allowed(d['src']):
+            # Reconstruct element
+            self.allowed_iframe = True
+            self.unknown_starttag('iframe', attrs)
+
+    def end_iframe(self):
+        if self.allowed_iframe:
+            self.allowed_iframe = False
+            self.unknown_endtag('iframe')
+
+    def is_allowed(self, url):
+        schema, netloc, path, params, query, fragment \
+            = urlparse.urlparse(url)
+
+        return (netloc in DOMAIN_WHITELIST)
 
     def unknown_starttag(self, tag, attrs):
         # Called for each unhandled tag, where attrs is a list of
@@ -125,21 +150,6 @@ class BaseProcessor(BaseParser):
 
     def handle_decl(self, text):
         pass  # Strip doctype declaration
-
-
-class Stripper(BaseProcessor):
-
-    def handle_starttag(self, tag, attrs):
-        pass
-
-    def handle_endtag(self, tag):
-        pass
-
-    def handle_charref(self, ref):
-        self.pieces.append(self.unescape("&#%s;" % ref))
-
-    def handle_entityref(self, ref):
-        self.pieces.append(self.unescape("&%s;" % ref))
 
 
 class FeedLinkFinder(BaseParser):
@@ -264,13 +274,13 @@ def sniff_feed(data):
 
 
 def strip_html(data):
-    '''
-    Strip all HTML tags and convert all entities/charrefs, effectively
-      creating a plain text version of the input document
-    '''
-    p = Stripper()
+    return markupsafe.Markup(data).striptags()
+
+
+def parse_html(data):
+    p = BaseProcessor()
     _parse(p, data)
-    return p.output()
+    return p.get_output()
 
 
 def scrub_html(data, blacklist):
@@ -279,4 +289,4 @@ def scrub_html(data, blacklist):
     '''
     p = Scrubber(blacklist)
     _parse(p, data)
-    return p.output()
+    return p.get_output()

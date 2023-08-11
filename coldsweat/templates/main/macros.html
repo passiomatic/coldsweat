@@ -54,8 +54,12 @@
                                 </div>
                                 <h1 class="article__title">{{e.title}}</h1>        
                                 {%if e.content %} 
-                                    <div class="article__content">
-                                        {{e.content|safe}}
+                                    <div class="article__content">                                        
+                                        {% if 'html' in e.content_type %}
+                                            {{e.content|safe}}
+                                        {% else%}
+                                            {{e.content}}
+                                        {% endif %}
                                         {%if e.link %}
                                             <div class="continue"><a class="btn btn-small btn-visit" rel="noreferrer" title="View entry on {{e.link}} (V key)" target="_blank" href="{{e.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
                                         {% endif %}

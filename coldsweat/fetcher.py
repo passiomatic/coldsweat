@@ -244,13 +244,18 @@ class Fetcher(object):
             content_type, content = t.get_content(('text/plain', ''))
             thumbnail_url = t.get_thumbnail_url()
 
+            if 'html' in content_type:
+                parsed_content = markup.parse_html(content)
+            else:
+                parsed_content = content
+                
             entry = {
                 'feed_id': self.feed.id,
                 'guid': guid,
                 'link': link,
                 'title': t.get_title(default='Untitled'),
                 'author': t.get_author() or feed_author,
-                'content': markup.parse_html(content),
+                'content': parsed_content,
                 'content_type': content_type,
                 'thumbnail_url': thumbnail_url,
                 'published_on': timestamp

@@ -48,7 +48,7 @@ test:
 install-build-deps:
 	python -m pip install build twine
 
-build: clean
+build: clean build-css
 	python -m build
 
 check:

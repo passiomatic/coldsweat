@@ -1,8 +1,8 @@
 {
   "name": "coldsweat",
   "scripts": {
-    "build-css": "parcel build coldsweat/static/stylesheets/all.scss --dist-dir=coldsweat/static",
-    "watch-css": "parcel watch coldsweat/static/stylesheets/all.scss --dist-dir=coldsweat/static"
+    "build-css": "parcel build ./assets/stylesheets/all.scss --dist-dir=coldsweat/static",
+    "watch-css": "parcel watch ./assets/stylesheets/all.scss --dist-dir=coldsweat/static"
   },
   "keywords": [],
   "author": "Andrea Peltrin",

@@ -3321,7 +3321,7 @@ dialog {
   padding: 0;
 }
 
-dialog[open] {
+dialog:modal {
   opacity: 1;
   justify-content: center;
   align-items: center;

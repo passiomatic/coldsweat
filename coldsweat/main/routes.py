@@ -34,8 +34,10 @@ def entry_list():
         unread, saved, group or feed
     '''
     offset = flask.request.args.get('offset', 0, type=int)
+    # This three ids allow to restore the UI panels
     group_id = flask.request.args.get('group_id',  0, type=int)
     feed_id = flask.request.args.get('feed_id', 0, type=int)
+    #entry_id = flask.request.args.get('entry_id', 0, type=int)
 
     user = flask_login.current_user.db_user
 
@@ -48,10 +50,15 @@ def entry_list():
 
     groups_feeds = itertools.groupby(queries.get_groups_and_feeds(flask_login.current_user.db_user), lambda q: (q.group_id, q.group_title))
 
+    page_title = 'All Articles'
     if group_id:
         query = queries.get_group_entries(user, group_id)
+        # @@TODO actual group name 
+        page_title = 'Group name'
     elif feed_id: 
         query = queries.get_feed_entries(user, feed_id)
+        # @@TODO actual feed name 
+        page_title = 'Feed name'
     else:
         query = queries.get_all_entries(user)
 
@@ -76,6 +83,7 @@ def entry_list():
         'prev_date': flask.request.args.get('prev_date', None),
         'is_xhr': flask.request.args.get('xhr', 0, type=int),
         'filter': filter,
+        'page_title': page_title,
         'groups_feeds': groups_feeds
     }
     if offset:

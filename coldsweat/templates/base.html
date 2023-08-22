@@ -5,7 +5,9 @@ Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Coldsweat</title>
+{% block title_block %}
+    <title>Coldsweat</title>
+{% endblock %}
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel='stylesheet' href='{{ url_for("static", filename="all.css") }}'>

@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block title_block %}
+    <title>{{page_title}} • Coldsweat</title>
+{% endblock %}
+
 {% block container_block %} 
     <nav class="nav">
         <div class="nav__branding">
@@ -12,8 +16,8 @@
             <dd>
                 <details>
                     <summary>
-                        {% set request_url = url_for('main.entry_list', xhr=1) %}
-                        <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}', event)">
+                        {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
+                        <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
                             <i class="fa fa-list-ul"></i> All Articles
                         </button>
                     </summary>
@@ -41,15 +45,15 @@
                     <dd>
                         <details>
                             <summary>
-                                {% set request_url = url_for('main.entry_list', group_id=group_id, xhr=1) %}
-                                <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}', event)">
+                                {% set request_url = url_for('main.entry_list', _external=True, group_id=group_id, xhr=1) %}
+                                <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}', '{{group_title}}', event)">
                                     <i class="fa fa-folder"></i><span>{{group_title}}</span>                                    
                                 </button>
                             </summary>
                             <ul class="">
                                 {% for f in feeds %}
-                                    {% set request_url = url_for('main.entry_list', feed_id=f.id, xhr=1) %}
-                                    <li><button class="btn-item" type="button" onclick="Sweat.loadFolder('{{request_url}}', event)" value=""><img class="favicon" src="{{f.icon_url}}" width="16" height="16"  alt="*"><span>{{f.title}}</span></button></li>
+                                    {% set request_url = url_for('main.entry_list', _external=True, feed_id=f.id, xhr=1) %}
+                                    <li><button class="btn-item" type="button" onclick="Sweat.loadFolder('{{request_url}}', '{{f.title}}', event)" value=""><img class="favicon" src="{{f.icon_url}}" width="16" height="16"  alt="*"><span>{{f.title}}</span></button></li>
                                 {% endfor %} 
                             </ul>
                         </details>

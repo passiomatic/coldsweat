@@ -25,6 +25,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
 
         setup: function() { 
+            window.addEventListener("popstate", (event) => {
+                //console.log('popstate', event.state)
+            });
+
             // Prev
             hotkeys('j', function(event, handler){
                 var currentCardInput = listViewEl.querySelector(".entry .entry-card input:checked");
@@ -112,9 +116,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 }); 
         },
 
-        loadEntry: function(id, event) {
+        loadEntry: function(id, title, event) {
             Sweat.replaceElement(`template-${id}`, 'main', event);
             Sweat.mark(id, 'read');
+            //document.title = `${title} • Coldsweat`;
         },
 
         replaceElement: function(sourceId, targetId, event) {
@@ -125,7 +130,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
             event.preventDefault();
         },
         
-        loadFolder: function(url, event){
+        loadFolder: function(url, title, event){
             if(event) {
                 event.preventDefault();
             }
@@ -137,6 +142,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     response.text().then((text) => {
                         var entryListEl = document.getElementById('panel-content');
                         entryListEl.innerHTML = text;
+                        var newUrl = new URL(url);
+                        // We want to restore the whole page
+                        newUrl.searchParams.delete('xhr');
+                        history.pushState({}, '', newUrl.href)
+                        document.title = `${title} • Coldsweat`;
                     });
                 });              
         },

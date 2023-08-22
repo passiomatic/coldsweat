@@ -98,10 +98,5 @@
             {% endif %}
             <button class="btn-text" onclick="Sweat.loadMore('{{request_url}}')">More</button>
         </li>
-    {% endif %}
-    <script id="popover-content" type="text/html">
-        <a class="btn btn-small btn-default" href="{{ url_for('main.entry_list_mark', feed=feed_id ) }}" data-remote-modal>Mark as Read</a>
-        <a class="btn btn-small btn-default" href="{{ url_for('main.feed_edit', feed=feed_id ) }}" data-remote-modal="modal-feed-edit">About</a>
-        <a class="btn btn-small btn-error" href="{{ url_for('main.feed_remove', feed=feed_id ) }}" data-remote-modal>Remove</a>
-    </script>    
+    {% endif %} 
 {% endmacro %}

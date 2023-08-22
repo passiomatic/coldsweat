@@ -13,3 +13,14 @@ h6 {
     line-height: $line-height-small;
     font-weight: $font-weight-heading;
 }
+
+hr {
+    clear : both;
+    //display : block;
+    //margin : $baselineheight * 2 0;
+    padding : 0;
+    height : 1px;
+    border : 0;
+    border-top : 1px solid $border-color; 
+    margin: 1rem 0;
+}

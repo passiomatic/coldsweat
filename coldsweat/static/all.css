@@ -2524,6 +2524,15 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
 }
 
+hr {
+  clear: both;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #bbb7b7;
+  margin: 1rem 0;
+  padding: 0;
+}
+
 .form__title {
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -3140,7 +3149,7 @@ article .article__title {
 }
 
 article .article__content h1, article .article__content h2, article .article__content h3, article .article__content h4, article .article__content h5, article .article__content h6 {
-  margin: 1.5rem 0 .75em;
+  margin: 1.5rem 0 .75rem;
   font-weight: 600;
 }
 
@@ -3152,12 +3161,12 @@ article .article__content h3, article .article__content h4, article .article__co
   font-size: 1rem;
 }
 
-article .article__content p, article .article__content blockquote, article .article__content picture, article .article__content figure, article .article__content table, article .article__content ul, article .article__content ol, article .article__content dl {
-  margin: .75em 0;
+article .article__content blockquote, article .article__content picture, article .article__content figure, article .article__content table, article .article__content p, article .article__content ul, article .article__content ol, article .article__content dl {
+  margin: .75rem 0;
   padding: 0;
 }
 
-article .article__content p:first-child, article .article__content blockquote:first-child, article .article__content picture:first-child, article .article__content figure:first-child, article .article__content table:first-child, article .article__content ul:first-child, article .article__content ol:first-child, article .article__content dl:first-child {
+article .article__content blockquote:first-child, article .article__content picture:first-child, article .article__content figure:first-child, article .article__content table:first-child, article .article__content p:first-child, article .article__content ul:first-child, article .article__content ol:first-child, article .article__content dl:first-child {
   margin-top: 0;
 }
 
@@ -3191,14 +3200,10 @@ article .article__content iframe, article .article__content video, article .arti
   width: 100%;
 }
 
-article .article__content hr {
-  margin: 1.5em 0;
-}
-
 article .article__content .continue {
   clear: both;
   text-align: center;
-  margin: 1.5em 0 0;
+  margin: 2rem 0 1rem;
 }
 
 html, body {

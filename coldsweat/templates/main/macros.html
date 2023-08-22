@@ -46,11 +46,13 @@
                     <div class="entry expanded {%if e.id in saved_ids%}status-saved{% endif %} {%if e.id in read_ids %}status-read{% endif %}">
                         <div class="item-inner">
                             <article>
+                                <label class="toggle toggle-save">
+                                    <input class="sr-only" onchange="Sweat.markSaved({{e.id}}, event)" {{ 'checked' if e.id in saved_ids else '' }}  type="checkbox">
+                                    <div class="toggle-icon" title="Toggle save (S key)"></div>
+                                </label>
+
                                 <div class="meta dim">
                                     <span class="entry__feed"><a title="Show more entries for this feed" href="{{ url_for('main.entry_list', feed_id=e.feed.id) }}">{{e.feed.title}}</a></span>
-                                    <span class="actions">
-                                        {%if e.id in saved_ids%}<i class="save-trigger icon-saved fa fa-star" title="Unsave (S key)"></i>{% else %}<i class="save-trigger icon-unsaved fa fa-star-o" title="Save (S key)"></i>{% endif %}{%if e.id in read_ids %}<i class="read-trigger icon-read fa fa-circle-o" title="Mark as unread (M key)"></i>{% else %}<i class="read-trigger icon-unread fa fa-circle" title="Mark as read (M key)"></i>{% endif %}                    
-                                    </span>
                                 </div>
                                 <h1 class="article__title">{{e.title}}</h1>        
                                 {%if e.content %} 

@@ -449,7 +449,7 @@ a:hover, a:active {
   content: "";
 }
 
-.fa-star:before, .view2 .meta .icon-saved:before, .list-view > li .meta .icon-saved:before {
+.fa-star:before, .list-view > li .meta .icon-saved:before {
   content: "";
 }
 
@@ -2860,6 +2860,7 @@ main {
 .view2 .item-inner {
   background: #fff;
   padding: 2.25em;
+  position: relative;
   box-shadow: 0 1px .5rem #918e8ebf;
 }
 
@@ -2870,6 +2871,24 @@ main {
 .view2 .item-inner .favicon {
   float: left;
   margin: 4px 0 0 -24px;
+}
+
+.view2 .item-inner .toggle-save {
+  z-index: 1;
+  font-size: 1.25rem;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.view2 .item-inner .toggle-save .toggle-icon {
+  width: 24px;
+  height: 24px;
+  background: url("star.7834d1b0.svg") center / 100% no-repeat;
+}
+
+.view2 .item-inner .toggle-save input:checked ~ .toggle-icon {
+  background-image: url("star-fill.3deaafe5.svg");
 }
 
 .view2.status-disabled .item-inner {
@@ -2906,10 +2925,6 @@ main {
   margin-left: 12px;
 }
 
-.view2 .meta .icon-saved {
-  display: none;
-}
-
 .view2.status-read h3 a:link {
   color: #175b82b3;
 }
@@ -2923,15 +2938,6 @@ main {
 }
 
 .view2.status-read .meta .icon-unread {
-  display: none;
-}
-
-.view2.status-saved .meta .icon-saved {
-  display: inline-block;
-  transform: scale(1.3);
-}
-
-.view2.status-saved .meta .icon-unsaved {
   display: none;
 }
 
@@ -3025,10 +3031,17 @@ body {
 }
 
 .sr-only {
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  left: -999px;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  -webkit-clip-path: inset(50%) !important;
+  clip-path: inset(50%) !important;
+  height: 1px !important;
+  width: 1px !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  position: absolute !important;
+  overflow: hidden !important;
 }
 
 .w-100 {

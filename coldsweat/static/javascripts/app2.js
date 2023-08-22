@@ -153,6 +153,12 @@ window.addEventListener("DOMContentLoaded", (event) => {
             return dialogEl;
         },
 
+        markSaved: function(id, event) {
+            var toggle = event.target;
+            var new_value = toggle.checked ? 'saved' : 'unsaved'
+            Sweat.mark(id, new_value)
+        },
+
         mark: function(id, status) {
             var formData = new FormData();
             formData.append('mark', '')

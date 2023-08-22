@@ -1,7 +1,7 @@
 {% import "main/macros.html" as macros %}
 
 {% macro render_panel() %}
-    <ul id="entry-list" class="list-view">                      
+    <ul id="entry-list" class="list-view {{ '' if is_xhr == 1 else 'in' }}">                      
         {% if count %}
             {{ macros.render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) }}
         {% else %}
@@ -58,8 +58,6 @@
 {% else %}
     {% extends "main/index.html" %}
     {% block panel_block %}
-        <div id="panel-content" class="panel-content">
-            {{ render_panel() }}
-        </div>
+        {{ render_panel() }}
     {% endblock %}
 {% endif %}

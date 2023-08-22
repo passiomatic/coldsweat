@@ -280,7 +280,9 @@ white-space : nowrap; }
 
 @mixin zero {
 margin : 0;
-padding : 0; }
+padding : 0; 
+list-style: none;
+}
 
 // @include media-query-bp(UNIT, QUERY PART LEFT, QUERY PART RIGHT, TARGET)
 // NOTE: This MUST be used from within a selectore for the parent reference to work

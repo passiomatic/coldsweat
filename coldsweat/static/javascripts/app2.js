@@ -140,8 +140,14 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         throw new Error(`Server returned error ${response.status} while handling request ${url}`);
                     }
                     response.text().then((text) => {
-                        var entryListEl = document.getElementById('panel-content');
-                        entryListEl.innerHTML = text;
+                        var panelEl = document.getElementById('panel');
+                        panelEl.innerHTML = text;
+                        var listEl = panelEl.querySelector('.list-view')
+                        window.requestAnimationFrame((timeStamp) => {
+                                // Add on next frame top trigger entering anim 
+                                listEl.classList.add('in')
+                            }
+                        )
                         var newUrl = new URL(url);
                         // We want to restore the whole page
                         newUrl.searchParams.delete('xhr');

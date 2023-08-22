@@ -156,7 +156,6 @@
 // Card 
 
 .entry-card {
-    //position: relative;
 }
 
 .entry-card label {
@@ -179,11 +178,13 @@
     font-weight: 500;
     word-break: break-all;
     color: $color-primary;
+    margin-bottom: .25rem;    
 }
 
 .entry-card__status {
     opacity: 0;
     font-size: .75rem;
+    align-self: flex-start;
 }
 
 .status-read .entry-card__status {

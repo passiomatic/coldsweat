@@ -24,6 +24,10 @@ body {
     display: flex;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    line-height: $line-height-small;
+}
+
 // https://gist.github.com/ffoodd/000b59f431e3e64e4ce1a24d5bb36034
 .sr-only {
 	border: 0 !important;

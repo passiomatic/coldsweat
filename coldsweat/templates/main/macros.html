@@ -19,13 +19,13 @@
                         {% endif %}
                     </div>
                     <div>
+                        <h3 class="entry-card__title">
+                            {{e.title}}
+                        </h3>
                         <h4 class="entry-card__feed">
                             <!-- <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*"> -->
                             {{e.feed.title}}
                         </h4>
-                        <h3 class="entry-card__title">
-                            {{e.title}}
-                        </h3>
                     </div>
                     {%if e.thumbnail_url %} 
                         <div class="entry-card__thumbnail">

@@ -2821,11 +2821,13 @@ input.search-query {
 .entry-card__title {
   word-break: break-all;
   color: #175b82;
+  margin-bottom: .25rem;
   font-weight: 500;
 }
 
 .entry-card__status {
   opacity: 0;
+  align-self: flex-start;
   font-size: .75rem;
 }
 
@@ -3024,8 +3026,17 @@ article .article__title {
   font-weight: 600;
 }
 
-article .article__content h1 {
-  border: none;
+article .article__content h1, article .article__content h2, article .article__content h3, article .article__content h4, article .article__content h5, article .article__content h6 {
+  margin: 1.5rem 0 .75em;
+  font-weight: 600;
+}
+
+article .article__content h1, article .article__content h2 {
+  font-size: 1.25rem;
+}
+
+article .article__content h3, article .article__content h4, article .article__content h5, article .article__content h6 {
+  font-size: 1rem;
 }
 
 article .article__content p, article .article__content blockquote, article .article__content picture, article .article__content figure, article .article__content table, article .article__content ul, article .article__content ol, article .article__content dl {
@@ -3040,6 +3051,7 @@ article .article__content p:first-child, article .article__content blockquote:fi
 article .article__content blockquote {
   color: #9c1c1e;
   padding: 0 24px;
+  font-size: .925em;
 }
 
 article .article__content blockquote p:last-child {
@@ -3086,6 +3098,10 @@ html, body {
 
 body {
   display: flex;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
 }
 
 .sr-only {

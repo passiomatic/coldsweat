@@ -203,11 +203,19 @@ article {
     }
     .article__content {
 
-
         // Headings
 
-        h1 {
-            border: none;
+        h1, h2, h3, h4, h5, h6 {
+            margin: 1.5rem 0 $baselineheight/2 0;
+            font-weight: 600;
+        }
+
+        h1, h2 {
+            font-size: $font-size-large;
+        }
+
+        h3, h4, h5, h6 {
+            font-size: $font-size-base;
         }
 
         // Other common block-level elements 
@@ -231,6 +239,7 @@ article {
         blockquote {
             color: $secondarycolor;
             padding: 0 $gutterwidth;
+            font-size: 0.925em; // A tad smaller...
 
             p:last-child {
                 margin-bottom: 0;

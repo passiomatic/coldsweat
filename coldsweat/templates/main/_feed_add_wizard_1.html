@@ -1,14 +1,14 @@
 
 
 {% macro render_form() %}
-    <form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.feed_add_1', ) }}" method="POST">
+    <form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.feed_add_1') }}" method="POST">
         <div class="form__title">
             <h3>Add Feed Subscription</h3>
         </div>
         <div class="">          
                 <fieldset>
                     <label class="form-label" for="self-link-field">Web address for the site or feed</label> 
-                    <input class="form-field" type="text" id="self-link-field" autofocus name="self_link" required size="40" value="{{self_link}}" placeholder="">                    
+                    <input class="form-field" type="text" id="self-link-field" autofocus name="self_link" required size="40" value="{{self_link}}">                    
                     <p>
                         <small>For example: theverge.com or http://www.reddit.com/top/.rss</small>
                     </p>

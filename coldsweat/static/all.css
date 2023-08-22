@@ -2544,6 +2544,64 @@ input.search-query {
   background-color: #711416;
 }
 
+.text-success {
+  color: #5eb337;
+}
+
+.text-warning {
+  color: #f7ea9c;
+}
+
+.text-danger {
+  color: #9c1c1e;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.align-items-end {
+  align-items: end;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.mr-auto {
+  margin-left: right;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+.mb-auto {
+  margin-bottom: auto;
+}
+
+.d-grid {
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  display: grid;
+}
+
 .tree-view {
   margin: 0;
   padding: 0;

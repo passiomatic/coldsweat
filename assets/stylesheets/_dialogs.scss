@@ -1,0 +1,42 @@
+// HTML 5 dialogs styling
+
+dialog {
+    background: transparent;
+    border: 0;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    color: $text-color;
+    // transition: transform .3s ease-out, opacity .3s ease-out;
+    // transform: translate(0%, -5%);
+}
+
+//dialog.in {
+dialog:modal {
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    //transform: translate(0%, 0%);
+}
+
+dialog::backdrop {
+    background: rgba($color-neutral-200, .75);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+dialog button[name="close"] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.dialog-content {
+    padding: 2rem;
+    background: $white;
+    border-radius: .75rem;
+}

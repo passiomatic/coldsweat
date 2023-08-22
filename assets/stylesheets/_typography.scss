@@ -1,0 +1,15 @@
+body {
+    // Keep browser default font size and scaled everything accordingly 
+    font: normal 1em/#{$line-height} $font-family;
+    color: $text-color;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: $line-height-small;
+    font-weight: $font-weight-heading;
+}

@@ -3,6 +3,9 @@
 
 // Import all SASS Bootstrap imports
 @import 'imports';
+@import 'dialogs';
+@import 'typography';
+@import 'forms';
 @import 'buttons';
 @import 'helpers';
 @import 'tree-view';
@@ -14,41 +17,11 @@ html,
 body {
     height: 100%;
     overflow-y: hidden;
-    // Keep browser default font size and scaled everythign accordingly 
-    font: normal 1em/#{$line-height} $font-family;
-    color: $text-color;
     background: $body-background;
 }
 
 body {
     display: flex;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    line-height: $line-height-small;
-}
-
-// https://gist.github.com/ffoodd/000b59f431e3e64e4ce1a24d5bb36034
-.sr-only {
-	border: 0 !important;
-	clip: rect(1px, 1px, 1px, 1px) !important; /* 1 */
-	-webkit-clip-path: inset(50%) !important;
-		clip-path: inset(50%) !important;  /* 2 */
-	height: 1px !important;
-	margin: -1px !important;
-	overflow: hidden !important;
-	padding: 0 !important;
-	position: absolute !important;
-	width: 1px !important;
-	white-space: nowrap !important;            /* 3 */
-}
-
-.w-100 {
-    width: 100%;
-}
-
-.h-100 {
-    height: 100%;
 }
 
 .dim {
@@ -83,54 +56,6 @@ h1, h2, h3, h4, h5, h6 {
 
     .icon-saved {
         color: #ebcd0c;
-    }
-}
-
-.expanded {
-    .meta {
-        .entry__feed {
-            text-transform: uppercase;
-            font-size: $font-size-xsmall;
-        }
-
-        .actions {
-            float: right;
-        }
-    }
-}
-
-
-.help-text {
-    //@extend abbr[title];
-}
-
-fieldset {
-    margin-bottom: .75rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: .375rem;
-}
-
-.form-field {
-    font-size: $font-size-base;
-    padding: .375rem;
-    border: 1px solid $border-color;
-    border-radius: .1875rem;
-    width: 100%;
-}
-
-small {
-    font-size: $font-size-small;
-    color: $text-color-muted;
-}
-
-.tooltip {
-    white-space: nowrap;
-
-    &.bottom {
-        margin-bottom: 7px;
     }
 }
 
@@ -375,58 +300,3 @@ nav {
     border: 1px solid darken($error-color, 10%);    
 }
 
-// Dialogs 
-
-dialog {
-    background: transparent;
-    border: 0;
-    opacity: 0;
-    padding: 0;
-    margin: 0;
-    width: 100vw;
-    height: 100vh;
-    color: $text-color;
-    // transition: transform .3s ease-out, opacity .3s ease-out;
-    // transform: translate(0%, -5%);
-}
-
-//dialog.in {
-dialog:modal {
-    opacity: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    //transform: translate(0%, 0%);
-}
-
-dialog::backdrop {
-    background: rgba($color-neutral-200, .75);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
-
-dialog button[name="close"] {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1;
-}
-
-.dialog-content {
-    padding: 2rem;    
-    background: $white;
-    border-radius: .75rem;
-}
-
-
-// Forms 
-
-.form__title {
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1rem;
-}
-
-.form__buttons {
-    margin-top: 1rem;
-}

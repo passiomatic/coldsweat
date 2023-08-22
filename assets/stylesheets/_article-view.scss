@@ -12,6 +12,12 @@ main {
     max-width: 75ch;
     margin: 2rem auto;
 
+    // .entry__feed {
+    //     text-transform: uppercase;
+    //     font-size: $font-size-xsmall;
+    //     color: $text-color-muted;        
+    // }
+
 
     &.heading {
         @include clearfix;

@@ -1,0 +1,35 @@
+.form {
+
+}
+
+.form__title {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: .375rem;
+}
+
+.form-field {
+    font-size: $font-size-base;
+    padding: .375rem;
+    border: 1px solid $border-color;
+    border-radius: .1875rem;
+    width: 100%;
+}
+
+.form__buttons {
+    margin-top: 1rem;
+}
+
+.help-text {
+    //@extend abbr[title];
+}
+
+fieldset {
+    margin-bottom: .75rem;
+}
+

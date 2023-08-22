@@ -12,6 +12,48 @@
     color: $danger-color;
 }
 
+.text-muted {
+    color: $text-color-muted;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+// Fonts
+
+.xsmall {
+    font-size: $font-size-xsmall;
+}
+
+.small,
+small {
+    font-size: $font-size-small;
+}
+
+// .regular {
+//     font-size: $font-size-base;
+// }
+
+.large {
+    font-size: $font-size-large;
+}
+
+.xlarge {
+    font-size: $font-size-xlarge;
+}
+
+
+// Sizing
+
+.w-100 {
+    width: 100%;
+}
+
+.h-100 {
+    height: 100%;
+}
+
 // Flexbox 
 
 .d-flex {
@@ -43,7 +85,7 @@
 }
 
 .mr-auto {
-    margin-left: right;
+    margin-right: auto;
 }
 
 .mt-auto {
@@ -54,7 +96,7 @@
     margin-bottom: auto;
 }
 
-/* Easy equal width columns grid */
+// Easy equal width columns grid
 
 .d-grid {
     display: grid;
@@ -62,3 +104,17 @@
     grid-auto-columns: 1fr;
 }
 
+// From https://gist.github.com/ffoodd/000b59f431e3e64e4ce1a24d5bb36034
+.sr-only {
+    border: 0 !important;
+    clip: rect(1px, 1px, 1px, 1px) !important;
+    -webkit-clip-path: inset(50%) !important;
+    clip-path: inset(50%) !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+}

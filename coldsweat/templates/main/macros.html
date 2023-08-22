@@ -51,8 +51,9 @@
                                     <div class="toggle-icon" title="Toggle save (S key)"></div>
                                 </label>
 
-                                <div class="meta dim">
-                                    <span class="entry__feed"><a title="Show more entries for this feed" href="{{ url_for('main.entry_list', feed_id=e.feed.id) }}">{{e.feed.title}}</a></span>
+                                <div class="">
+                                    {% set feed_url = url_for('main.entry_list', feed_id=e.feed.id) %}
+                                    <button class="btn-text text-muted xsmall text-uppercase" onclick="Sweat.loadFolder('{{feed_url}}')">{{e.feed.title}}</button>
                                 </div>
                                 <h1 class="article__title">{{e.title}}</h1>        
                                 {%if e.content %} 

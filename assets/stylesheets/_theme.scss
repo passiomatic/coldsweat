@@ -14,17 +14,10 @@ $font-family: system-ui, -apple-system, "Helvetica Neue", Arial, Helvetica, sans
 $font-family-alt : $font-family;
 $font-family-code: Consolas, Menlo, Monaco, "Courier New", monospace;
 
-$font-weight: normal;
+$font-weight: 400;
+$font-weight-heading : 600;
 
-// Your headings may inherit the base typeface, or you may set a different font stack
-//$baseheadingfont : inherit;
-
-// Choose between normal, bold or set a font-weight number (eg: 700) for your headings
-$font-weight-heading : 500;
-
-// Your headings may inherit the $textcolor, or you may set a different colour
 $heading-color : inherit;
-
 
 // Colors 
 

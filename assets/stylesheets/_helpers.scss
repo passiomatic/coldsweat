@@ -1,19 +1,19 @@
 // Texts
 
 .text-success {
-    color: $success-color;
+    color: $success-color !important;
 }
 
 .text-warning {
-    color: $warning-color;
+    color: $warning-color !important;
 }
 
 .text-danger {
-    color: $danger-color;
+    color: $danger-color !important;
 }
 
 .text-muted {
-    color: $text-color-muted;
+    color: $text-color-muted !important;
 }
 
 .text-uppercase {
@@ -23,12 +23,12 @@
 // Fonts
 
 .xsmall {
-    font-size: $font-size-xsmall;
+    font-size: $font-size-xsmall !important;
 }
 
 .small,
 small {
-    font-size: $font-size-small;
+    font-size: $font-size-small !important;
 }
 
 // .regular {
@@ -36,11 +36,11 @@ small {
 // }
 
 .large {
-    font-size: $font-size-large;
+    font-size: $font-size-large !important;
 }
 
 .xlarge {
-    font-size: $font-size-xlarge;
+    font-size: $font-size-xlarge !important;
 }
 
 

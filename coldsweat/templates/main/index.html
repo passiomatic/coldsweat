@@ -53,7 +53,9 @@
                             <ul class="">
                                 {% for f in feeds %}
                                     {% set request_url = url_for('main.entry_list', _external=True, feed_id=f.id, xhr=1) %}
-                                    <li><button class="btn-item" type="button" onclick="Sweat.loadFolder('{{request_url}}', '{{f.title}}', event)" value=""><img class="favicon" src="{{f.icon_url}}" width="16" height="16"  alt="*"><span>{{f.title}}</span></button></li>
+                                    <li><button class="btn-item" type="button" onclick="Sweat.loadFolder('{{request_url}}', '{{f.title}}', event)"><img class="favicon" src="{{f.icon_url}}" width="16" height="16"  alt="*">
+                                        <span class="{{ '' if f.enabled else 'feed-dead' }}">{{f.title}}</span></button>
+                                    </li>
                                 {% endfor %} 
                             </ul>
                         </details>

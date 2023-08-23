@@ -91,8 +91,11 @@
     .btn-item {
         font-size: $font-size-xsmall;
         padding: .5rem 1.5rem .5rem 1.5rem;
+    }
 
-     
+    .feed-dead {
+        text-decoration: line-through;
+        color: $color-neutral-200;
     }
 }
 

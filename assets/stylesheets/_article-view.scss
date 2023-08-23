@@ -3,6 +3,18 @@ main {
     flex-grow: 1;
     overflow-y: auto;
     height: 100vh;
+
+    .entry {
+        transform: translateX(-1.5rem);
+        opacity: 0.75;
+        transition: transform .16s ease-out, opacity .16s ease-out;
+    }
+    
+    // Entering
+    &.in .entry {
+        transform: translateX(0);
+        opacity: 1;                
+    }
 }
 
 
@@ -11,13 +23,6 @@ main {
     @include zero;
     max-width: 75ch;
     margin: 2rem auto;
-
-    // .entry__feed {
-    //     text-transform: uppercase;
-    //     font-size: $font-size-xsmall;
-    //     color: $text-color-muted;        
-    // }
-
 
     &.heading {
         @include clearfix;
@@ -105,14 +110,6 @@ main {
             }
         }
     }
-
-    &.status-sick {
-
-        .item-inner {
-            background-color: $warningcolor;
-        }
-    }
-
 
     .item-inner {
         border-bottom: 1px solid $lightestneutralcolor;

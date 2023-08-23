@@ -3020,6 +3020,17 @@ main {
   overflow-y: auto;
 }
 
+main .entry {
+  opacity: .75;
+  transition: transform .16s ease-out, opacity .16s ease-out;
+  transform: translateX(-1.5rem);
+}
+
+main.in .entry {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .view2 {
   max-width: 75ch;
   margin: 2rem auto;
@@ -3102,10 +3113,6 @@ main {
 
 .view2.status-disabled .item-inner h3 {
   text-decoration: line-through;
-}
-
-.view2.status-sick .item-inner {
-  background-color: #f7ea9c;
 }
 
 .view2 .item-inner {

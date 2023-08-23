@@ -117,17 +117,25 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         loadEntry: function(id, title, event) {
-            Sweat.replaceElement(`template-${id}`, 'main', event);
+            var mainEl = document.getElementById('main');
+            // Remove any previous animation triggers
+            mainEl.classList.remove('in')
+            Sweat.replaceElementWithTemplate(`template-${id}`, mainEl, event);            
+            window.requestAnimationFrame((timeStamp) => {
+                // Add on next frame to trigger entering animation
+                mainEl.classList.add('in')
+            })
+
             Sweat.mark(id, 'read');
             //document.title = `${title} • Coldsweat`;
+            event.preventDefault();
         },
 
-        replaceElement: function(sourceId, targetId, event) {
-            var sourceEl = document.getElementById(sourceId);
-            var targetEl = document.getElementById(targetId);
-            var sourceEl_ = sourceEl.content.firstElementChild.cloneNode(true);
-            targetEl.replaceChildren(...[sourceEl_]);
-            event.preventDefault();
+        replaceElementWithTemplate: function(templateId, targetEl, event) {
+            var templateEl = document.getElementById(templateId);
+            //var targetEl = document.getElementById(targetId);
+            var sourceElCopy = templateEl.content.firstElementChild.cloneNode(true);
+            targetEl.replaceChildren(...[sourceElCopy]);
         },
         
         loadFolder: function(url, title, event){
@@ -144,7 +152,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         panelEl.innerHTML = text;
                         var listEl = panelEl.querySelector('.list-view')
                         window.requestAnimationFrame((timeStamp) => {
-                                // Add on next frame top trigger entering anim 
+                                // Add on next frame to trigger entering animation 
                                 listEl.classList.add('in')
                             }
                         )

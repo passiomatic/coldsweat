@@ -56,7 +56,7 @@ class Fetcher(object):
         '''
         Internal server error
         '''
-        self.feed.error_count += 1
+        #self.feed.error_count += 1
         self.feed.last_status = response.status_code
         app.logger.warning(
             "%s has caused an error on server, skipped" % self.netloc)
@@ -163,7 +163,7 @@ class Fetcher(object):
         except RequestException:
             # Record any network error as 'Service Unavailable'
             self.feed.last_status = exceptions.ServiceUnavailable.code
-            self.feed.error_count += 1
+            #self.feed.error_count += 1
             app.logger.warning(
                 "a network error occured while fetching %s, skipped"
                 % self.netloc)
@@ -196,7 +196,6 @@ class Fetcher(object):
             self.feed.save()
 
     def check_feed_health(self):
-        # @@TODO Increase error_count only with 4xx errors
         if self.feed.error_count > MAX_FETCH_ERRORS:
             self._synthesize_entry(
                 'Feed has accumulated too many errors (last was %s).'

@@ -1,13 +1,13 @@
 // Theme vars
 @import 'theme';
 
-// Import all SASS Bootstrap imports
+// Import all SASS modules
 @import 'imports';
-@import 'dialogs';
 @import 'typography';
+@import 'helpers';
+@import 'dialogs';
 @import 'forms';
 @import 'buttons';
-@import 'helpers';
 @import 'tree-view';
 @import 'list-view';
 @import 'article-view';

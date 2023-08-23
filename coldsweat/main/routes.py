@@ -62,13 +62,14 @@ def entry_list():
     else:
         query = queries.get_all_entries(user)
 
-    filter = flask.request.args.get('filter', 'unread')
+    # Check URL or cookie value for current filter
+    filter = flask.request.args.get('filter') or flask.request.cookies.get('filter')
     if filter == 'saved':
         query = query.where(Entry.id << Saved.select(Saved.entry).where(Saved.user == user))
     elif filter == 'unread':
         query = query.where(~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
     else:
-        pass
+        filter = 'archive'
 
     view_variables = {
         'entries': query.order_by(

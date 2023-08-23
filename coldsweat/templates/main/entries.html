@@ -35,7 +35,7 @@
             </label>
             <label class="radio-switch__label">
                 {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}', '', event)" {% if filter == 'archive' %}checked{% endif %}  value="all" class="radio-switch__input" /><i class="fa fa-archive"></i>
+                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}', '', event)" {% if filter == 'archive' %}checked{% endif %}  value="archive" class="radio-switch__input" /><i class="fa fa-archive"></i>
             </label>
         </div>
         <div>

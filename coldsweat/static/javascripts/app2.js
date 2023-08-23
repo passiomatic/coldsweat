@@ -160,7 +160,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         // We want to restore the whole page
                         newUrl.searchParams.delete('xhr');
                         history.pushState({}, '', newUrl.href)
-                        document.title = `${title} • Coldsweat`;
+                        if(title) {
+                            document.title = `${title} • Coldsweat`;
+                        }
                     });
                 });              
         },

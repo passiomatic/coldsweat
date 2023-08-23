@@ -17,6 +17,7 @@
     .heading {
         position: sticky;
         top: 0;
+        z-index: 1;
         padding: .5rem 1.5rem;
         background: $color-neutral-600;
         border-bottom: 1px dotted $border-color;
@@ -35,15 +36,24 @@
 
     .heading,
     .entry {
-        transform: translateY(-1rem);
-        opacity: 0.3;
-        transition: transform .16s ease-out, opacity .16s ease-out;
+        transform: translateX(-1rem);
+        opacity: 0.5;
+        transition: transform .16s ease-out .22s, opacity .16s ease-out .22s;
+    }
+
+    // Apply an incremental delay up to the first 10 entries up to 0.2s
+    @for $i from 1 through 10 {
+        .heading:nth-child(#{$i}),
+        .entry:nth-child(#{$i}) {
+            // Override default delay 
+            transition-delay: calc(.02s * #{$i});
+        }
     }
 
     // Entering
     &.in .heading,
     &.in .entry {
-        transform: translateY(0);
+        transform: translateX(0);
         opacity: 1;
     }
 

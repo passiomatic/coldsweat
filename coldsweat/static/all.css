@@ -2830,6 +2830,7 @@ fieldset {
 }
 
 .list-view .heading {
+  z-index: 1;
   background: #ece9e9;
   border-bottom: 1px dotted #bbb7b7;
   padding: .5rem 1.5rem;
@@ -2849,14 +2850,54 @@ fieldset {
 }
 
 .list-view .heading, .list-view .entry {
-  opacity: .3;
-  transition: transform .16s ease-out, opacity .16s ease-out;
-  transform: translateY(-1rem);
+  opacity: .5;
+  transition: transform .16s ease-out .22s, opacity .16s ease-out .22s;
+  transform: translateX(-1rem);
+}
+
+.list-view .heading:first-child, .list-view .entry:first-child {
+  transition-delay: 20ms;
+}
+
+.list-view .heading:nth-child(2), .list-view .entry:nth-child(2) {
+  transition-delay: 40ms;
+}
+
+.list-view .heading:nth-child(3), .list-view .entry:nth-child(3) {
+  transition-delay: 60ms;
+}
+
+.list-view .heading:nth-child(4), .list-view .entry:nth-child(4) {
+  transition-delay: 80ms;
+}
+
+.list-view .heading:nth-child(5), .list-view .entry:nth-child(5) {
+  transition-delay: 100ms;
+}
+
+.list-view .heading:nth-child(6), .list-view .entry:nth-child(6) {
+  transition-delay: .12s;
+}
+
+.list-view .heading:nth-child(7), .list-view .entry:nth-child(7) {
+  transition-delay: .14s;
+}
+
+.list-view .heading:nth-child(8), .list-view .entry:nth-child(8) {
+  transition-delay: .16s;
+}
+
+.list-view .heading:nth-child(9), .list-view .entry:nth-child(9) {
+  transition-delay: .18s;
+}
+
+.list-view .heading:nth-child(10), .list-view .entry:nth-child(10) {
+  transition-delay: .2s;
 }
 
 .list-view.in .heading, .list-view.in .entry {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 .list-view.status-read h3 a:link {

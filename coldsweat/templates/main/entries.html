@@ -45,7 +45,8 @@
                     <i class="fa fa-cog"></i>
                 </button>
             {% elif group_id %}
-                <button onclick="" class="btn-text">
+                {% set group_edit_url = url_for('main.group_edit', group_id=group_id ) %}
+                <button  onclick="Sweat.openRemoteDialog('{{group_edit_url}}', event)" class="btn-text">
                     <i class="fa fa-cog"></i>
                 </button>
             {% endif %}

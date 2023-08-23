@@ -1,0 +1,17 @@
+<form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.group_edit', group_id=group.id) }}" method="POST">
+  <div class="form__title">
+    <h3 class="d-flex align-items-center">
+      <i class="fa fa-folder fa-fw"></i>&ensp;{{group.title}}
+    </h3>
+  </div>
+  <div class="">          
+        <fieldset>
+          <label class="form-label" for="field-title">Title</label> 
+          <input class="form-field" type="text" autofocus required id="field-title" name="title" size="40" value="{{group.title}}">
+        </fieldset>
+        
+  </div>
+  <div class="form__buttons">
+    <button type="submit" name="button_save" value="1" class="btn btn-primary">Save Changes</button>    
+  </div>
+</form>

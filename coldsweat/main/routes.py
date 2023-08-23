@@ -237,6 +237,35 @@ def entry_list_mark():
     return _render_script('main/_modal_done.js', location=redirect_url)
 
 
+@bp.route('/groups/edit', methods=['GET', 'POST'])
+@flask_login.login_required
+def group_edit():
+    group_id = flask.request.args.get('group_id', 0, type=int)
+
+    try:
+        group = Group.get(Group.id == group_id)
+    except Group.DoesNotExist:
+        flask.abort(404, 'No such group %s' % group_id)
+
+    user = flask_login.current_user.db_user
+
+    # Collect editable fields
+    #title = group.title
+
+    if flask.request.method == 'GET':
+        return flask.render_template('main/_group_edit.html', group=group)
+
+    # Handle postback
+    title = flask.request.form.get('title', '').strip()
+    if not title:
+        flask.flash('Error, group title cannot be empty.', category="error")
+        return flask.render_template('main/_group_edit.html', **locals())
+    group.title = title
+    group.save()
+    flask.flash('Changes have been saved.')
+    return _render_script('main/_modal_done.js', location=flask.url_for("main.entry_list", group=group.id))
+
+
 @bp.route('/feeds/edit', methods=['GET', 'POST'])
 @flask_login.login_required
 def feed_edit():

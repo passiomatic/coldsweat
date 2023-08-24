@@ -1957,7 +1957,6 @@ a:hover, a:active {
   margin: 8px 0 0;
   padding: 0;
   font-size: 1.6rem;
-  list-style: none;
 }
 
 .modal-header h3 {
@@ -2478,7 +2477,7 @@ input.search-query {
 }
 
 body {
-  color: #252424;
+  color: #161515;
   font: 1em / 1.5 system-ui, -apple-system, Helvetica Neue, Arial, Helvetica, sans-serif;
 }
 
@@ -2491,7 +2490,7 @@ hr {
   clear: both;
   height: 1px;
   border: 0;
-  border-top: 1px solid #bbb7b7;
+  border-top: 1px solid #b9b0b0;
   margin: 1rem 0;
   padding: 0;
 }
@@ -2509,7 +2508,7 @@ hr {
 }
 
 .text-muted {
-  color: #918e8e !important;
+  color: #837c7c !important;
 }
 
 .text-uppercase {
@@ -2604,7 +2603,7 @@ dialog {
   opacity: 0;
   width: 100vw;
   height: 100vh;
-  color: #252424;
+  color: #161515;
   background: none;
   border: 0;
   margin: 0;
@@ -2622,7 +2621,7 @@ dialog::backdrop {
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  background: #5e5c5cbf;
+  background: #4c4949bf;
 }
 
 dialog button[name="close"] {
@@ -2651,7 +2650,7 @@ dialog button[name="close"] {
 
 .form-field {
   width: 100%;
-  border: 1px solid #bbb7b7;
+  border: 1px solid #b9b0b0;
   border-radius: .1875rem;
   padding: .375rem;
   font-size: 1rem;
@@ -2696,7 +2695,6 @@ fieldset {
   border: 0;
   margin: 0;
   padding: 0;
-  list-style: none;
 }
 
 .btn-disabled {
@@ -2729,7 +2727,6 @@ fieldset {
 .tree-view {
   margin: 0;
   padding: 0;
-  list-style: none;
 }
 
 .tree-view dt {
@@ -2737,13 +2734,11 @@ fieldset {
   padding: 0 .75rem;
   font-size: .75rem;
   font-weight: 700;
-  list-style: none;
 }
 
 .tree-view dd {
   margin: 0;
   padding: 0;
-  list-style: none;
 }
 
 .tree-view dd ul {
@@ -2753,7 +2748,6 @@ fieldset {
 .tree-view dd ul li {
   margin: 0;
   padding: 0;
-  list-style: none;
   display: flex;
 }
 
@@ -2795,7 +2789,6 @@ fieldset {
   margin: 0;
   padding: .5rem;
   font-size: .875rem;
-  list-style: none;
   display: flex;
 }
 
@@ -2815,29 +2808,27 @@ fieldset {
 }
 
 .tree-view .feed-dead {
-  color: #5e5c5c;
+  color: #4c4949;
   text-decoration: line-through;
 }
 
 .list-view {
   height: 100vh;
-  border-right: 1px solid #bbb7b7;
+  border-right: 1px solid #b9b0b0;
   margin: 0 auto;
   padding: 0;
-  list-style: none;
   overflow-y: auto;
 }
 
 .list-view li {
   margin: 0;
   padding: 0;
-  list-style: none;
 }
 
 .list-view .heading {
   z-index: 1;
-  background: #ece9e9;
-  border-bottom: 1px dotted #bbb7b7;
+  background: #e2dede;
+  border-bottom: 1px dotted #b9b0b0;
   padding: .5rem 1.5rem;
   position: sticky;
   top: 0;
@@ -2845,13 +2836,13 @@ fieldset {
 
 .list-view .heading h2 {
   text-transform: uppercase;
-  color: #918e8e;
+  color: #837c7c;
   letter-spacing: 1px;
   font-size: .875rem;
 }
 
 .list-view .entry {
-  border-bottom: 1px dotted #bbb7b7;
+  border-bottom: 1px dotted #b9b0b0;
 }
 
 .list-view .heading, .list-view .entry {
@@ -2943,7 +2934,7 @@ fieldset {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 2;
-  background-color: #bbb7b7b3;
+  background-color: #b9b0b0b3;
   justify-content: space-between;
   align-items: center;
   padding: .5rem 0;
@@ -2982,7 +2973,7 @@ fieldset {
 }
 
 .status-read .entry-card__status {
-  color: #918e8e;
+  color: #837c7c;
   opacity: .45;
 }
 
@@ -2993,7 +2984,7 @@ fieldset {
 
 .entry-card__feed {
   text-transform: uppercase;
-  color: #918e8e;
+  color: #837c7c;
   align-items: center;
   gap: .25rem;
   font-size: .75rem;
@@ -3082,7 +3073,7 @@ main.in .entry {
   background: #fff;
   padding: 2.25em;
   position: relative;
-  box-shadow: 0 1px .5rem #918e8ebf;
+  box-shadow: 0 1px .5rem #837c7cbf;
 }
 
 .view2 .item-inner > h3 a {
@@ -3176,7 +3167,7 @@ article:after {
 }
 
 article .article__title {
-  border-bottom: 5px double #bbb7b7;
+  border-bottom: 5px double #b9b0b0;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   font-size: 1.5rem;
@@ -3199,7 +3190,6 @@ article .article__content h3, article .article__content h4, article .article__co
 article .article__content blockquote, article .article__content picture, article .article__content figure, article .article__content table, article .article__content p, article .article__content ul, article .article__content ol, article .article__content dl {
   margin: .75rem 0;
   padding: 0;
-  list-style: none;
 }
 
 article .article__content blockquote:first-child, article .article__content picture:first-child, article .article__content figure:first-child, article .article__content table:first-child, article .article__content p:first-child, article .article__content ul:first-child, article .article__content ol:first-child, article .article__content dl:first-child {
@@ -3217,7 +3207,7 @@ article .article__content blockquote p:last-child {
 }
 
 article .article__content figcaption {
-  color: #918e8e;
+  color: #837c7c;
   font-size: .875rem;
   font-style: italic;
 }
@@ -3225,7 +3215,6 @@ article .article__content figcaption {
 article .article__content li, article .article__content dd {
   margin: 0 0 .375em 24px;
   padding: 0;
-  list-style: none;
 }
 
 article .article__content img {
@@ -3245,7 +3234,7 @@ article .article__content .continue {
 
 html, body {
   height: 100%;
-  background: #d9d5d5;
+  background: #cec7c7;
   overflow-y: hidden;
 }
 
@@ -3286,7 +3275,6 @@ footer[role="contentinfo"] {
   text-align: center;
   margin: 4.5em 0 1.5em;
   padding: 0;
-  list-style: none;
 }
 
 footer[role="contentinfo"] .fa-heart {
@@ -3305,7 +3293,6 @@ dl.shortcuts {
   margin: 0;
   padding: 0;
   font-size: 1.4rem;
-  list-style: none;
 }
 
 dl.shortcuts dt {
@@ -3385,7 +3372,7 @@ pre {
 
 nav {
   height: 100vh;
-  background: #bbb7b7;
+  background: #b9b0b0;
   flex-direction: column;
   flex-basis: 15rem;
   display: flex;
@@ -3402,11 +3389,10 @@ nav {
   min-width: 12em;
   z-index: 4;
   background: #fff;
-  border: 1px solid #bbb7b7;
+  border: 1px solid #b9b0b0;
   border-radius: 3px;
   margin: 0;
   padding: 0;
-  list-style: none;
   display: none;
   position: absolute;
   top: -3px;
@@ -3416,7 +3402,7 @@ nav {
 
 .dropdown .dropdown-menu a {
   white-space: nowrap;
-  border-bottom: 1px solid #bbb7b7;
+  border-bottom: 1px solid #b9b0b0;
   font-size: 1.4rem;
 }
 
@@ -3438,7 +3424,7 @@ nav {
 }
 
 .radio-switch {
-  background-color: #d9d5d5;
+  background-color: #cec7c7;
   border-radius: .5rem;
   gap: .75rem;
   padding: .25rem;
@@ -3474,7 +3460,7 @@ nav {
 }
 
 .alert {
-  color: #252424;
+  color: #161515;
   background-color: #afccdf;
   border: 1px solid #679dc2;
   border-radius: .375rem;

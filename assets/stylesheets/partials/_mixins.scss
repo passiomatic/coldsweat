@@ -281,7 +281,6 @@ white-space : nowrap; }
 @mixin zero {
 margin : 0;
 padding : 0; 
-list-style: none;
 }
 
 // @include media-query-bp(UNIT, QUERY PART LEFT, QUERY PART RIGHT, TARGET)

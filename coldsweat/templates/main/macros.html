@@ -69,8 +69,11 @@
                                     </div>            
                                     <hr class="">
                                 {% endif %}
-                                <div class="small text-muted">    
-                                    <i class="fa fa-info-circle"></i> Posted {{e.published_on|datetime }} {%if e.author %} by {{ e.author }}{% endif %}                                              
+                                <div class="d-flex justify-content-between">
+                                    <div class="small text-muted">    
+                                        <i class="fa fa-info-circle"></i> Posted {{e.published_on|datetime }} {%if e.author %} by {{ e.author }}{% endif %}                                              
+                                    </div>
+                                    <button class="btn-text small text-muted" onclick="Sweat.shareEntry({title:'{{e.title}}', url:'{{e.link}}'})" type="button">Share</button>
                                 </div>
                             </article>    
                         </div>

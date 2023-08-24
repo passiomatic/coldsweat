@@ -217,7 +217,19 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         //child.scrollIntoView({ behavior: "smooth", block: "start" })
                     });
                 });
-        }
+        },
+
+        shareEntry: async function(shareData) {
+            if(navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Error while sharing entry: ', err)
+                }                
+            } else {
+                // @@TODO Copy URL to clipboard as fallback 
+            }
+        }        
     }
 
     Sweat.setup();

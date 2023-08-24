@@ -249,18 +249,17 @@ def group_edit():
 
     user = flask_login.current_user.db_user
 
-    # Collect editable fields
-    #title = group.title
-
     if flask.request.method == 'GET':
         return flask.render_template('main/_group_edit.html', group=group)
 
     # Handle postback
     title = flask.request.form.get('title', '').strip()
+    color = flask.request.form.get('color', '')
     if not title:
         flask.flash('Error, group title cannot be empty.', category="error")
         return flask.render_template('main/_group_edit.html', **locals())
     group.title = title
+    group.color = color
     group.save()
     flask.flash('Changes have been saved.')
     return _render_script('main/_modal_done.js', location=flask.url_for("main.entry_list", group=group.id))

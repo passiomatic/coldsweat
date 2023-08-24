@@ -1,6 +1,4 @@
-.form {
-
-}
+.form {}
 
 .form__title {
     text-transform: uppercase;
@@ -33,3 +31,19 @@ fieldset {
     margin-bottom: .75rem;
 }
 
+
+// Color swatches 
+
+.swatch label {
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: block;
+    border: 2px solid rgba($border-color, 0.5);
+    transition: transform .16s ease-out;
+}
+
+.swatch input:checked ~ label {
+    border: 2px solid $border-color;
+    transform: scale(1.25);
+}

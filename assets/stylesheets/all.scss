@@ -296,7 +296,7 @@ nav {
 
 .alert--error {
     color: $white;
-    background-color: $error-color;
-    border: 1px solid darken($error-color, 10%);    
+    background-color: $danger-color;
+    border: 1px solid darken($danger-color, 10%);    
 }
 

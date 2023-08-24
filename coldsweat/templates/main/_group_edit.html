@@ -9,7 +9,16 @@
           <label class="form-label" for="field-title">Title</label> 
           <input class="form-field" type="text" autofocus required id="field-title" name="title" size="40" value="{{group.title}}">
         </fieldset>
-        
+        <fieldset class="d-flex" style="gap: .75rem">
+          {% set colors = ['white', 'red', 'blue', 'orange' ] %}
+          {% for color in colors %}
+            <div class="swatch">
+              <input type="radio" class="sr-only" id="color-{{loop.index}}" name="color" value="{{color}}">
+              <label style="background-color: {{color}}" for="color-{{loop.index}}">
+              </label>
+            </div>          
+          {% endfor %}
+        </fieldset>        
   </div>
   <div class="form__buttons">
     <button type="submit" name="button_save" value="1" class="btn btn-primary">Save Changes</button>    

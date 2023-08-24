@@ -2797,11 +2797,12 @@ fieldset {
   min-width: 0;
   background: none;
   border: 0;
+  border-radius: .25rem;
   flex: 1;
   align-items: center;
   gap: .25rem;
-  margin: 0;
-  padding: .5rem;
+  margin: 0 .5rem;
+  padding: .5rem 0;
   font-size: .875rem;
   display: flex;
 }
@@ -2814,6 +2815,10 @@ fieldset {
 
 .tree-view .btn-item:hover, .tree-view .btn-folder:hover {
   text-decoration: underline;
+}
+
+.tree-view input:checked + .btn-item, .tree-view input:checked + .btn-folder {
+  background: #d9d5d5a6;
 }
 
 .tree-view .btn-item {

@@ -60,9 +60,11 @@
         align-items: center;
         gap: .25rem;
         appearance: none;
-        @include zero;
-        padding: .5rem .5rem .5rem .5rem;
+        //@include zero;
+        margin: 0 .5rem;
+        padding: .5rem 0;        
         background: transparent;
+        border-radius: .25rem;
         border: 0;
         font-size: $font-size-small;
         cursor: pointer;
@@ -86,6 +88,11 @@
             // transition: color .1s ease-out;
             text-decoration: underline;
         }   
+    }
+
+    input:checked + .btn-item,
+    input:checked + .btn-folder {
+        background: rgba($color-neutral-500, 0.65);
     }
 
     .btn-item {

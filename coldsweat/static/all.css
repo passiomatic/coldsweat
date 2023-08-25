@@ -2602,7 +2602,9 @@ hr {
 dialog {
   opacity: 0;
   width: 100vw;
+  max-width: unset;
   height: 100vh;
+  max-height: unset;
   color: #252424;
   background: none;
   border: 0;

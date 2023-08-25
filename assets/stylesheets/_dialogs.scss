@@ -7,7 +7,9 @@ dialog {
     padding: 0;
     margin: 0;
     width: 100vw;
+    max-width: unset; // Safari 
     height: 100vh;
+    max-height: unset; // Safari
     color: $text-color;
     // transition: transform .3s ease-out, opacity .3s ease-out;
     // transform: translate(0%, -5%);

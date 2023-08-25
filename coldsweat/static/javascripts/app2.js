@@ -18,7 +18,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         return segments.join('')
     }    
 
-    // Find innermost element that does not get replaced
+    // Innermost element that does not get replaced
     var listViewEl = document.getElementById("panel");
 
     const Sweat = {

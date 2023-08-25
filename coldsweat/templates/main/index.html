@@ -14,30 +14,20 @@
                 <dt>
                     EXPLORE                
                 </dt>            
-                <dd>
-                    <details>
-                        <summary>
-                            {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
-                            <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
-                                <i class="fa fa-list-ul"></i> All Articles
-                            </button>
-                        </summary>
-                        <ul class="">
-                        </ul>
-                    </details>
+                <dd style="margin: 0 1rem">
+                    {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
+                    <input id="group-all" class="sr-only" type="radio" name="tree">
+                    <label class="btn-folder" type="button" for="group-all" onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
+                        <i class="fa fa-list-ul"></i> All Articles
+                    </label>
                 </dd>
                 <!-- <dd>
-                    <details>
-                        <summary>
-                            {% set request_url = '' %}
-                            <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}', event)">
-                                <i class="fa fa-calendar-o"></i> Today
-                            </button>
-                        </summary>
-                        <ul class="">
-                        </ul>
-                    </details>
-                </dd>             -->
+                    {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
+                    <button class="btn-folder" type="button" onclick="Sweat.loadFolder('{{request_url}}', event)">
+                        <i class="fa fa-calendar-o"></i> Today
+                    </button>
+                </dd> 
+                -->
                 <dt>
                     FOLDERS                
                 </dt>

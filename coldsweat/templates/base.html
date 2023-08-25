@@ -16,34 +16,32 @@ Coldsweat {{version_string}} — http://lab.passiomatic.com/coldsweat/
 <link rel="shortcut icon" href='{{ url_for("static", filename="favicon.png") }}' sizes="32x32">
 <meta name="apple-mobile-web-app-title" content="Coldsweat">
 <script defer src='{{ url_for("static", filename="javascripts/vendor/hotkeys.min.js") }}'></script>
-<script defer src='{{ url_for("static", filename="javascripts/app2.js") }}'></script>
+<script defer src='{{ url_for("static", filename="javascripts/app.js") }}'></script>
 {% block head_block %}{% endblock %}
 </head>
 <body>
+    <!-- ALERTS -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alerts">
+                {% for category, message in messages %}
+                    <div class="alert alert--{{ category }}">{{ message|safe }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
     {% block container_block %}{% endblock %}
-<script>
-    window.applicationURL = '{{request.root_url}}';
-</script>
-
-<dialog id="dialog">
-    <div class="dialog-content">
-        Some content.
-    </div>
-    <!-- <button class="btn-icon" onclick="Sweat.closeDialog(event);" type="button" name="close">
-        <img src="/static/icon-close.svg" width="32" height="32" alt="Close"> 
-        Cancel
-    </button> -->
-</dialog>
-<!-- ALERTS -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="alerts">
-            {% for category, message in messages %}
-                <div class="alert alert--{{ category }}">{{ message|safe }}</div>
-            {% endfor %}
+    <dialog id="dialog">
+        <div class="dialog-content">
         </div>
-    {% endif %}
-{% endwith %}
+        <!-- <button class="btn-icon" onclick="Sweat.closeDialog(event);" type="button" name="close">
+            <img src="/static/icon-close.svg" width="32" height="32" alt="Close"> 
+            Cancel
+        </button> -->
+    </dialog>
+    <script>
+        window.applicationURL = '{{request.root_url}}';
+    </script>
 </body>
 </html>
 

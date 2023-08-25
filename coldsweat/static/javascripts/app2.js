@@ -89,7 +89,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     }
                     response.text().then((text) => {
                         const contentType = response.headers.get("content-type");
-                        console.log("contentType: " + contentType)
+                        //console.log("contentType: " + contentType)
                         if(contentType.startsWith('text/html')) {
                             dialogEl.querySelector('.dialog-content').innerHTML = text;
                         } else if (contentType.startsWith('text/javascript')) {

@@ -234,7 +234,7 @@ def entry_list_mark():
                     'entry %d already marked as read, ignored' % entry.id)
                 continue
 
-    return _render_script('main/_modal_done.js', location=redirect_url)
+    return _render_script('main/_dialog_done.js', location=redirect_url)
 
 
 @bp.route('/groups/edit', methods=['GET', 'POST'])
@@ -262,7 +262,7 @@ def group_edit():
     group.color = color
     group.save()
     flask.flash('Changes have been saved.')
-    return _render_script('main/_modal_done.js', location=flask.url_for("main.entry_list", group=group.id))
+    return _render_script('main/_dialog_done.js', location=flask.url_for("main.entry_list", group=group.id))
 
 
 @bp.route('/feeds/edit', methods=['GET', 'POST'])
@@ -297,7 +297,7 @@ def feed_edit():
     feed.title = title
     feed.save()
     flask.flash('Changes have been saved.')
-    return _render_script('main/_modal_done.js', location=flask.url_for("main.entry_list", feed=feed.id))
+    return _render_script('main/_dialog_done.js', location=flask.url_for("main.entry_list", feed=feed.id))
 
 
 @bp.route('/feeds/add/1', methods=['GET', 'POST'])
@@ -435,7 +435,7 @@ def profile():
         user.email = new_email
         user.display_name = new_display_name
         user.save()
-        return _render_script('main/_modal_done.js', location=flask.url_for("main.index"))
+        return _render_script('main/_dialog_done.js', location=flask.url_for("main.index"))
 
     return flask.render_template('main/_user_edit.html', user=user)
 

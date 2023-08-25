@@ -142,9 +142,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
             if(event) {
                 event.preventDefault();
             }
-            //console.log('target is', event.currentTarget)
             var inputEl = event.currentTarget.previousElementSibling
-            inputEl.checked = true;
+            if(inputEl) {
+                inputEl.checked = true;
+            }
             fetch(url)
                 .then((response) => {
                     if (!response.ok) {

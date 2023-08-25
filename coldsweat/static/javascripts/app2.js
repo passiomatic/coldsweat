@@ -1,22 +1,22 @@
 window.addEventListener("DOMContentLoaded", (event) => {
 
-    function findParent(currentNode, parentClass) {
-        while (currentNode.tagName != 'BODY') {
-            if (currentNode.classList.contains(parentClass)) {
-                return currentNode;
-            }
-            currentNode = currentNode.parentNode;
-        }
-        return null;
-    }
-    
+    // function findParent(currentNode, parentClass) {
+    //     while (currentNode.tagName != 'BODY') {
+    //         if (currentNode.classList.contains(parentClass)) {
+    //             return currentNode;
+    //         }
+    //         currentNode = currentNode.parentNode;
+    //     }
+    //     return null;
+    // }
+
     function makeEndpointURL(pathname) {
         var segments = [
             window.applicationURL,
             pathname
-        ]                          
+        ]
         return segments.join('')
-    }    
+    }
 
     // Innermost element that does not get replaced
     var listViewEl = document.getElementById("panel");
@@ -24,17 +24,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
     const Sweat = {
 
 
-        setup: function() { 
+        setup: function () {
             window.addEventListener("popstate", (event) => {
                 //console.log('popstate', event.state)
             });
 
             // Prev
-            hotkeys('j', function(event, handler){
+            hotkeys('j', function (event, handler) {
                 var currentCardInput = listViewEl.querySelector(".entry .entry-card input:checked");
                 var prevCard = null;
                 var prevCardInput = null;
-                if(currentCardInput) {
+                if (currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
                     // @@TODO Skip headings
                     prevCard = li.previousElementSibling;
@@ -42,19 +42,19 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 } else {
                     // Select first
                     prevCardInput = listViewEl.querySelector(".entry .entry-card input");
-                } 
-                if(prevCardInput) {
+                }
+                if (prevCardInput) {
                     prevCardInput.checked = true;
                     Sweat.mark(prevCardInput.value, 'read');
                     Sweat.loadEntry(prevCardInput.value, event);
-                }                
+                }
             });
             // Next
-            hotkeys('k', function(event, handler){
+            hotkeys('k', function (event, handler) {
                 var currentCardInput = listViewEl.querySelector(".entry .entry-card input:checked");
                 var nextCard = null;
                 var nextCardInput = null;
-                if(currentCardInput) {
+                if (currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
                     // @@TODO Skip headings
                     nextCard = li.nextElementSibling;
@@ -62,25 +62,25 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 } else {
                     // Select first
                     nextCardInput = listViewEl.querySelector(".entry .entry-card input");
-                } 
-                if(nextCardInput) {
-                    nextCardInput.checked = true;       
+                }
+                if (nextCardInput) {
+                    nextCardInput.checked = true;
                     Sweat.mark(nextCardInput.value, 'read')
                     Sweat.loadEntry(nextCardInput.value, event)
                 }
-            });            
+            });
         },
 
-        submitRemoteForm: function(url, event) {
-            var dialogEl = document.getElementById('dialog'); 
+        submitRemoteForm: function (url, event) {
+            var dialogEl = document.getElementById('dialog');
 
             // @@TODO Add spinner
             var button = dialogEl.querySelector('button[type=submit]');
-            if(button) {
+            if (button) {
                 button.disabled = true;
             }
 
-            event.preventDefault();                                 
+            event.preventDefault();
             var formData = new FormData(event.target);
             fetch(makeEndpointURL(url), { method: 'POST', body: formData })
                 .then((response) => {
@@ -90,19 +90,19 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     response.text().then((text) => {
                         const contentType = response.headers.get("content-type");
                         //console.log("contentType: " + contentType)
-                        if(contentType.startsWith('text/html')) {
+                        if (contentType.startsWith('text/html')) {
                             dialogEl.querySelector('.dialog-content').innerHTML = text;
                         } else if (contentType.startsWith('text/javascript')) {
                             eval(text);
-                        } 
-                    });                        
+                        }
+                    });
 
-                    
+
                 });
         },
 
-        openRemoteDialog: function(url, event) {
-            var dialogEl = document.getElementById('dialog'); 
+        openRemoteDialog: function (url, event) {
+            var dialogEl = document.getElementById('dialog');
 
             fetch(url)
                 .then((response) => {
@@ -110,17 +110,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         throw new Error(`Server returned error ${response.status} while handling request ${url}`);
                     }
                     response.text().then((text) => {
-                        dialogEl.querySelector('.dialog-content').innerHTML = text;                        
+                        dialogEl.querySelector('.dialog-content').innerHTML = text;
                         Sweat.openDialog(dialogEl, event)
                     });
-                }); 
+                });
         },
 
-        loadEntry: function(id, title, event) {
+        loadEntry: function (id, title, event) {
             var mainEl = document.getElementById('main');
             // Remove any previous animation triggers
             mainEl.classList.remove('in')
-            Sweat.replaceElementWithTemplate(`template-${id}`, mainEl, event);            
+            Sweat.replaceElementWithTemplate(`template-${id}`, mainEl, event);
             window.requestAnimationFrame((timeStamp) => {
                 // Add on next frame to trigger entering animation
                 mainEl.classList.add('in')
@@ -131,19 +131,19 @@ window.addEventListener("DOMContentLoaded", (event) => {
             event.preventDefault();
         },
 
-        replaceElementWithTemplate: function(templateId, targetEl, event) {
+        replaceElementWithTemplate: function (templateId, targetEl, event) {
             var templateEl = document.getElementById(templateId);
             //var targetEl = document.getElementById(targetId);
             var sourceElCopy = templateEl.content.firstElementChild.cloneNode(true);
             targetEl.replaceChildren(...[sourceElCopy]);
         },
-        
-        loadFolder: function(url, title, event){
-            if(event) {
+
+        loadFolder: function (url, title, event) {
+            if (event) {
                 event.preventDefault();
             }
             var inputEl = event.currentTarget.previousElementSibling
-            if(inputEl) {
+            if (inputEl) {
                 inputEl.checked = true;
             }
             fetch(url)
@@ -156,40 +156,40 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         panelEl.innerHTML = text;
                         var listEl = panelEl.querySelector('.list-view')
                         window.requestAnimationFrame((timeStamp) => {
-                                // Add on next frame to trigger entering animation 
-                                listEl.classList.add('in')
-                            }
+                            // Add on next frame to trigger entering animation 
+                            listEl.classList.add('in')
+                        }
                         )
                         var newUrl = new URL(url);
                         // We want to restore the whole page
                         newUrl.searchParams.delete('xhr');
                         history.pushState({}, '', newUrl.href)
-                        if(title) {
+                        if (title) {
                             document.title = `${title} • Coldsweat`;
                         }
                     });
-                });              
+                });
         },
 
-        closeDialog: function(event) {
-            var dialog = document.getElementById('dialog');                        
+        closeDialog: function (event) {
+            var dialog = document.getElementById('dialog');
             //dialog.classList.remove("in"); 
-            dialog.close();  
+            dialog.close();
         },
 
-        openDialog: function(dialogEl, event) {
-            dialogEl.showModal();         
+        openDialog: function (dialogEl, event) {
+            dialogEl.showModal();
             //dialogEl.classList.add("in"); 
             return dialogEl;
         },
 
-        markSaved: function(id, event) {
+        markSaved: function (id, event) {
             var toggle = event.target;
             var new_value = toggle.checked ? 'saved' : 'unsaved'
             Sweat.mark(id, new_value)
         },
 
-        mark: function(id, status) {
+        mark: function (id, status) {
             var formData = new FormData();
             formData.append('mark', '')
             formData.append('as', status)
@@ -203,7 +203,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 });
         },
 
-        loadMore: function(url) {
+        loadMore: function (url) {
             var wrapper = document.getElementById("entry-list");
             fetch(url)
                 .then((response) => {
@@ -214,7 +214,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         var button = wrapper.querySelector(".more");
                         button.remove();
                         var template = document.createElement('template');
-                        template.innerHTML = text;                                            
+                        template.innerHTML = text;
                         template.content.childNodes.forEach((child) => {
                             wrapper.appendChild(child.cloneNode(true));
                         })
@@ -223,17 +223,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 });
         },
 
-        shareEntry: async function(shareData) {
-            if(navigator.share) {
+        shareEntry: async function (shareData) {
+            if (navigator.share) {
                 try {
                     await navigator.share(shareData);
                 } catch (err) {
                     console.log('Error while sharing entry: ', err)
-                }                
+                }
             } else {
                 // @@TODO Copy URL to clipboard as fallback 
             }
-        }        
+        }
     }
 
     Sweat.setup();

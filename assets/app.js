@@ -122,7 +122,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         loadEntry: function (id, title, event) {
             var mainEl = document.getElementById('main');
             // Remove any previous animation triggers
-            mainEl.classList.remove('in')
+            //mainEl.classList.remove('in')
             Sweat.replaceElementWithTemplate(`template-${id}`, mainEl, event);
             window.requestAnimationFrame((timeStamp) => {
                 // Add on next frame to trigger entering animation

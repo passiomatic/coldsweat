@@ -1,8 +1,8 @@
 {
   "name": "coldsweat",
   "scripts": {
-    "build-css": "parcel build ./assets/stylesheets/all.scss --dist-dir=coldsweat/static",
-    "watch-css": "parcel watch ./assets/stylesheets/all.scss --dist-dir=coldsweat/static"
+    "build-assets": "parcel build ./assets/stylesheets/app.scss ./assets/app.js --dist-dir=coldsweat/static",
+    "watch-assets": "parcel watch ./assets/stylesheets/app.scss ./assets/app.js --dist-dir=coldsweat/static"
   },
   "keywords": [],
   "author": "Andrea Peltrin",
@@ -13,5 +13,8 @@
   },
   "browserslist": [
     "defaults"
-  ]
+  ],
+  "dependencies": {
+    "morphdom": "^2.7.0"
+  }
 }

@@ -11,11 +11,11 @@ install-deps:
 install-package:
 	pip install -e .  
 	
-build-css:
-	npm run build-css
+build-assets:
+	npm run build-assets
 
-watch-css:
-	npm run watch-css
+watch-assets:
+	npm run watch-assets
 
 setup:
 	flask --app coldsweat setup alice@example.com -p password1234 -n "Alice Cooper"
@@ -48,7 +48,7 @@ test:
 install-build-deps:
 	python -m pip install build twine
 
-build: clean
+build: clean build-assets
 	python -m build
 
 check:

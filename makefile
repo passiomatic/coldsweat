@@ -5,7 +5,10 @@ all: run-debug
 venv:
 	python3 -m venv .venv
 
-install-deps:
+install-js-deps:
+	npm ci
+
+install-deps: install-js-deps
 	python -m pip install -r requirements.txt 
 
 install-package:

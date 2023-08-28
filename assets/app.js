@@ -1,4 +1,5 @@
 //var morphdom = require('morphdom');
+import hotkeys from 'hotkeys-js';
 
 window.addEventListener("DOMContentLoaded", (event) => {
 

@@ -1,6 +1,8 @@
-<form onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.entry_list_mark') }}" method="POST">
+<form class="d-flex align-items-center flex-column" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.entry_list_mark') }}" method="POST">
   <input type="hidden"  name="before" value="{{now|epoch}}">
-  <h3>Mark all entries as read?</h3>
-  <button type="submit" class="btn btn-primary">Mark as Read</button>
-  <button type="button" class="btn" onclick="Sweat.closeDialog(event);">Cancel</button>
+  <h3 class="large">Mark all as read?</h3>
+  <div class="form__buttons">
+    <button type="submit" class="btn btn-primary">Mark as Read</button>
+    <button type="button" class="btn" onclick="Sweat.closeDialog(event);">Cancel</button>
+  </div>
 </form>

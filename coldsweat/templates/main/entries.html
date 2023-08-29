@@ -18,10 +18,16 @@
     <div class="entry__filter">
 
         {% if count %}
-            {% set mark_all_url = url_for('main.entry_list_mark', all='') %}
-            <button title="Mark all as read" class="btn-text" onclick="Sweat.openRemoteDialog('{{mark_all_url}}', event)">
+            {% if feed_id  %}
+                {% set mark_url = url_for('main.entry_list_mark', feed_id=feed_id) %}
+            {% elif group_id %}
+                {% set mark_url = url_for('main.entry_list_mark', group_id=group_id) %}
+            {% else %}
+                {% set mark_url = url_for('main.entry_list_mark') %}
+            {% endif %}
+            <button title="" class="btn-text" onclick="Sweat.openRemoteDialog('{{mark_url}}', event)">
                 <i class="fa fa-check-square"></i>
-            </button>
+            </button>           
         {% endif %}
 
         <div class="radio-switch">

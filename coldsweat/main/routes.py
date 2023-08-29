@@ -178,13 +178,20 @@ def group_list():
 @flask_login.login_required
 def entry_list_mark():
     '''
-    Mark feed|all entries as read
+    Mark feed|group|all entries as read
     '''
     feed_id = flask.request.args.get('feed_id', 0, type=int)
+    group_id = flask.request.args.get('group_id', 0, type=int)
 
     if flask.request.method == 'GET':
         now = datetime.utcnow()
-        return flask.render_template('main/_entries_mark_%s_read.html' % ('feed' if feed_id else 'all'), **locals())
+        if feed_id:
+            template = 'main/_entries_mark_feed_read.html'
+        elif group_id:
+            template = 'main/_entries_mark_group_read.html'
+        else:
+            template = 'main/_entries_mark_all_read.html'
+        return flask.render_template(template, feed_id=feed_id, group_id=group_id, now=now)
 
     # Handle postback
     try:
@@ -212,6 +219,9 @@ def entry_list_mark():
         ).distinct()
         flask.flash('Feed has been marked as read', category="info")
         redirect_url = flask.url_for('main.entry_list', feed=feed_id)
+    if group_id: 
+        # @@TODO
+        pass
     else:
         q = Entry.select(Entry).join(Feed).join(Subscription).where(
             (Subscription.user == user) &

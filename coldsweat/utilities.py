@@ -33,6 +33,12 @@ def make_data_uri(content_type, data):
     return "data:%s;base64,%s" % (content_type,
                                   base64.standard_b64encode(data).decode('utf-8'))
 
+def excerpt(value):
+    if value:
+        words = value.split()[:10]
+        return ' '.join(words) + '…'
+    return ''
+
 
 # --------------------
 # Hash functions

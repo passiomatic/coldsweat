@@ -251,7 +251,7 @@ class Fetcher(object):
                 'feed_id': self.feed.id,
                 'guid': guid,
                 'link': link,
-                'title': get_entry_title(entry_dict, default='Untitled'),
+                'title': get_entry_title(entry_dict, default=''),
                 'author': get_entry_author(entry_dict) or feed_author,
                 'content': parsed_content,
                 'content_type': content_type,

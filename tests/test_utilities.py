@@ -23,3 +23,12 @@ def test_validate_url(value, wanted):
 )
 def test_friendly_url(value, wanted):
     assert utilities.friendly_url(value) == wanted
+
+
+@pytest.mark.parametrize("value, wanted", [
+    ('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris blandit lectus vel venenatis cursus.', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris blandit…'),
+    ('', ''),
+] 
+)
+def test_excerpt(value, wanted):
+    assert utilities.excerpt(value) == wanted

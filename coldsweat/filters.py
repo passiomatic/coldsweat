@@ -7,6 +7,11 @@ from werkzeug import http
 from . import utilities
 
 
+@app.template_filter('excerpt')
+def excerpt(value):
+    return utilities.excerpt(value)
+
+
 @app.template_filter('friendly_url')
 def friendly_url(value):
     if value:

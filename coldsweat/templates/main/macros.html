@@ -20,7 +20,11 @@
                     </div>
                     <div>
                         <h3 class="entry-card__title">
-                            {{e.title}}
+                            {% if e.title%}
+                                {{e.title}}
+                            {% else %}
+                                {{ e.content|striptags|excerpt }}
+                            {% endif %}                            
                         </h3>
                         <h4 class="entry-card__feed">
                             <!-- <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*"> -->

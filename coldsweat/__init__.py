@@ -1,17 +1,19 @@
 '''
 Coldsweat - RSS aggregator and web reader compatible with the Fever API
 '''
-__version__ = (0, 10, 0, '')
+__version__ = (0, 10, 1, '')
 
 import os 
 import flask_login
 import flask
+from flask.cli import FlaskGroup
+import click
 from flask_cdn import CDN
 from .auth import bp as auth_blueprint
 from .main import bp as main_blueprint
 from .fever import bp as fever_blueprint
 from .auth import SessionUser
-import coldsweat.cli as cli
+import coldsweat.commands as commands
 import coldsweat.models as models
 
 try:
@@ -42,7 +44,6 @@ def create_app(config_class=None):
 
         if 'DATABASE_URL' in app.config:
             app.logger.info(f"Using DATABASE_URL {app.config['DATABASE_URL']}")
-            pass
         else:
             # Fallback to sqlite db and dev secret key
             default_database_url = f"sqlite:///{os.path.join(app.instance_path, 'coldsweat.db')}"
@@ -56,6 +57,9 @@ def create_app(config_class=None):
     cdn.init_app(app)
     
     models.db_wrapper.init_app(app)
+    if models.db_wrapper.get_engine() == 'sqlite':
+        models.db_wrapper.database.pragma('foreign_keys', 1, permanent=True)
+        models.db_wrapper.database.pragma('journal_mode', 'wal', permanent=True)
 
     login_manager = flask_login.LoginManager()
     login_manager.login_view = "auth.login"
@@ -89,9 +93,13 @@ def create_app(config_class=None):
     app.register_blueprint(fever_blueprint)
 
     # Add CLI support
-    cli.add_commands(app)
+    commands.add_commands(app)
 
     with app.app_context():
         from . import filters  # noqa
 
     return app
+
+@click.group(cls=FlaskGroup, create_app=create_app)
+def cli():
+    """Management script for the Coldsweat application."""

@@ -1,6 +1,6 @@
 [project]
 name = "coldsweat"
-version = "0.10.0"
+version = "0.10.1"
 authors = [
   { name="Andrea Peltrin" },
 ]
@@ -41,3 +41,6 @@ packages = ["coldsweat", "coldsweat.main", "coldsweat.auth", "coldsweat.fever" ]
 
 [tool.setuptools.package-data]
 coldsweat = ["static/*.*", "templates/*.html"]
+
+[project.scripts]
+coldsweat = "coldsweat:cli"

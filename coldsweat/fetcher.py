@@ -15,8 +15,10 @@ import werkzeug.exceptions as exceptions
 from werkzeug import http
 from . import markup
 from .models import (Entry, Feed, db_wrapper)
-from .translators import EntryTranslator, FeedTranslator
-from .utilities import (datetime_as_epoch,
+from .utilities import (datetime_as_epoch, 
+                        tuple_as_datetime, 
+                        scrub_url, 
+                        truncate,
                         format_http_datetime,
                         make_sha1_hash,
                         make_data_uri,
@@ -54,7 +56,7 @@ class Fetcher(object):
         '''
         Internal server error
         '''
-        self.feed.error_count += 1
+        #self.feed.error_count += 1
         self.feed.last_status = response.status_code
         app.logger.warning(
             "%s has caused an error on server, skipped" % self.netloc)
@@ -131,6 +133,7 @@ class Fetcher(object):
         self._fetch_icon()        
 
     handle_307 = handle_200   # Alias
+    handle_303 = handle_200   # Alias
     handle_302 = handle_200   # Alias
 
     def update_feed(self):
@@ -160,7 +163,7 @@ class Fetcher(object):
         except RequestException:
             # Record any network error as 'Service Unavailable'
             self.feed.last_status = exceptions.ServiceUnavailable.code
-            self.feed.error_count += 1
+            #self.feed.error_count += 1
             app.logger.warning(
                 "a network error occured while fetching %s, skipped"
                 % self.netloc)
@@ -193,7 +196,6 @@ class Fetcher(object):
             self.feed.save()
 
     def check_feed_health(self):
-        # @@TODO Increase error_count only with 4xx errors
         if self.feed.error_count > MAX_FETCH_ERRORS:
             self._synthesize_entry(
                 'Feed has accumulated too many errors (last was %s).'
@@ -215,22 +217,18 @@ class Fetcher(object):
                 "%s caused a parser error (%s), tried to parse it anyway" % (
                     self.netloc, soup.bozo_exception))
 
-        ft = FeedTranslator(soup.feed)
-
-        self.feed.last_updated_on = ft.get_timestamp(self.instant)
-        self.feed.alternate_link = ft.get_alternate_link()
+        self.feed.last_updated_on = get_feed_timestamp(soup.feed, self.instant)
+        self.feed.alternate_link = get_feed_alternate_link(soup.feed)
         # Do not set title again if already set
-        self.feed.title = self.feed.title or ft.get_title()
+        self.feed.title = self.feed.title or get_feed_title(soup.feed)
 
-        feed_author = ft.get_author()
+        feed_author = get_feed_author(soup.feed)
 
         new_entries = []
         for entry_dict in soup.entries:
 
-            t = EntryTranslator(entry_dict)
-
-            link = t.get_link()
-            guid = t.get_guid(default=link)
+            link = get_entry_link(entry_dict)
+            guid = get_entry_guid(entry_dict, default=link)
 
             # If an entry doesn't have a link nor a GUID we
             #   cannot uniquely identify it
@@ -240,9 +238,9 @@ class Fetcher(object):
                     % self.netloc)
                 continue
 
-            timestamp = t.get_timestamp(default=self.instant)
-            content_type, content = t.get_content(('text/plain', ''))
-            thumbnail_url = t.get_thumbnail_url()
+            timestamp = get_entry_timestamp(entry_dict, default=self.instant)
+            content_type, content = get_entry_content(entry_dict, ('text/plain', ''))
+            thumbnail_url = get_entry_thumbnail_url(entry_dict)
 
             if 'html' in content_type:
                 parsed_content = markup.parse_html(content)
@@ -253,8 +251,8 @@ class Fetcher(object):
                 'feed_id': self.feed.id,
                 'guid': guid,
                 'link': link,
-                'title': t.get_title(default='Untitled'),
-                'author': t.get_author() or feed_author,
+                'title': get_entry_title(entry_dict, default='Untitled'),
+                'author': get_entry_author(entry_dict) or feed_author,
                 'content': parsed_content,
                 'content_type': content_type,
                 'thumbnail_url': thumbnail_url,
@@ -275,7 +273,7 @@ class Fetcher(object):
                         .as_rowcount()
                         .execute())
                 else: 
-                    # MySQL doesn't support conlict targets, see:
+                    # MySQL doesn't support conflict targets, see:
                     # https://stackoverflow.com/questions/74691515/python-peewee-using-excluded-to-resolve-conflict-resolution
                     count += (Entry.insert_many(batch).on_conflict(
                         # Pass down these new values only for certain fields
@@ -370,7 +368,130 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
         raise exc
     return response
 
-        
+
+# ------------------------------------------------------
+# Helpers
+# ------------------------------------------------------
+
+IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif']
+
+
+def get_feed_timestamp(feed_dict, default):
+    for header in ['published_parsed', 'updated_parsed']:
+        value = feed_dict.get(header, None)
+        if value:
+            # Fix future dates if necessary
+            return min(tuple_as_datetime(value), default)
+    app.logger.debug(u'no feed timestamp found, using default')
+    return default
+
+
+def get_feed_author(feed_dict):
+    if 'name' in feed_dict.get('author_detail', []):
+        return feed_dict.author_detail.name
+    return ''
+
+
+def get_feed_alternate_link(feed_dict):
+    return feed_dict.get('link', '')
+
+
+def get_feed_title(feed_dict):
+    if 'title' in feed_dict:
+        return truncate(markup.strip_html(feed_dict.title),
+                        Feed.MAX_TITLE_LENGTH)
+    return ''
+
+
+def get_entry_guid(entry_dict, default):
+    """
+    Get a useful GUID from a feed entry
+    """
+    return getattr(entry_dict, 'id', default)
+
+
+def get_entry_timestamp(entry_dict, default):
+    """
+    Select the best timestamp for an entry
+    """
+    for header in ['published_parsed', 'created_parsed', 'updated_parsed']:
+        value = entry_dict.get(header, None)
+        if value:
+            # Fix future dates
+            return min(tuple_as_datetime(value), default)
+    app.logger.debug(u'no entry timestamp found, using default')
+    return default
+
+
+def get_entry_title(entry_dict, default):
+    if 'title' in entry_dict:
+        return truncate(markup.strip_html(entry_dict.title),
+                        Entry.MAX_TITLE_LENGTH)
+    return default
+
+
+def get_entry_source(entry_dict):
+    #  d = self.entry_dict.get('source')
+    #  d['link']
+    return ''
+
+
+def get_entry_content(entry_dict, default):
+    """
+    Select the best content from an entry
+    """
+    candidates = entry_dict.get('content', [])
+    if 'summary_detail' in entry_dict:
+        candidates.append(entry_dict.summary_detail)
+    for c in candidates:
+        # Match text/html, application/xhtml+xml
+        if 'html' in c.type:
+            return c.type, c.value
+    # Return first result, regardless of MIME type
+    if candidates:
+        return candidates[0].type, candidates[0].value
+
+    app.logger.debug(u'no entry content found, using default')
+    return default
+
+
+def get_entry_thumbnail_url(entry_dict):
+    #See https://www.rssboard.org/media-rss
+    if 'media_content' in entry_dict:
+        media_content = entry_dict['media_content'][0]
+        try:
+            image_type = media_content['type']
+        except KeyError:
+            image_type = None
+        if image_type in IMAGE_TYPES:
+            try:
+                return media_content['url']
+            except KeyError:
+                pass
+    if 'media_thumbnail' in entry_dict:
+        # "... If multiple thumbnails are included, and time coding is not at play, 
+        #  it is assumed that the images are in order of importance."
+        media_thumbnail = entry_dict['media_thumbnail'][0]
+        return media_thumbnail['url']
+    return ''
+
+
+def get_entry_link(entry_dict):
+    # Special case for FeedBurner entries
+    # https://stackoverflow.com/questions/25760622/difference-between-origlink-and-link-in-rss-feedback-xml-file
+    if 'feedburner_origlink' in entry_dict:
+        return scrub_url(entry_dict.feedburner_origlink)
+    if 'link' in entry_dict:
+        return scrub_url(entry_dict.link)
+    return ''
+
+
+def get_entry_author(entry_dict):
+    if 'name' in entry_dict.get('author_detail', []):
+        return entry_dict.author_detail.name
+    return ''
+
+
 # ------------------------------------------------------
 # Custom error codes 9xx & exceptions
 # ------------------------------------------------------

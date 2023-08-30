@@ -300,6 +300,7 @@ def feed_edit():
     groups = [s.group for s in q]
 
     if flask.request.method == 'GET':
+        # @@TODO remove locals()
         return flask.render_template('main/_feed_edit.html', **locals())
 
     # Handle postback
@@ -310,7 +311,7 @@ def feed_edit():
     feed.title = title
     feed.save()
     flask.flash('Changes have been saved.')
-    return _render_script('main/_dialog_done.js', location=flask.url_for("main.entry_list", feed=feed.id))
+    return _render_script('main/_feed_edit_done.js', feed=feed)
 
 
 @bp.route('/feeds/add/1', methods=['GET', 'POST'])

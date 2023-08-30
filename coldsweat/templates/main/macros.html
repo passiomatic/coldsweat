@@ -107,3 +107,19 @@
         </li>
     {% endif %} 
 {% endmacro %}
+
+
+{% macro render_group_label(id, title) %}
+    {% set request_url = url_for('main.entry_list', _external=True, group_id=id, xhr=1) %}
+    <label class="btn-folder" id="label-group-{{id}}" for="group-{{id}}" onclick="Sweat.loadFolder('{{request_url}}', '{{title}}', event)">
+        <i class="fa fa-folder"></i><span>{{title}}</span>                                    
+    </label>
+{% endmacro %}
+
+
+{% macro render_feed_label(feed) %}
+    {% set request_url = url_for('main.entry_list', _external=True, feed_id=id, xhr=1) %}
+    <label class="btn-item" id="label-feed-{{feed.id}}" for="feed-{{feed.id}}" type="button" onclick="Sweat.loadFolder('{{request_url}}', '{{feed.title}}', event)"><img class="favicon" src="{{feed.icon_url}}" width="16" height="16"  alt="*">
+        <span class="{{ '' if feed.enabled else 'feed-dead' }}">{{feed.title}}</span>
+    </label>
+{% endmacro %}

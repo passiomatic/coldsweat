@@ -96,6 +96,9 @@ def entry_list():
     return response
 
 
+def _render_alerts():
+    return flask.render_template("main/_alerts.html")    
+
 # @bp.route('/entries/<int:entry_id>')
 # @flask_login.login_required
 # def entry(entry_id):
@@ -267,12 +270,12 @@ def group_edit():
     color = flask.request.form.get('color', '')
     if not title:
         flask.flash('Error, group title cannot be empty.', category="error")
-        return flask.render_template('main/_group_edit.html', **locals())
+        return flask.render_template('main/_group_edit.html', group=group)
     group.title = title
     group.color = color
     group.save()
     flask.flash('Changes have been saved.')
-    return _render_script('main/_dialog_done.js', location=flask.url_for("main.entry_list", group=group.id))
+    return _render_script('main/_group_edit_done.js', group=group)
 
 
 @bp.route('/feeds/edit', methods=['GET', 'POST'])
@@ -469,8 +472,8 @@ def _add_subscription(feed_, group_id):
     return _render_script('main/_dialog_done.js', location=flask.url_for("main.entry_list", feed=feed_.id))
 
 
-def _render_script(filename, location):
-    template = flask.render_template(filename, location=location)
+def _render_script(filename, **kwargs):
+    template = flask.render_template(filename, **kwargs)
     r = flask.make_response(template)
     r.headers["Content-Type"] = "text/javascript"
     return r  

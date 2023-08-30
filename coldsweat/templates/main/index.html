@@ -1,3 +1,5 @@
+{% import "main/macros.html" as macros %}
+
 {% extends "base.html" %}
 
 {% block title_block %}
@@ -36,19 +38,15 @@
                         <dd>
                             <details>
                                 <summary>
-                                    {% set request_url = url_for('main.entry_list', _external=True, group_id=g_id, xhr=1) %}
                                     <input id="group-{{g_id}}" class="sr-only" type="radio" {{ 'checked' if g_id == group_id else '' }} name="tree">
-                                    <label class="btn-folder" for="group-{{g_id}}" onclick="Sweat.loadFolder('{{request_url}}', '{{group_title}}', event)">
-                                        <i class="fa fa-folder"></i><span>{{group_title}}</span>                                    
-                                    </label>
+                                    {{ macros.render_group_label(g_id, group_title) }}
                                 </summary>
                                 <ul class="">
                                     {% for f in feeds %}
                                         {% set request_url = url_for('main.entry_list', _external=True, feed_id=f.id, xhr=1) %}
                                         <li>
                                             <input id="feed-{{f.id}}" class="sr-only" type="radio" {{ 'checked' if f.id == feed_id else '' }} name="tree">
-                                            <label class="btn-item" for="feed-{{f.id}}" type="button" onclick="Sweat.loadFolder('{{request_url}}', '{{f.title}}', event)"><img class="favicon" src="{{f.icon_url}}" width="16" height="16"  alt="*">
-                                            <span class="{{ '' if f.enabled else 'feed-dead' }}">{{f.title}}</span></label>
+                                            {{ macros.render_feed_label(f) }}                                            
                                         </li>
                                     {% endfor %} 
                                 </ul>

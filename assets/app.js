@@ -1,5 +1,5 @@
-//var morphdom = require('morphdom');
 import hotkeys from 'hotkeys-js';
+import morphdom from 'morphdom';
 
 window.addEventListener("DOMContentLoaded", (event) => {
 
@@ -26,6 +26,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
     const Sweat = {
 
+        morph: function (sourceEl, fragment, options) {
+            morphdom(sourceEl, fragment, options)
+        },
 
         setup: function () {
             window.addEventListener("popstate", (event) => {
@@ -92,15 +95,14 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     }
                     response.text().then((text) => {
                         const contentType = response.headers.get("content-type");
-                        //console.log("contentType: " + contentType)
                         if (contentType.startsWith('text/html')) {
                             dialogEl.querySelector('.dialog-content').innerHTML = text;
                         } else if (contentType.startsWith('text/javascript')) {
+                            Sweat.closeDialog();
+                            // Finished, update UI
                             eval(text);
                         }
                     });
-
-
                 });
         },
 

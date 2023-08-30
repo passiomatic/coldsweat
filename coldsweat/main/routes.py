@@ -95,10 +95,6 @@ def entry_list():
     response.set_cookie('filter', filter)
     return response
 
-
-def _render_alerts():
-    return flask.render_template("main/_alerts.html")    
-
 # @bp.route('/entries/<int:entry_id>')
 # @flask_login.login_required
 # def entry(entry_id):

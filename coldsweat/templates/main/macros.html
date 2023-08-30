@@ -124,3 +124,17 @@
         <span class="{{ '' if feed.enabled else 'feed-dead' }}">{{feed.title}}</span>
     </label>
 {% endmacro %}  
+
+
+{% macro render_alerts() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alerts">
+                {% for category, message in messages %}
+                    <div class="alert alert--{{ category }}">{{ message|safe }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endmacro %}  
+

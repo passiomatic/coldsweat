@@ -1,3 +1,4 @@
+{% import "main/macros.html" as macros %}
 <!doctype html>
 <!-- 
 Coldsweat — http://lab.passiomatic.com/coldsweat/
@@ -19,7 +20,7 @@ Coldsweat — http://lab.passiomatic.com/coldsweat/
 {% block head_block %}{% endblock %}
 </head>
 <body>
-    {% include 'main/_alerts.html' %}
+    {{ macros.render_alerts() }}
     {% block container_block %}{% endblock %}
     <dialog id="dialog">
         <div class="dialog-content">

@@ -25,6 +25,12 @@ window.addEventListener("DOMContentLoaded", (event) => {
     var listViewEl = document.getElementById("panel");
 
     const Sweat = {
+        
+        onEntryLoad: function(id, title, event) {
+            var entryEl = document.getElementById(`entry-${id}`);
+            entryEl.classList.add('status-read')
+            Sweat.loadEntry(id, title, event)
+        },
 
         morph: function (sourceEl, fragment, options) {
             morphdom(sourceEl, fragment, options)
@@ -132,6 +138,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
             })
 
             Sweat.mark(id, 'read');
+            // @@TODO
             //document.title = `${title} • Coldsweat`;
             event.preventDefault();
         },

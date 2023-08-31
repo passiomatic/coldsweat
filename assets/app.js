@@ -146,10 +146,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
         loadFolder: function (url, title, event) {
             if (event) {
                 event.preventDefault();
-            }
-            var inputEl = event.currentTarget.previousElementSibling
-            if (inputEl) {
-                inputEl.checked = true;
+                var inputEl = event.currentTarget.previousElementSibling
+                if (inputEl) {
+                    inputEl.checked = true;
+                }                
             }
             fetch(url)
                 .then((response) => {

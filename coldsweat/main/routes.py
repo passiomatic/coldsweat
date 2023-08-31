@@ -133,25 +133,25 @@ def entry_mark(entry_id):
     return ('', 200)
 
 
-@bp.route('/feeds')
-@flask_login.login_required
-def feed_list():
-    '''
-    Show subscribed feeds
-    '''
-    offset, group_id, feed_id, filter_class, panel_title, page_title = \
-        0, 0, 0, 'feeds', 'Feeds', 'Feeds'
+# @bp.route('/feeds')
+# @flask_login.login_required
+# def feed_list():
+#     '''
+#     Show subscribed feeds
+#     '''
+#     offset, group_id, feed_id, filter_class, panel_title, page_title = \
+#         0, 0, 0, 'feeds', 'Feeds', 'Feeds'
 
-    offset = flask.request.args.get('offset', 0, type=int)
-    user = flask_login.current_user.db_user
-    max_errors = 100
-    groups = feed.get_groups(user)
-    count, query = feed.get_feeds(user, Feed.id).count(), feed.get_feeds(user)
-    feeds = query.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
-    offset += FEEDS_PER_PAGE
-    is_xhr = flask.request.args.get('xhr', 0, type=int)
+#     offset = flask.request.args.get('offset', 0, type=int)
+#     user = flask_login.current_user.db_user
+#     max_errors = 100
+#     groups = feed.get_groups(user)
+#     count, query = feed.get_feeds(user, Feed.id).count(), feed.get_feeds(user)
+#     feeds = query.order_by(Feed.title).offset(offset).limit(FEEDS_PER_PAGE)
+#     offset += FEEDS_PER_PAGE
+#     is_xhr = flask.request.args.get('xhr', 0, type=int)
 
-    return flask.render_template('main/feeds.html', **locals())
+#     return flask.render_template('main/feeds.html', **locals())
 
 
 @bp.route('/groups')
@@ -348,7 +348,7 @@ def feed_add_1():
     # It's a feed
 
     feed_ = feed.add_feed_from_url(self_link, fetch_data=False)
-    #app.logger.debug("starting fetcher")
+    app.logger.debug("Starting fetcher for just subscribed feed")
     fetcher.Fetcher(feed_).update_feed_with_data(response.text)
 
     return _add_subscription(feed_, group_id)
@@ -466,7 +466,7 @@ def _add_subscription(feed_, group_id):
         flask.flash(f"Feed has been added to <i>{group.title}</i> group", category="info")
     else:
         flask.flash(f"Feed is already in <i>{group.title}</i> group'", category="info")
-    return _render_script('main/_dialog_done.js', location=flask.url_for("main.entry_list", feed=feed_.id))
+    return _render_script('main/_feed_add_wizard_done.js', feed=feed_)
 
 
 def _render_script(filename, **kwargs):

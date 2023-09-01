@@ -9,7 +9,7 @@
                 <fieldset>
                     <label class="form-label" for="self-link-field">Web address for the site or feed</label> 
                     <input class="form-field" type="text" id="self-link-field" autofocus name="self_link" required size="40" value="{{self_link}}">                    
-                    <p>
+                    <p class="text-muted">
                         <small>For example: theverge.com or http://www.reddit.com/top/.rss</small>
                     </p>
                 </fieldset>                
@@ -26,7 +26,7 @@
                 <hr class="">
                 <div>
                     <a href="javascript:window.open(`{{request.root_url}}{{url_for('main.feed_add_1')}}?self_link=${encodeURIComponent(location.href)}&title=${encodeURIComponent(document.title)}`)"><i class="fa fa-bookmark-o"></i> Subscribe Feed</a><br>
-                    <p>
+                    <p class="text-muted">
                         <small class="">Drag bookmarklet to your browser toolbar and quickly subscribe to any feed.</small>
                     </p>
                 </div>

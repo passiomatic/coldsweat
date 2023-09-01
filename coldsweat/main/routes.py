@@ -301,12 +301,16 @@ def feed_edit():
 
     # Handle postback
     title = flask.request.form.get('title', '').strip()
+    enabled = flask.request.form.get('enabled') == "1"
     if not title:
         flask.flash('Error, feed title cannot be empty.', category="error")
+        # @@TODO remove locals()
         return flask.render_template('main/_feed_edit.html', **locals())
     feed.title = title
+    feed.enabled = enabled
     feed.save()
     flask.flash('Changes have been saved.')
+    #flask.flash('Feed <i>%s</i> is now enabled.' % feed.title, category="info")
     return _render_script('main/_feed_edit_done.js', feed=feed)
 
 
@@ -401,33 +405,6 @@ def feed_remove():
     flask.flash(
         f'You are no longer subscribed to <i>{feed.title}</i>.', category="info")
     
-    return flask.redirect(flask.url_for('main.feed_list'))
-
-
-@bp.route('/feeds/enable', methods=['GET', 'POST'])
-@flask_login.login_required
-def feed_enable():
-
-    feed_id = flask.request.args.get('feed', 0, type=int)
-
-    #user = flask_login.current_user.db_user
-    # @@TODO: Check if user is subscribed too?
-    try:
-        feed = Feed.get(Feed.id == feed_id)
-    except Feed.DoesNotExist:
-        flask.abort(404, 'No such feed %s' % feed_id)
-
-    if flask.request.method == 'GET':
-        return _render_modal(flask.url_for('main.feed_enable', feed=feed.id),
-            title='Enable <i>%s</i> again?' % feed.title, 
-            body='Coldsweat will attempt to update it again during the next fetch.', button='Enable')
-            
-    # Handle postback
-    feed.enabled = True
-    feed.error_count = 0
-    feed.save()
-    flask.flash('Feed <i>%s</i> is now enabled.' % feed.title, category="info")
-
     return flask.redirect(flask.url_for('main.feed_list'))
 
     

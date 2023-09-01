@@ -41,7 +41,7 @@
         transition: transform .16s ease-out .22s, opacity .16s ease-out .22s;
     }
 
-    // Apply an incremental delay up to the first 10 entries up to 0.2s
+    // Apply an incremental delay up to 0.2s
     @for $i from 1 through 10 {
         .heading:nth-child(#{$i}),
         .entry:nth-child(#{$i}) {

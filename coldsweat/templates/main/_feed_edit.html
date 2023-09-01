@@ -12,7 +12,6 @@
           <label class="form-label" for="field-self-link">Web address (URL)</label> 
           <input class="form-field" type="text" id="field-self-link" name="self_link" readonly size="40" value="{{feed.self_link}}">
         </fieldset>
-        
         <table class="table">
           <tbody>
             {% if feed.alternate_link %}
@@ -35,7 +34,7 @@
                   <td class="text-danger">Disabled</td>
                 {% endif %}
             </tr>                        
-            
+          
             <tr>
                 <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
                 <td>{{feed.last_checked_on|datetime}}&ensp;<code>{{feed.last_status|status_title|capitalize}}</code></td>
@@ -50,6 +49,19 @@
             {% endif %}
           </tbody>        
         </table>
+        {% if feed.enabled %}
+          <!-- Keep enabled -->
+          <input type="hidden" name="enabled" value="1">
+        {% else %}
+          <fieldset>
+            <label class="form-label">
+              <input class="" type="checkbox" id="field-enabled" name="enabled" value="1"> Enable this feed again
+            </label>
+            <p class="text-muted">
+              <small>Coldsweat will try to update the feed during the next refresh</small>
+            </p>            
+          </fieldset>
+        {% endif %}
   </div>
   <div class="form__buttons">
     <button type="submit" name="button_save" value="1" class="btn btn-primary">Save Changes</button>    

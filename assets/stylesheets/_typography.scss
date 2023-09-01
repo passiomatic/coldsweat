@@ -15,12 +15,49 @@ h6 {
 }
 
 hr {
-    clear : both;
+    clear: both;
     //display : block;
     //margin : $baselineheight * 2 0;
-    padding : 0;
-    height : 1px;
-    border : 0;
-    border-top : 1px solid $border-color; 
+    padding: 0;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid $border-color;
     margin: 1rem 0;
+}
+
+a {
+    text-decoration: none;
+    color: $link-color;
+    @include transition(all .1s ease-out);
+
+    &:visited {
+        color: $link-color;
+    }
+
+    &:hover {
+        text-decoration: underline;
+        color: $link-color-hover;
+    }
+
+    &:focus {
+        outline: thin dotted;
+        color: $link-color;
+    }
+
+    &:hover,
+    &:active {
+        outline: 0;
+    }
+}
+
+::-moz-selection {
+    background-color: lighten($primarycolor, 65%);
+    color: $primarycolor;
+    text-shadow: none;
+}
+
+::selection {
+    background-color: lighten($primarycolor, 65%);
+    color: $primarycolor;
+    text-shadow: none;
 }

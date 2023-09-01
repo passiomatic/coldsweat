@@ -24,26 +24,11 @@ body {
     display: flex;
 }
 
-.dim {
-    color: $lightneutralcolor;
-
-    a {
-        color: $lightneutralcolor;
-
-        &:visited {
-            color: $lightneutralcolor;
-        }
-
-        &:hover {
-            color: $linkcolorhover;
-        }
-
-        &:focus {
-            color: $linkcolorfocus;
-        }
-    }
+::selection {
+    background-color: lighten($color-primary, 65%);
+    color: $color-primary;
+    text-shadow : none; 
 }
-
 
 .meta {
     font-size: $font-size-small;
@@ -135,8 +120,8 @@ pre {
     display: flex;
     justify-content: center;
     align-items: center;
-    @extend .dim;
-
+    color: $text-color-muted;
+    
     i {
         display: block;
         opacity: .6;
@@ -144,13 +129,6 @@ pre {
     }
 
 }
-
-.loading {
-    text-align: center;
-    color: $neutralcolor;
-    //margin: $baselineheight/2 0;
-}
-
 
 // Forms
 

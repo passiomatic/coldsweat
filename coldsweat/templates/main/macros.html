@@ -21,7 +21,6 @@
                             {% endif %}                            
                         </h3>
                         <h4 class="entry-card__feed">
-                            <!-- <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*"> -->
                             {{e.feed.title}}
                         </h4>
                     </div>
@@ -40,8 +39,11 @@
                                 <input class="sr-only" onchange="Sweat.markSaved({{e.id}}, event)" {{ 'checked' if e.id in saved_ids else '' }}  type="checkbox">
                                 <div class="toggle-icon" title="Toggle save (S key)"></div>
                             </label>
-                            <div class="">
+                            <div class="d-flex align-items-center">
                                 {% set feed_url = url_for('main.entry_list', feed_id=e.feed.id) %}
+                                {% if e.feed.icon_url %}
+                                    <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*">&ensp;
+                                {% endif %}
                                 <button class="btn-text text-muted xsmall text-uppercase" onclick="Sweat.loadFolder('{{feed_url}}')">{{e.feed.title}}</button>
                             </div>
                             <h1 class="article__title">{{e.title}}</h1>        

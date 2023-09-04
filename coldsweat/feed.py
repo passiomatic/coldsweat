@@ -6,7 +6,8 @@ import time
 from xml.etree import ElementTree
 from flask import current_app as app
 from peewee import JOIN, fn, IntegrityError
-from .models import (Entry, Feed, Group, Read, Saved, Subscription)
+import coldsweat.models as models
+from .models import (Entry, Feed, Group, Read, Saved, Subscription, FetchLog)
 from .utilities import make_sha1_hash, scrub_url
 from .fetcher import Fetcher
 
@@ -249,27 +250,32 @@ def add_feeds_from_opml(filename, fetch_data=False):
 
 def fetch_feeds(feeds):
     """
-    Fetch given feeds, possibly parallelizing requests
+    Fetch given feeds
     """
 
     start = time.time()
 
     app.logger.debug("starting fetcher")
+    fetch_log = FetchLog.create()
 
-    # if config.fetcher.processes:
-    #     from multiprocessing import Pool
-    #     # Each worker has its own connection
-    #     p = Pool(4, initializer=database.connect)
-    #     p.map(feed_worker, feeds)
-    #     # Exit the worker processes so their connections do not leak
-    #     p.close()
-    # else:
-    # Just sequence requests in this process
-    for feed in feeds:
-        feed_worker(feed)
-
-    app.logger.info("fetch completed: %d feeds checked in %.1fs" % (
-        len(feeds), time.time() - start))
+    report = []
+    try:
+        for feed in feeds:
+            feed_worker(feed)
+            # Report only feed with errors
+            if feed.last_status and feed.last_status >= 400:
+                report.append({'title': feed.title, 'alternate_link': feed.alternate_link, 'self_link': feed.self_link, 'last_status': feed.last_status})
+    except Exception as ex:
+        fetch_log.status = models.STATUS_ERROR
+        fetch_log.save()
+        raise ex
+            
+    elapsed_time = time.time() - start
+    app.logger.info(f"fetch completed: {len(feeds)} feeds checked in {elapsed_time:.1f}s")
+    fetch_log.status = models.STATUS_COMPLETED
+    fetch_log.report = report
+    fetch_log.elapsed_time = elapsed_time
+    fetch_log.save()
 
 
 def fetch_all_feeds():

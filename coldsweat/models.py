@@ -3,8 +3,9 @@ Database models
 '''
 from datetime import datetime
 from playhouse.signals import (pre_save, Model)
+from playhouse.sqlite_ext import JSONField
 from playhouse.flask_utils import FlaskDB
-from peewee import (BooleanField, CharField, FixedCharField, DateTimeField,
+from peewee import (BooleanField, CharField, FixedCharField, DateTimeField, TimestampField, FloatField,
                     ForeignKeyField,
                     IntegerField,
                     TextField)
@@ -38,7 +39,12 @@ DfHjCbUKnl6OZTgAEAR+pHH9rWoLkAAAAASUVORK5CYII="
 FEED_GENERIC = 'G'
 FEED_MASTODON = 'M'
 FEED_YOUTUBE = 'Y'
+
 MAX_URL_LENGTH = 3072 // 4  # Stay below the 3072 char limit of recent MySQL versions with 4-byte text encodings
+
+STATUS_ERROR = 'E'
+STATUS_STARTED = 'S'
+STATUS_COMPLETED = 'C'
 
 class ColdsweatDB(FlaskDB):
     '''
@@ -66,6 +72,16 @@ class ColdsweatDB(FlaskDB):
 # Pass Peewee Model class with signal support
 # See https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#database-wrapper
 db_wrapper = ColdsweatDB(model_class=Model)
+
+
+class FetchLog(db_wrapper.Model):
+    status = CharField(max_length=1, default=STATUS_STARTED)  # S, C, E
+    report = JSONField(default=[])
+    started_on = TimestampField(utc=True)
+    elapsed_time = FloatField(default=0)
+
+    class Meta:
+        table_name = 'fetch_log'
 
 
 class User(db_wrapper.Model):
@@ -263,6 +279,6 @@ def setup():
     """
     with db_wrapper.database as database:
         database.create_tables([User, Feed, Entry, Group, Read, Saved,
-                                Subscription], safe=True)
+                                Subscription, FetchLog], safe=True)
 
     Group.insert_many(BUILTIN_GROUPS).on_conflict_replace().execute()

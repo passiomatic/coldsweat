@@ -33,6 +33,9 @@ run-debug:
 fetch:
 	flask --app coldsweat --debug fetch
 
+reset:
+	rm ./instance/coldsweat.db
+
 # Tests
 
 create-test-data: export FLASK_DATABASE_URL=sqlite:///instance/coldsweat-test.db

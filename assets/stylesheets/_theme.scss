@@ -89,7 +89,7 @@ $link-color-focus: $link-color-hover;
 
 // Alerts 
 
-$alert-color:  #b8cddb;
+$alert-color: #b8cddb;
 $success-color: #6bb349;
 $warning-color: #e8db92;
 $danger-color: $color-secondary;
@@ -97,3 +97,13 @@ $danger-color: $color-secondary;
 // Misc.
 
 $border-color : $color-neutral-400;
+
+// Tables 
+
+$table-padding : .5rem 0;
+$table-background-color: transparent;
+$table-background-stripe: $color-neutral-400;
+$table-background-hover: $color-neutral-400;
+$table-border-width: 1px;
+$table-border-style: solid;
+$table-border-color: $border-color;

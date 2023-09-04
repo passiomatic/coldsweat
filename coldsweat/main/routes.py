@@ -432,6 +432,13 @@ def cheatsheet():
     return flask.render_template('main/_cheatsheet.html', **locals())
 
 
+@bp.route('/log')
+@flask_login.login_required
+def fetch_log():
+    log = queries.get_fetch_log()
+    return flask.render_template('main/log.html', log=log)
+
+
 def _add_subscription(feed_, group_id):
     if group_id:
         group = Group.get(Group.id == group_id)

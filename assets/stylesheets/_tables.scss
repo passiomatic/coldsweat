@@ -1,0 +1,92 @@
+table {
+    max-width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.table {
+    width: 100%;
+    max-width: 100%;
+
+    th,
+    td {
+        padding: $table-padding;
+        vertical-align: top;
+        border-top: $table-border-width $table-border-style $table-border-color;
+        line-height: $line-height;
+        text-align: left;
+    }
+
+    th {
+        font-weight: 500;
+    }
+
+    thead th {
+        vertical-align: bottom;
+    }
+
+    colgroup+thead tr:first-child th,
+    colgroup+thead tr:first-child td,
+    thead:first-child tr:first-child th,
+    thead:first-child tr:first-child td {
+        border-top: 0;
+    }
+
+    // tbody+tbody {
+    //     border-top: $table-border-width * 2  $table-border-style  $table-border-color;
+    // }
+
+    tbody tr td,
+    tbody tr th {
+        //@include transition(background-color $transitionduration 0 ease);
+    }
+}
+
+// BORDERED
+
+.table-bordered {
+    border: $table-border-width $table-border-style $table-border-color;
+    border-left: 0;
+    border-collapse: separate;
+
+    th,
+    td {
+        border-left: $table-border-width $table-border-style $table-border-color;
+    }
+
+    caption+thead tr:first-child th,
+    caption+tbody tr:first-child th,
+    caption+tbody tr:first-child td,
+    colgroup+thead tr:first-child th,
+    colgroup+tbody tr:first-child th,
+    colgroup+tbody tr:first-child td,
+    thead:first-child tr:first-child th,
+    tbody:first-child tr:first-child th,
+    tbody:first-child tr:first-child td {
+        border-top: 0;
+    }
+
+}
+
+// STRIPED
+
+.table-striped {
+
+    tbody tr:nth-child(odd) td,
+    tbody tr:nth-child(odd) th {
+        background-color: $table-background-stripe;
+    }
+}
+
+// HOVER
+
+.table-hover {
+
+    tbody {
+
+        tr:hover td,
+        tr:hover th {
+            background-color: $table-background-hover;
+        }
+    }
+}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block container_block %}
+
+<div class="">
+    <table class="table">
+        <tr>
+            <th>
+                &nbsp;
+            </th>
+            <th>
+                Started on
+            </th>
+            <th>
+                Elapsed time
+            </th>
+        </tr>
+        {% for line in log %}
+            <tr>
+                <td>
+                    {{'✅' if line.status == 'C' else '❌'}}
+                </td>
+                <td>
+                    {{line.started_on|datetime}}
+                </td>
+                <td>
+                    {{"%.1f"|format(line.elapsed_time)}}
+                </td>
+            </tr>
+            {% if line.report %}
+                <tr class="report">
+                    <td colspan="2">
+                        <h3 class="large">Feed errors</h3>
+                        <ul>
+                            {% for feed in line.report %}
+                                <li>
+                                    <a href="{{feed.alternate_link}}">{{feed.title}}</a> <code>{{feed.last_status}}</code>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

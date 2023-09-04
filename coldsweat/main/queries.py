@@ -2,7 +2,7 @@
 import time
 from flask import current_app as app
 from peewee import JOIN, fn, IntegrityError
-from ..models import (Entry, Feed, Group, Read, Saved, Subscription)
+from ..models import (Entry, Feed, Group, Read, Saved, Subscription, FetchLog)
 
 
 
@@ -37,3 +37,7 @@ def get_all_entries(user):
     # Force distinct for entries from feed in multiple groups
     q = Entry.select().join(Feed).join(Subscription).where(Subscription.user == user).distinct()
     return q
+
+
+def get_fetch_log():
+    return FetchLog.select().order_by(FetchLog.started_on.desc()).limit(10)

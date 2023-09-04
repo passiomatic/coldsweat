@@ -189,7 +189,6 @@ class Fetcher(object):
                 app.logger.warning(
                     "%s replied with unhandled status %d, aborted" % (
                         self.netloc, status))
-                return
         except exceptions.HTTPException:
             self.check_feed_health()
         finally:

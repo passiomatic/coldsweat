@@ -17,7 +17,7 @@
             {% if feed.alternate_link %}
               <tr>
                   <th><i class="fa fa-globe fa-fw"></i> Web page</th>
-                  <td><a target="_blank" title="Visit feed web page" href="{{feed.alternate_link}}">{{feed.alternate_link|friendly_url}}</a></td>
+                  <td><a target="_blank" rel="noopener noreferrer" title="Visit feed web page" href="{{feed.alternate_link}}">{{feed.alternate_link|friendly_url}}</a></td>
               </tr>                        
             {% endif %}
 

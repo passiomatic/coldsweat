@@ -120,6 +120,10 @@ article {
             }
         }
 
+        q {
+            color: $secondarycolor;
+        }
+
         figcaption {
             font-size: $font-size-small;
             font-style: italic;

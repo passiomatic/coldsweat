@@ -1,29 +1,19 @@
 main {
-    //min-width: max-content;
     flex-grow: 1;
     overflow-y: auto;
     height: 100vh;
-    background: $white;
 
     .entry {
         transform: translateX(-1.5rem);
         opacity: 0.75;
         transition: transform .16s ease-out, opacity .16s ease-out;
         position: relative;
-        padding: 0 2rem;
 
-        // Title
-
-        .favicon {
-            float: left;
-            //margin: 4px 0 0 (-$gutterwidth);
-        }
-        
         // Saved status
 
         .toggle-save {
             position: absolute;
-            top: -.5rem;
+            top: 1rem;
             right: 1rem;
             z-index: 1;
             font-size: $font-size-large;
@@ -45,25 +35,20 @@ main {
         transform: translateX(0);
         opacity: 1;                
     }
-}
-
-
-.view2 {
-    margin: 2rem auto;
 
     .continue {
         clear: both;
         margin-top: 2rem;
         text-align: center;
-    }
+    }    
 }
 
-
-
-// =entry ================================
+// Article
 
 article {
     @include clearfix;
+    background: $white;
+    padding: 2rem;
 
     .article__title {
         font-size: $font-size-xlarge;     

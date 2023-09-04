@@ -31,44 +31,42 @@
                     {% endif %}                    
                 </label>
             </div>
-            <template id="template-{{e.id}}">             
-                <div class="view2">                      
-                    <div class="entry {%if e.id in saved_ids%}status-saved{% endif %}">
-                        <article>
-                            <label class="toggle toggle-save">
-                                <input class="sr-only" onchange="Sweat.markSaved({{e.id}}, event)" {{ 'checked' if e.id in saved_ids else '' }}  type="checkbox">
-                                <div class="toggle-icon" title="Toggle save (S key)"></div>
-                            </label>
-                            <div class="d-flex align-items-center">
-                                {% set feed_url = url_for('main.entry_list', feed_id=e.feed.id) %}
-                                {% if e.feed.icon_url %}
-                                    <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*">&ensp;
+            <template id="template-{{e.id}}">                                  
+                <div class="entry {%if e.id in saved_ids%}status-saved{% endif %}">
+                    <article>
+                        <label class="toggle toggle-save">
+                            <input class="sr-only" onchange="Sweat.markSaved({{e.id}}, event)" {{ 'checked' if e.id in saved_ids else '' }}  type="checkbox">
+                            <div class="toggle-icon" title="Toggle save (S key)"></div>
+                        </label>
+                        <div class="d-flex align-items-center">
+                            {% set feed_url = url_for('main.entry_list', feed_id=e.feed.id) %}
+                            {% if e.feed.icon_url %}
+                                <img class="favicon" src="{{e.feed.icon_url}}" width="16" height="16"  alt="*">&ensp;
+                            {% endif %}
+                            <button class="btn-text text-muted xsmall text-uppercase" onclick="Sweat.loadFolder('{{feed_url}}')">{{e.feed.title}}</button>
+                        </div>
+                        <h1 class="article__title">{{e.title}}</h1>        
+                        {%if e.content %} 
+                            <div class="article__content">                                        
+                                {% if 'html' in e.content_type %}
+                                    {{e.content|safe}}
+                                {% else%}
+                                    {{e.content}}
                                 {% endif %}
-                                <button class="btn-text text-muted xsmall text-uppercase" onclick="Sweat.loadFolder('{{feed_url}}')">{{e.feed.title}}</button>
+                            </div>            
+                        {% endif %}
+                        {%if e.link %}
+                        <div class="continue"><a class="btn btn-small btn-visit" rel="noopener noreferrer" title="View entry on {{e.link}} (V key)" target="_blank" href="{{e.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
+                        {% endif %}
+                        <hr class="">
+                        <div class="d-flex justify-content-between">
+                            <div class="small text-muted">    
+                                <i class="fa fa-info-circle"></i> Posted {{e.published_on|datetime }} {%if e.author %} by {{ e.author }}{% endif %}                                              
                             </div>
-                            <h1 class="article__title">{{e.title}}</h1>        
-                            {%if e.content %} 
-                                <div class="article__content">                                        
-                                    {% if 'html' in e.content_type %}
-                                        {{e.content|safe}}
-                                    {% else%}
-                                        {{e.content}}
-                                    {% endif %}
-                                </div>            
-                            {% endif %}
-                            {%if e.link %}
-                            <div class="continue"><a class="btn btn-small btn-visit" rel="noopener noreferrer" title="View entry on {{e.link}} (V key)" target="_blank" href="{{e.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
-                            {% endif %}
-                            <hr class="">
-                            <div class="d-flex justify-content-between">
-                                <div class="small text-muted">    
-                                    <i class="fa fa-info-circle"></i> Posted {{e.published_on|datetime }} {%if e.author %} by {{ e.author }}{% endif %}                                              
-                                </div>
-                                <button class="btn-text small text-muted" onclick="Sweat.shareEntry({title:'{{e.title}}', url:'{{e.link}}'})" type="button">Share</button>
-                            </div>
-                        </article>    
-                    </div>
-                </div>                                      
+                            <button class="btn-text small text-muted" onclick="Sweat.shareEntry({title:'{{e.title}}', url:'{{e.link}}'})" type="button">Share</button>
+                        </div>
+                    </article>    
+                </div>                                          
             </template>
         </li>
         {% set ns.prev_date = date  %}

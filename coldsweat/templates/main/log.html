@@ -34,7 +34,7 @@
                         <ul>
                             {% for feed in line.report %}
                                 <li>
-                                    <a href="{{feed.alternate_link}}">{{feed.title}}</a> <code>{{feed.last_status}}</code>
+                                    <a target="_black" rel="noreferrer" href="{{feed.alternate_link}}">{{feed.title}}</a> <code>{{feed.last_status}}</code>
                                 </li>
                             {% endfor %}
                         </ul>

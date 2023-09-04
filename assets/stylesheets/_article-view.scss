@@ -49,7 +49,6 @@ main {
 
 
 .view2 {
-    max-width: 75ch;
     margin: 2rem auto;
 
     .continue {
@@ -75,6 +74,8 @@ article {
     }
 
     .article__content {
+        max-width: 75ch;
+        margin: 0 auto;
 
         // Headings
 

@@ -148,6 +148,21 @@ article {
         embed {
             width: 100%;
         }
+    
+        // Misc.
+        
+        sub,
+        sup {
+            font-size: $font-size-small;
+        }
+
+        sub {
+            vertical-align: bottom;
+        }
+
+        sup {
+            vertical-align: top;
+        }
     }
 
 }

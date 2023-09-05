@@ -3,6 +3,7 @@
 .list-view {
 
     @include zero;
+    list-style: none;
     margin: 0 auto;
                       
     border-right: 1px solid $border-color;  

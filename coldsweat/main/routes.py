@@ -427,6 +427,14 @@ def profile():
     return flask.render_template('main/_user_edit.html', user=user)
 
 
+@bp.route('/export')
+@flask_login.login_required
+def export():
+    user = flask_login.current_user.db_user
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: q.group_title)
+    return flask.render_template('main/export.xml', timestamp=datetime.utcnow(), groups_feeds=groups_feeds)
+
+
 @bp.route('/cheatsheet')
 def cheatsheet():
     return flask.render_template('main/_cheatsheet.html', **locals())

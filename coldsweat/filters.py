@@ -33,6 +33,13 @@ def iso_datetime(value):
     return ''
 
 
+@app.template_filter('http_datetime')
+def http_datetime(value):
+    if value:
+        return utilities.format_http_datetime(value)
+    return ''
+
+
 @app.template_filter('date')
 def date(value):
     if value:

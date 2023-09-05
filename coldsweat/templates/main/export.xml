@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <opml version="2.0">
     <head>
-        <title>Coldsweat subscriptions</title>
-		<dateCreated>{{timestamp}}</dateCreated>
+        <title>Your Coldsweat Subscriptions</title>
+		<dateCreated>{{timestamp|http_datetime}}</dateCreated>
     </head>
     <body>        
-        {{for title, feeds in groups}}
-        <outline title="{{title}}" text="{{title}}">
-            {{for feed in feeds}}
-            <outline text="{{feed.title}}" title="{{feed.title}}"
-                type="rss" xmlUrl="{{feed.self_link}}" {{if feed.alternate_link}}htmlUrl="{{feed.alternate_link}}"{{endif}}/>
-            {{endfor}}
-        </outline>
-        {{endfor}}
+        {% for group_title, feeds in groups_feeds -%}
+            <outline text="{{group_title}}">
+                {% for feed in feeds -%}
+                    <outline title="{{feed.title}}" text="{{feed.title}}" 
+                        type="rss" xmlUrl="{{feed.self_link}}" {% if feed.alternate_link %}htmlUrl="{{feed.alternate_link}}"{% endif %} />
+                {% endfor -%}
+            </outline>
+        {% endfor -%}
     </body>
 </opml>

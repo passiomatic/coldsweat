@@ -154,6 +154,8 @@ class Fetcher(object):
                     "%s is below minimun fetch interval, skipped"
                     % self.netloc)
                 return
+        
+        self.feed.last_checked_on = self.instant
 
         try:
             response = fetch_url(self.feed.self_link,
@@ -167,11 +169,9 @@ class Fetcher(object):
             app.logger.warning(
                 "a network error occured while fetching %s, skipped"
                 % self.netloc)
-            self.check_feed_health()
+            #self.check_feed_health()
             self.feed.save()
             return
-
-        self.feed.last_checked_on = self.instant
 
         # Check if we got a redirect first
         if response.history:

@@ -37,8 +37,8 @@
           
             <tr>
                 <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
-                <td>{{feed.last_checked_on|datetime}}&ensp;<code>{{feed.last_status|status_title|capitalize}}</code></td>
-            </tr>                        
+                <td>{{feed.last_checked_on|datetime}}, got {{feed.last_status|status_title|capitalize}}</td>
+            </tr>                       
             
             {% if feed.error_count %}
                 <tr>

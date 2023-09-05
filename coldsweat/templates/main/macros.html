@@ -45,8 +45,12 @@
                             {% endif %}
                             <button class="btn-text text-muted xsmall text-uppercase" onclick="Sweat.loadFolder('{{feed_url}}')">{{e.feed.title}}</button>
                         </div>
-                        <h1 class="article__title">{{e.title}}</h1>        
-                        {%if e.content %} 
+                        {% if e.title%}
+                            <h1 class="article__title">{{e.title}}</h1>        
+                        {% else %}
+                            <hr>
+                        {% endif %}
+                        {%if e.content %}
                             <div class="article__content">                                        
                                 {% if 'html' in e.content_type %}
                                     {{e.content|safe}}

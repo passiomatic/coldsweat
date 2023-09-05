@@ -18,7 +18,7 @@
                 </dt>            
                 <dd style="margin: 0 1rem">
                     {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
-                    <input id="group-all" class="sr-only" type="radio" name="tree">
+                    <input id="group-all" class="sr-only" type="radio" {{ 'checked' if (not feed_id) and (not group_id) else '' }} name="tree">
                     <label class="btn-folder" type="button" for="group-all" onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
                         <i class="fa fa-list-ul"></i> All Articles
                     </label>
@@ -75,7 +75,11 @@
     </section>
     <!-- ARTICLE -->
     <main id="main">
-        Select an article.
+        <div class="d-flex h-100 align-items-center justify-content-center">            
+            <p class="large text-muted">
+                Select an article from the list.
+            </p>
+        </div>
     </main>
 {% endblock %}
 

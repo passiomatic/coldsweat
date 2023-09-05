@@ -432,7 +432,11 @@ def profile():
 def export():
     user = flask_login.current_user.db_user
     groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: q.group_title)
-    return flask.render_template('main/export.xml', timestamp=datetime.utcnow(), groups_feeds=groups_feeds)
+
+    template =  flask.render_template('main/export.xml', timestamp=datetime.utcnow(), groups_feeds=groups_feeds)
+    r = flask.make_response(template)
+    r.headers["Content-Type"] = "application/xml"
+    return r
 
 
 @bp.route('/cheatsheet')

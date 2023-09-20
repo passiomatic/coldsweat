@@ -1,7 +1,7 @@
 import peewee
 import flask
 import flask_login
-from ..models import User, Feed, Entry, Read
+from ..models import User, Feed, Entry, Read, Subscription
 from ..utilities import format_datetime
 from . import bp, SessionUser
 
@@ -47,12 +47,8 @@ def get_stats():
 
     namespace = {
         'last_checked_on': last_checked_on,
-        'entry_count': Entry.select().count(),
-        'unread_entry_count': Entry.select().where(
-            ~(Entry.id << Read.select(Read.entry))).count(),
         'feed_count': Feed.select().count(),
-        # @@TODO: count enabled feeds with at least one subscriber
-        'active_feed_count': Feed.select().where(Feed.enabled==True).count()  # noqa
+        'active_feed_count': Feed.select().join(Subscription).where(Feed.enabled==True).count()  # noqa
     }
 
     return namespace

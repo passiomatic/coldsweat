@@ -47,7 +47,6 @@ def create_app(config_class=None):
         else:
             # Fallback to sqlite db and dev secret key
             default_database_url = f"sqlite:///{os.path.join(app.instance_path, 'coldsweat.db')}"
-            #@@TODO Specify foreign_keys=1 journal_mode=WAL"
             app.logger.debug(f"DATABASE_URL not found in configuration settings, using default {default_database_url}")
             app.config['SECRET_KEY'] = "Secret key for dev purposes only"
             app.config['DATABASE_URL'] = default_database_url

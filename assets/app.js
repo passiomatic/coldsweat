@@ -57,6 +57,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 }
                 if (prevCardInput) {
                     prevCardInput.checked = true;
+                    var entryEl = document.getElementById(`entry-${prevCardInput.value}`);
+                    entryEl.classList.add('status-read');
                     Sweat.mark(prevCardInput.value, 'read');
                     Sweat.loadEntry(prevCardInput.value, event);
                 }
@@ -77,6 +79,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 }
                 if (nextCardInput) {
                     nextCardInput.checked = true;
+                    var entryEl = document.getElementById(`entry-${nextCardInput.value}`);
+                    entryEl.classList.add('status-read');
                     Sweat.mark(nextCardInput.value, 'read')
                     Sweat.loadEntry(nextCardInput.value, event)
                 }

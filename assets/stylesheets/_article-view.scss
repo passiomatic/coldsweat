@@ -36,11 +36,12 @@ main {
         opacity: 1;                
     }
 
-    .continue {
+    .article__footer {
+        margin: 2rem 0 0 0;
+        padding: 1rem 0 0 0;
+        border-top: 1px solid $border-color;
         clear: both;
-        margin-top: 2rem;
-        text-align: center;
-    }    
+    }
 }
 
 // Article
@@ -53,9 +54,12 @@ article {
     .article__title {
         font-size: $font-size-xlarge;     
         font-weight: 600;
-        padding-bottom: 1rem;     
-        margin: .25rem 0 1.5rem 0;
+    }
+    
+    .article__meta {
         border-bottom: 5px double $border-color;
+        padding: 0 0 1rem 0;
+        margin: .25rem 0 1rem 0;
     }
 
     .article__content {

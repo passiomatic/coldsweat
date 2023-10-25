@@ -47,6 +47,9 @@
                         </div>
                         {% if e.title%}
                             <h1 class="article__title">{{e.title}}</h1>        
+                            <div class="article__meta small text-muted">
+                                Posted {{e.published_on|datetime }} {%if e.author %} by {{ e.author }}{% endif %}
+                            </div>
                         {% else %}
                             <hr>
                         {% endif %}
@@ -60,15 +63,11 @@
                             </div>            
                         {% endif %}
                         {%if e.link %}
-                        <div class="continue"><a class="btn btn-small btn-visit" rel="noopener noreferrer" title="View entry on {{e.link}} (V key)" target="_blank" href="{{e.link}}"><i class="fa fa-globe"></i> Visit Website</a></div>
-                        {% endif %}
-                        <hr class="">
-                        <div class="d-flex justify-content-between">
-                            <div class="small text-muted">    
-                                <i class="fa fa-info-circle"></i> Posted {{e.published_on|datetime }} {%if e.author %} by {{ e.author }}{% endif %}                                              
-                            </div>
+                        <div class="article__footer d-flex align-items-center justify-content-between">
+                            <a class="btn btn-small btn-visit" rel="noopener noreferrer" title="View article on {{e.link}} (V key)" target="_blank" href="{{e.link}}"><i class="fa fa-globe"></i> View Original</a>
                             <button class="btn-text small text-muted" onclick="Sweat.shareEntry({title:'{{e.title}}', url:'{{e.link}}'})" type="button">Share</button>
                         </div>
+                        {% endif %}
                     </article>    
                 </div>                                          
             </template>

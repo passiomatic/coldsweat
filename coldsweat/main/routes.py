@@ -34,9 +34,10 @@ def entry_list():
         unread, saved, group or feed
     '''
     offset = flask.request.args.get('offset', 0, type=int)
-    # This three ids allow to restore the UI panels
+    # These three ids allow to restore the UI panels
     group_id = flask.request.args.get('group_id',  0, type=int)
     feed_id = flask.request.args.get('feed_id', 0, type=int)
+    # @@TODO
     #entry_id = flask.request.args.get('entry_id', 0, type=int)
 
     user = flask_login.current_user.db_user

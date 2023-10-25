@@ -206,8 +206,10 @@ def entry_list_mark():
         except Feed.DoesNotExist:
             flask.abort(404, f'No such feed {feed_id}')
 
-        q = Entry.select(Entry).join(Feed).join(Subscription).where(
-            (Subscription.user == user) &
+        q = (Entry.select(Entry)
+            .join(Feed)
+            .join(Subscription)
+            .where((Subscription.user == user) &
             # Exclude entries already marked as read
             ~(Entry.id << Read.select(Read.entry).where(
                 Read.user == user)) &
@@ -215,12 +217,28 @@ def entry_list_mark():
             (Entry.feed == feed) &
             # Exclude entries fetched after the page load
             (Feed.last_checked_on < before)
-        ).distinct()
+        ).distinct())
         flask.flash('Feed has been marked as read', category="info")
         redirect_url = flask.url_for('main.entry_list', feed=feed_id)
-    if group_id: 
-        # @@TODO
-        pass
+    elif group_id: 
+        try:
+            group = Group.get(Group.id == group_id)
+        except Group.DoesNotExist:
+            flask.abort(404, f'No such group {group_id}')
+
+        q = (Entry.select(Entry)
+            .join(Feed)
+            .join(Subscription)
+            .where((Subscription.user == user) & 
+            (Subscription.group == group) &
+            # Exclude entries already marked as read
+            ~(Entry.id << Read.select(
+                Read.entry).where(Read.user == user)) &
+            # Exclude entries fetched after the page load
+            (Entry.published_on < before)
+            ).distinct())
+        flask.flash(f'All {group.title} entries have been marked as read', category="info")
+        redirect_url = flask.url_for('main.entry_list', unread='')        
     else:
         q = Entry.select(Entry).join(Feed).join(Subscription).where(
             (Subscription.user == user) &

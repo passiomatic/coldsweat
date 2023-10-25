@@ -96,10 +96,11 @@ article {
         }
 
         blockquote {
-            color: $secondarycolor;
-            padding: 0 $gutterwidth;
+            // color: $secondarycolor;
+            padding: 0 $gutterwidth / 2;
+            // margin: 0 $gutterwidth / 2;
             font-size: 0.925em; // A tad smaller...
-
+            border-left: .25rem solid $color-neutral-500; 
             p:last-child {
                 margin-bottom: 0;
             }

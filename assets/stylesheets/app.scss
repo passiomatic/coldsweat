@@ -22,7 +22,9 @@ body {
 }
 
 body {
-    display: flex;
+    display: grid;
+    grid-template-columns: 240px 1fr 2fr;
+    grid-template-rows: auto;
 }
 
 ::selection {
@@ -114,7 +116,7 @@ pre {
 }
 
 
-// Messages taking all panel height
+// Messages taking all vertical height
 .notice {
     text-align: center;
     height: 100%;
@@ -170,7 +172,6 @@ nav {
     background: $color-neutral-400;
     height: 100vh;
     overflow-y: scroll;
-    flex-basis: 15rem;
     display: flex;
     flex-direction: column;    
 }

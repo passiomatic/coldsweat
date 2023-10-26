@@ -7,9 +7,33 @@ from ..models import (Entry, Feed, Group, Read, Saved, Subscription, FetchLog)
 
 
 def get_groups_and_feeds(user):
-    q = (Feed.select(Feed.id, Feed.enabled, Feed.self_link, Feed.alternate_link, Feed.title, Feed.icon_url, Group.id.alias('group_id'), Group.title.alias('group_title'))
+    group_read_subquery = (Group.select(Group.id, fn.Count(Entry.id).alias("group_read_count"))
+                           .join(Subscription)
+                           .join(Feed)
+                           .join(Entry)
+                           .join(Read)
+                           .where((Subscription.user == user) & (Subscription.user == Read.user))
+                           .group_by(Group.id))
+    feed_read_subquery = (Feed.select(Feed.id, fn.Count(Entry.id).alias("feed_read_count"))
+                          .join(Subscription)
+                          .switch(Feed)
+                          .join(Entry)
+                          .join(Read)
+                          .where((Subscription.user == user) & (Subscription.user == Read.user))
+                          .group_by(Feed.id))    
+    # for fsubq in feed_read_subquery:
+    #     print(fsubq.id, fsubq.feed_read_count)
+    q = (Feed.select(Feed, 
+                     Group.id.alias('group_id'), 
+                     Group.title.alias('group_title'), 
+                     group_read_subquery.c.group_read_count, 
+                     feed_read_subquery.c.feed_read_count)
          .join(Subscription)
          .join(Group)
+         .join(group_read_subquery, JOIN.LEFT_OUTER, on=(
+             group_read_subquery.c.id == Group.id))      
+         .join(feed_read_subquery, JOIN.LEFT_OUTER, on=(
+             feed_read_subquery.c.id == Feed.id))                  
          .where((
              Subscription.user == user)).order_by(Group.title)).objects()
     return q

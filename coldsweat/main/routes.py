@@ -49,7 +49,7 @@ def entry_list():
     read_ids = dict((i.id, None) for i in r)
     saved_ids = dict((i.id, None) for i in s)
 
-    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(flask_login.current_user.db_user), lambda q: (q.group_id, q.group_title))
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(flask_login.current_user.db_user), lambda q: (q.group_id, q.group_title, q.group_read_count))
 
     page_title = 'All Articles'
     if group_id:
@@ -362,7 +362,7 @@ def feed_add_1():
     try:
         response = fetcher.fetch_url(self_link)
     except RequestException:
-        flask.flash("Error, feed address is incorrect or remote host is unreachable.", category="error")
+        flask.flash("Error, feed address is not correct or remote host is unreachable.", category="error")
         return flask.render_template('main/_feed_add_wizard_1.html', **locals())    
     if not markup.sniff_feed(response.text):
         links = markup.find_feed_links(response.text, base_url=self_link)

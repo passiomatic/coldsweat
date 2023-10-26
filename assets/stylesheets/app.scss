@@ -281,3 +281,13 @@ nav {
     border: 1px solid darken($danger-color, 10%);    
 }
 
+.badge {
+    border-radius: .25rem;
+    background-color: $color-neutral-300;
+    color: $white;
+    min-width: 3ch;
+    font-size: $font-size-xsmall;
+    align-self: center;
+    text-align: center;
+    margin-right: .5rem;
+}

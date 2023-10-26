@@ -36,41 +36,16 @@ def nav():
 
     user = flask_login.current_user.db_user
 
-    # r = Entry.select(Entry.id).join(Read).where((Read.user ==
-    #                                              user)).objects()
-    # s = Entry.select(Entry.id).join(Saved).where((Saved.user ==
-    #                                               user)).objects()
-    # read_ids = dict((i.id, None) for i in r)
-    # saved_ids = dict((i.id, None) for i in s)
-
     groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
 
-    # page_title = 'All Articles'
-    # if group_id:
-    #     query = queries.get_group_entries(user, group_id)
-    #     # @@TODO actual group name 
-    #     page_title = 'Group name'
-    # elif feed_id: 
-    #     query = queries.get_feed_entries(user, feed_id)
-    #     # @@TODO actual feed name 
-    #     page_title = 'Feed name'
-    # else:
-    #     query = queries.get_all_entries(user)
-
-    # Check URL or cookie value for current filter
-    # filter = flask.request.args.get('filter') or flask.request.cookies.get('filter')
-    # if filter == 'saved':
-    #     query = query.where(Entry.id << Saved.select(Saved.entry).where(Saved.user == user))
-    # elif filter == 'unread':
-    #     query = query.where(~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
-    # else:
-    #     filter = 'archive'
+    total_unread_count = queries.get_total_unread_count(user)
 
     view_variables = {
         'feed_id': feed_id,
         'group_id': group_id,
         'is_xhr': flask.request.args.get('xhr', 0, type=int),
-        'groups_feeds': groups_feeds
+        'groups_feeds': groups_feeds,
+        'total_unread_count': total_unread_count
     }
 
     return flask.render_template('main/_nav.html', **view_variables)
@@ -78,10 +53,6 @@ def nav():
 @bp.route('/entries')
 @flask_login.login_required
 def entry_list():
-    '''
-    Show entries filtered and possibly paginated by:
-        unread, saved, group or feed
-    '''
     offset = flask.request.args.get('offset', 0, type=int)
     # These three ids allow to restore the UI panels
     group_id = flask.request.args.get('group_id',  0, type=int)
@@ -121,6 +92,8 @@ def entry_list():
     else:
         filter = 'archive'
 
+    total_unread_count = queries.get_total_unread_count(user)
+
     view_variables = {
         'entries': query.order_by(
             Entry.published_on.desc()
@@ -135,7 +108,8 @@ def entry_list():
         'is_xhr': flask.request.args.get('xhr', 0, type=int),
         'filter': filter,
         'page_title': page_title,
-        'groups_feeds': groups_feeds
+        'groups_feeds': groups_feeds,
+        'total_unread_count': total_unread_count
     }
     if offset:
         return flask.render_template("main/entries-more.html", **view_variables)

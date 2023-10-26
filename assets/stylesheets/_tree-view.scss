@@ -2,7 +2,6 @@
 
 .tree-view {
     @include zero;
-    //color: $white;
     dt {
         font-size: $font-size-xsmall;
         font-weight: 700;
@@ -13,9 +12,6 @@
 
     dd {
         @include zero;
-
-        //margin-bottom: .75rem;
-
         ul {
             list-style: none;                        
             li {
@@ -86,7 +82,7 @@
         &:hover {
             // color: $color-neutral-700;
             // transition: color .1s ease-out;
-            text-decoration: underline;
+            //text-decoration: underline;
         }   
     }
 

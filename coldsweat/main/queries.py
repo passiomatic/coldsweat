@@ -4,6 +4,15 @@ from flask import current_app as app
 from peewee import JOIN, fn, IntegrityError
 from ..models import (Entry, Feed, Group, Read, Saved, Subscription, FetchLog)
 
+def get_total_unread_count(user):
+    # @@TODO Compute *unread* entries 
+    (total, read) = (Entry.select(fn.Count(Entry.id), fn.Count(Read.id))
+         .join(Feed)
+         .join(Subscription)
+         .switch(Entry)
+         .join(Read, JOIN.LEFT_OUTER)
+         .where((Subscription.user == user) & (Read.user == user)).scalar(as_tuple=True))
+    return total - read
 
 
 def get_groups_and_feeds(user):

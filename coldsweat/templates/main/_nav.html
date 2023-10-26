@@ -8,14 +8,19 @@
             <dt id="dt-explore">
                 EXPLORE
             </dt>
-            <dd id="dd-all" style="margin: 0 1rem">
-                {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
-                <input id="group-all" class="sr-only" type="radio" {{ 'checked' if (not feed_id) and (not group_id)
-                    else '' }} name="tree">
-                <label class="btn-folder" type="button" for="group-all"
-                    onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
-                    <i class="fa fa-list-ul"></i> All Articles
-                </label>
+            <dd id="dd-all">
+                <ul>
+                    <li>
+                        {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
+                        <input id="group-all" class="sr-only" type="radio" {{ 'checked' if (not feed_id) and (not group_id)
+                            else '' }} name="tree">
+                        <label class="btn-folder" type="button" for="group-all"
+                            onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
+                            <i class="fa fa-list-ul"></i> All Articles
+                        </label>
+                        <span id="all-unread" class="badge">{{total_unread_count}}</span>
+                    </li>
+                </ul>
             </dd>
             <dt id="dt-folders">
                 FOLDERS

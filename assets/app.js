@@ -23,17 +23,38 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
     // Innermost element that does not get replaced
     var listViewEl = document.getElementById("panel");
+    var navViewEl = document.getElementById("nav");
+    var dirty = false;
 
     const Sweat = {
-        
-        onEntryLoad: function(id, title, event) {
+
+        onEntryLoad: function (id, title, event) {
             var entryEl = document.getElementById(`entry-${id}`);
             entryEl.classList.add('status-read')
             Sweat.loadEntry(id, title, event)
         },
 
         morph: function (sourceEl, fragment, options) {
-            morphdom(sourceEl, fragment, options)
+            morphdom(sourceEl, fragment, {
+                childrenOnly: true,
+                onBeforeElUpdated: (fromEl, toEl) => {
+                    if (fromEl.tagName == "DETAILS") {
+                        console.log(`Skipped ${fromEl.getAttribute('id')}`)
+                        return false;
+                    }
+                    // console.log(`Matched ${fromEl.getAttribute('id')} <- ${toEl.getAttribute('id')}`);
+                    return true;
+                },
+                onBeforeElChildrenUpdated: (fromEl, toEl) => {
+                    if (fromEl.tagName == "DETAILS") {
+                        console.log(`Skipped ${fromEl.getAttribute('id')}`)
+                        return false;
+                    }
+
+                    console.log(`Updated ${fromEl.getAttribute('id')}`)
+                    return true;
+                }     
+            })
         },
 
         setup: function () {
@@ -85,6 +106,26 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     Sweat.loadEntry(nextCardInput.value, event)
                 }
             });
+
+            // Update UI timer 
+            var timerId = setInterval(() => {
+                if (dirty) {
+                    var newUrl = new URL(location.href);
+                    newUrl.pathname = '/nav'
+                    // console.log('New URL ' + newUrl.href)
+                    fetch(newUrl)
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`Server returned error ${response.status} while handing GET request`);
+                            }
+                            response.text().then((text) => {
+                                navViewEl.innerHTML = text;
+                                // Sweat.morph(navViewEl, text.trim())
+                            });
+                        });
+                    dirty = false;
+                }
+            }, 1500)
         },
 
         submitRemoteForm: function (url, event) {
@@ -134,20 +175,21 @@ window.addEventListener("DOMContentLoaded", (event) => {
         loadEntry: function (id, title, event) {
             var mainEl = document.getElementById('main');
             fetch(makeEndpointURL(`/entries/${id}`))
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Server returned error ${response.status} while handing GET request`);
-                }
-                response.text().then((text) => {
-                    mainEl.innerHTML = text;                    
-                    // Remove any previous animation triggers
-                    //mainEl.classList.remove('in')
-                    window.requestAnimationFrame((timeStamp) => {
-                        // Add on next frame to trigger entering animation
-                        mainEl.classList.add('in')
-                    })
-                });    
-            });    
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned error ${response.status} while handing GET request`);
+                    }
+                    response.text().then((text) => {
+                        mainEl.innerHTML = text;
+                        // Remove any previous animation triggers
+                        //mainEl.classList.remove('in')
+                        dirty = true;
+                        window.requestAnimationFrame((timeStamp) => {
+                            // Add on next frame to trigger entering animation
+                            mainEl.classList.add('in')
+                        })
+                    });
+                });
 
             // @@TODO
             //document.title = `${title} • Coldsweat`;
@@ -167,7 +209,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 var inputEl = event.currentTarget.previousElementSibling
                 if (inputEl) {
                     inputEl.checked = true;
-                }                
+                }
             }
             fetch(url)
                 .then((response) => {

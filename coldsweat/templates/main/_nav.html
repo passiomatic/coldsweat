@@ -1,0 +1,61 @@
+{% import "main/macros.html" as macros %}
+<nav class="nav" id="nav">
+    <div class="nav__branding">
+        <i class="fa fa-tint"></i>
+    </div>
+    <form>
+        <dl id="tree-view" class="tree-view">
+            <dt id="dt-explore">
+                EXPLORE
+            </dt>
+            <dd id="dd-all" style="margin: 0 1rem">
+                {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
+                <input id="group-all" class="sr-only" type="radio" {{ 'checked' if (not feed_id) and (not group_id)
+                    else '' }} name="tree">
+                <label class="btn-folder" type="button" for="group-all"
+                    onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
+                    <i class="fa fa-list-ul"></i> All Articles
+                </label>
+            </dd>
+            <dt id="dt-folders">
+                FOLDERS
+            </dt>
+            {% if groups_feeds %}
+            {% for (g_id, group_title, group_unread_count), feeds in groups_feeds %}
+            <dd id="dd-{{g_id}}">
+                <details id="details-{{g_id}}">
+                    <summary>
+                        <input id="group-{{g_id}}" class="sr-only" type="radio" {{ 'checked' if g_id==group_id else ''
+                            }} name="tree">
+                        {{ macros.render_group_label(g_id, group_title, group_unread_count) }}
+                    </summary>
+                    <ul class="ul-{{g_id}}">
+                        {% for f in feeds %}
+                        {% set request_url = url_for('main.entry_list', _external=True, feed_id=f.id, xhr=1) %}
+                        <li id="li-{{f.id}}">
+                            <input id="feed-{{f.id}}" class="sr-only" type="radio" {{ 'checked' if f.id==feed_id else ''
+                                }} name="tree">
+                            {{ macros.render_feed_label(f) }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            </dd>
+            {% endfor %}
+            {% endif %}
+        </dl>
+    </form>
+    <div id="add" style="margin: auto .75rem .75rem .75rem;">
+        {% set add_url = url_for('main.feed_add_1', xhr=1) %}
+        <button class="btn-text small" onclick="Sweat.openRemoteDialog('{{ add_url }}', event);"><i
+                class="fa fa-plus-square"></i> Add feed subscription</button>
+    </div>
+    <!-- <ul class="">
+        <li class="sep"><li class="dropdown"><a data-toggle="dropdown" href="#"><i class="fa fa-user fa-fw"></i></a>   
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="{{ url_for('main.profile') }}" data-remote-modal>Your profile</a>
+                <li><a href="{{ url_for('auth.logout') }}">Log out</a>
+            </ul>
+        </li>
+    </ul> -->
+</nav>

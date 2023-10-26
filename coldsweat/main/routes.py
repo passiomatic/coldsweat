@@ -25,6 +25,55 @@ GROUPS_PER_PAGE = 30
 def index():
     return entry_list()
 
+@bp.route('/nav')
+@flask_login.login_required
+def nav():
+    # These three ids allow to restore the UI panels
+    group_id = flask.request.args.get('group_id',  0, type=int)
+    feed_id = flask.request.args.get('feed_id', 0, type=int)
+    # @@TODO
+    #entry_id = flask.request.args.get('entry_id', 0, type=int)
+
+    user = flask_login.current_user.db_user
+
+    # r = Entry.select(Entry.id).join(Read).where((Read.user ==
+    #                                              user)).objects()
+    # s = Entry.select(Entry.id).join(Saved).where((Saved.user ==
+    #                                               user)).objects()
+    # read_ids = dict((i.id, None) for i in r)
+    # saved_ids = dict((i.id, None) for i in s)
+
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
+
+    # page_title = 'All Articles'
+    # if group_id:
+    #     query = queries.get_group_entries(user, group_id)
+    #     # @@TODO actual group name 
+    #     page_title = 'Group name'
+    # elif feed_id: 
+    #     query = queries.get_feed_entries(user, feed_id)
+    #     # @@TODO actual feed name 
+    #     page_title = 'Feed name'
+    # else:
+    #     query = queries.get_all_entries(user)
+
+    # Check URL or cookie value for current filter
+    # filter = flask.request.args.get('filter') or flask.request.cookies.get('filter')
+    # if filter == 'saved':
+    #     query = query.where(Entry.id << Saved.select(Saved.entry).where(Saved.user == user))
+    # elif filter == 'unread':
+    #     query = query.where(~(Entry.id << Read.select(Read.entry).where(Read.user == user)))
+    # else:
+    #     filter = 'archive'
+
+    view_variables = {
+        'feed_id': feed_id,
+        'group_id': group_id,
+        'is_xhr': flask.request.args.get('xhr', 0, type=int),
+        'groups_feeds': groups_feeds
+    }
+
+    return flask.render_template('main/_nav.html', **view_variables)
 
 @bp.route('/entries')
 @flask_login.login_required
@@ -49,7 +98,7 @@ def entry_list():
     read_ids = dict((i.id, None) for i in r)
     saved_ids = dict((i.id, None) for i in s)
 
-    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(flask_login.current_user.db_user), lambda q: (q.group_id, q.group_title, q.group_read_count))
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
 
     page_title = 'All Articles'
     if group_id:

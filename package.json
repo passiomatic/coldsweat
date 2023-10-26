@@ -16,6 +16,6 @@
   ],
   "dependencies": {
     "hotkeys-js": "3.12.0",
-    "morphdom": "2.7.0"
+    "morphdom": "2.7.1"
   }
 }

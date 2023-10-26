@@ -1,5 +1,5 @@
 import hotkeys from 'hotkeys-js';
-import morphdom from 'morphdom';
+import 'idiomorph';
 
 window.addEventListener("DOMContentLoaded", (event) => {
 
@@ -35,26 +35,27 @@ window.addEventListener("DOMContentLoaded", (event) => {
         },
 
         morph: function (sourceEl, fragment, options) {
-            morphdom(sourceEl, fragment, {
-                childrenOnly: true,
-                onBeforeElUpdated: (fromEl, toEl) => {
-                    if (fromEl.tagName == "DETAILS") {
-                        console.log(`Skipped ${fromEl.getAttribute('id')}`)
-                        return false;
-                    }
-                    // console.log(`Matched ${fromEl.getAttribute('id')} <- ${toEl.getAttribute('id')}`);
-                    return true;
-                },
-                onBeforeElChildrenUpdated: (fromEl, toEl) => {
-                    if (fromEl.tagName == "DETAILS") {
-                        console.log(`Skipped ${fromEl.getAttribute('id')}`)
-                        return false;
-                    }
+            Idiomorph.morph(sourceEl, fragment)
+            // morphdom(sourceEl, fragment, {
+            //     childrenOnly: true,
+            //     onBeforeElUpdated: (fromEl, toEl) => {
+            //         if (fromEl.tagName == "DETAILS") {
+            //             console.log(`Skipped ${fromEl.getAttribute('id')}`)
+            //             return false;
+            //         }
+            //         // console.log(`Matched ${fromEl.getAttribute('id')} <- ${toEl.getAttribute('id')}`);
+            //         return true;
+            //     },
+            //     onBeforeElChildrenUpdated: (fromEl, toEl) => {
+            //         if (fromEl.tagName == "DETAILS") {
+            //             console.log(`Skipped ${fromEl.getAttribute('id')}`)
+            //             return false;
+            //         }
 
-                    console.log(`Updated ${fromEl.getAttribute('id')}`)
-                    return true;
-                }     
-            })
+            //         console.log(`Updated ${fromEl.getAttribute('id')}`)
+            //         return true;
+            //     }     
+            // })
         },
 
         setup: function () {
@@ -112,15 +113,14 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 if (dirty) {
                     var newUrl = new URL(location.href);
                     newUrl.pathname = '/nav'
-                    // console.log('New URL ' + newUrl.href)
                     fetch(newUrl)
                         .then((response) => {
                             if (!response.ok) {
-                                throw new Error(`Server returned error ${response.status} while handing GET request`);
+                                throw new Error(`Server returned error ${response.status} while handling GET request`);
                             }
                             response.text().then((text) => {
-                                navViewEl.innerHTML = text;
-                                // Sweat.morph(navViewEl, text.trim())
+                                // navViewEl.innerHTML = text;
+                                Sweat.morph(navViewEl, text.trim())
                             });
                         });
                     dirty = false;
@@ -177,7 +177,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
             fetch(makeEndpointURL(`/entries/${id}`))
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(`Server returned error ${response.status} while handing GET request`);
+                        throw new Error(`Server returned error ${response.status} while handling GET request`);
                     }
                     response.text().then((text) => {
                         mainEl.innerHTML = text;
@@ -261,7 +261,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
             fetch(makeEndpointURL(`/entries/${id}`), { method: 'POST', body: formData })
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(`Server returned error ${response.status} while handing POST request`);
+                        throw new Error(`Server returned error ${response.status} while handling POST request`);
                     }
                     response.text().then((text) => {
                     });

@@ -4,7 +4,7 @@
         <i class="fa fa-tint"></i>
     </div>
     <form>
-        <dl id="tree-view" class="tree-view">
+        <dl class="tree-view">
             <dt id="dt-explore">
                 EXPLORE
             </dt>
@@ -23,7 +23,7 @@
             {% if groups_feeds %}
             {% for (g_id, group_title, group_unread_count), feeds in groups_feeds %}
             <dd id="dd-{{g_id}}">
-                <details id="details-{{g_id}}">
+                <details>
                     <summary>
                         <input id="group-{{g_id}}" class="sr-only" type="radio" {{ 'checked' if g_id==group_id else ''
                             }} name="tree">

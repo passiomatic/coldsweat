@@ -16,6 +16,6 @@
   ],
   "dependencies": {
     "hotkeys-js": "3.12.0",
-    "morphdom": "2.7.1"
+    "idiomorph": "^0.0.9"
   }
 }

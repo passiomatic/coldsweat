@@ -1,0 +1,42 @@
+<div class="entry {%if entry.id in saved_ids%}status-saved{% endif %}">
+    <article>
+        <label class="toggle toggle-save">
+            <input class="sr-only" onchange="Sweat.markSaved({{entry.id}}, event)" {{ 'checked' if entry.id in saved_ids else ''
+                }} type="checkbox">
+            <div class="toggle-icon" title="Toggle save (S key)"></div>
+        </label>
+        <div class="d-flex align-items-center">
+            {% set feed_url = url_for('main.entry_list', feed_id=entry.feed.id) %}
+            {% if entry.feed.icon_url %}
+            <img class="favicon" src="{{entry.feed.icon_url}}" width="16" height="16" alt="*">&ensp;
+            {% endif %}
+            <button class="btn-text text-muted xsmall text-uppercase"
+                onclick="Sweat.loadFolder('{{feed_url}}')">{{entry.feed.title}}</button>
+        </div>
+        {% if entry.title%}
+        <h1 class="article__title">{{entry.title}}</h1>
+        <div class="article__meta small text-muted">
+            Posted {{entry.published_on|datetime }} {%if entry.author %} by {{ entry.author }}{% endif %}
+        </div>
+        {% else %}
+        <hr>
+        {% endif %}
+        {%if entry.content %}
+        <div class="article__content">
+            {% if 'html' in entry.content_type %}
+            {{entry.content|safe}}
+            {% else%}
+            {{entry.content}}
+            {% endif %}
+        </div>
+        {% endif %}
+        {%if entry.link %}
+        <div class="article__footer d-flex align-items-center justify-content-between">
+            <a class="btn btn-small btn-visit" rel="noopener noreferrer" title="View article on {{entry.link}} (V key)"
+                target="_blank" href="{{entry.link}}"><i class="fa fa-globe"></i> View Original</a>
+            <button class="btn-text small text-muted"
+                onclick="Sweat.shareEntry({title:'{{entry.title}}', url:'{{entry.link}}'})" type="button">Share</button>
+        </div>
+        {% endif %}
+    </article>
+</div>

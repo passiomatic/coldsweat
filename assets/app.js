@@ -133,26 +133,33 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
         loadEntry: function (id, title, event) {
             var mainEl = document.getElementById('main');
-            // Remove any previous animation triggers
-            //mainEl.classList.remove('in')
-            Sweat.replaceElementWithTemplate(`template-${id}`, mainEl, event);
-            window.requestAnimationFrame((timeStamp) => {
-                // Add on next frame to trigger entering animation
-                mainEl.classList.add('in')
-            })
+            fetch(makeEndpointURL(`/entries/${id}`))
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Server returned error ${response.status} while handing GET request`);
+                }
+                response.text().then((text) => {
+                    mainEl.innerHTML = text;                    
+                    // Remove any previous animation triggers
+                    //mainEl.classList.remove('in')
+                    window.requestAnimationFrame((timeStamp) => {
+                        // Add on next frame to trigger entering animation
+                        mainEl.classList.add('in')
+                    })
+                });    
+            });    
 
-            Sweat.mark(id, 'read');
             // @@TODO
             //document.title = `${title} • Coldsweat`;
             event.preventDefault();
         },
 
-        replaceElementWithTemplate: function (templateId, targetEl, event) {
-            var templateEl = document.getElementById(templateId);
-            //var targetEl = document.getElementById(targetId);
-            var sourceElCopy = templateEl.content.firstElementChild.cloneNode(true);
-            targetEl.replaceChildren(...[sourceElCopy]);
-        },
+        // replaceElementWithTemplate: function (templateId, targetEl, event) {
+        //     var templateEl = document.getElementById(templateId);
+        //     //var targetEl = document.getElementById(targetId);
+        //     var sourceElCopy = templateEl.content.firstElementChild.cloneNode(true);
+        //     targetEl.replaceChildren(...[sourceElCopy]);
+        // },
 
         loadFolder: function (url, title, event) {
             if (event) {

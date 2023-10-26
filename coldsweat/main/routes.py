@@ -90,32 +90,28 @@ def entry_list():
     }
     if offset:
         return flask.render_template("main/entries-more.html", **view_variables)
-    
+
     response = flask.make_response(flask.render_template("main/entries.html", **view_variables))
     # Remember last used filter across requests
     response.set_cookie('filter', filter)
     return response
 
-# @bp.route('/entries/<int:entry_id>')
-# @flask_login.login_required
-# def entry(entry_id):
-#     entry = get_object_or_404(Entry, (Entry.id == entry_id))
+@bp.route('/entries/<int:entry_id>')
+@flask_login.login_required
+def entry_detail(entry_id):
+    entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
-#     user = flask_login.current_user.db_user
+    user = flask_login.current_user.db_user
 
-#     feed.mark_entry(user, entry, 'read')
-#     query, view_variables = _make_view_variables(user)
-#     n = query.where(Entry.published_on < entry.published_on).order_by(
-#         Entry.published_on.desc()).limit(1)
+    feed.mark_entry(user, entry, 'read')
+    view_variables = {
+        'entry': entry,
+        'saved_ids': [],
+        'read_ids': [],
+        'is_xhr': flask.request.args.get('xhr', 0, type=int),
+    }
 
-#     view_variables.update({
-#         'entry': entry,
-#         'page_title': entry.title,
-#         'next_entries': n,
-#         'count': 0  # Fake it
-#     })
-
-#     return flask.render_template('main/entry.html', **view_variables)
+    return flask.render_template('main/_entry.html', **view_variables)
 
 @bp.route('/entries/<int:entry_id>', methods=["POST"])
 @flask_login.login_required
@@ -208,17 +204,17 @@ def entry_list_mark():
             flask.abort(404, f'No such feed {feed_id}')
 
         q = (Entry.select(Entry)
-            .join(Feed)
-            .join(Subscription)
-            .where((Subscription.user == user) &
-            # Exclude entries already marked as read
-            ~(Entry.id << Read.select(Read.entry).where(
-                Read.user == user)) &
-            # Filter by current feed
-            (Entry.feed == feed) &
-            # Exclude entries fetched after the page load
-            (Feed.last_checked_on < before)
-        ).distinct())
+             .join(Feed)
+             .join(Subscription)
+             .where((Subscription.user == user) &
+                    # Exclude entries already marked as read
+                    ~(Entry.id << Read.select(Read.entry).where(
+                        Read.user == user)) &
+                    # Filter by current feed
+                    (Entry.feed == feed) &
+                    # Exclude entries fetched after the page load
+                    (Feed.last_checked_on < before)
+                    ).distinct())
         flask.flash('Feed has been marked as read', category="info")
         redirect_url = flask.url_for('main.entry_list', feed=feed_id)
     elif group_id: 
@@ -228,16 +224,16 @@ def entry_list_mark():
             flask.abort(404, f'No such group {group_id}')
 
         q = (Entry.select(Entry)
-            .join(Feed)
-            .join(Subscription)
-            .where((Subscription.user == user) & 
-            (Subscription.group == group) &
-            # Exclude entries already marked as read
-            ~(Entry.id << Read.select(
-                Read.entry).where(Read.user == user)) &
-            # Exclude entries fetched after the page load
-            (Entry.published_on < before)
-            ).distinct())
+             .join(Feed)
+             .join(Subscription)
+             .where((Subscription.user == user) & 
+                    (Subscription.group == group) &
+                    # Exclude entries already marked as read
+                    ~(Entry.id << Read.select(
+                        Read.entry).where(Read.user == user)) &
+                    # Exclude entries fetched after the page load
+                    (Entry.published_on < before)
+                    ).distinct())
         flask.flash(f'All {group.title} entries have been marked as read', category="info")
         redirect_url = flask.url_for('main.entry_list', unread='')        
     else:
@@ -414,19 +410,19 @@ def feed_remove():
 
     if flask.request.method == 'GET':
         return _render_modal(flask.url_for('main.feed_remove', feed=feed.id),
-            title='Remove <i>%s</i> from your subscriptions?'
-            % feed.title, button='Remove')
+                             title='Remove <i>%s</i> from your subscriptions?'
+                             % feed.title, button='Remove')
 
     # Handle postback
     Subscription.delete().where(
         (Subscription.user == user
-            ) & (Subscription.feed == feed)).execute()
+         ) & (Subscription.feed == feed)).execute()
     flask.flash(
         f'You are no longer subscribed to <i>{feed.title}</i>.', category="info")
-    
+
     return flask.redirect(flask.url_for('main.feed_list'))
 
-    
+
 @bp.route('/profile', methods=['GET', 'POST'])
 @flask_login.login_required
 def profile():

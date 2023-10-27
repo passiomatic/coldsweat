@@ -35,13 +35,6 @@ main {
         transform: translateX(0);
         opacity: 1;                
     }
-
-    .article__footer {
-        margin: 2rem 0 0 0;
-        padding: 1rem 0 0 0;
-        border-top: 1px solid $border-color;
-        clear: both;
-    }
 }
 
 // Article
@@ -54,17 +47,18 @@ article {
     .article__title {
         font-size: $font-size-xlarge;     
         font-weight: 600;
+        margin: .75rem 0 0 0;
     }
     
     .article__meta {
         border-bottom: 5px double $border-color;
         padding: 0 0 1rem 0;
-        margin: .25rem 0 1rem 0;
+        margin: .25rem 0 2rem 0;
     }
 
     .article__content {
         max-width: 75ch;
-        margin: 0 auto;
+        margin: 0 auto 2rem auto;
 
         // Headings
 
@@ -92,11 +86,15 @@ article {
         ol,
         dl {
             @include zero;
-            margin: .75rem 0;
+            margin: 1rem 0;
 
             &:first-child {
                 margin-top: 0;
             }
+        }
+        
+        a {
+            text-decoration: underline;
         }
 
         blockquote {
@@ -176,4 +174,9 @@ article {
         }
     }
 
+    .article__footer {
+        clear: both;
+        padding: 1rem 0 0 0;
+        border-top: 1px solid $border-color;
+    }
 }

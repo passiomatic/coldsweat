@@ -23,8 +23,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
     // Innermost element that does not get replaced
     var listViewEl = document.getElementById("panel");
-    var navViewEl = document.getElementById("nav");
-    var dirty = false;
+    // var navViewEl = document.getElementById("nav");
+    // var dirty = false;
 
     const Sweat = {
 
@@ -81,7 +81,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     prevCardInput.checked = true;
                     var entryEl = document.getElementById(`entry-${prevCardInput.value}`);
                     entryEl.classList.add('status-read');
-                    Sweat.mark(prevCardInput.value, 'read');
+                    // Sweat.mark(prevCardInput.value, 'read');
                     Sweat.loadEntry(prevCardInput.value, event);
                 }
             });
@@ -103,29 +103,29 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     nextCardInput.checked = true;
                     var entryEl = document.getElementById(`entry-${nextCardInput.value}`);
                     entryEl.classList.add('status-read');
-                    Sweat.mark(nextCardInput.value, 'read')
+                    // Sweat.mark(nextCardInput.value, 'read')
                     Sweat.loadEntry(nextCardInput.value, event)
                 }
             });
 
             // Update UI timer 
-            var timerId = setInterval(() => {
-                if (dirty) {
-                    var newUrl = new URL(location.href);
-                    newUrl.pathname = '/nav'
-                    fetch(newUrl)
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error(`Server returned error ${response.status} while handling GET request`);
-                            }
-                            response.text().then((text) => {
-                                // navViewEl.innerHTML = text;
-                                Sweat.morph(navViewEl, text.trim())
-                            });
-                        });
-                    dirty = false;
-                }
-            }, 1500)
+            // var timerId = setInterval(() => {
+            //     if (dirty) {
+            //         var newUrl = new URL(location.href);
+            //         newUrl.pathname = '/nav'
+            //         fetch(newUrl)
+            //             .then((response) => {
+            //                 if (!response.ok) {
+            //                     throw new Error(`Server returned error ${response.status} while handling GET request`);
+            //                 }
+            //                 response.text().then((text) => {
+            //                     // navViewEl.innerHTML = text;
+            //                     Sweat.morph(navViewEl, text)
+            //                 });
+            //             });
+            //         dirty = false;
+            //     }
+            // }, 1500)
         },
 
         submitRemoteForm: function (url, event) {
@@ -180,10 +180,10 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         throw new Error(`Server returned error ${response.status} while handling GET request`);
                     }
                     response.text().then((text) => {
-                        mainEl.innerHTML = text;
+                        // mainEl.innerHTML = text;
                         // Remove any previous animation triggers
                         //mainEl.classList.remove('in')
-                        dirty = true;
+                        eval(text)
                         window.requestAnimationFrame((timeStamp) => {
                             // Add on next frame to trigger entering animation
                             mainEl.classList.add('in')
@@ -203,7 +203,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         //     targetEl.replaceChildren(...[sourceElCopy]);
         // },
 
-        loadFolder: function (url, title, event) {
+        loadFolder: function (url, title, event, updateNav=false) {
             if (event) {
                 event.preventDefault();
                 var inputEl = event.currentTarget.previousElementSibling
@@ -229,11 +229,16 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         // We want to restore the whole page
                         newUrl.searchParams.delete('xhr');
                         history.pushState({}, '', newUrl.href)
+                        dirty = updateNav
                         if (title) {
                             document.title = `${title} • Coldsweat`;
-                        }
+                        }                        
                     });
                 });
+        },
+
+        loadFolderAndNav: function (url, title, event) {
+            Sweat.loadFolder(url, title, event, true)
         },
 
         closeDialog: function (event) {

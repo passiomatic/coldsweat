@@ -119,22 +119,49 @@ def entry_list():
     response.set_cookie('filter', filter)
     return response
 
+# @bp.route('/entries/<int:entry_id>')
+# @flask_login.login_required
+# def entry_detail(entry_id):
+#     entry = get_object_or_404(Entry, (Entry.id == entry_id))
+
+#     user = flask_login.current_user.db_user
+
+#     feed.mark_entry(user, entry, 'read')
+#     view_variables = {
+#         'entry': entry,
+#         'saved_ids': [],
+#         'read_ids': [],
+#         'is_xhr': flask.request.args.get('xhr', 0, type=int),
+#     }
+
+#     return flask.render_template('main/_entry.html', **view_variables)
+
 @bp.route('/entries/<int:entry_id>')
 @flask_login.login_required
 def entry_detail(entry_id):
-    entry = get_object_or_404(Entry, (Entry.id == entry_id))
-
+    # These three ids allow to restore the UI panels
+    group_id = flask.request.args.get('group_id',  0, type=int)
+    feed_id = flask.request.args.get('feed_id', 0, type=int)
     user = flask_login.current_user.db_user
+
+    # We need to rebuild nav and article view
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
+    total_unread_count = queries.get_total_unread_count(user)
+    entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
     feed.mark_entry(user, entry, 'read')
     view_variables = {
+        'feed_id': feed_id,
+        'group_id': group_id,
         'entry': entry,
-        'saved_ids': [],
-        'read_ids': [],
+        'saved_ids': [], # @@TODO
+        'read_ids': [], # @@TODO
+        'groups_feeds': groups_feeds,
+        'total_unread_count': total_unread_count,
         'is_xhr': flask.request.args.get('xhr', 0, type=int),
     }
 
-    return flask.render_template('main/_entry.html', **view_variables)
+    return _render_script('main/_entry.js', **view_variables)
 
 @bp.route('/entries/<int:entry_id>', methods=["POST"])
 @flask_login.login_required

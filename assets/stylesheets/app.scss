@@ -191,35 +191,6 @@ nav {
     }
 }
 
-// dropdown
-
-.radio-switch {
-    background-color: $color-neutral-500;
-    border-radius: .5rem;
-    display: inline-flex;
-    padding: 0.25rem;
-    gap: .75rem;
-}
-
-.radio-switch__label {
-    border-radius: .35rem;
-    cursor: pointer;
-    width: 1.5rem;
-    padding: 0.25rem .5rem;
-    text-align: center;
-}
-
-// Selected 
-.radio-switch__label:has(input:checked) {
-    background-color: $color-primary-200;
-    color: $white;
-}
-
-.radio-switch__input {
-    display: none;
-}
-
-
 .alerts {
     z-index: 1;
     position: absolute;

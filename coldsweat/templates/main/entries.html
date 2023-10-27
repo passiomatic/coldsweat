@@ -16,7 +16,7 @@
         {% endif %}
     </ul>     
     <div class="entry__filter">
-        <div class="mr-auto">
+        <div class="d-flex mr-auto">
             {% if count %}
                 {% if feed_id  %}
                     {% set mark_url = url_for('main.entry_list_mark', feed_id=feed_id) %}
@@ -25,9 +25,9 @@
                 {% else %}
                     {% set mark_url = url_for('main.entry_list_mark') %}
                 {% endif %}
-                <button title="" class="btn-text" onclick="Sweat.openRemoteDialog('{{mark_url}}', event)">
+                <button class="btn-icon" onclick="Sweat.openRemoteDialog('{{mark_url}}', event)">
                     <i class="fa fa-check-square"></i>
-                </button>           
+                </button>
             {% endif %}
         </div>
         <div class="radio-switch">
@@ -41,18 +41,18 @@
             </label>
             <label class="radio-switch__label">
                 {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}', '', event)" {% if filter == 'archive' %}checked{% endif %}  value="archive" class="radio-switch__input" /><i class="fa fa-archive"></i>
+                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}', '', event)" {% if filter == 'archive' %}checked{% endif %}  value="archive" class="radio-switch__input" /><i class="fa fa-list-ul"></i>
             </label>
         </div>
-        <div class="ml-auto">
+        <div class="d-flex ml-auto">
             {% if feed_id  %}
                 {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
-                <button class="btn-text" onclick="Sweat.openRemoteDialog('{{feed_edit_url}}', event)">
+                <button class="btn-icon" onclick="Sweat.openRemoteDialog('{{feed_edit_url}}', event)">
                     <i class="fa fa-cog"></i>
                 </button>
             {% elif group_id %}
                 {% set group_edit_url = url_for('main.group_edit', group_id=group_id ) %}
-                <button  onclick="Sweat.openRemoteDialog('{{group_edit_url}}', event)" class="btn-text">
+                <button class="btn-icon" onclick="Sweat.openRemoteDialog('{{group_edit_url}}', event)">
                     <i class="fa fa-cog"></i>
                 </button>
             {% endif %}

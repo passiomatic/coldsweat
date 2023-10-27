@@ -22,6 +22,22 @@
 
 }
 
+.btn-icon {
+    @include zero;
+    appearance: none;
+    background-color: $color-neutral-500;
+    border-radius: .25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;    
+    margin: 0;
+    padding: .5rem .75rem;
+    border: 0;
+    font-size: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
 .btn-text {
     @include zero;
     appearance: none;
@@ -76,3 +92,33 @@
         color: darken($buttoncolorerror, 5%);
     }
 }
+
+
+// Switch 
+
+.radio-switch {
+    background-color: $color-neutral-500;
+    border-radius: .5rem;
+    display: inline-flex;
+    // padding: 0.25rem;
+    gap: .75rem;
+}
+
+.radio-switch__label {
+    border-radius: .35rem;
+    cursor: pointer;
+    width: 1.5rem;
+    padding: 0.25rem .5rem;
+    text-align: center;
+}
+
+// Selected 
+.radio-switch__label:has(input:checked) {
+    background-color: $color-primary-200;
+    color: $white;
+}
+
+.radio-switch__input {
+    display: none;
+}
+

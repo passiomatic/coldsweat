@@ -1,8 +1,8 @@
 <div class="entry {%if entry.id in saved_ids%}status-saved{% endif %}">
     <article>
         <label class="toggle toggle-save">
-            <input class="sr-only" onchange="Sweat.markSaved({{entry.id}}, event)" {{ 'checked' if entry.id in saved_ids else ''
-                }} type="checkbox">
+            <input class="sr-only" onchange="Sweat.markSaved({{entry.id}}, event)" {{ 'checked' if entry.id in saved_ids
+                else '' }} type="checkbox">
             <div class="toggle-icon" title="Toggle save (S key)"></div>
         </label>
         <div class="d-flex align-items-center">
@@ -15,12 +15,12 @@
         </div>
         {% if entry.title%}
         <h1 class="article__title">{{entry.title}}</h1>
+        {% else %}
+        <h1 class="article__title">{{ entry.content|striptags|excerpt }}</h1>
+        {% endif %}
         <div class="article__meta small text-muted">
             Posted {{entry.published_on|datetime }} {%if entry.author %} by {{ entry.author }}{% endif %}
         </div>
-        {% else %}
-        <hr>
-        {% endif %}
         {%if entry.content %}
         <div class="article__content">
             {% if 'html' in entry.content_type %}

@@ -210,6 +210,12 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 if (inputEl) {
                     inputEl.checked = true;
                 }
+            }            
+            var newUrl = new URL(url);
+            newUrl.searchParams.delete('xhr');
+            if(newUrl == location.href) {
+                // Do not reload the same folder
+                return;
             }
             fetch(url)
                 .then((response) => {
@@ -229,7 +235,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         // We want to restore the whole page
                         newUrl.searchParams.delete('xhr');
                         history.pushState({}, '', newUrl.href)
-                        dirty = updateNav
                         if (title) {
                             document.title = `${title} • Coldsweat`;
                         }                        

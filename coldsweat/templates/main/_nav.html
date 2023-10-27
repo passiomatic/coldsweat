@@ -1,12 +1,12 @@
 {% import "main/macros.html" as macros %}
 
-{% macro render_feed_list(feeds) %}
+{% macro render_feed_list(g_id, feeds) %}
 <ul>
     {% for f in feeds %}
     {% set request_url = url_for('main.entry_list', _external=True, feed_id=f.id, xhr=1) %}
-    <li id="li-{{f.id}}">
-        <input id="feed-{{f.id}}" class="sr-only" type="radio" {{ 'checked' if f.id==feed_id else '' }} name="tree">
-        {{ macros.render_feed_label(f) }}
+    <li id="li-{{g_id}}-{{f.id}}">
+        <input id="feed-{{g_id}}-{{f.id}}" class="sr-only" type="radio" {{ 'checked' if f.id==feed_id else '' }} name="tree">
+        {{ macros.render_feed_label(g_id, f) }}
     </li>
     {% endfor %}
 </ul>
@@ -18,7 +18,7 @@
     </div>
     <form>
         <dl class="tree-view">
-            <dt id="dt-explore">
+            <dt>
                 EXPLORE
             </dt>
             <dd id="dd-all">
@@ -35,14 +35,14 @@
                     </li>
                 </ul>
             </dd>
-            <dt id="dt-folders">
+            <dt>
                 FEEDS
             </dt>
             {% if groups_feeds %}
             {% for (g_id, group_title, group_unread_count), feeds in groups_feeds %}
             <dd id="dd-{{g_id}}">
                 {% if g_id == 1 %}
-                {{ render_feed_list(feeds) }}
+                {{ render_feed_list(g_id, feeds) }}
                 {% else %}
                 <details>
                     <summary>
@@ -50,7 +50,7 @@
                             }} name="tree">
                         {{ macros.render_group_label(g_id, group_title, group_unread_count) }}
                     </summary>
-                    {{ render_feed_list(feeds) }}
+                    {{ render_feed_list(g_id, feeds) }}
                 </details>
                 {% endif %}
             </dd>

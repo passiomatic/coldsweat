@@ -59,54 +59,19 @@ body {
     }
 }
 
-footer[role="contentinfo"] {
-    @include zero;
-    margin: $baselineheight*3 0 $baselineheight 0;
-    text-align: center;
-
-    .fa-heart {
-        cursor: help;
-    }
-}
-
-.page {
-    margin: $baselineheight/2 auto 0 auto;
-    background: $white;
-    padding: $baselineheight $gutterwidth*1.5;
-    @include box-shadow(0 0 4px $lightneutralcolor);
-    border-radius: $borderradius;
-}
-
-dl.shortcuts {
-    @include zero;
-    @include font-size(14);
-
-    dt {
-        margin: $baselineheight 0 $baselineheight/2 0;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: $lightneutralcolor;
-        font-weight: bold;
-    }
-
-    dd {
-        margin-bottom: $baselineheight/2 !important;
-    }
-}
 
 // A keyboard shortcut
 
 kbd {
-    //@include font-size(13);
     padding: 2px 0;
     width: 2em;
     display: inline-block;
-    background: $lightestneutralcolor;
+    background: $color-neutral-600;
     text-align: center;
-    border-radius: $borderradius;
-    color: $neutralcolor;
+    border-radius: .25rem;
+    color: $text-color;
     text-transform: uppercase;
-    box-shadow: 0 1px 0 $lightneutralcolor;
+    box-shadow: 0 2px 0 $color-neutral-300, 0 -1px 0 $white;
 }
 
 
@@ -290,4 +255,23 @@ nav {
     align-self: center;
     text-align: center;
     margin-right: .5rem;
+}
+
+// Keyboard shortcuts
+
+.shortcuts {
+    border: 1px solid $border-color;
+    border-radius: .5rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    dt {
+        font-weight: $font-weight-heading;
+        margin: 0 0 .5rem 0;
+        color: $text-color-muted;
+    }
+    dd {
+        color: $text-color-muted;
+    }    
 }

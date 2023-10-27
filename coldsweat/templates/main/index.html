@@ -3,22 +3,36 @@
 {% extends "base.html" %}
 
 {% block title_block %}
-    <title>{{page_title}} • Coldsweat</title>
+<title>{{page_title}} • Coldsweat</title>
 {% endblock %}
 
-{% block container_block %} 
-    {% include "main/_nav.html" %}
-    <section class="panel" id="panel">
-        {% block panel_block %} 
-        {% endblock %}
-    </section>
-    <!-- ARTICLE -->
-    <main id="main">
-        <div class="d-flex h-100 align-items-center justify-content-center">            
-            <p class="large text-muted">
-                Select an article from the list.
-            </p>
+{% block container_block %}
+{% include "main/_nav.html" %}
+<section class="panel" id="panel">
+    {% block panel_block %}
+    {% endblock %}
+</section>
+<!-- ARTICLE -->
+<main id="main">
+    <div class="d-flex flex-column h-100 align-items-center justify-content-center" style="gap: 3rem">
+        <p class="large text-muted">
+            Select an article from the list.
+        </p>
+        <div class="">
+            <dl class="shortcuts">
+                <dt class="">Keyboard shortcuts</dt>
+                <dd><kbd>j</kbd>&ensp;Previous article
+                </dd>
+                <dd><kbd>k</kbd>&ensp;Next article
+                </dd>
+                <dd><kbd>m</kbd>&ensp;Mark/unmark current article as read
+                </dd>
+                <dd><kbd>s</kbd>&ensp;Save/unsave current article
+                </dd>
+                <dd><kbd>v</kbd>&ensp;View article on original website
+                </dd>
+            </dl>
         </div>
-    </main>
+    </div>
+</main>
 {% endblock %}
-

@@ -61,7 +61,9 @@
     <label class="btn-folder" id="label-group-{{id}}" for="group-{{id}}" onclick="Sweat.loadFolder('{{request_url}}', '{{title}}', event)">
         <i class="fa fa-folder"></i><span>{{title}}</span>  
     </label>
-    <span id="group-unread-{{id}}" class="badge">{{unread_count if unread_count else ''}}</span>                                          
+    {% if unread_count %}
+        <span id="group-unread-{{id}}" class="badge">{{unread_count}}</span>                                          
+    {% endif %}
 {% endmacro %}
 
 
@@ -71,7 +73,9 @@
         <img class="favicon" src="{{feed.icon_url}}" width="16" height="16"  alt="*">
         <span class="{{ '' if feed.enabled else 'feed-dead' }}">{{feed.title}}</span>
     </label>
-    <span id="feed-unread-{{feed.id}}" class="badge">{{feed.feed_read_count if feed.feed_read_count else ''}}</span>
+    {% if feed.feed_read_count %}
+        <span id="feed-unread-{{feed.id}}" class="badge">{{feed.feed_read_count}}</span>
+    {% endif %}
 {% endmacro %}  
 
 

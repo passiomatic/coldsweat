@@ -1,4 +1,17 @@
 {% import "main/macros.html" as macros %}
+
+{% macro render_feed_list(feeds) %}
+<ul>
+    {% for f in feeds %}
+    {% set request_url = url_for('main.entry_list', _external=True, feed_id=f.id, xhr=1) %}
+    <li id="li-{{f.id}}">
+        <input id="feed-{{f.id}}" class="sr-only" type="radio" {{ 'checked' if f.id==feed_id else '' }} name="tree">
+        {{ macros.render_feed_label(f) }}
+    </li>
+    {% endfor %}
+</ul>
+{% endmacro %}
+
 <nav class="nav" id="nav">
     <div class="nav__branding">
         <i class="fa fa-tint"></i>
@@ -12,8 +25,8 @@
                 <ul>
                     <li>
                         {% set request_url = url_for('main.entry_list', _external=True, xhr=1) %}
-                        <input id="group-all" class="sr-only" type="radio" {{ 'checked' if (not feed_id) and (not group_id)
-                            else '' }} name="tree">
+                        <input id="group-all" class="sr-only" type="radio" {{ 'checked' if (not feed_id) and (not
+                            group_id) else '' }} name="tree">
                         <label class="btn-folder" type="button" for="group-all"
                             onclick="Sweat.loadFolder('{{request_url}}', 'All Articles', event)">
                             <i class="fa fa-list-ul"></i> All Articles
@@ -23,28 +36,23 @@
                 </ul>
             </dd>
             <dt id="dt-folders">
-                FOLDERS
+                FEEDS
             </dt>
             {% if groups_feeds %}
             {% for (g_id, group_title, group_unread_count), feeds in groups_feeds %}
             <dd id="dd-{{g_id}}">
+                {% if g_id == 1 %}
+                {{ render_feed_list(feeds) }}
+                {% else %}
                 <details>
                     <summary>
                         <input id="group-{{g_id}}" class="sr-only" type="radio" {{ 'checked' if g_id==group_id else ''
                             }} name="tree">
                         {{ macros.render_group_label(g_id, group_title, group_unread_count) }}
                     </summary>
-                    <ul class="ul-{{g_id}}">
-                        {% for f in feeds %}
-                        {% set request_url = url_for('main.entry_list', _external=True, feed_id=f.id, xhr=1) %}
-                        <li id="li-{{f.id}}">
-                            <input id="feed-{{f.id}}" class="sr-only" type="radio" {{ 'checked' if f.id==feed_id else ''
-                                }} name="tree">
-                            {{ macros.render_feed_label(f) }}
-                        </li>
-                        {% endfor %}
-                    </ul>
+                    {{ render_feed_list(feeds) }}
                 </details>
+                {% endif %}
             </dd>
             {% endfor %}
             {% endif %}

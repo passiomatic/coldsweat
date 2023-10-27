@@ -44,7 +44,7 @@ def get_groups_and_feeds(user):
          .join(feed_read_subquery, JOIN.LEFT_OUTER, on=(
              feed_read_subquery.c.id == Feed.id))                  
          .where((
-             Subscription.user == user)).order_by(Group.title)).objects()
+             Subscription.user == user)).order_by(Group.id)).objects()
     return q
 
 

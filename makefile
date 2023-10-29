@@ -33,6 +33,9 @@ run-debug:
 fetch:
 	flask --app coldsweat --debug fetch
 
+shell:
+	flask --app coldsweat shell
+
 reset:
 	rm ./instance/coldsweat.db
 

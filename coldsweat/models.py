@@ -46,6 +46,11 @@ STATUS_ERROR = 'E'
 STATUS_STARTED = 'S'
 STATUS_COMPLETED = 'C'
 
+
+NEWS_FEED_URL = 'https://lab.passiomatic.com/coldsweat/news.atom'
+NEWS_FEED_ALTERNATE_URL = 'https://lab.passiomatic.com/coldsweat/'
+
+
 class ColdsweatDB(FlaskDB):
     '''
     Specialised FlaskDB which deals with testing memory 
@@ -129,7 +134,7 @@ class User(db_wrapper.Model):
     @staticmethod
     def validate_password(password):
         return len(password) >= User.MIN_PASSWORD_LENGTH
-    
+
 
 class Group(db_wrapper.Model):
     """
@@ -273,6 +278,7 @@ BUILTIN_GROUPS = [
     {'id': 9, 'title': "Reserved 9"},
 ]
 
+
 def setup():
     """
     Create database tables for all models and bootstrap data
@@ -282,3 +288,4 @@ def setup():
                                 Subscription, FetchLog], safe=True)
 
     Group.insert_many(BUILTIN_GROUPS).on_conflict_replace().execute()
+    Feed.insert(self_link=NEWS_FEED_URL, alternate_link=NEWS_FEED_ALTERNATE_URL, title="Coldsweat News & Updates").on_conflict_replace().execute()

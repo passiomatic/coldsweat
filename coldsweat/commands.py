@@ -3,7 +3,7 @@ import click
 from werkzeug import security
 import coldsweat.feed as feed
 import coldsweat.models as models
-from .models import User
+from .models import User, Group, Feed
 
 
 def add_commands(app):
@@ -48,7 +48,10 @@ def add_commands(app):
 
         password_hash = security.generate_password_hash(password)
         fever_api_key = User.make_fever_api_key(email, password)
-        User.create(email=email, password_hash=password_hash, fever_api_key=fever_api_key, display_name=name)
+        user = User.create(email=email, password_hash=password_hash, fever_api_key=fever_api_key, display_name=name)
+        default_group = Group.get(Group.title == Group.DEFAULT_GROUP)
+        news_feed = Feed.get(Feed.self_link == models.NEWS_FEED_URL)
+        feed.add_subscription(user, news_feed, default_group)
         print(f"Setup completed for user {email}")
 
 

@@ -28,6 +28,11 @@ body {
     grid-template-rows: auto;
 }
 
+// Element spans across all grid columns
+.full-page  {
+    grid-column: 1 / 4;
+}
+
 ::selection {
     background-color: lighten($color-primary, 65%);
     color: $color-primary;

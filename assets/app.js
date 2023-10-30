@@ -1,5 +1,6 @@
 import hotkeys from 'hotkeys-js';
 import 'idiomorph';
+import 'htmx.org';
 
 window.addEventListener("DOMContentLoaded", (event) => {
 

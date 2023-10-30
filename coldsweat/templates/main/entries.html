@@ -36,16 +36,16 @@
         </div>
         <div class="radio-switch">
             <label class="radio-switch__label">
-                {% set request_url_1 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1, _external=True) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_1}}', '', event)" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
+                {% set request_url_unread = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1, _external=True) %}
+                <input type="radio" name="status" hx-get="{{request_url_unread}}" hx-target="#panel" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
             </label>
             <label class="radio-switch__label">
-                {% set request_url_2 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1, _external=True) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_2}}', '', event)" {% if filter == 'saved' %}checked{% endif %}  value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
+                {% set request_url_saved = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1, _external=True) %}
+                <input type="radio" name="status" hx-get="{{request_url_saved}}" hx-target="#panel" {% if filter == 'saved' %}checked{% endif %} value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
             </label>
             <label class="radio-switch__label">
-                {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1, _external=True) %}
-                <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}', '', event)" {% if filter == 'archive' %}checked{% endif %}  value="archive" class="radio-switch__input" /><i class="fa fa-list-ul"></i>
+                {% set request_url_archive = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1, _external=True) %}
+                <input type="radio" name="status" hx-get="{{request_url_archive}}" hx-target="#panel" {% if filter == 'archive' %}checked{% endif %} value="archive" class="radio-switch__input" /><i class="fa fa-list-ul"></i>
             </label>
         </div>
         <div class="d-flex ml-auto">

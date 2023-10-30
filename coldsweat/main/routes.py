@@ -119,22 +119,6 @@ def entry_list():
     response.set_cookie('filter', filter)
     return response
 
-# @bp.route('/entries/<int:entry_id>')
-# @flask_login.login_required
-# def entry_detail(entry_id):
-#     entry = get_object_or_404(Entry, (Entry.id == entry_id))
-
-#     user = flask_login.current_user.db_user
-
-#     feed.mark_entry(user, entry, 'read')
-#     view_variables = {
-#         'entry': entry,
-#         'saved_ids': [],
-#         'read_ids': [],
-#         'is_xhr': flask.request.args.get('xhr', 0, type=int),
-#     }
-
-#     return flask.render_template('main/_entry.html', **view_variables)
 
 @bp.route('/entries/<int:entry_id>')
 @flask_login.login_required

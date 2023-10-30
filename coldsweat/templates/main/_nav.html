@@ -28,7 +28,7 @@
                         <input id="group-all" class="sr-only" type="radio" {{ 'checked' if (not feed_id) and (not
                             group_id) else '' }} name="tree">
                         <label class="btn-folder" type="button" for="group-all"
-                            hx-get="{{ url_for('main.entry_list', xhr=1) }}" hx-target="#panel">
+                            hx-get="{{request_url}}" hx-target="#panel">
                             <i class="fa fa-list-ul"></i> All Articles
                         </label>
                         <span id="all-unread" class="badge">{{total_unread_count}}</span>

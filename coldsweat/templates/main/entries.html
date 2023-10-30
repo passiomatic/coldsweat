@@ -1,8 +1,12 @@
 {% import "main/macros.html" as macros %}
 
 {% macro render_panel() %}
-    <ul id="entry-list" class="list-view {{ '' if is_xhr == 1 else 'in' }}">                      
+    <ul id="entry-list" class="list-view {{ '' if is_xhr == 1 else 'in' }}">        
         {% if count %}
+            <li class="heading">
+                <h2>{{page_title}}</h2>
+                <div class="small text-muted">{{"{:,}".format(count)}} articles</div>
+            </li> 
             {{ macros.render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) }}
         {% else %}
             <li class="h-100">
@@ -32,15 +36,15 @@
         </div>
         <div class="radio-switch">
             <label class="radio-switch__label">
-                {% set request_url_1 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1) %}
+                {% set request_url_1 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1, _external=True) %}
                 <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_1}}', '', event)" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
             </label>
             <label class="radio-switch__label">
-                {% set request_url_2 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1) %}
+                {% set request_url_2 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1, _external=True) %}
                 <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_2}}', '', event)" {% if filter == 'saved' %}checked{% endif %}  value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
             </label>
             <label class="radio-switch__label">
-                {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1) %}
+                {% set request_url_3 = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1, _external=True) %}
                 <input type="radio" name="status" onchange="Sweat.loadFolder('{{request_url_3}}', '', event)" {% if filter == 'archive' %}checked{% endif %}  value="archive" class="radio-switch__input" /><i class="fa fa-list-ul"></i>
             </label>
         </div>

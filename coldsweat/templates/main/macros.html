@@ -1,12 +1,5 @@
-{% macro render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) %}
-    {% set ns = namespace(prev_date = '') %}
+{% macro render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) %}           
     {% for e in entries %}
-        {% set date = e.published_on|since_today %}
-        {% if date != ns.prev_date %}
-            <li class="heading">
-                <h2><time>{{date}}</time></h2>
-            </li>            
-        {% endif %}
         <li id="entry-{{e.id}}" class="entry {%if e.id in read_ids %}status-read{% else %}status-unread{% endif %}">
             <div class="entry-card">
                 <input class="sr-only" onchange="Sweat.onEntryLoad({{e.id}}, '{{e.title|urlencode}}', event)" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
@@ -21,7 +14,11 @@
                             {% endif %}                            
                         </h3>
                         <h4 class="entry-card__feed">
-                            {{e.feed.title}}
+                            {%if feed_id %}
+                                {{e.published_on|datetime }}                        
+                            {% else %}
+                                {{e.feed.title}}
+                            {% endif %}
                         </h4>
                     </div>
                     {%if e.thumbnail_url %} 
@@ -32,14 +29,6 @@
                 </label>
             </div>
         </li>
-        {% set ns.prev_date = date  %}
-    {% else %}
-        <div class="notice">
-            <div>
-                <i class="fa fa-tint fa-4x"></i>
-                <p>No articles found.</p>
-            </div>
-        </div>  
     {% endfor %}
     {% if offset < count %}
         <li class="more">

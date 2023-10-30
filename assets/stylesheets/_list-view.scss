@@ -24,10 +24,10 @@
         border-bottom: 1px dotted $border-color;
 
         h2 {
-            text-transform: uppercase;
+            // text-transform: uppercase;
             color: $text-color-muted;
-            letter-spacing: 1px;
-            font-size: $font-size-small;
+            // letter-spacing: 1px;
+            // font-size: $font-size-small;
         }
     }
 
@@ -161,9 +161,8 @@
 }
 
 .entry-card__feed {
-    font-size: $font-size-xsmall;
+    font-size: $font-size-small;
     font-weight: normal;
-    text-transform: uppercase;
     display: flex;
     align-items: center;
     gap: .25rem;

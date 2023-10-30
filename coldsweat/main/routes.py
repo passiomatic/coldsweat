@@ -25,30 +25,30 @@ GROUPS_PER_PAGE = 30
 def index():
     return entry_list()
 
-@bp.route('/nav')
-@flask_login.login_required
-def nav():
-    # These three ids allow to restore the UI panels
-    group_id = flask.request.args.get('group_id',  0, type=int)
-    feed_id = flask.request.args.get('feed_id', 0, type=int)
-    # @@TODO
-    #entry_id = flask.request.args.get('entry_id', 0, type=int)
+# @bp.route('/nav')
+# @flask_login.login_required
+# def nav():
+#     # These three ids allow to restore the UI panels
+#     group_id = flask.request.args.get('group_id',  0, type=int)
+#     feed_id = flask.request.args.get('feed_id', 0, type=int)
+#     # @@TODO
+#     #entry_id = flask.request.args.get('entry_id', 0, type=int)
 
-    user = flask_login.current_user.db_user
+#     user = flask_login.current_user.db_user
 
-    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
+#     groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
 
-    total_unread_count = queries.get_total_unread_count(user)
+#     total_unread_count = queries.get_total_unread_count(user)
 
-    view_variables = {
-        'feed_id': feed_id,
-        'group_id': group_id,
-        'is_xhr': flask.request.args.get('xhr', 0, type=int),
-        'groups_feeds': groups_feeds,
-        'total_unread_count': total_unread_count
-    }
+#     view_variables = {
+#         'feed_id': feed_id,
+#         'group_id': group_id,
+#         'is_xhr': flask.request.args.get('xhr', 0, type=int),
+#         'groups_feeds': groups_feeds,
+#         'total_unread_count': total_unread_count
+#     }
 
-    return flask.render_template('main/_nav.html', **view_variables)
+#     return flask.render_template('main/_nav.html', **view_variables)
 
 @bp.route('/entries')
 @flask_login.login_required
@@ -74,12 +74,12 @@ def entry_list():
     page_title = 'All Articles'
     if group_id:
         query = queries.get_group_entries(user, group_id)
-        # @@TODO actual group name 
-        page_title = 'Group name'
+        group = Group.get_or_none(Group.id==group_id)
+        page_title = group.title if group else ''
     elif feed_id: 
         query = queries.get_feed_entries(user, feed_id)
-        # @@TODO actual feed name 
-        page_title = 'Feed name'
+        feed = Feed.get_or_none(Feed.id==feed_id)        
+        page_title = feed.title if feed else ''
     else:
         query = queries.get_all_entries(user)
 

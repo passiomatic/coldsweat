@@ -14,7 +14,7 @@
             <img class="favicon" src="{{entry.feed.icon_url}}" width="16" height="16" alt="*">&ensp;
             {% endif %}
             <button class="btn-text text-muted xsmall text-uppercase"
-                onclick="Sweat.loadFolder('{{feed_url}}')">{{entry.feed.title}}</button>
+                hx-get="{{feed_url}}" hx-target="#panel">{{entry.feed.title}}</button>
         </div>
         {% if entry.title%}
         <h1 class="article__title">{{entry.title}}</h1>

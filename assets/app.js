@@ -4,16 +4,6 @@ import 'htmx.org';
 
 window.addEventListener("DOMContentLoaded", (event) => {
 
-    // function findParent(currentNode, parentClass) {
-    //     while (currentNode.tagName != 'BODY') {
-    //         if (currentNode.classList.contains(parentClass)) {
-    //             return currentNode;
-    //         }
-    //         currentNode = currentNode.parentNode;
-    //     }
-    //     return null;
-    // }
-
     function makeEndpointURL(pathname) {
         var segments = [
             window.applicationURL,
@@ -173,68 +163,68 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 });
         },
 
-        loadEntry: function (id, title, event) {
-            var mainEl = document.getElementById('main');
-            fetch(makeEndpointURL(`/entries/${id}`))
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Server returned error ${response.status} while handling GET request`);
-                    }
-                    response.text().then((text) => {
-                        // mainEl.innerHTML = text;
-                        // Remove any previous animation triggers
-                        //mainEl.classList.remove('in')
-                        eval(text)
-                        window.requestAnimationFrame((timeStamp) => {
-                            // Add on next frame to trigger entering animation
-                            mainEl.classList.add('in')
-                        })
-                    });
-                });
+        // loadEntry: function (id, title, event) {
+        //     var mainEl = document.getElementById('main');
+        //     fetch(makeEndpointURL(`/entries/${id}`))
+        //         .then((response) => {
+        //             if (!response.ok) {
+        //                 throw new Error(`Server returned error ${response.status} while handling GET request`);
+        //             }
+        //             response.text().then((text) => {
+        //                 // mainEl.innerHTML = text;
+        //                 // Remove any previous animation triggers
+        //                 //mainEl.classList.remove('in')
+        //                 eval(text)
+        //                 window.requestAnimationFrame((timeStamp) => {
+        //                     // Add on next frame to trigger entering animation
+        //                     mainEl.classList.add('in')
+        //                 })
+        //             });
+        //         });
 
-            // @@TODO
-            //document.title = `${title} • Coldsweat`;
-            event.preventDefault();
-        },
+        //     // @@TODO
+        //     //document.title = `${title} • Coldsweat`;
+        //     event.preventDefault();
+        // },
 
-        loadFolder: function (url, title, event, updateNav=false) {
-            if (event) {
-                event.preventDefault();
-                var inputEl = event.currentTarget.previousElementSibling
-                if (inputEl) {
-                    inputEl.checked = true;
-                }
-            }            
-            var newUrl = new URL(url);
-            newUrl.searchParams.delete('xhr');
-            if(newUrl == location.href) {
-                // Do not reload the same folder
-                return;
-            }
-            fetch(url)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Server returned error ${response.status} while handling request ${url}`);
-                    }
-                    response.text().then((text) => {
-                        var panelEl = document.getElementById('panel');
-                        panelEl.innerHTML = text;
-                        var listEl = panelEl.querySelector('.list-view')
-                        window.requestAnimationFrame((timeStamp) => {
-                            // Add on next frame to trigger entering animation 
-                            listEl.classList.add('in')
-                        }
-                        )
-                        var newUrl = new URL(url);
-                        // We want to restore the whole page
-                        newUrl.searchParams.delete('xhr');
-                        history.pushState({}, '', newUrl.href)
-                        if (title) {
-                            document.title = `${title} • Coldsweat`;
-                        }                        
-                    });
-                });
-        },
+        // loadFolder: function (url, title, event, updateNav=false) {
+        //     if (event) {
+        //         event.preventDefault();
+        //         var inputEl = event.currentTarget.previousElementSibling
+        //         if (inputEl) {
+        //             inputEl.checked = true;
+        //         }
+        //     }            
+        //     var newUrl = new URL(url);
+        //     newUrl.searchParams.delete('xhr');
+        //     if(newUrl == location.href) {
+        //         // Do not reload the same folder
+        //         return;
+        //     }
+        //     fetch(url)
+        //         .then((response) => {
+        //             if (!response.ok) {
+        //                 throw new Error(`Server returned error ${response.status} while handling request ${url}`);
+        //             }
+        //             response.text().then((text) => {
+        //                 var panelEl = document.getElementById('panel');
+        //                 panelEl.innerHTML = text;
+        //                 var listEl = panelEl.querySelector('.list-view')
+        //                 window.requestAnimationFrame((timeStamp) => {
+        //                     // Add on next frame to trigger entering animation 
+        //                     listEl.classList.add('in')
+        //                 }
+        //                 )
+        //                 var newUrl = new URL(url);
+        //                 // We want to restore the whole page
+        //                 newUrl.searchParams.delete('xhr');
+        //                 history.pushState({}, '', newUrl.href)
+        //                 if (title) {
+        //                     document.title = `${title} • Coldsweat`;
+        //                 }                        
+        //             });
+        //         });
+        // },
 
         closeDialog: function (event) {
             var dialog = document.getElementById('dialog');

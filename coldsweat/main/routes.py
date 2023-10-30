@@ -161,7 +161,7 @@ def entry_detail(entry_id):
         'is_xhr': flask.request.args.get('xhr', 0, type=int),
     }
 
-    return _render_script('main/_entry.js', **view_variables)
+    return flask.render_template('main/_entry.html', **view_variables)
 
 @bp.route('/entries/<int:entry_id>', methods=["POST"])
 @flask_login.login_required

@@ -4,8 +4,8 @@ main {
     height: 100vh;
 
     .entry {
-        transform: translateX(-1.5rem);
-        opacity: 0.75;
+        // transform: translateX(-1.5rem);
+        // opacity: 0.75;
         transition: transform .16s ease-out, opacity .16s ease-out;
         position: relative;
 
@@ -31,10 +31,10 @@ main {
     }
     
     // Entering
-    &.in .entry {
-        transform: translateX(0);
-        opacity: 1;                
-    }
+    // &.in .entry {
+    //     transform: translateX(0);
+    //     opacity: 1;                
+    // }
 }
 
 // Article

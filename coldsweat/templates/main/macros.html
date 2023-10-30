@@ -2,7 +2,7 @@
     {% for e in entries %}
         <li id="entry-{{e.id}}" class="entry {%if e.id in read_ids %}status-read{% else %}status-unread{% endif %}">
             <div class="entry-card">
-                <input class="sr-only" onchange="Sweat.onEntryLoad({{e.id}}, '{{e.title|urlencode}}', event)" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
+                <input class="sr-only" hx-get="{{ url_for('main.entry_detail', entry_id=e.id, xhr=1) }}" hx-target="#main" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
                 <label for="c-{{e.id}}">
                     <div class="entry-card__status"></div>
                     <div>
@@ -47,7 +47,7 @@
 
 {% macro render_group_label(id, title, unread_count) %}
     {% set request_url = url_for('main.entry_list', _external=True, group_id=id, xhr=1) %}
-    <label class="btn-folder" id="label-group-{{id}}" for="group-{{id}}" onclick="Sweat.loadFolder('{{request_url}}', '{{title}}', event)">
+    <label class="btn-folder" id="label-group-{{id}}" for="group-{{id}}" hx-get="{{request_url}}" hx-target="#panel">
         <i class="fa fa-folder"></i><span>{{title}}</span>  
     </label>
     {% if unread_count %}
@@ -58,7 +58,7 @@
 
 {% macro render_feed_label(g_id, feed) %}
     {% set request_url = url_for('main.entry_list', _external=True, feed_id=feed.id, xhr=1) %}
-    <label class="btn-item" id="label-feed-{{g_id}}-{{feed.id}}" for="feed-{{feed.id}}" type="button" onclick="Sweat.loadFolder('{{request_url}}', '{{feed.title}}', event)">
+    <label class="btn-item" id="label-feed-{{g_id}}-{{feed.id}}" for="feed-{{feed.id}}" type="button" hx-get="{{request_url}}" hx-target="#panel">
         <img class="favicon" src="{{feed.icon_url}}" width="16" height="16"  alt="*">
         <span class="{{ '' if feed.enabled else 'feed-dead' }}">{{feed.title}}</span>
     </label>

@@ -197,13 +197,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
             event.preventDefault();
         },
 
-        // replaceElementWithTemplate: function (templateId, targetEl, event) {
-        //     var templateEl = document.getElementById(templateId);
-        //     //var targetEl = document.getElementById(targetId);
-        //     var sourceElCopy = templateEl.content.firstElementChild.cloneNode(true);
-        //     targetEl.replaceChildren(...[sourceElCopy]);
-        // },
-
         loadFolder: function (url, title, event, updateNav=false) {
             if (event) {
                 event.preventDefault();
@@ -241,10 +234,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         }                        
                     });
                 });
-        },
-
-        loadFolderAndNav: function (url, title, event) {
-            Sweat.loadFolder(url, title, event, true)
         },
 
         closeDialog: function (event) {

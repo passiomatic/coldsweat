@@ -37,9 +37,9 @@
 
     .heading,
     .entry {
-        transform: translateX(-1rem);
-        opacity: 0.5;
-        transition: transform .16s ease-out .22s, opacity .16s ease-out .22s;
+        // transform: translateX(-1rem);
+        // opacity: 0.5;
+        // transition: transform .16s ease-out .22s, opacity .16s ease-out .22s;
     }
 
     // Apply an incremental delay up to 0.2s
@@ -54,8 +54,8 @@
     // Entering
     &.in .heading,
     &.in .entry {
-        transform: translateX(0);
-        opacity: 1;
+        // transform: translateX(0);
+        // opacity: 1;
     }
 
     &.status-read {

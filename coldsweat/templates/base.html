@@ -1,7 +1,7 @@
 {% import "main/macros.html" as macros %}
 <!doctype html>
 <!-- 
-Coldsweat — http://lab.passiomatic.com/coldsweat/
+Coldsweat — https://lab.passiomatic.com/coldsweat/
 -->
 <html lang="en">
 <head>
@@ -24,12 +24,6 @@ Coldsweat — http://lab.passiomatic.com/coldsweat/
     {{ macros.render_alerts() }}
     {% block container_block %}{% endblock %}
     <dialog id="dialog">
-        <div class="dialog-content">
-        </div>
-        <!-- <button class="btn-icon" onclick="Sweat.closeDialog(event);" type="button" name="close">
-            <img src="/static/icon-close.svg" width="32" height="32" alt="Close"> 
-            Cancel
-        </button> -->
     </dialog>
     <script>
         window.applicationURL = '{{request.root_url}}';

@@ -41,7 +41,9 @@
 {% endmacro %}
     
 {% if is_xhr %}
-    {{render_form()}}
+    <div class="dialog-content" hx-target="this">
+        {{render_form()}}
+    </div>
 {% else %}
     {% extends "main/index.html" %}
      

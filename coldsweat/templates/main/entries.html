@@ -51,12 +51,12 @@
         <div class="d-flex ml-auto">
             {% if feed_id  %}
                 {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
-                <button class="btn-icon" onclick="Sweat.openRemoteDialog('{{feed_edit_url}}', event)">
+                <button class="btn-icon" hx-get="{{feed_edit_url}}" hx-target="#dialog">
                     <i class="fa fa-cog"></i>
                 </button>
             {% elif group_id %}
                 {% set group_edit_url = url_for('main.group_edit', group_id=group_id ) %}
-                <button class="btn-icon" onclick="Sweat.openRemoteDialog('{{group_edit_url}}', event)">
+                <button class="btn-icon" hx-get="{{group_edit_url}}" hx-target="#dialog">
                     <i class="fa fa-cog"></i>
                 </button>
             {% endif %}

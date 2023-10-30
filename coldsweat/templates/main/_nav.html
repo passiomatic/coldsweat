@@ -60,7 +60,7 @@
     </form>
     <div id="add" style="margin: auto .75rem .75rem .75rem;">
         {% set add_url = url_for('main.feed_add_1', xhr=1) %}
-        <button class="btn-text small" onclick="Sweat.openRemoteDialog('{{ add_url }}', event);"><i
+        <button class="btn-text small" hx-get="{{add_url}}" hx-target="#dialog"><i
                 class="fa fa-plus-square"></i> Add feed subscription</button>
     </div>
     <!-- <ul class="">

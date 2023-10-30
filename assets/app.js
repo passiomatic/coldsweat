@@ -1,6 +1,22 @@
 import hotkeys from 'hotkeys-js';
 import 'idiomorph';
 import 'htmx.org';
+window.htmx = require('htmx.org');
+
+htmx.on("htmx:afterSwap", (e) => {
+    if (e.detail.target.id == "dialog") {
+        var dialogEl = e.detail.target;
+        dialogEl.showModal();
+    }
+})
+
+htmx.on("htmx:beforeSwap", (e) => {
+    if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
+        var dialogEl = e.detail.target;
+        dialogEl.close()
+        e.detail.shouldSwap = false
+    }
+})
 
 window.addEventListener("DOMContentLoaded", (event) => {
 

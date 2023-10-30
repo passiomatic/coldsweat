@@ -1,70 +1,75 @@
-<form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.feed_edit', feed_id=feed.id) }}" method="POST">
-  <div class="form__title">
-    <h3 class="d-flex align-items-center">
-        <img class="favicon" src="{{feed.icon_url}}" width="16" height="16"  alt="*">&ensp;{{feed.title}}
-    </h3>
-  </div>
-  <div class="">          
-        <fieldset>
-          <label class="form-label" for="field-title">Title</label> 
-          <input class="form-field" type="text" required id="field-title" name="title" size="40" value="{{title}}">
-  
-          <label class="form-label" for="field-self-link">Web address (URL)</label> 
-          <input class="form-field" type="text" id="field-self-link" name="self_link" readonly size="40" value="{{feed.self_link}}">
-        </fieldset>
-        <table class="table">
-          <tbody>
-            {% if feed.alternate_link %}
-              <tr>
-                  <th><i class="fa fa-globe fa-fw"></i> Web page</th>
-                  <td><a target="_blank" rel="noopener noreferrer" title="Visit feed web page" href="{{feed.alternate_link}}">{{feed.alternate_link|friendly_url}}</a></td>
-              </tr>                        
-            {% endif %}
+<div class="dialog-content" hx-target="this">
+  <form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)"
+    action="{{ url_for('main.feed_edit', feed_id=feed.id) }}" method="POST">
+    <div class="form__title">
+      <h3 class="d-flex align-items-center">
+        <img class="favicon" src="{{feed.icon_url}}" width="16" height="16" alt="*">&ensp;{{feed.title}}
+      </h3>
+    </div>
+    <div class="">
+      <fieldset>
+        <label class="form-label" for="field-title">Title</label>
+        <input class="form-field" type="text" required id="field-title" name="title" size="40" value="{{title}}">
 
-            <tr>
-                <th><i class="fa fa-folder fa-fw"></i> Groups</th>
-                <td>{% for g in groups %}{{g.title}}{% if not loop.last %}, {% endif %}{% endfor %}</td>
-            </tr>                        
+        <label class="form-label" for="field-self-link">Web address (URL)</label>
+        <input class="form-field" type="text" id="field-self-link" name="self_link" readonly size="40"
+          value="{{feed.self_link}}">
+      </fieldset>
+      <table class="table">
+        <tbody>
+          {% if feed.alternate_link %}
+          <tr>
+            <th><i class="fa fa-globe fa-fw"></i> Web page</th>
+            <td><a target="_blank" rel="noopener noreferrer" title="Visit feed web page"
+                href="{{feed.alternate_link}}">{{feed.alternate_link|friendly_url}}</a></td>
+          </tr>
+          {% endif %}
 
-            <tr>
-                <th><i class="fa fa-check fa-fw"></i> Status</th>
-                {% if feed.enabled %}
-                  <td class="text-success">Enabled</td>
-                {% else %}
-                  <td class="text-danger">Disabled</td>
-                {% endif %}
-            </tr>                        
-          
-            <tr>
-                <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
-                <td>{{feed.last_checked_on|datetime}}, got {{feed.last_status|status_title|capitalize}}</td>
-            </tr>                       
-            
-            {% if feed.error_count %}
-                <tr>
-                    <th><i class="fa fa-warning fa-fw"></i> Total errors</th>
-                    <td>{{feed.error_count}}
-                    </td>
-                </tr>                        
+          <tr>
+            <th><i class="fa fa-folder fa-fw"></i> Groups</th>
+            <td>{% for g in groups %}{{g.title}}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+          </tr>
+
+          <tr>
+            <th><i class="fa fa-check fa-fw"></i> Status</th>
+            {% if feed.enabled %}
+            <td class="text-success">Enabled</td>
+            {% else %}
+            <td class="text-danger">Disabled</td>
             {% endif %}
-          </tbody>        
-        </table>
-        {% if feed.enabled %}
-          <!-- Keep enabled -->
-          <input type="hidden" name="enabled" value="1">
-        {% else %}
-          <fieldset>
-            <label class="form-label">
-              <input class="" type="checkbox" id="field-enabled" name="enabled" value="1"> Enable this feed again
-            </label>
-            <p class="text-muted">
-              <small>Coldsweat will try to update the feed during the next refresh</small>
-            </p>            
-          </fieldset>
-        {% endif %}
-  </div>
-  <div class="form__buttons">
-    <button type="submit" name="button_save" value="1" class="btn btn-primary">Save Changes</button>    
-    <button type="button" class="btn" onclick="Sweat.closeDialog(event);">Cancel</button>
-  </div>
-</form>
+          </tr>
+
+          <tr>
+            <th><i class="fa fa-clock-o fa-fw"></i> Last check</th>
+            <td>{{feed.last_checked_on|datetime}}, got {{feed.last_status|status_title|capitalize}}</td>
+          </tr>
+
+          {% if feed.error_count %}
+          <tr>
+            <th><i class="fa fa-warning fa-fw"></i> Total errors</th>
+            <td>{{feed.error_count}}
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+      {% if feed.enabled %}
+      <!-- Keep enabled -->
+      <input type="hidden" name="enabled" value="1">
+      {% else %}
+      <fieldset>
+        <label class="form-label">
+          <input class="" type="checkbox" id="field-enabled" name="enabled" value="1"> Enable this feed again
+        </label>
+        <p class="text-muted">
+          <small>Coldsweat will try to update the feed during the next refresh</small>
+        </p>
+      </fieldset>
+      {% endif %}
+    </div>
+    <div class="form__buttons">
+      <button type="submit" name="button_save" value="1" class="btn btn-primary">Save Changes</button>
+      <button type="button" class="btn" onclick="Sweat.closeDialog(event);">Cancel</button>
+    </div>
+  </form>
+</div>

@@ -24,7 +24,7 @@ body {
 
 body {
     display: grid;
-    grid-template-columns: 240px 1fr 2fr;
+    grid-template-columns: $navbar-width 1fr 2fr;
     grid-template-rows: auto;
 }
 

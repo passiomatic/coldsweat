@@ -14,6 +14,8 @@
 @import 'list-view';
 @import 'article-view';
 
+$z-index-base: 10;
+$z-index-alerts: $z-index-base + 1;
 
 html,
 body {
@@ -197,7 +199,7 @@ nav {
 }
 
 .alerts {
-    z-index: 1;
+    z-index: $z-index-alerts;
     position: absolute;
     top: .75rem;
     left: 0;

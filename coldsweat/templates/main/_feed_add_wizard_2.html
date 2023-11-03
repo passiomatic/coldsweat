@@ -8,7 +8,8 @@
               <p>Coldsweat found the following feed(s) for {{self_link|friendly_url}}:</p>
               {% for url, title in links %}
                   <label>
-                      <input type="radio" {%if loop.first %}checked{% endif %} name="self_link" value="{{url}}"> {{title}} <code>{{url}}</code>
+                      <input type="radio" {%if loop.first %}checked{% endif %} name="self_link" value="{{url}}"> {{title}}<br>
+                      <small><code>{{url}}</code></small>
                   </label>             
               {% endfor %}
               <input type="hidden" name="group" value="{{group_id}}">
@@ -22,7 +23,7 @@
             <p>Coldsweat could not find any feed for {{self_link|friendly_url}}.</p>
         </div>
         <div class="form__buttons">
-          <button type="button" class="btn btn-primary">Close</button>
+          <button type="button" onclick="Sweat.closeDialog(event);" class="btn btn-primary">Close</button>
         </div>
     {% endif %}        
   </form>  

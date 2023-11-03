@@ -25,30 +25,30 @@ GROUPS_PER_PAGE = 30
 def index():
     return entry_list()
 
-# @bp.route('/nav')
-# @flask_login.login_required
-# def nav():
-#     # These three ids allow to restore the UI panels
-#     group_id = flask.request.args.get('group_id',  0, type=int)
-#     feed_id = flask.request.args.get('feed_id', 0, type=int)
-#     # @@TODO
-#     #entry_id = flask.request.args.get('entry_id', 0, type=int)
+@bp.route('/nav')
+@flask_login.login_required
+def nav():
+    # These three ids allow to restore the UI panels
+    group_id = flask.request.args.get('group_id',  0, type=int)
+    feed_id = flask.request.args.get('feed_id', 0, type=int)
+    # @@TODO
+    #entry_id = flask.request.args.get('entry_id', 0, type=int)
 
-#     user = flask_login.current_user.db_user
+    user = flask_login.current_user.db_user
 
-#     groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
+    groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
 
-#     total_unread_count = queries.get_total_unread_count(user)
+    total_unread_count = queries.get_total_unread_count(user)
 
-#     view_variables = {
-#         'feed_id': feed_id,
-#         'group_id': group_id,
-#         'is_xhr': flask.request.args.get('xhr', 0, type=int),
-#         'groups_feeds': groups_feeds,
-#         'total_unread_count': total_unread_count
-#     }
+    view_variables = {
+        'feed_id': feed_id,
+        'group_id': group_id,
+        'is_xhr': flask.request.args.get('xhr', 0, type=int),
+        'groups_feeds': groups_feeds,
+        'total_unread_count': total_unread_count
+    }
 
-#     return flask.render_template('main/_nav.html', **view_variables)
+    return flask.render_template('main/_nav.html', **view_variables)
 
 @bp.route('/entries')
 @flask_login.login_required
@@ -320,7 +320,9 @@ def group_edit():
     group.color = color
     group.save()
     flask.flash('Changes have been saved.')
-    return _render_script('main/_group_edit_done.js', group=group)
+    response = flask.make_response('', 204)  # No content 
+    response.headers['HX-Trigger'] = 'nav-changed'    
+    return response
 
 
 @bp.route('/feeds/edit', methods=['GET', 'POST'])
@@ -360,7 +362,9 @@ def feed_edit():
     feed.save()
     flask.flash('Changes have been saved.')
     #flask.flash('Feed <i>%s</i> is now enabled.' % feed.title, category="info")
-    return _render_script('main/_feed_edit_done.js', feed=feed)
+    response = flask.make_response('', 204)  # No content 
+    response.headers['HX-Trigger'] = 'nav-changed'
+    return response
 
 
 @bp.route('/feeds/add/1', methods=['GET', 'POST'])
@@ -404,7 +408,11 @@ def feed_add_1():
     app.logger.debug("Starting fetcher for just subscribed feed")
     fetcher.Fetcher(feed_).update_feed_with_data(response.text)
 
-    return _add_subscription(feed_, group_id)
+    _add_subscription(feed_, group_id)
+    response = flask.make_response('', 204)  # No content 
+    response.headers['HX-Trigger'] = 'nav-changed'
+    return response
+
 
 @bp.route('/feeds/add/2', methods=['POST'])
 @flask_login.login_required
@@ -427,7 +435,12 @@ def feed_add_2():
 #                                               locals())
 
     feed_ = feed.add_feed_from_url(self_link, fetch_data=True)
-    return _add_subscription(feed_, group_id)
+    
+    _add_subscription(feed_, group_id)
+    response = flask.make_response('', 204)  # No content 
+    response.headers['HX-Trigger'] = 'nav-changed'
+    return response
+    
 
 
 @bp.route('/feeds/remove', methods=['GET', 'POST'])
@@ -511,7 +524,7 @@ def _add_subscription(feed_, group_id):
         flask.flash(f"Feed has been added to <i>{group.title}</i> group", category="info")
     else:
         flask.flash(f"Feed is already in <i>{group.title}</i> group'", category="info")
-    return _render_script('main/_feed_add_wizard_done.js', feed=feed_)
+    #return _render_script('main/_feed_add_wizard_done.js', feed=feed_)
 
 
 def _render_script(filename, **kwargs):

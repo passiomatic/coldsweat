@@ -1,6 +1,5 @@
-<div class="dialog-content" hx-target="this">
-  <form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)"
-    action="{{ url_for('main.group_edit', group_id=group.id) }}" method="POST">
+<div class="dialog-content">
+  <form class="form"  hx-post="{{ url_for('main.group_edit', group_id=group.id) }}" method="POST">
     <div class="form__title">
       <h3 class="d-flex align-items-center">
         <i class="fa fa-folder fa-fw"></i>&ensp;{{group.title}}

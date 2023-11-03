@@ -1,27 +1,29 @@
-<form onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.feed_add_2') }}" method="POST">
-  <div class="form__title">
-    <h3>Add Feed Subscription</h3>
-  </div>
-  {% if links %}
-      <div class="">          
-            <p>Coldsweat found the following feed(s) for {{self_link|friendly_url}}:</p>
-            {% for url, title in links %}
-                <label>
-                    <input type="radio" {%if loop.first %}checked{% endif %} name="self_link" value="{{url}}"> {{title}} <code>{{url}}</code>
-                </label>             
-            {% endfor %}
-            <input type="hidden" name="group" value="{{group_id}}">
-      </div>
-      <div class="form__buttons">
-        <button type="submit" class="btn btn-primary">Subscribe</button>
-        <button type="button" class="btn" onclick="Sweat.closeDialog(event);">Cancel</button>
-      </div>  
-  {% else %}
-      <div class="">          
-          <p>Coldsweat could not find any feed for {{self_link|friendly_url}}.</p>
-      </div>
-      <div class="form__buttons">
-        <button type="button" class="btn btn-primary">Close</button>
-      </div>
-  {% endif %}        
-</form>
+<div class="dialog-content">
+  <form hx-post="{{ url_for('main.feed_add_2') }}" method="POST">
+    <div class="form__title">
+      <h3>Add Feed Subscription</h3>
+    </div>
+    {% if links %}
+        <div class="">          
+              <p>Coldsweat found the following feed(s) for {{self_link|friendly_url}}:</p>
+              {% for url, title in links %}
+                  <label>
+                      <input type="radio" {%if loop.first %}checked{% endif %} name="self_link" value="{{url}}"> {{title}} <code>{{url}}</code>
+                  </label>             
+              {% endfor %}
+              <input type="hidden" name="group" value="{{group_id}}">
+        </div>
+        <div class="form__buttons">
+          <button type="submit" class="btn btn-primary">Subscribe</button>
+          <button type="button" class="btn" onclick="Sweat.closeDialog(event);">Cancel</button>
+        </div>  
+    {% else %}
+        <div class="">          
+            <p>Coldsweat could not find any feed for {{self_link|friendly_url}}.</p>
+        </div>
+        <div class="form__buttons">
+          <button type="button" class="btn btn-primary">Close</button>
+        </div>
+    {% endif %}        
+  </form>  
+</div>

@@ -1,7 +1,7 @@
 
 
 {% macro render_form() %}
-    <form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)" action="{{ url_for('main.feed_add_1') }}" method="POST">
+    <form class="form" hx-post="{{ url_for('main.feed_add_1') }}" method="POST">
         <div class="form__title">
             <h3>Add Feed Subscription</h3>
         </div>
@@ -41,16 +41,14 @@
 {% endmacro %}
     
 {% if is_xhr %}
-    <div class="dialog-content" hx-target="this">
+    <div class="dialog-content">
         {{render_form()}}
     </div>
 {% else %}
     {% extends "main/index.html" %}
-     
+    <!-- Place on page  -->
     {% block container_block %} 
-        <div id="modal-add-subscription" role="dialog" class="modal fade hide">
-            {{render_form()}}
-        </div>
+        {{render_form()}}
     {% endblock %}
 {% endif %}
 

@@ -1,6 +1,5 @@
-<div class="dialog-content" hx-target="this">
-  <form class="form" onsubmit="Sweat.submitRemoteForm(this.getAttribute('action'), event)"
-    action="{{ url_for('main.feed_edit', feed_id=feed.id) }}" method="POST">
+<div class="dialog-content">
+  <form class="form" hx-post="{{ url_for('main.feed_edit', feed_id=feed.id) }}" method="POST">
     <div class="form__title">
       <h3 class="d-flex align-items-center">
         <img class="favicon" src="{{feed.icon_url}}" width="16" height="16" alt="*">&ensp;{{feed.title}}

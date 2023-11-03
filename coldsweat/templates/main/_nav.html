@@ -12,7 +12,7 @@
 </ul>
 {% endmacro %}
 
-<nav class="nav" hx-swap-oob="true" id="nav">
+<nav class="nav" hx-swap-oob="true"  hx-trigger="nav-changed from:body" hx-get="{{ url_for('main.nav') }}" hx-target="this" id="nav">
     <div class="nav__branding">
         <i class="fa fa-tint"></i>
     </div>

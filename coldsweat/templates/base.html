@@ -23,7 +23,7 @@ Coldsweat — https://lab.passiomatic.com/coldsweat/
 <body>
     {{ macros.render_alerts() }}
     {% block container_block %}{% endblock %}
-    <dialog id="dialog">
+    <dialog id="dialog" hx-target="this">
     </dialog>
     <script>
         window.applicationURL = '{{request.root_url}}';

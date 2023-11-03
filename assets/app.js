@@ -13,8 +13,8 @@ htmx.on("htmx:afterSwap", (e) => {
 htmx.on("htmx:beforeSwap", (e) => {
     if (e.detail.target.id == "dialog" && !e.detail.xhr.response) {
         var dialogEl = e.detail.target;
-        dialogEl.close()
-        e.detail.shouldSwap = false
+        dialogEl.close();
+        e.detail.shouldSwap = false;
     }
 })
 

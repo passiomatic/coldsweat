@@ -274,26 +274,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 });
         },
 
-        loadMore: function (url) {
-            var wrapper = document.getElementById("entry-list");
-            fetch(url)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Server returned error ${response.status} while handling pagination`);
-                    }
-                    response.text().then((text) => {
-                        var button = wrapper.querySelector(".more");
-                        button.remove();
-                        var template = document.createElement('template');
-                        template.innerHTML = text;
-                        template.content.childNodes.forEach((child) => {
-                            wrapper.appendChild(child.cloneNode(true));
-                        })
-                        //child.scrollIntoView({ behavior: "smooth", block: "start" })
-                    });
-                });
-        },
-
         shareEntry: async function (shareData) {
             if (navigator.share) {
                 try {

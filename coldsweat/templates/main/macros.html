@@ -1,6 +1,18 @@
 {% macro render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) %}           
     {% for e in entries %}
-        <li id="entry-{{e.id}}" class="entry {%if e.id in read_ids %}status-read{% else %}status-unread{% endif %}">
+        {% if loop.last and ( offset < count )%}
+            <!-- There's more data to load  -->
+            {% if feed_id %}
+                {% set request_url = url_for('main.entry_list', feed_id=feed_id, offset=offset, prev_date=prev_date, xhr=1) %}
+            {% elif group_id %}
+                {% set request_url = url_for('main.entry_list', group_id=group_id, offset=offset, prev_date=prev_date, xhr=1) %}
+            {% else %}
+                {% set request_url = url_for('main.entry_list', offset=offset, prev_date=prev_date, xhr=1) %}
+            {% endif %}        
+            <li id="entry-{{e.id}}" hx-get="{{request_url}}" hx-trigger="intersect once" hx-swap="afterend" class="entry {%if e.id in read_ids %}status-read{% else %}status-unread{% endif %}">
+        {% else %}
+            <li id="entry-{{e.id}}" class="entry {%if e.id in read_ids %}status-read{% else %}status-unread{% endif %}">
+        {% endif %} 
             <div class="entry-card">
                 <input class="sr-only" hx-get="{{ url_for('main.entry_detail', group_id=group_id, feed_id=feed_id, entry_id=e.id, xhr=1) }}" hx-target="#main" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
                 <label for="c-{{e.id}}">
@@ -30,18 +42,6 @@
             </div>
         </li>
     {% endfor %}
-    {% if offset < count %}
-        <li class="more">
-            {% if feed_id %}
-                {% set request_url = url_for('main.entry_list', feed_id=feed_id, offset=offset, prev_date=prev_date, xhr=1) %}
-            {% elif group_id %}
-                {% set request_url = url_for('main.entry_list', group_id=group_id, offset=offset, prev_date=prev_date, xhr=1) %}
-            {% else %}
-                {% set request_url = url_for('main.entry_list', offset=offset, prev_date=prev_date, xhr=1) %}
-            {% endif %}
-            <button class="btn-text" onclick="Sweat.loadMore('{{request_url}}')">More</button>
-        </li>
-    {% endif %} 
 {% endmacro %}
 
 

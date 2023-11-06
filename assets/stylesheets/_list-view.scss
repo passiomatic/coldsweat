@@ -141,6 +141,14 @@
     }
 }
 
+.entry-card__date {
+    padding: .25rem 1.5rem;
+    font-size: $font-size-small;
+    color: $text-color-muted;
+    background: $color-neutral-600;
+    border-bottom: 1px dotted $border-color;
+}
+
 .entry-card__title {
     font-weight: 500;
     word-break: break-all;

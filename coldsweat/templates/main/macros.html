@@ -14,6 +14,10 @@
             <li id="entry-{{e.id}}" class="entry {%if e.id in read_ids %}status-read{% else %}status-unread{% endif %}">
         {% endif %} 
             <div class="entry-card">
+                {% set date = e.published_on|since_today %}
+                {% if loop.changed(date) %}
+                    <h2 class="entry-card__date">{{date}}</h2>
+                {% endif %}
                 <input class="sr-only" hx-get="{{ url_for('main.entry_detail', group_id=group_id, feed_id=feed_id, entry_id=e.id, xhr=1) }}" hx-target="#main" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
                 <label for="c-{{e.id}}">
                     <div class="entry-card__status"></div>

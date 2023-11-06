@@ -179,7 +179,15 @@ def datetime_since_today(value, comparison_value=None):
         return 'today'
     elif delta.days == 1:
         return 'yesterday'
-
-    # Earlier date
-    return format_date(value)
-
+    elif delta.days <= 7:
+        return 'this week'  #@@FIXME
+    elif delta.days <= 14:
+        return '1 week ago'
+    elif delta.days <= 21:
+        return '2 weeks ago'
+    elif delta.days <= 28:
+        return '3 weeks ago'
+    elif delta.days <= 60:
+        return 'last month'
+    # Do not show anything if too in the past
+    return ''

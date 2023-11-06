@@ -98,7 +98,7 @@ article {
         }
 
         blockquote {
-            // color: $secondarycolor;
+            // color: $color-secondary;
             padding: 0 $gutterwidth / 2;
             // margin: 0 $gutterwidth / 2;
             font-size: 0.925em; // A tad smaller...
@@ -125,7 +125,7 @@ article {
         }
 
         q {
-            color: $secondarycolor;
+            color: $color-secondary;
         }
 
         figcaption {
@@ -139,7 +139,7 @@ article {
         li,
         dd {
             @include zero;
-            margin: 0 0 $baselineheight/4 $gutterwidth;
+            margin: 0 0 $line-height/4 $gutterwidth;
         }
 
         // Images

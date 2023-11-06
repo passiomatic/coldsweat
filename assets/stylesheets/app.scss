@@ -10,6 +10,7 @@
 @import 'dialogs';
 @import 'forms';
 @import 'buttons';
+@import 'wells';
 @import 'tree-view';
 @import 'list-view';
 @import 'article-view';
@@ -56,7 +57,7 @@ body {
 .popover-content {
     .btn {
         display: block;
-        margin: 0 0 $baselineheight / 3 0;
+        margin: 0 0 $line-height / 3 0;
     }
 
     .btn:last-child {
@@ -81,8 +82,8 @@ kbd {
 
 
 pre {
-    background: $lightestneutralcolor;
-    border-radius: $borderradius;
+    background: $color-neutral-600;
+    border-radius: .5rem;
     padding: 8px 4px;
 }
 
@@ -99,7 +100,7 @@ pre {
     i {
         display: block;
         opacity: .6;
-        margin: $baselineheight 0 0;
+        margin: $line-height 0 0;
     }
 
 }
@@ -109,26 +110,26 @@ pre {
 #modal-feed-edit {
 
     table {
-        margin-top: $baselineheight;
+        margin-top: $line-height;
     }
 
 
     th,
     td {
-        border-top-color: $lighterneutralcolor;
+        border-top-color: $color-neutral-600;
     }
 
     .enabled {
-        color: $successcolor;
+        color: $success-color;
     }
 
     .disabled {
-        color: $errorcolor;
+        color: $color-secondary;
     }
 
     code {
-        background: $lightestneutralcolor;
-        border-radius: $borderradius;
+        background: $color-neutral-600;
+        border-radius: .5rem;
         padding: 2px 4px;
     }
 
@@ -167,8 +168,8 @@ nav {
         display: none;
         background: $white;
         border: 1px solid $border-color;
-        border-radius: $borderradius;
-        @include box-shadow(0 0 4px rgba($neutralcolor, .5));
+        border-radius: .5rem;
+        @include box-shadow(0 0 4px rgba($color-neutral-300, .5));
 
         a {
             @include font-size(14);
@@ -176,8 +177,8 @@ nav {
             border-bottom: 1px solid $border-color;
 
             &:hover {
-                color: $navigationlinkcolor;
-                background: $lightestneutralcolor
+                color: $text-color;
+                background: $color-neutral-600
             }
         }
 
@@ -187,7 +188,7 @@ nav {
     }
 
     &.open {
-        background: darken($navigationbackgroundcolor, 15%); // Like hover
+        background: darken($color-neutral-100, 15%); // Like hover
 
         // Show 
         .dropdown-menu {

@@ -20,7 +20,7 @@ h1,
 .h1 {
 @include font-size($basefontsize * 2);
 line-height: 1.2;
-border-bottom: 4px double $lighterneutralcolor;
+border-bottom: 4px double $color-neutral-600;
 padding-bottom: $baselineheight/4;
 margin-bottom: $baselineheight; }
 

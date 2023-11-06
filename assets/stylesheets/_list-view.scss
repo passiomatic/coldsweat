@@ -61,11 +61,11 @@
     &.status-read {
         h3 {
             a:link {
-                color: rgba($linkcolor, .7);
+                color: rgba($link-color, .7);
             }
 
             a:hover {
-                color: $linkcolorhover;
+                color: $link-color-hover;
             }
         }
 
@@ -78,19 +78,7 @@
         }
     }
 
-    .more {
-        //text-align: center;
-        background: $lightestneutralcolor;
-        // border-bottom-left-radius: $borderradius;
-        // border-bottom-right-radius: $borderradius;
-        margin-bottom: 3.5rem;
 
-        button {
-            display: block;
-            width: 100%;
-            padding: .5rem 0;
-        }
-    }
 
 }
 
@@ -131,7 +119,7 @@
     gap: .5rem;
 
     background-color: $white;
-    padding: $baselineheight/2 .75rem;
+    padding: $line-height/2 .75rem;
 
     transition: background-color .1s ease-out;
     cursor: pointer;

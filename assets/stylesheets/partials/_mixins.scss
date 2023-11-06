@@ -27,7 +27,7 @@ color : $color; }
 @mixin chromeframe {
 margin : .2em 0;
 background : $lightneutralcolor;
-color : $neutralcolor;
+color : $color-neutral-300;
 padding : .2em 0; }
 
 // hidden
@@ -250,7 +250,7 @@ overflow : auto; }
 
 // @include placeholder(VALUE) (color)
 
-@mixin placeholder($color : $neutralcolor) {
+@mixin placeholder($color : $color-neutral-300) {
 
 &:-moz-placeholder {
 //@include font-size(14);

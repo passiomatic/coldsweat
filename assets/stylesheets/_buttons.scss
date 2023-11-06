@@ -1,3 +1,8 @@
+@mixin buttongrad 		{ @include vertical($buttonbackgroundcolor, darken($buttonbackgroundcolor, 10%)); }
+@mixin errorgrad 		{ @include vertical($errorcolor, darken($errorcolor, 10%)); }
+@mixin primarygrad 		{ @include vertical($primarycolor, darken($primarycolor, 10%)); }
+@mixin successgrad 		{ @include vertical($successcolor, darken($successcolor, 10%)); }
+
 .btn {
     display: inline-block;
     padding: $buttonpadding;
@@ -8,6 +13,7 @@
     text-align: center;
     vertical-align: middle;
     background-color: $buttonbackgroundcolor;
+    @include buttongrad;
     border: $buttonborderwidth $buttonborderstyle $buttonbordercolor;
     border-bottom-color: $buttonbottombordercolor;
     border-radius: $buttonborderradius;
@@ -57,8 +63,8 @@
 
 .btn-primary {
     background-color: $primarycolor;
+    @include primarygrad;
 
-    // @include primarygrad;
     border : {
         color: $buttonbordercolorprimary;
         bottom-color: darken($buttonbordercolorprimary, 10%);
@@ -76,8 +82,8 @@
 
 .btn-danger {
     background-color: $errorcolor;
+    @include errorgrad;
 
-    // @include errorgrad;
     border : {
         color: $buttonbordercolorerror;
         bottom-color: darken($buttonbordercolorerror, 10%);

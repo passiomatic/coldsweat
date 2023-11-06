@@ -1,67 +1,69 @@
 {% import "main/macros.html" as macros %}
 
 {% macro render_panel() %}
-    <ul id="entry-list" class="list-view {{ '' if is_xhr == 1 else 'in' }}">        
-        {% if count %}
-            <li class="heading">
-                <h2>{{page_title}}</h2>
-                <div class="small text-muted">{{"{:,}".format(count)}} articles</div>
-            </li> 
-            {{ macros.render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) }}
-        {% else %}
-            <li class="h-100">
-                <div class="notice">
-                    <div>
-                        <i class="fa fa-tint fa-4x"></i>
-                        <p>No {{filter if filter != 'archive' else '' }} articles found.</p>
-                    </div>
-                </div>
-            </li>
-        {% endif %}
-    </ul>     
-    <div class="entry__filter">
-        <div class="d-flex mr-auto">
+    <section class="panel" hx-trigger="article-list-changed from:body" hx-get="{{ url_for('main.entry_list') }}" hx-target="this"  id="panel">
+        <ul id="entry-list" class="list-view {{ '' if is_xhr == 1 else 'in' }}">        
             {% if count %}
-                {% if feed_id  %}
-                    {% set mark_url = url_for('main.entry_list_mark', feed_id=feed_id) %}
-                {% elif group_id %}
-                    {% set mark_url = url_for('main.entry_list_mark', group_id=group_id) %}
-                {% else %}
-                    {% set mark_url = url_for('main.entry_list_mark') %}
+                <li class="heading">
+                    <h2>{{page_title}}</h2>
+                    <div class="small text-muted">{{"{:,}".format(count)}} articles</div>
+                </li> 
+                {{ macros.render_entries(entries, count, offset, feed_id, group_id, read_ids, saved_ids) }}
+            {% else %}
+                <li class="h-100">
+                    <div class="notice">
+                        <div>
+                            <i class="fa fa-tint fa-4x"></i>
+                            <p>No {{filter if filter != 'archive' else '' }} articles found.</p>
+                        </div>
+                    </div>
+                </li>
+            {% endif %}
+        </ul>     
+        <div class="entry__filter">
+            <div class="d-flex mr-auto">
+                {% if count %}
+                    {% if feed_id  %}
+                        {% set mark_url = url_for('main.entry_list_mark', feed_id=feed_id) %}
+                    {% elif group_id %}
+                        {% set mark_url = url_for('main.entry_list_mark', group_id=group_id) %}
+                    {% else %}
+                        {% set mark_url = url_for('main.entry_list_mark') %}
+                    {% endif %}
+                    <button class="btn-icon" hx-get="{{mark_url}}" hx-target="#dialog">
+                        <i class="fa fa-check-square"></i>
+                    </button>
                 {% endif %}
-                <button class="btn-icon" onclick="Sweat.openRemoteDialog('{{mark_url}}', event)">
-                    <i class="fa fa-check-square"></i>
-                </button>
-            {% endif %}
-        </div>
-        <div class="radio-switch">
-            <label class="radio-switch__label">
-                {% set request_url_unread = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1, _external=True) %}
-                <input type="radio" name="status" hx-get="{{request_url_unread}}" hx-target="#panel" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
-            </label>
-            <label class="radio-switch__label">
-                {% set request_url_saved = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1, _external=True) %}
-                <input type="radio" name="status" hx-get="{{request_url_saved}}" hx-target="#panel" {% if filter == 'saved' %}checked{% endif %} value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
-            </label>
-            <label class="radio-switch__label">
-                {% set request_url_archive = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1, _external=True) %}
-                <input type="radio" name="status" hx-get="{{request_url_archive}}" hx-target="#panel" {% if filter == 'archive' %}checked{% endif %} value="archive" class="radio-switch__input" /><i class="fa fa-list-ul"></i>
-            </label>
-        </div>
-        <div class="d-flex ml-auto">
-            {% if feed_id  %}
-                {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
-                <button class="btn-icon" hx-get="{{feed_edit_url}}" hx-target="#dialog">
-                    <i class="fa fa-cog"></i>
-                </button>
-            {% elif group_id %}
-                {% set group_edit_url = url_for('main.group_edit', group_id=group_id ) %}
-                <button class="btn-icon" hx-get="{{group_edit_url}}" hx-target="#dialog">
-                    <i class="fa fa-cog"></i>
-                </button>
-            {% endif %}
-        </div>
-    </div>   
+            </div>
+            <div class="radio-switch">
+                <label class="radio-switch__label">
+                    {% set request_url_unread = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='unread', xhr=1, _external=True) %}
+                    <input type="radio" name="status" hx-get="{{request_url_unread}}" hx-target="#panel" {% if filter == 'unread' %}checked{% endif %} value="unread" class="radio-switch__input" /><i class="fa fa-circle"></i>
+                </label>
+                <label class="radio-switch__label">
+                    {% set request_url_saved = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='saved', xhr=1, _external=True) %}
+                    <input type="radio" name="status" hx-get="{{request_url_saved}}" hx-target="#panel" {% if filter == 'saved' %}checked{% endif %} value="saved" class="radio-switch__input" /><i class="fa fa-star"></i>
+                </label>
+                <label class="radio-switch__label">
+                    {% set request_url_archive = url_for('main.entry_list', feed_id=feed_id, group_id=group_id, filter='archive', xhr=1, _external=True) %}
+                    <input type="radio" name="status" hx-get="{{request_url_archive}}" hx-target="#panel" {% if filter == 'archive' %}checked{% endif %} value="archive" class="radio-switch__input" /><i class="fa fa-list-ul"></i>
+                </label>
+            </div>
+            <div class="d-flex ml-auto">
+                {% if feed_id  %}
+                    {% set feed_edit_url = url_for('main.feed_edit', feed_id=feed_id ) %}
+                    <button class="btn-icon" hx-get="{{feed_edit_url}}" hx-target="#dialog">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                {% elif group_id %}
+                    {% set group_edit_url = url_for('main.group_edit', group_id=group_id ) %}
+                    <button class="btn-icon" hx-get="{{group_edit_url}}" hx-target="#dialog">
+                        <i class="fa fa-cog"></i>
+                    </button>
+                {% endif %}
+            </div>
+        </div>   
+    </section>    
 {% endmacro %}
 
 {% if is_xhr %}

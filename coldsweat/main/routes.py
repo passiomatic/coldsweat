@@ -232,6 +232,7 @@ def entry_list_mark():
     user = flask_login.current_user.db_user
 
     if feed_id:
+        # Mark feed as read 
         try:
             feed = Feed.get((Feed.id == feed_id))
         except Feed.DoesNotExist:
@@ -252,6 +253,7 @@ def entry_list_mark():
         flask.flash('Feed has been marked as read', category="info")
         redirect_url = flask.url_for('main.entry_list', feed=feed_id)
     elif group_id: 
+        # Mark group as read 
         try:
             group = Group.get(Group.id == group_id)
         except Group.DoesNotExist:
@@ -271,6 +273,7 @@ def entry_list_mark():
         flask.flash(f'All {group.title} entries have been marked as read', category="info")
         redirect_url = flask.url_for('main.entry_list', unread='')        
     else:
+        # Mark all as read
         q = Entry.select(Entry).join(Feed).join(Subscription).where(
             (Subscription.user == user) &
             # Exclude entries already marked as read
@@ -292,7 +295,9 @@ def entry_list_mark():
                     'entry %d already marked as read, ignored' % entry.id)
                 continue
 
-    return _render_script('main/_dialog_done.js', location=redirect_url)
+    response = flask.make_response('', 204)  # No content 
+    response.headers['HX-Trigger'] = 'nav-changed,article-list-changed'    
+    return response
 
 
 @bp.route('/groups/edit', methods=['GET', 'POST'])

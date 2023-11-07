@@ -43,7 +43,7 @@ $wellshadowblur: $gutterwidth / 2;
 .well {
     min-height: 20px;
     padding: $gutterwidth / 2;
-    margin-bottom: $line-height;
+    margin-bottom: .25rem;
     background-color: $wellbackgroundcolor;
     border: $wellborderwidth $wellborderstyle $wellbordercolor;
     border-radius: $wellborderradius;

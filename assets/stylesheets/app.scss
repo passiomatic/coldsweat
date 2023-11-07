@@ -57,7 +57,7 @@ body {
 .popover-content {
     .btn {
         display: block;
-        margin: 0 0 $line-height / 3 0;
+        margin: 0 0 .25rem 0;
     }
 
     .btn:last-child {
@@ -100,7 +100,7 @@ pre {
     i {
         display: block;
         opacity: .6;
-        margin: $line-height 0 0;
+        margin: 1.5rem 0 0;
     }
 
 }
@@ -110,7 +110,7 @@ pre {
 #modal-feed-edit {
 
     table {
-        margin-top: $line-height;
+        margin-top: 1.5rem;
     }
 
 

@@ -139,7 +139,7 @@ article {
         li,
         dd {
             @include zero;
-            margin: 0 0 $line-height/4 $gutterwidth;
+            margin: 0 0 .25rem $gutterwidth;
         }
 
         // Images

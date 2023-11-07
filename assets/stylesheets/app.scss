@@ -176,10 +176,10 @@ nav {
         background: $white;
         border: 1px solid $border-color;
         border-radius: .5rem;
-        @include box-shadow(0 0 4px rgba($color-neutral-300, .5));
+        box-shadow: 0 0 4px rgba($color-neutral-300, .5);
 
         a {
-            @include font-size(14);
+            font-size: $font-size-small;
             white-space: nowrap;
             border-bottom: 1px solid $border-color;
 

@@ -99,8 +99,7 @@ article {
 
         blockquote {
             // color: $color-secondary;
-            padding: 0 $gutterwidth / 2;
-            // margin: 0 $gutterwidth / 2;
+            padding: 0 .75rem;
             font-size: 0.925em; // A tad smaller...
             border-left: .25rem solid $color-neutral-500; 
             p:last-child {
@@ -139,7 +138,7 @@ article {
         li,
         dd {
             @include zero;
-            margin: 0 0 .25rem $gutterwidth;
+            margin: 0 0 .25rem 1.5rem;
         }
 
         // Images

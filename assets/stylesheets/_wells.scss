@@ -35,14 +35,14 @@ $wellcolor: $text-color;
 // Add optional box-shadow values or ignore
 // By default shadow colour is a tint of background colour. Adjust percentage as required
 $wellshadow: darken($wellbackgroundcolor, 10%);
-$wellshadowblur: $gutterwidth / 2;
+$wellshadowblur: .75rem;
 
 
 // Styles 
 
 .well {
     min-height: 20px;
-    padding: $gutterwidth / 2;
+    padding: .75rem;
     margin-bottom: .25rem;
     background-color: $wellbackgroundcolor;
     border: $wellborderwidth $wellborderstyle $wellbordercolor;
@@ -56,13 +56,11 @@ $wellshadowblur: $gutterwidth / 2;
 }
 
 .well--large {
-    padding: $gutterwidth;
-    //@include box-shadow(inset 0 1px $wellshadowblur * 2 $wellshadow); 
+    padding: 1.5rem;
 }
 
 .well--small {
-    padding: $gutterwidth / 4;
-    //@include box-shadow(inset 0 1px $wellshadowblur / 2 $wellshadow);  
+    padding: .375rem;
 }
 
 .well--dim {

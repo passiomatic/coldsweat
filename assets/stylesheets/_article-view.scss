@@ -24,158 +24,167 @@ main {
                 height: 24px;
             }
 
-            input:checked ~ .toggle-icon {
+            input:checked~.toggle-icon {
                 background-image: url('/assets/star-fill.svg');
             }
         }
     }
-    
+
     // Entering
     &.in .entry {
         transform: translateX(0);
-        opacity: 1;                
+        opacity: 1;
     }
 }
 
 // Article
 
-article {
-    @include clearfix;
+article {   
     background: $white;
     padding: 2rem;
+}
 
-    .article__title {
-        font-size: $font-size-xlarge;     
+.article__title {
+    font-size: $font-size-xlarge;
+    font-weight: 600;
+    margin: .75rem 0 0 0;
+}
+
+.article__meta {
+    border-bottom: 5px double $border-color;
+    padding: 0 0 1rem 0;
+    margin: .25rem 0 2rem 0;
+}
+
+.article__content {
+    @include clearfix;
+    max-width: 75ch;
+    margin: 0 auto 2rem auto;
+
+    // Headings
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 1.5rem 0 .75rem 0;
         font-weight: 600;
-        margin: .75rem 0 0 0;
-    }
-    
-    .article__meta {
-        border-bottom: 5px double $border-color;
-        padding: 0 0 1rem 0;
-        margin: .25rem 0 2rem 0;
     }
 
-    .article__content {
-        max-width: 75ch;
-        margin: 0 auto 2rem auto;
+    h1,
+    h2 {
+        font-size: $font-size-large;
+    }
 
-        // Headings
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-size: $font-size-base;
+    }
 
-        h1, h2, h3, h4, h5, h6 {
-            margin: 1.5rem 0 .75rem 0;
-            font-weight: 600;
-        }
+    // Other common block-level elements 
 
-        h1, h2 {
-            font-size: $font-size-large;
-        }
+    blockquote,
+    picture,
+    figure,
+    table,
+    p,
+    ul,
+    ol,
+    dl {
+        @include zero;
+        margin: 1rem 0;
 
-        h3, h4, h5, h6 {
-            font-size: $font-size-base;
-        }
-
-        // Other common block-level elements 
-
-        blockquote,
-        picture,
-        figure,
-        table,
-        p,
-        ul,
-        ol,
-        dl {
-            @include zero;
-            margin: 1rem 0;
-
-            &:first-child {
-                margin-top: 0;
-            }
-        }
-        
-        a {
-            text-decoration: underline;
-        }
-
-        blockquote {
-            // color: $color-secondary;
-            padding: 0 .75rem;
-            font-size: 0.925em; // A tad smaller...
-            border-left: .25rem solid $color-neutral-500; 
-            p:last-child {
-                margin-bottom: 0;
-            }
-        }
-
-        pre {
-            // margin: 1.5rem 0;
-            white-space: pre;
-            // border: 4px solid $color-primary-300;
-            border-radius: .25rem;
-            overflow-y: scroll;
-            padding: .5rem .75rem;
-            // Striped
-            background: repeating-linear-gradient(0deg, #162430, #162430 1px, #273c4d 1px, #273c4d 2px);
-            font: 0.9em $font-family-code;
-            line-height: 1.5;
-            color: #abf5ba;            
-            text-shadow: rgba(208, 245, 215, 0.45) 0 0 6px;
-            // box-shadow: inset #152029 0 0 6px 1px;
-        }
-
-        q {
-            color: $color-secondary;
-        }
-
-        figcaption {
-            font-size: $font-size-small;
-            font-style: italic;
-            color: $text-color-muted;
-        }
-
-        // List items 
-
-        li,
-        dd {
-            @include zero;
-            margin: 0 0 .25rem 1.5rem;
-        }
-
-        // Images
-
-        img {
-            max-width: 100%;
-            height: auto;
-            background: $color-neutral-600;
-        }
-
-        // Media
-
-        iframe, 
-        video,
-        embed {
-            width: 100%;
-        }
-    
-        // Misc.
-        
-        sub,
-        sup {
-            font-size: $font-size-small;
-        }
-
-        sub {
-            vertical-align: bottom;
-        }
-
-        sup {
-            vertical-align: top;
+        &:first-child {
+            margin-top: 0;
         }
     }
 
-    .article__footer {
-        clear: both;
-        padding: 1rem 0 0 0;
-        border-top: 1px solid $border-color;
+    a {
+        text-decoration: underline;
     }
+
+    blockquote {
+        // color: $color-secondary;
+        padding: 0 .75rem;
+        font-size: 0.925em; // A tad smaller...
+        border-left: .25rem solid $color-neutral-500;
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    pre {
+        // margin: 1.5rem 0;
+        white-space: pre;
+        // border: 4px solid $color-primary-300;
+        border-radius: .25rem;
+        overflow-y: scroll;
+        padding: .5rem .75rem;
+        // Striped
+        background: repeating-linear-gradient(0deg, #162430, #162430 1px, #273c4d 1px, #273c4d 2px);
+        font: 0.9em $font-family-code;
+        line-height: 1.5;
+        color: #abf5ba;
+        text-shadow: rgba(208, 245, 215, 0.45) 0 0 6px;
+        // box-shadow: inset #152029 0 0 6px 1px;
+    }
+
+    q {
+        color: $color-secondary;
+    }
+
+    figcaption {
+        font-size: $font-size-small;
+        font-style: italic;
+        color: $text-color-muted;
+    }
+
+    // List items 
+
+    li,
+    dd {
+        @include zero;
+        margin: 0 0 .25rem 1.5rem;
+    }
+
+    // Images
+
+    img {
+        max-width: 100%;
+        height: auto;
+        background: $color-neutral-600;
+    }
+
+    // Media
+
+    iframe,
+    video,
+    embed {
+        width: 100%;
+    }
+
+    // Misc.
+
+    sub,
+    sup {
+        font-size: $font-size-small;
+    }
+
+    sub {
+        vertical-align: bottom;
+    }
+
+    sup {
+        vertical-align: top;
+    }
+}
+
+.article__footer {
+    padding: 1rem 0 0 0;
+    border-top: 1px solid $border-color;
 }

@@ -45,35 +45,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
     const Sweat = {
 
-        onEntryLoad: function (id, title, event) {
-            var entryEl = document.getElementById(`entry-${id}`);
-            entryEl.classList.add('status-read')
-            Sweat.loadEntry(id, title, event)
-        },
-
-        morph: function (sourceEl, fragment, options) {
-            Idiomorph.morph(sourceEl, fragment)
-            // morphdom(sourceEl, fragment, {
-            //     childrenOnly: true,
-            //     onBeforeElUpdated: (fromEl, toEl) => {
-            //         if (fromEl.tagName == "DETAILS") {
-            //             console.log(`Skipped ${fromEl.getAttribute('id')}`)
-            //             return false;
-            //         }
-            //         // console.log(`Matched ${fromEl.getAttribute('id')} <- ${toEl.getAttribute('id')}`);
-            //         return true;
-            //     },
-            //     onBeforeElChildrenUpdated: (fromEl, toEl) => {
-            //         if (fromEl.tagName == "DETAILS") {
-            //             console.log(`Skipped ${fromEl.getAttribute('id')}`)
-            //             return false;
-            //         }
-
-            //         console.log(`Updated ${fromEl.getAttribute('id')}`)
-            //         return true;
-            //     }     
-            // })
-        },
+        // onEntryLoad: function (id, title, event) {
+        //     var entryEl = document.getElementById(`entry-${id}`);
+        //     entryEl.classList.add('status-read')
+        //     Sweat.loadEntry(id, title, event)
+        // },
 
         setup: function () {
             window.addEventListener("popstate", (event) => {
@@ -136,26 +112,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
             dialogEl.showModal();
             //dialogEl.classList.add("in"); 
             return dialogEl;
-        },
-
-        // markSaved: function (id, event) {
-        //     var toggle = event.target;
-        //     var new_value = toggle.checked ? 'saved' : 'unsaved'
-        //     Sweat.mark(id, new_value)
-        // },
-
-        mark: function (id, status) {
-            var formData = new FormData();
-            formData.append('mark', '')
-            formData.append('as', status)
-            fetch(makeEndpointURL(`/entries/${id}`), { method: 'POST', body: formData })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Server returned error ${response.status} while handling POST request`);
-                    }
-                    response.text().then((text) => {
-                    });
-                });
         },
 
         shareEntry: async function (shareData) {

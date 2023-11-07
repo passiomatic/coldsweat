@@ -1,14 +1,62 @@
-@mixin buttongrad 		{ @include vertical($buttonbackgroundcolor, darken($buttonbackgroundcolor, 10%)); }
-@mixin errorgrad 		{ @include vertical($errorcolor, darken($errorcolor, 10%)); }
-@mixin primarygrad 		{ @include vertical($primarycolor, darken($primarycolor, 10%)); }
-@mixin successgrad 		{ @include vertical($successcolor, darken($successcolor, 10%)); }
+@mixin buttongrad {
+    @include vertical($buttonbackgroundcolor, darken($buttonbackgroundcolor, 10%));
+}
+
+@mixin errorgrad {
+    @include vertical($color-secondary, darken($color-secondary, 10%));
+}
+
+@mixin primarygrad {
+    @include vertical($color-primary, darken($color-primary, 10%));
+}
+
+// Vars
+
+$buttonpadding: 6px 11px;
+
+// Buttons have a default flat background colour
+// Add an optional gradient in _bootstrap-form-buttons.scss
+// Configure the gradient colours in _texture.scss
+$buttonbackgroundcolor: $color-neutral-600;
+
+// Set the default button’s border width. Default is $borderwidth defined above
+$buttonborderwidth: 1px;
+
+// Set the default button’s border style
+$buttonborderstyle: solid;
+
+// By default border colour is a tint of background colour. Adjust percentage as required
+$buttonbordercolor : darken($buttonbackgroundcolor, 13%);
+
+// Sometimes you may want a darker bottom border to suggest three-dimensions
+$buttonbottombordercolor : darken($buttonbordercolor, 17%);
+
+// Set the default button’s border radius.
+$buttonborderradius: .5rem;
+
+// Set the default button’s text colour
+// Colours for :hover and :active  are derived automatically from $buttoncolor
+// Override colours for :hover and :active in _bootstrap-form-buttons.scss
+$buttoncolor: $text-color;
+
+// Set the primary action button’s border and text colours
+$buttonbordercolorprimary		: darken($color-primary, 10%);
+$buttoncolorprimary				: $white;
+
+
+// Set the error button’s border and text colours
+$buttonbordercolorerror			: darken($color-secondary, 10%);
+$buttoncolorerror				: $white;
+
+
+// Styles 
 
 .btn {
     display: inline-block;
     padding: $buttonpadding;
     margin-bottom: 0;
     font-size: $font-size-base;
-    line-height: $baselineheight;
+    line-height: $line-height;
     color: $buttoncolor;
     text-align: center;
     vertical-align: middle;
@@ -35,7 +83,7 @@
     border-radius: .25rem;
     display: inline-flex;
     align-items: center;
-    gap: .75rem;    
+    gap: .75rem;
     margin: 0;
     padding: .5rem .75rem;
     border: 0;
@@ -62,7 +110,7 @@
 
 
 .btn-primary {
-    background-color: $primarycolor;
+    background-color: $color-primary;
     @include primarygrad;
 
     border : {
@@ -75,13 +123,13 @@
     &:visited,
     &:active,
     &:hover {
-        background-color: darken($primarycolor, 3%);
+        background-color: darken($color-primary, 3%);
         color: darken($buttoncolorprimary, 5%);
     }
 }
 
 .btn-danger {
-    background-color: $errorcolor;
+    background-color: $color-secondary;
     @include errorgrad;
 
     border : {
@@ -94,7 +142,7 @@
     &:visited,
     &:active,
     &:hover {
-        background-color: darken($errorcolor, 10%);
+        background-color: darken($color-secondary, 10%);
         color: darken($buttoncolorerror, 5%);
     }
 }
@@ -127,4 +175,3 @@
 .radio-switch__input {
     display: none;
 }
-

@@ -1,0 +1,139 @@
+// Typography
+
+@mixin css-hyphens($val: auto) {
+	-webkit-hyphens: $val;
+	-moz-hyphens: $val;
+	-ms-hyphens: $val;
+	-o-hyphens: $val;
+	hyphens: $val;
+}
+
+// Hidden
+
+@mixin hidden {
+	display: none !important;
+	visibility: hidden;
+}
+
+@mixin hide-text {
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+@mixin invisible {
+	visibility: hidden;
+}
+
+@mixin visuallyhidden {
+	overflow: hidden;
+	position: absolute;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+
+	&.focusable {
+
+		&:active,
+		&:focus {
+			position: static;
+			clip: auto;
+			height: auto;
+			width: auto;
+			margin: 0;
+			overflow: visible;
+		}
+	}
+}
+
+// cancels visuallyhidden, invisible, hidden
+@mixin visible($display: block) {
+	overflow: visible;
+	position: static;
+	clip: auto;
+	height: auto;
+	width: auto;
+	margin: 0;
+	display: $display !important;
+	visibility: visible;
+}
+
+// Gradients 
+
+@mixin horizontal($startColor : $white, $endColor : $lighterneutralcolor) {
+	background-color: $endColor;
+	background-image: -webkit-gradient(linear, 0 0, 100% 0, from($startColor), to($endColor)); // Safari 4+, Chrome 2+
+	background-image: -webkit-linear-gradient(left, $startColor, $endColor); // Safari 5.1+, Chrome 10+
+	background-image: -moz-linear-gradient(left, $startColor, $endColor); // FF 3.6+
+	background-image: -ms-linear-gradient(left, $startColor, $endColor); // IE10
+	background-image: -o-linear-gradient(left, $startColor, $endColor); // Opera 11.10
+	background-image: linear-gradient(left, $startColor, $endColor); // W3C
+	background-repeat: repeat-x;
+}
+
+@mixin vertical($startColor : $white, $endColor: $lighterneutralcolor) {
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from($startColor), to($endColor)); // Safari 4+, Chrome 2+
+	background-image: -webkit-linear-gradient(top, $startColor, $endColor); // Safari 5.1+, Chrome 10+
+	background-color: $endColor;
+	background-image: -moz-linear-gradient(top, $startColor, $endColor); // FF 3.6+
+	background-image: -ms-linear-gradient(top, $startColor, $endColor); // IE10
+	background-image: -o-linear-gradient(top, $startColor, $endColor); // Opera 11.10
+	background-image: linear-gradient(top, $startColor, $endColor); // W3C
+	background-repeat: repeat-x;
+}
+
+@mixin directional($startColor : $white, $endColor : $lighterneutralcolor, $deg : 45deg) {
+	background-color: $endColor;
+	background-image: -moz-linear-gradient($deg, $startColor, $endColor); // FF 3.6+
+	background-image: -ms-linear-gradient($deg, $startColor, $endColor); // IE10
+	background-image: -webkit-linear-gradient($deg, $startColor, $endColor); // Safari 5.1+, Chrome 10+
+	background-image: -o-linear-gradient($deg, $startColor, $endColor); // Opera 11.10
+	background-image: linear-gradient($deg, $startColor, $endColor); // W3C
+	background-repeat: repeat-x;
+}
+
+@mixin bordered($top-color: #eee, $right-color: #eee, $bottom-color: #eee, $left-color: #eee) {
+	border-top: solid 1px $top-color;
+	border-left: solid 1px $left-color;
+	border-right: solid 1px $right-color;
+	border-bottom: solid 1px $bottom-color;
+}
+
+// @include placeholder(VALUE) (color)
+
+@mixin placeholder($color : $color-neutral-300) {
+
+	&:-moz-placeholder {
+		color: $color;
+	}
+
+	&::-moz-placeholder {
+		color: $color;
+	}
+
+	&:-ms-input-placeholder {
+		color: $color;
+	}
+
+	&::-webkit-input-placeholder {
+		color: $color;
+	}
+}
+
+// @include overflow
+
+@mixin text-overflow {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+// @include zero
+
+@mixin zero {
+	margin: 0;
+	padding: 0;
+}

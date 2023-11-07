@@ -51,13 +51,13 @@ a {
 }
 
 ::-moz-selection {
-    background-color: lighten($primarycolor, 65%);
-    color: $primarycolor;
+    background-color: lighten($color-primary, 65%);
+    color: $color-primary;
     text-shadow: none;
 }
 
 ::selection {
-    background-color: lighten($primarycolor, 65%);
-    color: $primarycolor;
+    background-color: lighten($color-primary, 65%);
+    color: $color-primary;
     text-shadow: none;
 }

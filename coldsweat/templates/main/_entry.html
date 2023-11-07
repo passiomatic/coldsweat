@@ -4,8 +4,8 @@
 <div class="entry {%if entry.id in saved_ids%}status-saved{% endif %}">
     <article>
         <label class="toggle toggle-save">
-            <input class="sr-only" onchange="Sweat.markSaved({{entry.id}}, event)" {{ 'checked' if entry.id in saved_ids
-                else '' }} type="checkbox">
+            <input type="checkbox" class="sr-only" hx-post="{{ url_for('main.entry_save', entry_id=entry.id)}}" {{ 'checked' if entry.id in saved_ids
+                else '' }} name="save" value="1">
             <div class="toggle-icon" title="Toggle save (S key)"></div>
         </label>
         <div class="d-flex align-items-center">

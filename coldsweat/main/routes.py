@@ -149,19 +149,26 @@ def entry_detail(entry_id):
 
 @bp.route('/entries/<int:entry_id>', methods=["POST"])
 @flask_login.login_required
-def entry_mark(entry_id):
-    try:
-        status = flask.request.form['as']
-    except KeyError:
-        flask.abort(400, 'Missing parameter as=read|unread|saved|unsaved')
+def entry_save(entry_id):
+    status = flask.request.form.get('save', 0, type=int) 
 
     user = flask_login.current_user.db_user
     entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
-    if 'mark' in flask.request.form:
-        feed.mark_entry(user, entry, status)    
+    feed.mark_entry(user, entry, 'saved' if status else 'unsaved')    
+    return ('', 204)  # No content
 
-    return ('', 200)
+# @@TODO
+# @bp.route('/entries/read/<int:entry_id>', methods=["POST"])
+# @flask_login.login_required
+# def entry_read(entry_id):
+#     status = flask.request.form.get('read', 0, type=int) 
+
+#     user = flask_login.current_user.db_user
+#     entry = get_object_or_404(Entry, (Entry.id == entry_id))
+
+#     feed.mark_entry(user, entry, 'read' if status else 'unread')    
+#     return ('', 204)  # No content
 
 
 # @bp.route('/feeds')

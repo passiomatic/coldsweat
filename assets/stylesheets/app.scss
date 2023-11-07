@@ -1,9 +1,16 @@
+
+// Import bourbon.io
+@import 'vendor/bourbon/bourbon';
+// Sass mixins
+@import "mixins";
+// Font Awesome icon fonts (optional)
+@import "font-awesome";
+
 // Theme vars
 @import 'theme';
 
 // Import all SASS modules
 @import 'reset';
-@import 'imports';
 @import 'typography';
 @import 'tables';
 @import 'helpers';

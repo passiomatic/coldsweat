@@ -1,7 +1,7 @@
 {% import "main/macros.html" as macros %}
 
 {% macro render_panel() %}
-    <section class="panel" hx-trigger="article-list-changed from:body" hx-get="{{ url_for('main.entry_list') }}" hx-target="this"  id="panel">
+    <section class="panel" id="panel">
         <ul id="entry-list" class="list-view {{ '' if is_xhr == 1 else 'in' }}">        
             {% if count %}
                 <li class="heading">

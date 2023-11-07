@@ -55,7 +55,7 @@ def nav():
 def entry_list():
     offset = flask.request.args.get('offset', 0, type=int)
     # These three ids allow to restore the UI panels
-    group_id = flask.request.args.get('group_id',  0, type=int)
+    group_id = flask.request.args.get('group_id', 0, type=int)
     feed_id = flask.request.args.get('feed_id', 0, type=int)
     # @@TODO
     #entry_id = flask.request.args.get('entry_id', 0, type=int)
@@ -251,7 +251,7 @@ def entry_list_mark():
                     (Feed.last_checked_on < before)
                     ).distinct())
         flask.flash('Feed has been marked as read', category="info")
-        redirect_url = flask.url_for('main.entry_list', feed=feed_id)
+        #redirect_url = flask.url_for('main.entry_list', feed=feed_id)
     elif group_id: 
         # Mark group as read 
         try:
@@ -271,7 +271,7 @@ def entry_list_mark():
                     (Entry.published_on < before)
                     ).distinct())
         flask.flash(f'All {group.title} entries have been marked as read', category="info")
-        redirect_url = flask.url_for('main.entry_list', unread='')        
+        #redirect_url = flask.url_for('main.entry_list', unread='')        
     else:
         # Mark all as read
         q = Entry.select(Entry).join(Feed).join(Subscription).where(
@@ -283,7 +283,7 @@ def entry_list_mark():
             (Feed.last_checked_on < before)
         ).distinct()
         flask.flash('All entries have been marked as read', category="info")
-        redirect_url = flask.url_for('main.entry_list', unread='')
+        #redirect_url = flask.url_for('main.entry_list', unread='')
 
     #  @@TODO: Use insert_many()
     with models.db_wrapper.database.transaction():
@@ -296,7 +296,17 @@ def entry_list_mark():
                 continue
 
     response = flask.make_response('', 204)  # No content 
-    response.headers['HX-Trigger'] = 'nav-changed,article-list-changed'    
+    if feed_id:
+        nav_url = flask.url_for('main.nav', feed_id=feed_id)
+        article_url = flask.url_for('main.entry_list', feed_id=feed_id)
+    elif group_id:
+        nav_url = flask.url_for('main.nav', group_id=group_id)
+        article_url = flask.url_for('main.entry_list', group_id=group_id)
+    else:
+        nav_url = flask.url_for('main.nav')
+        article_url = flask.url_for('main.entry_list')        
+    response.headers['HX-Trigger'] = flask.json.dumps(
+        {"navChanged": {"url": nav_url}, "articleListChanged": {"url": article_url}})    
     return response
 
 
@@ -326,7 +336,8 @@ def group_edit():
     group.save()
     flask.flash('Changes have been saved.')
     response = flask.make_response('', 204)  # No content 
-    response.headers['HX-Trigger'] = 'nav-changed'    
+    nav_url = flask.url_for('main.nav', group_id=group_id)
+    response.headers['HX-Trigger'] = flask.json.dumps({"navChanged": {"url": nav_url}})    
     return response
 
 
@@ -356,19 +367,20 @@ def feed_edit():
         return flask.render_template('main/_feed_edit.html', **locals())
 
     # Handle postback
-    title = flask.request.form.get('title', '').strip()
+    new_title = flask.request.form.get('title', '').strip()
     enabled = flask.request.form.get('enabled') == "1"
-    if not title:
+    if not new_title:
         flask.flash('Error, feed title cannot be empty.', category="error")
         # @@TODO remove locals()
         return flask.render_template('main/_feed_edit.html', **locals())
-    feed.title = title
+    feed.title = new_title
     feed.enabled = enabled
     feed.save()
     flask.flash('Changes have been saved.')
     #flask.flash('Feed <i>%s</i> is now enabled.' % feed.title, category="info")
     response = flask.make_response('', 204)  # No content 
-    response.headers['HX-Trigger'] = 'nav-changed'
+    nav_url = flask.url_for('main.nav', feed_id=feed_id)
+    response.headers['HX-Trigger'] = flask.json.dumps({"navChanged": {"url": nav_url}})
     return response
 
 
@@ -415,7 +427,8 @@ def feed_add_1():
 
     _add_subscription(feed_, group_id)
     response = flask.make_response('', 204)  # No content 
-    response.headers['HX-Trigger'] = 'nav-changed'
+    nav_url = flask.url_for('main.nav', feed_id=feed_.id)
+    response.headers['HX-Trigger'] = flask.json.dumps({"navChanged": {"url": nav_url}})    
     return response
 
 
@@ -440,12 +453,13 @@ def feed_add_2():
 #                                               locals())
 
     feed_ = feed.add_feed_from_url(self_link, fetch_data=True)
-    
+
     _add_subscription(feed_, group_id)
     response = flask.make_response('', 204)  # No content 
-    response.headers['HX-Trigger'] = 'nav-changed'
+    nav_url = flask.url_for('main.nav', feed_id=feed_.id)
+    response.headers['HX-Trigger'] = flask.json.dumps({"navChanged": {"url": nav_url}})    
     return response
-    
+
 
 
 @bp.route('/feeds/remove', methods=['GET', 'POST'])

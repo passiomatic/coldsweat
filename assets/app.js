@@ -18,6 +18,16 @@ htmx.on("htmx:beforeSwap", (e) => {
     }
 })
 
+document.body.addEventListener("navChanged", function (evt) {
+    // console.log("navChanged:",  evt.detail.url)
+    htmx.ajax('GET', evt.detail.url, '#nav')
+})
+
+document.body.addEventListener("articleListChanged", function (evt) {
+    // console.log("articleListChanged:",  evt.detail.url)    
+    htmx.ajax('GET', evt.detail.url, '#panel')
+})
+
 window.addEventListener("DOMContentLoaded", (event) => {
 
     function makeEndpointURL(pathname) {

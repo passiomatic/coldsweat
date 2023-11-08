@@ -120,18 +120,20 @@ def entry_list():
     return response
 
 
+# @@FIXME: Figure out a better way to split views and URL's
 @bp.route('/entries/<int:entry_id>')
 @flask_login.login_required
 def entry_detail(entry_id):
     # These three ids allow to restore the UI panels
+    entry_id = flask.request.args.get('entry_id',  0, type=int)
     group_id = flask.request.args.get('group_id',  0, type=int)
     feed_id = flask.request.args.get('feed_id', 0, type=int)
     user = flask_login.current_user.db_user
 
     # We need to rebuild nav and article view
+    entry = get_object_or_404(Entry, (Entry.id == entry_id))
     groups_feeds = itertools.groupby(queries.get_groups_and_feeds(user), lambda q: (q.group_id, q.group_title, q.group_read_count))
     total_unread_count = queries.get_total_unread_count(user)
-    entry = get_object_or_404(Entry, (Entry.id == entry_id))
 
     feed.mark_entry(user, entry, 'read')
     view_variables = {

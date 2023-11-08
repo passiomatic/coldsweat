@@ -18,7 +18,7 @@
                 {% if date_since and loop.changed(date_since) %}
                     <h2 class="entry-card__date">{{date_since}}</h2>
                 {% endif %}
-                <input class="sr-only" hx-get="{{ url_for('main.entry_detail', group_id=group_id, feed_id=feed_id, entry_id=e.id, xhr=1) }}" hx-target="#main" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entries">
+                <input class="sr-only" id="c-{{e.id}}" type="radio" value="{{e.id}}" name="entry_id">
                 <label for="c-{{e.id}}">
                     <div class="entry-card__status"></div>
                     <div>

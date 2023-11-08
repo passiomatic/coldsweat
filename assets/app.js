@@ -68,6 +68,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 }
                 if (prevCardInput) {
                     prevCardInput.checked = true;
+                    htmx.trigger(`#${prevCardInput.id}`, "change");                    
                     var entryEl = document.getElementById(`entry-${prevCardInput.value}`);
                     entryEl.classList.add('status-read');
                 }
@@ -87,7 +88,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 }
                 if (nextCardInput) {
                     nextCardInput.checked = true;
-                    // htmx.trigger(`#${nextCardInput.id}`, "changed");
+                    htmx.trigger(`#${nextCardInput.id}`, "change");
                     var entryEl = document.getElementById(`entry-${nextCardInput.value}`);
                     entryEl.classList.add('status-read');
                 }

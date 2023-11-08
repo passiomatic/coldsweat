@@ -30,13 +30,13 @@ document.body.addEventListener("articleListChanged", function (evt) {
 
 window.addEventListener("DOMContentLoaded", (event) => {
 
-    function makeEndpointURL(pathname) {
-        var segments = [
-            window.applicationURL,
-            pathname
-        ]
-        return segments.join('')
-    }
+    // function makeEndpointURL(pathname) {
+    //     var segments = [
+    //         window.applicationURL,
+    //         pathname
+    //     ]
+    //     return segments.join('')
+    // }
 
     // Innermost element that does not get replaced
     var listViewEl = document.getElementById("panel");
@@ -52,9 +52,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
         // },
 
         setup: function () {
-            window.addEventListener("popstate", (event) => {
-                //console.log('popstate', event.state)
-            });
 
             // Prev
             hotkeys('j', function (event, handler) {
@@ -63,7 +60,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 var prevCardInput = null;
                 if (currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
-                    // @@TODO Skip headings
                     prevCard = li.previousElementSibling;
                     prevCardInput = prevCard.querySelector(".entry-card input");
                 } else {
@@ -74,8 +70,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     prevCardInput.checked = true;
                     var entryEl = document.getElementById(`entry-${prevCardInput.value}`);
                     entryEl.classList.add('status-read');
-                    // Sweat.mark(prevCardInput.value, 'read');
-                    Sweat.loadEntry(prevCardInput.value, event);
                 }
             });
             // Next
@@ -85,7 +79,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 var nextCardInput = null;
                 if (currentCardInput) {
                     var li = currentCardInput.parentNode.parentNode;
-                    // @@TODO Skip headings
                     nextCard = li.nextElementSibling;
                     nextCardInput = nextCard.querySelector(".entry-card input");
                 } else {
@@ -94,10 +87,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 }
                 if (nextCardInput) {
                     nextCardInput.checked = true;
+                    // htmx.trigger(`#${nextCardInput.id}`, "changed");
                     var entryEl = document.getElementById(`entry-${nextCardInput.value}`);
                     entryEl.classList.add('status-read');
-                    // Sweat.mark(nextCardInput.value, 'read')
-                    Sweat.loadEntry(nextCardInput.value, event)
                 }
             });
         },

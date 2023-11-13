@@ -1,10 +1,10 @@
 feedparser==6.0.10
 peewee==3.16.2
-requests==2.30.0
+requests==2.31.0
 pytest==7.3.1
-urllib3==1.26.6
-flask==2.3.2
-flask-login==0.6.2
+urllib3==1.26.18
+flask==3.0.0
+flask-login==0.6.3
 flask-cdn==1.5.3
 tomli==2.0.1
 markupsafe==2.1.3

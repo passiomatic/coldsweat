@@ -45,13 +45,18 @@
                 {% if g_id == 1 %}
                 {{ render_feed_list(g_id, feeds) }}
                 {% else %}
-                <details>
-                    <summary>
-                        <input id="group-{{g_id}}" class="sr-only" type="radio" {{ 'checked' if g_id==group_id else ''
-                            }} name="tree">
-                        {{ macros.render_group_label(g_id, group_title, group_unread_count) }}
-                    </summary>
-                    {{ render_feed_list(g_id, feeds) }}
+                <div class="tree-node" id="node-{{g_id}}">
+                    <div class="d-flex align-items-center">
+                        <div class="tree-node__toggle" onclick="Sweat.toggleNode('node-{{g_id}}')"></div>
+                        <div class="tree-node__label">
+                            <input id="group-{{g_id}}" class="sr-only" type="radio" {{ 'checked' if g_id==group_id else ''
+                                }} name="tree">
+                            {{ macros.render_group_label(g_id, group_title, group_unread_count) }}
+                        </div>
+                    </div>
+                    <div class="tree-node__content">
+                        {{ render_feed_list(g_id, feeds) }}
+                    </div>
                 </details>
                 {% endif %}
             </dd>

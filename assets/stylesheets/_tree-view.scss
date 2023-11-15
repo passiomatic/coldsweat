@@ -20,34 +20,42 @@
             }
         }
         
-        // Arrows
-        
-        details summary::-webkit-details-marker {
-            display: none; // Hides marker on Safari 
+        .tree-node {
         }
-        
-        details summary {
-            list-style: none; // Other browsers
-            display: flex;
-            align-items: center;
-            //gap: .25rem;
-            //justify-content: space-between;
-        }
-        
-        details summary:before {
-            content: '';
+
+        .tree-node__toggle {
             //background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23252424' viewBox='0 0 256 256'%3E%3Cpath d='M216.49,104.49l-80,80a12,12,0,0,1-17,0l-80-80a12,12,0,0,1,17-17L128,159l71.51-71.52a12,12,0,0,1,17,17Z'%3E%3C/path%3E%3C/svg%3E");
+            // Arrow right
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23252424' viewBox='0 0 256 256'%3E%3Cpath d='M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z'%3E%3C/path%3E%3C/svg%3E");            
             background-size: 12px 12px;
             background-repeat: no-repeat;
-            width: 12px;
-            height: 12px;
-            margin: 0 0 0 .25rem;
+            background-position: center;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            // margin: 0 0 0 .25rem;
         }
-        
-        details[open] summary:before {
+
+        .tree-node.open .tree-node__toggle {
+            // Arrow down
             transform: rotate(90deg);
+        }   
+
+        .tree-node__label {
+            display: flex;
+            align-items: center;
+            margin-right: .5rem;
+            width: 100%;
+        } 
+
+        .tree-node__content {
+            display: none;
+        }
+
+        .tree-node.open .tree-node__content {
+            display: block;
         }        
+     
     }
 
     .btn-item,

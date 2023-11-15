@@ -55,7 +55,7 @@
         <i class="fa fa-folder"></i><span>{{title}}</span>  
     </label>
     {% if unread_count %}
-        <span id="group-unread-{{id}}" class="badge">{{unread_count}}</span>                                          
+        <span id="group-unread-{{id}}" class="ml-auto badge">{{unread_count}}</span>                                          
     {% endif %}
 {% endmacro %}
 
@@ -67,7 +67,7 @@
         <span class="{{ '' if feed.enabled else 'feed-dead' }}">{{feed.title}}</span>
     </label>
     {% if feed.feed_read_count %}
-        <span id="feed-unread-{{g_id}}-{{feed.id}}" class="badge">{{feed.feed_read_count}}</span>
+        <span id="feed-unread-{{g_id}}-{{feed.id}}" class="ml-auto badge">{{feed.feed_read_count}}</span>
     {% endif %}
 {% endmacro %}  
 

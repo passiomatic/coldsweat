@@ -30,26 +30,17 @@ document.body.addEventListener("articleListChanged", function (evt) {
 
 window.addEventListener("DOMContentLoaded", (event) => {
 
-    // function makeEndpointURL(pathname) {
-    //     var segments = [
-    //         window.applicationURL,
-    //         pathname
-    //     ]
-    //     return segments.join('')
-    // }
-
     // Innermost element that does not get replaced
     var listViewEl = document.getElementById("panel");
     // var navViewEl = document.getElementById("nav");
-    // var dirty = false;
 
     const Sweat = {
 
-        // onEntryLoad: function (id, title, event) {
-        //     var entryEl = document.getElementById(`entry-${id}`);
-        //     entryEl.classList.add('status-read')
-        //     Sweat.loadEntry(id, title, event)
-        // },
+        toggleNode: function (id, event) {
+            console.log('toggleNode ', id)
+            var nodeEl = document.getElementById(id);
+            nodeEl.classList.toggle('open')
+        },
 
         setup: function () {
 

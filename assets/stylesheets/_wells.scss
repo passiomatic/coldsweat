@@ -1,9 +1,3 @@
-// Rock Hammer by Stuff and Nonsense
-// Version: <!-- $version -->
-// URL: http://stuffandnonsense.co.uk/projects/rock-hammer/
-// Version: <!-- $license -->
-// Adapted from: https://github.com/twitter/bootstrap/blob/master/less/wells.less
-
 // Vars
 
 // =wells ============
@@ -12,7 +6,7 @@
 // Add an optional gradient in _bootstrap-wells.scss
 // Configure the gradient colours in _texture.scss
 $wellbackgroundcolor : $color-neutral-500;
-$wellaltbackgroundcolor : darken($color-neutral-500, 8%);
+$wellaltbackgroundcolor : darken($color-neutral-500, 4%);
 
 // Set wells’ border width
 $wellborderwidth: 1px;
@@ -20,35 +14,22 @@ $wellborderwidth: 1px;
 // And wells’ border style
 $wellborderstyle: solid;
 
-// And wells’ border color
-$wellcolor: lighten($color-neutral-400, 75%);
-
 // Set the wells’ border radius.
 $wellborderradius: .5rem;
 
 // By default wells’ border is a tint of $wellbackgroundcolor. Adjust percentage as required
-$wellbordercolor: darken($wellbackgroundcolor, 10%);
-
-// Set the wells’ text colour
-$wellcolor: $text-color;
-
-// Add optional box-shadow values or ignore
-// By default shadow colour is a tint of background colour. Adjust percentage as required
-$wellshadow: darken($wellbackgroundcolor, 10%);
-$wellshadowblur: .75rem;
-
+$wellbordercolor: $border-color;
 
 // Styles 
 
 .well {
-    min-height: 20px;
+    min-height: 2rem;
     padding: .75rem;
-    margin-bottom: .25rem;
+    margin-bottom: 1rem;
     background-color: $wellbackgroundcolor;
     border: $wellborderwidth $wellborderstyle $wellbordercolor;
     border-radius: $wellborderradius;
-    //@include box-shadow(inset 0 1px $wellshadowblur $wellshadow); 
-    color: $wellcolor;
+    color: $text-color;
 
     p:last-child {
         margin-bottom: 0;

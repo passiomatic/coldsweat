@@ -48,6 +48,10 @@ article {
     font-size: $font-size-xlarge;
     font-weight: 600;
     margin: .75rem 0 0 0;
+
+    a {
+        color: inherit;
+    }
 }
 
 .article__meta {

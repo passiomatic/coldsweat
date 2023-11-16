@@ -14,9 +14,9 @@
                 onclick="Sweat.loadFolder('{{feed_url}}')">{{entry.feed.title}}</button>
         </div>
         {% if entry.title%}
-        <h1 class="article__title">{{entry.title}}</h1>
+        <h1 class="article__title"><a rel="noopener noreferrer" target="_blank" href="{{entry.link}}">{{entry.title}}</a></h1>
         {% else %}
-        <h1 class="article__title">{{ entry.content|striptags|excerpt }}</h1>
+        <h1 class="article__title"><a rel="noopener noreferrer" target="_blank" href="{{entry.link}}">{{ entry.content|striptags|excerpt }}</a></h1>
         {% endif %}
         <div class="article__meta small text-muted">
             Posted {{entry.published_on|datetime }} {%if entry.author %} by {{ entry.author }}{% endif %}

@@ -289,10 +289,12 @@ def fetch_feeds(feeds):
 
 def fetch_all_feeds():
     """
-    Fetch all enabled feeds
+    Fetch all enabled feeds with at least one subscription
     """
 
-    feeds = Feed.select().where(Feed.enabled == True)  # noqa
+    feeds = (Feed.select()
+        .join(Subscription)
+        .where(Feed.enabled == True))
 
     if feeds.count() == 0:
         app.logger.info("no feeds found to fetch, halted")

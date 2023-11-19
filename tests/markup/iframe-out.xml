@@ -19,7 +19,7 @@
          <category><![CDATA[Internet]]></category>
          <guid isPermaLink="false">https://redpunk.com/?p=1575</guid>
          <description><![CDATA[Test :)]]></description>
-         <content:encoded><![CDATA[<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/jfKfPfyJRdk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>]]></content:encoded>
+         <content:encoded><![CDATA[<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/jfKfPfyJRdk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>Placeholder content</iframe>]]></content:encoded>
          <wfw:commentRss>https://redpunk.com/articoli/test-youtube-embed/feed/</wfw:commentRss>
          <slash:comments>0</slash:comments>
       </item>

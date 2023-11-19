@@ -60,13 +60,14 @@ class BaseProcessor(BaseParser):
 
     def __init__(self, xhtml_mode=False):
         BaseParser.__init__(self)
-        self.allowed_iframe = False
+        self.found_iframe = 0
         self.xhtml_mode = xhtml_mode
 
     # @@NOTE: reset is called implicitly by base class
 
     def reset(self):
         BaseParser.reset(self)
+        self.found_iframe = 0
         self.pieces = []
 
     def get_output(self):
@@ -79,19 +80,21 @@ class BaseProcessor(BaseParser):
         d = dict(_normalize_attrs(attrs))
         if self.is_allowed(d['src']):
             # Reconstruct element
-            self.allowed_iframe = True
+            self.found_iframe = 1
             self.unknown_starttag('iframe', attrs)
+        else:
+            self.found_iframe = -1
 
     def end_iframe(self):
-        if self.allowed_iframe:
-            self.allowed_iframe = False
+        if self.found_iframe > 0:
+            self.found_iframe = 0
             self.unknown_endtag('iframe')
 
     def is_allowed(self, url):
         schema, netloc, path, params, query, fragment \
             = urlparse.urlparse(url)
 
-        return (netloc in DOMAIN_WHITELIST)
+        return (netloc.lower() in DOMAIN_WHITELIST)
 
     def unknown_starttag(self, tag, attrs):
         # Called for each unhandled tag, where attrs is a list of
@@ -137,7 +140,11 @@ class BaseProcessor(BaseParser):
         # Called for each block of plain text, i.e. outside of any tag and
         #   not containing any character or entity references
         #   Store the original text verbatim
-        self.pieces.append(text)
+        if self.found_iframe >= 0:
+            self.pieces.append(text)
+        else:
+            self.pieces.append(f'<p><em>Removed content: {text}</em></p>')
+        
 
     # The following elements will be stripped by
     #   the default implementation

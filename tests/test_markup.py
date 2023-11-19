@@ -40,7 +40,8 @@ def test_stripping_html(value, wanted):
 
 @pytest.mark.parametrize("file_in, file_out", [
     ('markup/in.xml', 'markup/out.xml'),
-    ('markup/iframe-in.xml', 'markup/iframe-out.xml')
+    ('markup/iframe-in.xml', 'markup/iframe-out.xml'),
+    ('markup/bad-iframe-in.xml', 'markup/bad-iframe-out.xml')
 ]
 )
 def test_processor(file_in, file_out):

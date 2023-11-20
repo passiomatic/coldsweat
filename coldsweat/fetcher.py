@@ -219,6 +219,15 @@ class Fetcher(object):
         # Do not set title again if already set
         self.feed.title = self.feed.title or get_feed_title(soup.feed)
 
+        icon_url = get_feed_icon(soup.feed)
+        if icon_url:
+            self.feed.icon_url = icon_url        
+        else:
+            # Prefer alternate_link if available since self_link
+            #   could point to Feed Burner or similar services            
+            feed_hostname = urllib.parse.urlsplit(self.feed.alternate_link or self.feed.self_link).hostname
+            self.feed.icon_url = f"https://icons.duckduckgo.com/ip3/{feed_hostname}.ico"
+        
         feed_author = get_feed_author(soup.feed)
 
         new_entries = []
@@ -280,31 +289,27 @@ class Fetcher(object):
 
         if not self.feed.icon or not self.feed.icon_last_updated_on or \
            ((self.instant - self.feed.icon_last_updated_on).days > FETCH_ICONS_INTERVAL):
-            # Prefer alternate_link if available since self_link could
-            # point to Feed Burner or similar services
-            self.feed.icon, self.feed.icon_url  = self._favicon_fetcher(
-                self.feed.alternate_link or self.feed.self_link)
+            self.feed.icon = self._favicon_fetcher(self.feed.icon_url)
+            # If fetch is unsuccessful we'll retry to fetch after FETCH_ICONS_INTERVAL
             self.feed.icon_last_updated_on = self.instant
 
-            app.logger.debug(f"fetched favicon {self.feed.icon_url}")
+            app.logger.debug(f"fetched favicon at {self.feed.icon_url}")
 
     def _favicon_fetcher(self, url):
         '''
         Fetch a site favicon via service
         '''
-        hostname = urllib.parse.urlsplit(url).hostname
-        endpoint = f"https://icons.duckduckgo.com/ip3/{hostname}.ico"
 
         try:
-            response = fetch_url(endpoint)
+            response = fetch_url(url)
         except RequestException as exc:
             app.logger.warning(
                 "could not fetch favicon for %s (%s)" % (url, exc))
-            # @@TODO: Endpoint shoudl point to a default icon from static folder
-            return (Feed.DEFAULT_ICON, endpoint)
+            # @@TODO: Endpoint should point to a default icon from static folder
+            return (Feed.DEFAULT_ICON, url)
 
-        return (make_data_uri(
-            response.headers['Content-Type'], response.content), endpoint)
+        return make_data_uri(
+            response.headers['Content-Type'], response.content)
 
     def add_synthesized_entry(self, title, content_type, content):
         '''
@@ -394,6 +399,26 @@ def get_feed_title(feed_dict):
                         Feed.MAX_TITLE_LENGTH)
     return ''
 
+def get_feed_icon(feed_dict):
+    try:
+        atom_icon = feed_dict['icon']
+    except KeyError:
+        atom_icon = ''
+
+    try:
+        rss_icon = feed_dict['image']['href']
+        rss_icon_width = feed_dict['image']['width']
+        rss_icon_height = feed_dict['image']['height']
+    except KeyError:
+        rss_icon = ''
+        rss_icon_width = 0
+        rss_icon_height = 0       
+
+    # Check if square 
+    if rss_icon and rss_icon_width and rss_icon_height and (rss_icon_width == rss_icon_height):
+        return rss_icon
+    
+    return atom_icon
 
 def get_entry_guid(entry_dict, default):
     """

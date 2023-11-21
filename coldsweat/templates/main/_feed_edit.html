@@ -1,7 +1,7 @@
 <form action="{{ url_for('main.feed_edit', feed=feed.id) }}" data-ajax-post method="POST">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times-circle"></i></button>  
-    <h3><img class="favicon" src="{{feed.icon_url}}" width="16" height="16"  alt="*"> {{feed.title}}</h3>
+    <h3><img class="favicon" src="{{feed.icon_url if feed.icon_url else feed.DEFAULT_ICON}}" width="16" height="16"  alt="*"> {{feed.title}}</h3>
   </div>
   <div class="modal-body">          
         <label for="field-title">Title</label> 

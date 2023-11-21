@@ -12,7 +12,7 @@
         <li class="feed {% if loop.first %}current{% endif %} {{feed_status(f, max_errors)}}">
             <div class="item-inner">
                 <h3 class="h4">
-                    <img class="favicon" src="{{f.icon_url}}" width="16" height="16" alt="*"><a title="Show all entries for feed" href="{{ url_for('main.entry_list', filter='feed', id=f.id) }}">{{f.title}}</a>
+                    <img class="favicon" src="{{f.icon_url if f.icon_url else f.DEFAULT_ICON}}" width="16" height="16"  alt="*"><a title="Show all entries for feed" href="{{ url_for('main.entry_list', filter='feed', id=f.id) }}">{{f.title}}</a>
                 </h3>
                 <div class="meta dim">
                     <span class="feed">

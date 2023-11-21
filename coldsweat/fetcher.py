@@ -424,7 +424,10 @@ def get_entry_guid(entry_dict, default):
     """
     Get a useful GUID from a feed entry
     """
-    return getattr(entry_dict, 'id', default)
+    if 'id' in entry_dict:
+        return entry_dict.id or default
+    else:
+        return default
 
 
 def get_entry_timestamp(entry_dict, default):

@@ -60,12 +60,10 @@ class BaseProcessor(BaseParser):
 
     def __init__(self, xhtml_mode=False):
         BaseParser.__init__(self)
-        self.found_iframe = 0
         self.xhtml_mode = xhtml_mode
 
-    # @@NOTE: reset is called implicitly by base class
-
     def reset(self):
+        # Reset is called implicitly by base class on init
         BaseParser.reset(self)
         self.found_iframe = 0
         self.pieces = []
@@ -87,8 +85,8 @@ class BaseProcessor(BaseParser):
 
     def end_iframe(self):
         if self.found_iframe > 0:
-            self.found_iframe = 0
             self.unknown_endtag('iframe')
+        self.found_iframe = 0
 
     def is_allowed(self, url):
         schema, netloc, path, params, query, fragment \
@@ -143,7 +141,7 @@ class BaseProcessor(BaseParser):
         if self.found_iframe >= 0:
             self.pieces.append(text)
         else:
-            self.pieces.append(f'<p><em>Removed content: {text}</em></p>')
+            self.pieces.append(f'<p><em>[Removed content: {text}]</em></p>')
         
 
     # The following elements will be stripped by

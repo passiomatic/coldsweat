@@ -41,7 +41,6 @@ def test_stripping_html(value, wanted):
 @pytest.mark.parametrize("file_in, file_out", [
     ('markup/in.xml', 'markup/out.xml'),
     ('markup/iframe-in.xml', 'markup/iframe-out.xml'),
-    ('markup/bad-iframe-in.xml', 'markup/bad-iframe-out.xml')
 ]
 )
 def test_processor(file_in, file_out):
@@ -50,8 +49,30 @@ def test_processor(file_in, file_out):
     processor = BaseProcessor(xhtml_mode=True)
     soup_in = feedparser.parse(path.join(test_dir, file_in))
     soup_out = feedparser.parse(path.join(test_dir, file_out))
-    entry_in = soup_in.entries[0]
-    entry_out = soup_out.entries[0]
+    entry_in_0 = soup_in.entries[0]
+    entry_out_0 = soup_out.entries[0]
     processor.reset()
-    processor.feed(entry_in.content[0].value)
-    assert processor.get_output() == entry_out.content[0].value
+    processor.feed(entry_in_0.content[0].value)
+    assert processor.get_output() == entry_out_0.content[0].value
+
+
+@pytest.mark.parametrize("file_in, file_out", [
+    ('markup/bad-iframe-in.xml', 'markup/bad-iframe-out.xml')
+]
+)
+def test_processor_2(file_in, file_out):
+
+    # Use xhtml_mode to match Feedpaser output
+    processor = BaseProcessor(xhtml_mode=True)
+    soup_in = feedparser.parse(path.join(test_dir, file_in))
+    soup_out = feedparser.parse(path.join(test_dir, file_out))
+    entry_in_0 = soup_in.entries[0]
+    entry_in_1 = soup_in.entries[1]
+    entry_out_0 = soup_out.entries[0]
+    entry_out_1 = soup_out.entries[1]
+    processor.reset()
+    processor.feed(entry_in_0.content[0].value)
+    assert processor.get_output() == entry_out_0.content[0].value
+    processor.reset()
+    processor.feed(entry_in_1.content[0].value)
+    assert processor.get_output() == entry_out_1.content[0].value

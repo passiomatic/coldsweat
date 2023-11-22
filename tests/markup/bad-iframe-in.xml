@@ -18,10 +18,21 @@
          <pubDate>Mon, 07 Aug 2023 09:57:28 +0000</pubDate>
          <category><![CDATA[Internet]]></category>
          <guid isPermaLink="false">https://redpunk.com/?p=1575</guid>
-         <description><![CDATA[Test :)]]></description>
          <content:encoded><![CDATA[Lorem ipsum<iframe width="560" height="315" src="https://www.evil.com/embed/jfKfPfyJRdk" title="Evil video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>Placeholder content</iframe>]]></content:encoded>
          <wfw:commentRss>https://redpunk.com/articoli/test-youtube-embed/feed/</wfw:commentRss>
          <slash:comments>0</slash:comments>
       </item>
+      <item>
+         <title>Test Bad YouTube Embed 2</title>
+         <link>https://redpunk.com/articoli/test-youtube-embed-2/</link>
+         <comments>https://redpunk.com/articoli/test-youtube-embed/#respond</comments>
+         <dc:creator><![CDATA[Andrea Peltrin]]></dc:creator>
+         <pubDate>Mon, 07 Aug 2023 09:58:28 +0000</pubDate>
+         <category><![CDATA[Internet]]></category>
+         <guid isPermaLink="false">https://redpunk.com/?p=1576</guid>
+         <content:encoded><![CDATA[Lorem ipsum<iframe width="560" height="315" src="https://www.evil.com/embed/jfKfPfyJRdk" title="Evil video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>]]></content:encoded>
+         <wfw:commentRss>https://redpunk.com/articoli/test-youtube-embed/feed/</wfw:commentRss>
+         <slash:comments>0</slash:comments>
+      </item>      
    </channel>
 </rss>

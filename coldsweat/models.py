@@ -74,12 +74,18 @@ class User(db_wrapper.Model):
     """
 
     MIN_PASSWORD_LENGTH = 12
+    AUTH_TOKEN_EXPIRATION_DAYS = 14
 
     display_name = CharField(default='')
     email = CharField(unique=True)
     fever_api_key = CharField()
     enabled = BooleanField(default=True)
     password_hash = CharField()
+
+    # Fresh RSS
+
+    api_auth_token = CharField(default='')
+    api_auth_token_expires_on = DateTimeField(null=True)
 
     def __repr__(self):
         return "%s:%s" % (self.id, self.email)
@@ -92,9 +98,18 @@ class User(db_wrapper.Model):
         return make_md5_hash('%s:%s' % (email, password))
 
     @staticmethod
+    def make_api_auth_token(email, password):
+        # @@TODO 
+        return f'{email}/123'
+
+    @staticmethod
     def validate_fever_api_key(api_key):
         # Clients may send api_key in uppercase, lower it
         return User.get_or_none(User.fever_api_key == api_key.lower(), User.enabled == True)  # noqa
+
+    @staticmethod
+    def validate_api_auth_token(token):
+        return User.get_or_none(User.api_auth_token == token, User.enabled == True)  # noqa
 
     def check_password(self, password):
         return security.check_password_hash(self.password_hash, password)

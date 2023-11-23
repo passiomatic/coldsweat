@@ -12,6 +12,7 @@ from flask_cdn import CDN
 from .auth import bp as auth_blueprint
 from .main import bp as main_blueprint
 from .fever import bp as fever_blueprint
+from .freshrss import bp as freshrss_blueprint
 from .auth import SessionUser
 import coldsweat.commands as commands
 import coldsweat.models as models
@@ -73,16 +74,6 @@ def create_app(config_class=None):
 
         return SessionUser(user)
 
-    # @@TODO Use for API auth 
-    # @login_manager.request_loader
-    # def request_loader(request):
-    #     email = request.form.get('email')
-    #     user = models.User.get_or_none(email=email)
-    #     if not user:
-    #         return None
-
-    #     return SessionUser(user)
-
     # Register auth routes
     app.register_blueprint(auth_blueprint)
 
@@ -91,6 +82,9 @@ def create_app(config_class=None):
 
     # Register Fever API routes
     app.register_blueprint(fever_blueprint)
+    
+    # Register FreshRSS API routes
+    app.register_blueprint(freshrss_blueprint)
 
     # Add CLI support
     commands.add_commands(app)

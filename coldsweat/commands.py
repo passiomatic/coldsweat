@@ -48,7 +48,8 @@ def add_commands(app):
 
         password_hash = security.generate_password_hash(password)
         fever_api_key = User.make_fever_api_key(email, password)
-        User.create(email=email, password_hash=password_hash, fever_api_key=fever_api_key, display_name=name)
+        api_auth_token = User.make_api_auth_token(email, password)
+        User.create(email=email, password_hash=password_hash, fever_api_key=fever_api_key, api_auth_token=api_auth_token, display_name=name)
         print(f"Setup completed for user {email}")
 
 

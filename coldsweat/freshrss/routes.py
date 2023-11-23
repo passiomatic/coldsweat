@@ -3,8 +3,13 @@ Google Reader/FreshRSS API
 
 Specs:
     - https://feedhq.readthedocs.io/en/latest/api/terminology.html#authentication
+    - https://github.com/theoldreader/api
     - https://www.inoreader.com/developers/
+
+How to perform an ideal sync between client and server:
     - https://github.com/FreshRSS/FreshRSS/issues/2566#issuecomment-541317776
+
+FreshRSS PHP implementation:
     - https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L280
 """
 import re

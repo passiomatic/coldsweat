@@ -25,11 +25,14 @@ import coldsweat.models as models
 from ..models import (
     User, Feed, Group, Entry, Read, Saved, Subscription)
 
-# All entries
 STREAM_READING_LIST = 'user/-/state/com.google/reading-list'
-# Starred entries
+
+# Entry states
 STREAM_STARRED = 'user/-/state/com.google/starred'
 STREAM_READ = 'user/-/state/com.google/read'
+
+STREAM_FEED_PREFIX = 'feed/'
+STREAM_LABEL_PREFIX = 'user/-/label/'
 
 @bp.route('/accounts/ClientLogin', methods=['GET', 'POST'])
 def login():
@@ -149,8 +152,9 @@ def get_stream_contents(stream_id):
 def get_stream_ids():
     user = get_user(flask.request)
 
-    stream_id = flask.request.args.get('s')
-    item_count = min(flask.request.args.get('n', type=int, default=100), 1000)
+    stream_id = flask.request.args.get('s', default=STREAM_READING_LIST)
+    item_count = min(flask.request.args.get('n', type=int, default=20), 1000)
+    sort_criteria = flask.request.args.get('r', default='n')
     #include_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
     continuation_string = flask.request.args.get('c', default='')
     excluded_stream_ids = flask.request.args.get('xt')
@@ -159,16 +163,57 @@ def get_stream_ids():
     max_epoch_timestamp = flask.request.args.get('nt')
 
     # Unread 
-    if STREAM_READ in excluded_stream_ids:
-        q = feed.get_unread_entries(user, Entry.id).objects()
-    elif STREAM_STARRED in included_stream_ids:
+    # if STREAM_READ in excluded_stream_ids:
+    #     q = feed.get_unread_entries(user, Entry.id).objects()
+    # elif STREAM_STARRED in included_stream_ids:
+    #     q = feed.get_saved_entries(user, Entry.id).objects()
+    if stream_id == STREAM_READING_LIST:
+        q = feed.get_all_entries(user, Entry.id).objects()        
+    elif stream_id == STREAM_STARRED:
         q = feed.get_saved_entries(user, Entry.id).objects()
+    elif stream_id.startswith(STREAM_FEED_PREFIX):
+        feed_self_link = ''
+        q = get_feed_entries(user, feed_self_link).objects()
+    elif stream_id.startswith(STREAM_LABEL_PREFIX):
+        group_title = ''
+        q = get_group_entries(user, group_title).objects()
+    else:
+        # Bad request
+        flask.abort(400)
 
-    entry_ids = [{'id': r.id} for r in q]
+    if sort_criteria == 'n':
+        # Newest entries first
+        q = q.order_by(Entry.published_on.desc())
+    else:
+        q = q.order_by(Entry.published_on.asc())
+
+    entry_ids = [{'id': r.id} for r in q.limit(item_count)]
     payload = {
+        # @@TODO add continuation
         'itemRefs': entry_ids
     }    
     return flask.jsonify(payload)
+
+# @@TODO move to queries.py
+def get_feed_entries(user, self_link):
+    q =  (Entry.select(Entry.id)
+          .join(Feed)
+          .join(Subscription) 
+          .where(
+        (Subscription.user == user) &
+        (Feed.self_link == self_link)).distinct())
+    return q
+
+def get_group_entries(user, group_title):
+    q =  (Entry.select(Entry.id)
+          .join(Feed)
+          .join(Subscription) 
+          .join(Group) 
+          .where(
+        (Subscription.user == user) &
+        (Group.title == group_title)))
+    return q
+
 
 # --------------
 # Helpers

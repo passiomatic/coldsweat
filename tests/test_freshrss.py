@@ -73,7 +73,7 @@ def test_user_info(client):
     
 
 # --------------
-# Tags
+# Tag
 # --------------
 
 def test_tag_list(client):  
@@ -82,12 +82,33 @@ def test_tag_list(client):
     assert len(r.json['tags']) > 0
     #print(r.json['tags'])
 
+# --------------
+# Feed
+# --------------
 
 def test_subscription_list(client):  
     r = get(client, '/reader/api/0/subscription/list', query_string={'output': 'json'}, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['subscriptions']) > 0
-    print(r.json['subscriptions'])
+    #print(r.json['subscriptions'])
+
+# --------------
+# Items
+# --------------
+
+ITEMS_PATH = '/reader/api/0/stream/items/ids'
+
+def test_items_reading_list(client):  
+    query_string={
+        'output': 'json',
+        's': 'user/-/state/com.google/reading-list',
+        'r': 'o',
+        'n': 50
+    }
+    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    assert r.status_code == 200    
+    assert len(r.json['itemRefs']) == 50
+    #print(r.json['itemRefs'])
 
 # --------------
 #  Helpers 

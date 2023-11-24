@@ -108,7 +108,17 @@ def test_items_reading_list(client):
     r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 50
-    #print(r.json['itemRefs'])
+    #print(r.json)
+
+def test_items_starred(client):  
+    query_string={
+        'output': 'json',
+        's': 'user/-/state/com.google/starred',
+    }
+    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    assert r.status_code == 200    
+    assert len(r.json['itemRefs']) == 0
+    #print(r.json)
 
 def test_items_feed(client):  
     query_string={

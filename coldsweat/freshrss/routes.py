@@ -187,10 +187,10 @@ def get_stream_items_ids():
     else:
         q = q.order_by(Entry.published_on.asc())
 
-    entry_ids = [{'id': r.id} for r in q.limit(item_count)]
+    entry_ids = [{'id': f'{r.id}'} for r in q.limit(item_count)]
     payload = {
-        # @@TODO add continuation
-        'itemRefs': entry_ids
+        'itemRefs': entry_ids,
+        #'continuation': ''
     }    
     return flask.jsonify(payload)
 

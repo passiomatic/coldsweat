@@ -2,7 +2,7 @@
 Google Reader/FreshRSS API
 
 Specs:
-    - https://feedhq.readthedocs.io/en/latest/api/terminology.html#authentication
+    - https://feedhq.readthedocs.io/en/latest/api/
     - https://github.com/theoldreader/api
     - https://www.inoreader.com/developers/
 
@@ -51,9 +51,20 @@ Auth={token}\n
     """
     return (payload, 200)
 
-# @bp.route('/', methods=['GET'])
-# def index_get():
-#     return flask.render_template("fever/index.html")
+@bp.route('/reader/api/0/user-info', methods=['GET'])
+def get_user_info():
+    user = get_user(flask.request)
+
+    payload = {
+        "userId": f"{user.id}",
+        "userName": user.display_name,
+        "userProfileId": f"{user.id}",
+        "userEmail": user.email,
+        "isBloggerUser": False,
+        #"signupTimeSec": 1163850013,
+        "isMultiLoginEnabled": False,
+    }
+    return flask.jsonify(payload)
 
 @bp.route('/reader/api/0/tag/list', methods=['GET'])
 def get_tag_list():

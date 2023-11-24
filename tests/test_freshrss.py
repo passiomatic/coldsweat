@@ -36,7 +36,7 @@ def client(app):
     return app.test_client()
 
 # --------------
-# Auth
+# Auth/User
 # --------------
 
 AUTH_PATH = '/accounts/ClientLogin'
@@ -64,6 +64,13 @@ def test_auth(client):
     }    
     r = post(client, AUTH_PATH, query_string=auth_args)
     assert b"Auth=" in r.data
+
+
+def test_user_info(client):
+    r = get(client, '/reader/api/0/user-info', query_string={'output': 'json'}, headers=AUTH_HEADERS)
+    assert r.status_code == 200  
+    assert r.json['userEmail'] == TEST_EMAIL
+    
 
 # --------------
 # Tags

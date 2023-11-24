@@ -22,10 +22,10 @@ setup:
 	flask --app coldsweat import tests/sample-subscriptions.opml alice@example.com -f
 
 run:
-	flask --app coldsweat run
+	flask --app coldsweat run --host=0.0.0.0
 
 run-debug:
-	flask --app coldsweat run --debug
+	flask --app coldsweat run --host=0.0.0.0 --debug
 
 fetch:
 	flask --app coldsweat --debug fetch

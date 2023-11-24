@@ -110,6 +110,29 @@ def test_items_reading_list(client):
     assert len(r.json['itemRefs']) == 50
     #print(r.json['itemRefs'])
 
+def test_items_feed(client):  
+    query_string={
+        'output': 'json',
+        's': 'feed/https://lab.passiomatic.com/coldsweat/tests/feed5.xml',
+        'r': 'n',
+    }
+    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    assert r.status_code == 200    
+    assert len(r.json['itemRefs']) > 0
+    #print(r.json['itemRefs'])
+
+def test_items_label(client):  
+    query_string={
+        'output': 'json',
+        's': 'user/-/label/Graphics',
+    }
+    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    assert r.status_code == 200    
+    assert len(r.json['itemRefs']) > 0
+    #print(r.json['itemRefs'])
+
+
+
 # --------------
 #  Helpers 
 # --------------

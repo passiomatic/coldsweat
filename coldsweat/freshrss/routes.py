@@ -149,7 +149,7 @@ def get_stream_contents(stream_id):
     return flask.jsonify(payload)
 
 @bp.route('/reader/api/0/stream/items/ids', methods=['GET'])
-def get_stream_ids():
+def get_stream_items_ids():
     user = get_user(flask.request)
 
     stream_id = flask.request.args.get('s', default=STREAM_READING_LIST)
@@ -172,10 +172,10 @@ def get_stream_ids():
     elif stream_id == STREAM_STARRED:
         q = feed.get_saved_entries(user, Entry.id).objects()
     elif stream_id.startswith(STREAM_FEED_PREFIX):
-        feed_self_link = ''
+        feed_self_link = stream_id[5:]
         q = get_feed_entries(user, feed_self_link).objects()
     elif stream_id.startswith(STREAM_LABEL_PREFIX):
-        group_title = ''
+        group_title = stream_id[13:]
         q = get_group_entries(user, group_title).objects()
     else:
         # Bad request

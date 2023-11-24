@@ -87,7 +87,7 @@ def test_subscription_list(client):
     r = get(client, '/reader/api/0/subscription/list', query_string={'output': 'json'}, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['subscriptions']) > 0
-    #print(r.json['subscriptions'])
+    print(r.json['subscriptions'])
 
 # --------------
 #  Helpers 

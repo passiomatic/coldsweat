@@ -33,9 +33,6 @@ STREAM_READ = 'user/-/state/com.google/read'
 
 @bp.route('/accounts/ClientLogin', methods=['GET', 'POST'])
 def login():
-    app.logger.debug('client from %s requested: %s' % (
-        flask.request.remote_addr, flask.request.url))
-
     email = flask.request.values.get('Email')
     password = flask.request.values.get('Passwd') 
 
@@ -43,6 +40,7 @@ def login():
     if not user:
         flask.abort(401)
 
+    # @@TODO Use actual session token
     sid, lsid, token = f'{email}/123', f'{email}/123', f'{email}/123'
     payload = f"""
 SID={sid}\n
@@ -91,18 +89,27 @@ def get_tag_list():
 @bp.route('/reader/api/0/subscription/list', methods=['GET'])
 def get_subscription_list():
     user = get_user(flask.request)
+    groups = feed.get_groups(user)
 
-    feeds = feed.get_feeds(user)
-    subscription_list = [{
-        'id': f'feed/{feed.self_link}',
-        # @@TODO 
-        'firstitemmsec': 0,
-        'title': feed.title,
-        'htmlUrl': feed.alternate_link,
-        'sortid': f'A{feed.id:08}',
-        'categories': {            
-        }
-    } for feed in feeds]
+    subscription_list = []
+    for group in groups:
+        feeds = feed.get_group_feeds(user, group)
+        for feed_ in feeds: 
+            subscription_list.append({
+                'id': f'feed/{feed_.self_link}',
+                'title': feed_.title,
+                'url': feed_.self_link,
+                'htmlUrl': feed_.alternate_link,
+                'iconUrl': feed_.icon_url,
+                #'sortid': f'A{feed.id:08}',
+                #'firstitemmsec': 0,
+                'categories': [            
+                    {
+                        'id': f'user/-/label/{group.title}',
+                        'label': group.title,
+                    },            
+                ]
+            })
 
     payload = {
         'subscriptions': subscription_list
@@ -139,11 +146,11 @@ def get_stream_contents(stream_id):
     return flask.jsonify(payload)
 
 @bp.route('/reader/api/0/stream/items/ids', methods=['GET'])
-def get_stream_ids(stream_id):
+def get_stream_ids():
     user = get_user(flask.request)
 
     stream_id = flask.request.args.get('s')
-    item_count = flask.request.args.get('n', type=int, default=20)
+    item_count = min(flask.request.args.get('n', type=int, default=100), 1000)
     #include_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
     continuation_string = flask.request.args.get('c', default='')
     excluded_stream_ids = flask.request.args.get('xt')

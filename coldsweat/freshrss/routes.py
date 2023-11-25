@@ -45,12 +45,8 @@ def login():
 
     # @@TODO Use actual session token
     sid, lsid, token = f'{email}/123', f'{email}/123', f'{email}/123'
-    payload = f"""
-SID={sid}\n
-LSID={lsid}\n
-Auth={token}\n
-    """
-    return (payload, 200)
+    payload = f"""SID={sid}\nLSID={lsid}\nAuth={token}\n"""
+    return payload, 200, {'Content-Type': 'text/plain'}
 
 @bp.route('/reader/api/0/user-info', methods=['GET'])
 def get_user_info():
@@ -193,6 +189,19 @@ def get_stream_items_ids():
         #'continuation': ''
     }    
     return flask.jsonify(payload)
+
+@bp.route('/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
+def get_stream_items_contents():
+    # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L784
+    #items = flask.request.values.getlist('i')
+    pass
+
+
+@bp.route('/reader/api/0/token', methods=['GET'])
+def get_token():
+    # @@TODO Make a short-lived token
+    return 'token123', 200, {'Content-Type': 'text/plain'}
+
 
 # @@TODO move to queries.py
 def get_feed_entries(user, self_link):

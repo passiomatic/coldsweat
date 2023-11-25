@@ -96,7 +96,8 @@ def test_subscription_list(client):
 # Items
 # --------------
 
-ITEMS_PATH = '/reader/api/0/stream/items/ids'
+ITEMS_IDS_PATH = '/reader/api/0/stream/items/ids'
+ITEMS_CONTENTS_PATH = '/reader/api/0/stream/items/contents'
 
 def test_items_reading_list(client):  
     query_string={
@@ -105,7 +106,7 @@ def test_items_reading_list(client):
         'r': 'o',
         'n': 50
     }
-    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 50
     #print(r.json)
@@ -115,7 +116,7 @@ def test_items_starred(client):
         'output': 'json',
         's': 'user/-/state/com.google/starred',
     }
-    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 0
     #print(r.json)
@@ -126,7 +127,7 @@ def test_items_feed(client):
         's': 'feed/https://lab.passiomatic.com/coldsweat/tests/feed5.xml',
         'r': 'n',
     }
-    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) > 0
     #print(r.json['itemRefs'])
@@ -136,12 +137,18 @@ def test_items_label(client):
         'output': 'json',
         's': 'user/-/label/Graphics',
     }
-    r = get(client, ITEMS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) > 0
     #print(r.json['itemRefs'])
 
+# def test_items_contents(client):
+#     pass
 
+def test_post_token(client):
+    r = get(client, '/reader/api/0/token', headers=AUTH_HEADERS)    
+    assert r.status_code == 200 
+    assert r.text == 'token123'
 
 # --------------
 #  Helpers 

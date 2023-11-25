@@ -12,10 +12,9 @@ How to perform an ideal sync between client and server:
 FreshRSS PHP implementation:
     - https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L280
 """
-import re
 import struct
 from datetime import datetime, timedelta
-from peewee import fn, IntegrityError
+#from peewee import fn, IntegrityError
 import flask
 from . import bp
 from flask import current_app as app
@@ -33,6 +32,8 @@ STREAM_READ = 'user/-/state/com.google/read'
 
 STREAM_FEED_PREFIX = 'feed/'
 STREAM_LABEL_PREFIX = 'user/-/label/'
+
+ITEM_LONG_FORM_PREFIX = 'tag:google.com,2005:reader/item/'
 
 @bp.route('/accounts/ClientLogin', methods=['GET', 'POST'])
 def login():
@@ -120,7 +121,7 @@ def get_subscription_list():
 def get_stream_contents(stream_id):
     user = get_user(flask.request)
 
-    sort_criteria = flask.request.args.get('r')
+    sort_criteria = flask.request.args.get('r', default='n')
     item_count = flask.request.args.get('n', type=int, default=20)
     continuation_string = flask.request.args.get('c', default='')
     excluded_stream_ids = flask.request.args.get('xt')
@@ -137,6 +138,7 @@ def get_stream_contents(stream_id):
         "continuation": "page2",
         "id": f"user/{user.id}/state/com.google/reading-list",
         "self": [{
+            # @@TODO
             "href": "https://feedhq.org/reader/api/0/stream/contents/user/-/state/com.google/reading-list?output=json"
         }],
         "items": []
@@ -181,9 +183,10 @@ def get_stream_items_ids():
         # Newest entries first
         q = q.order_by(Entry.published_on.desc())
     else:
+        # 'd', 'o', or...
         q = q.order_by(Entry.published_on.asc())
 
-    entry_ids = [{'id': f'{r.id}'} for r in q.limit(item_count)]
+    entry_ids = [{'id': to_long_form(r.id)} for r in q.limit(item_count)]
     payload = {
         'itemRefs': entry_ids,
         #'continuation': ''
@@ -192,9 +195,11 @@ def get_stream_items_ids():
 
 @bp.route('/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
 def get_stream_items_contents():
+    user = get_user(flask.request)
     # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L784
-    #items = flask.request.values.getlist('i')
-    pass
+    items = flask.request.values.getlist('i')
+    #print(items)
+
 
 
 @bp.route('/reader/api/0/token', methods=['GET'])
@@ -228,17 +233,23 @@ def get_group_entries(user, group_title):
 # Helpers
 # --------------
 
-# def to_long_form(short_form):
-#     value = hex(struct.unpack("L", struct.pack("l", short_form))[0])
-#     if value.endswith("L"):
-#         value = value[:-1]
-#     return 'tag:google.com,2005:reader/item/{0}'.format(
-#         value[2:].zfill(16)
-#     )
+def to_short_form(long_form):
+    """
+    Long form
+    The prefix `tag:google.com,2005:reader/item/` followed by the ID as an *unsigned* *base 16* number 
+      that is *0-padded* so that it's always 16 characters wide.
 
-# def to_short_form(long_form):
-#     value = int(long_form.split('/')[-1], 16)
-#     return struct.unpack("l", struct.pack("L", value))[0]
+    Short form
+    The ID as a *signed* *base 10* number.
+
+    https://github.com/mihaip/google-reader-api/blob/master/wiki/ItemId.wiki
+    """
+    value = int(long_form.split('/')[-1], 16)
+    return struct.unpack("l", struct.pack("L", value))[0]
+
+def to_long_form(entry_id):
+    value = hex(struct.unpack("L", struct.pack("l", entry_id))[0])
+    return 'tag:google.com,2005:reader/item/{0}'.format(value[2:].zfill(16))
 
 def get_user(request):
     # Authorization: GoogleLogin auth=<token>

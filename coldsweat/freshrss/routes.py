@@ -15,7 +15,7 @@ FreshRSS PHP implementation:
 import struct
 from datetime import datetime, timedelta
 import time
-#from peewee import fn, IntegrityError
+from peewee import JOIN
 import flask
 from . import bp
 from flask import current_app as app
@@ -158,8 +158,8 @@ def get_stream_items_ids():
     continuation_string = flask.request.args.get('c', default='')
     excluded_stream_ids = flask.request.args.get('xt')
     included_stream_ids = flask.request.args.get('it')
-    min_epoch_timestamp = flask.request.args.get('ot')
-    max_epoch_timestamp = flask.request.args.get('nt')
+    min_timestamp = flask.request.args.get('ot')
+    max_timestamp = flask.request.args.get('nt')
 
     # Unread 
     # if STREAM_READ in excluded_stream_ids:
@@ -181,6 +181,9 @@ def get_stream_items_ids():
     else:
         # Bad request
         flask.abort(400)
+
+    # if min_timestamp:
+    #     q = q.where(Entry.published_on_as_epoch > min_timestamp)
 
     if sort_criteria == 'n':
         # Newest entries first
@@ -241,10 +244,16 @@ def get_stream_items_contents():
             'categories': [
                 # @@TODO Add actual categories
                 'user/-/state/com.google/reading-list',
-                # @@ Add read/saved info 
             ],
             'origin': {'streamId': f'feed/{entry.feed.self_link}'}
         }
+
+        # Add states
+        if entry.read_on:
+            item['categories'].append(STREAM_READ)
+        if entry.saved_on:
+            item['categories'].append(STREAM_STARRED)
+
         items.append(item)
 
     payload = {
@@ -283,14 +292,18 @@ def get_group_entries(user, group_title):
     return q
 
 def get_entries(user, ids, sort_criteria):
-    q = (Entry.select(Entry, Feed)
+    q = (Entry.select(Entry, Feed, Read.read_on.alias("read_on"), Saved.saved_on.alias("saved_on"))
          .join(Feed)
          .join(Subscription)
+         .switch(Entry)
+         .join(Read, JOIN.LEFT_OUTER)
+         .switch(Entry)         
+         .join(Saved, JOIN.LEFT_OUTER)
          .where((Subscription.user == user) & (Entry.id << ids))
          .order_by(sort_criteria)
-         .distinct())
+         .distinct()
+         .objects())
     return q
-    #return _get_entries(user, q)
 
 # def _get_entries(user, q):
 

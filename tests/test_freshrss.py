@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 from coldsweat import create_app
 from coldsweat.utilities import datetime_as_epoch
-from coldsweat.models import User, db_wrapper
+from coldsweat.models import User, Entry, db_wrapper
 from coldsweat import TestingConfig
 
 API_ENDPOINT = "/freshrss"
@@ -70,7 +70,7 @@ def test_user_info(client):
     r = get(client, '/reader/api/0/user-info', query_string={'output': 'json'}, headers=AUTH_HEADERS)
     assert r.status_code == 200  
     assert r.json['userEmail'] == TEST_EMAIL
-    
+
 
 # --------------
 # Tag
@@ -142,8 +142,16 @@ def test_items_label(client):
     assert len(r.json['itemRefs']) > 0
     #print(r.json['itemRefs'])
 
-# def test_items_contents(client):
-#     pass
+def test_items_contents(client):
+    entry_ids = [entry.id for entry in Entry.select(Entry.id).limit(10).objects()]
+    query_string={
+        'output': 'json',
+        'i': entry_ids
+    }    
+    r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    assert r.status_code == 200    
+    assert len(r.json['items']) == 10
+    #print(r.json['items'])
 
 def test_post_token(client):
     r = get(client, '/reader/api/0/token', headers=AUTH_HEADERS)    

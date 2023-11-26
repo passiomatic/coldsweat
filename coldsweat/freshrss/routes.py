@@ -14,6 +14,7 @@ FreshRSS PHP implementation:
 """
 import struct
 from datetime import datetime, timedelta
+import time
 #from peewee import fn, IntegrityError
 import flask
 from . import bp
@@ -167,6 +168,8 @@ def get_stream_items_ids():
     #     q = feed.get_saved_entries(user, Entry.id).objects()
     if stream_id == STREAM_READING_LIST:
         q = feed.get_all_entries(user, Entry.id).objects()        
+    elif stream_id == STREAM_READ:
+        q = feed.get_read_entries(user, Entry.id).objects()
     elif stream_id == STREAM_STARRED:
         q = feed.get_saved_entries(user, Entry.id).objects()
     elif stream_id.startswith(STREAM_FEED_PREFIX):
@@ -196,9 +199,60 @@ def get_stream_items_ids():
 @bp.route('/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
 def get_stream_items_contents():
     user = get_user(flask.request)
+
     # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L784
-    items = flask.request.values.getlist('i')
-    #print(items)
+    #item_count = min(flask.request.args.get('n', type=int, default=20), 1000)
+    sort_criteria = flask.request.args.get('r', default='n')
+    ids = flask.request.values.getlist('i')
+    #print(ids)
+
+    if sort_criteria == 'n':
+        # Newest entries first
+        order_by = Entry.published_on.desc()
+    else:
+        # 'd', 'o', or...
+        order_by = Entry.published_on.asc()
+
+    entries = get_entries(user, ids, order_by)
+
+    items = []
+    for entry in entries:
+        item = {
+            'id': to_long_form(entry.id),
+            'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
+            'timestampUsec':  f'{entry.feed.last_updated_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
+            'published': entry.published_on_as_epoch,
+            'updated': entry.published_on_as_epoch,
+            'title': entry.title,
+            'author': entry.author,
+            'canonical': [
+                {'href': entry.link}
+            ],
+            'alternate': [
+                {
+                    'href': entry.link,
+                    'type': entry.content_type,
+                },                    
+            ],
+            'content': {
+                'direction': 'ltr',
+                'content': entry.content,
+            },            
+            'categories': [
+                # @@TODO Add actual categories
+                'user/-/state/com.google/reading-list',
+                # @@ Add read/saved info 
+            ],
+            'origin': {'streamId': f'feed/{entry.feed.self_link}'}
+        }
+        items.append(item)
+
+    payload = {
+        'id': 'user/-/state/com.google/reading-list',
+        'updated': time.time(),
+        'items': items,
+    }
+    return flask.jsonify(payload)
 
 
 
@@ -228,6 +282,38 @@ def get_group_entries(user, group_title):
         (Group.title == group_title)))
     return q
 
+def get_entries(user, ids, sort_criteria):
+    q = (Entry.select(Entry, Feed)
+         .join(Feed)
+         .join(Subscription)
+         .where((Subscription.user == user) & (Entry.id << ids))
+         .order_by(sort_criteria)
+         .distinct())
+    return q
+    #return _get_entries(user, q)
+
+# def _get_entries(user, q):
+
+#     r = Entry.select(Entry.id).join(Read).where(Read.user == user).objects()
+#     s = Entry.select(Entry.id).join(Saved).where(Saved.user == user).objects()
+
+#     read_ids = dict((i.id, None) for i in r)
+#     saved_ids = dict((i.id, None) for i in s)
+
+#     result = []
+#     for entry in q:
+#         result.append({
+#             'id': entry.id,
+#             'feed_id': entry.feed.id,
+#             'title': entry.title,
+#             'author': entry.author,
+#             'html': entry.content,
+#             'url': entry.link,
+#             'is_saved': 1 if entry.id in saved_ids else 0,
+#             'is_read': 1 if entry.id in read_ids else 0,
+#             'created_on_time': entry.published_on_as_epoch
+#         })
+#     return result
 
 # --------------
 # Helpers

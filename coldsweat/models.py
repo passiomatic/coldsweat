@@ -181,6 +181,10 @@ class Feed(db_wrapper.Model):
         return 0
 
     @property
+    def last_updated_on_as_epoch_msec(self):
+        return self.last_updated_on_as_epoch * 1000
+    
+    @property
     def icon_or_default(self):
         return self.icon if self.icon else Feed.DEFAULT_ICON
 

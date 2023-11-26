@@ -87,6 +87,12 @@ def get_unread_entries(user, *select):
     return q
 
 
+def get_read_entries(user, *select):
+    q = _q(*select).where((Subscription.user == user) &
+                          (Entry.id << Read.select(Read.entry).where(
+                              Read.user == user))).distinct()
+    return q
+
 def get_saved_entries(user, *select):
     # @@TODO: include read information
     q = _q(*select).where((Subscription.user == user) &

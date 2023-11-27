@@ -265,8 +265,8 @@ def get_stream_items_contents():
         # Add states
         if entry.read_on:
             item['categories'].append(STREAM_READ)
-        else:
-            item['categories'].append(STREAM_UNREAD)
+        # else:
+        #     item['categories'].append(STREAM_UNREAD)
 
         if entry.saved_on:
             item['categories'].append(STREAM_STARRED)

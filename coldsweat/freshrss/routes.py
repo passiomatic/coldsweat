@@ -29,7 +29,7 @@ from ..models import (
 STREAM_READING_LIST = 'user/-/state/com.google/reading-list'
 STREAM_STARRED = 'user/-/state/com.google/starred'
 STREAM_READ = 'user/-/state/com.google/read'
-STREAM_UNREAD = 'user/-/state/com.google/unread'
+STREAM_UNREAD = 'user/-/state/com.google/kept-unread'
 
 STREAM_FEED_PREFIX = 'feed/'
 STREAM_LABEL_PREFIX = 'user/-/label/'
@@ -265,8 +265,8 @@ def get_stream_items_contents():
         # Add states
         if entry.read_on:
             item['categories'].append(STREAM_READ)
-        # else:
-        #     item['categories'].append(STREAM_UNREAD)
+        else:
+            item['categories'].append(STREAM_UNREAD)
 
         if entry.saved_on:
             item['categories'].append(STREAM_STARRED)

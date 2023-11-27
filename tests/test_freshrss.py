@@ -177,7 +177,7 @@ def test_items_contents(client):
     r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['items']) == 10
-    print(r.json)
+    #print(r.json)
 
 def test_post_token(client):
     r = get(client, '/reader/api/0/token', headers=AUTH_HEADERS)    

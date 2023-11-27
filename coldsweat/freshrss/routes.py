@@ -105,6 +105,7 @@ def get_subscription_list():
                 'htmlUrl': feed_.alternate_link,
                 'iconUrl': feed_.icon_url,
                 #'sortid': f'A{feed.id:08}',
+                # https://stackoverflow.com/a/4429974
                 #'firstitemmsec': 0,
                 'categories': [            
                     {

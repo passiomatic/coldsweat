@@ -232,7 +232,7 @@ def get_stream_items_contents():
         item = {
             'id': entry.long_form_id,
             'crawlTimeMsec': f'{entry.added_on_as_epoch_msec}',            
-            'timestampUsec':  f'{entry.added_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
+            'timestampUsec': f'{entry.added_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
             'published': entry.published_on_as_epoch,
             #'updated': entry.published_on_as_epoch,
             'title': entry.title,

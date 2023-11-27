@@ -217,7 +217,7 @@ class Entry(db_wrapper.Model):
 
     @property
     def added_on_as_epoch_msec(self):
-        return datetime_as_epoch(self.added_on)
+        return datetime_as_epoch(self.added_on) * 1000
 
     @property
     def long_form_id(self):

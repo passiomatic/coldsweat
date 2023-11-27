@@ -25,9 +25,8 @@ import coldsweat.models as models
 from ..models import (
     User, Feed, Group, Entry, Read, Saved, Subscription)
 
-STREAM_READING_LIST = 'user/-/state/com.google/reading-list'
-
 # Entry states
+STREAM_READING_LIST = 'user/-/state/com.google/reading-list'
 STREAM_STARRED = 'user/-/state/com.google/starred'
 STREAM_READ = 'user/-/state/com.google/read'
 
@@ -35,6 +34,8 @@ STREAM_FEED_PREFIX = 'feed/'
 STREAM_LABEL_PREFIX = 'user/-/label/'
 
 ITEM_LONG_FORM_PREFIX = 'tag:google.com,2005:reader/item/'
+
+MAX_ITEMS_IDS = 1000
 
 @bp.route('/accounts/ClientLogin', methods=['GET', 'POST'])
 def login():
@@ -122,9 +123,9 @@ def get_subscription_list():
 def get_stream_contents(stream_id):
     user = get_user(flask.request)
 
-    sort_criteria = flask.request.args.get('r', default='n')
-    item_count = flask.request.args.get('n', type=int, default=20)
-    continuation_string = flask.request.args.get('c', default='')
+    rank = flask.request.args.get('r', default='n')
+    entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
+    offset = flask.request.args.get('c', type=int, default=0)
     excluded_stream_ids = flask.request.args.get('xt')
     included_stream_ids = flask.request.args.get('it')
     min_epoch_timestamp = flask.request.args.get('ot')
@@ -147,15 +148,16 @@ def get_stream_contents(stream_id):
 
     return flask.jsonify(payload)
 
+
 @bp.route('/reader/api/0/stream/items/ids', methods=['GET'])
 def get_stream_items_ids():
     user = get_user(flask.request)
 
     stream_id = flask.request.args.get('s', default=STREAM_READING_LIST)
-    item_count = min(flask.request.args.get('n', type=int, default=20), 1000)
-    sort_criteria = flask.request.args.get('r', default='n')
+    rank = flask.request.args.get('r', default='n')
+    entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
+    offset = flask.request.args.get('c', type=int, default=0)
     #include_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
-    continuation_string = flask.request.args.get('c', default='')
     excluded_stream_ids = flask.request.args.get('xt')
     included_stream_ids = flask.request.args.get('it')
     min_timestamp = flask.request.args.get('ot')
@@ -167,36 +169,44 @@ def get_stream_items_ids():
     # elif STREAM_STARRED in included_stream_ids:
     #     q = feed.get_saved_entries(user, Entry.id).objects()
     if stream_id == STREAM_READING_LIST:
-        q = feed.get_all_entries(user, Entry.id).objects()        
+        q = feed.get_all_entries(user, Entry)       
     elif stream_id == STREAM_READ:
-        q = feed.get_read_entries(user, Entry.id).objects()
+        q = feed.get_read_entries(user, Entry)
     elif stream_id == STREAM_STARRED:
-        q = feed.get_saved_entries(user, Entry.id).objects()
+        q = feed.get_saved_entries(user, Entry)
     elif stream_id.startswith(STREAM_FEED_PREFIX):
         feed_self_link = stream_id[5:]
-        q = get_feed_entries(user, feed_self_link).objects()
+        q = get_feed_entries(user, feed_self_link)
     elif stream_id.startswith(STREAM_LABEL_PREFIX):
         group_title = stream_id[13:]
-        q = get_group_entries(user, group_title).objects()
+        q = get_group_entries(user, group_title)
     else:
         # Bad request
         flask.abort(400)
 
+    # @@TODO
     # if min_timestamp:
     #     q = q.where(Entry.published_on_as_epoch > min_timestamp)
 
-    if sort_criteria == 'n':
+    #total_entries = q.count()
+    q = q.offset(offset).limit(entry_count)
+
+    if rank == 'n':
         # Newest entries first
         q = q.order_by(Entry.published_on.desc())
     else:
         # 'd', 'o', or...
         q = q.order_by(Entry.published_on.asc())
 
-    entry_ids = [{'id': to_long_form(r.id)} for r in q.limit(item_count)]
+    entry_ids = [{'id': e.long_form_id} for e in q]
     payload = {
         'itemRefs': entry_ids,
-        #'continuation': ''
     }    
+
+    # Check if we have finished
+    if entry_count == len(entry_ids):
+        payload['continuation'] =  f'{offset + MAX_ITEMS_IDS}'
+
     return flask.jsonify(payload)
 
 @bp.route('/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
@@ -204,12 +214,11 @@ def get_stream_items_contents():
     user = get_user(flask.request)
 
     # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L784
-    #item_count = min(flask.request.args.get('n', type=int, default=20), 1000)
-    sort_criteria = flask.request.args.get('r', default='n')
+    rank = flask.request.args.get('r', default='n')
     ids = flask.request.values.getlist('i')
     #print(ids)
 
-    if sort_criteria == 'n':
+    if rank == 'n':
         # Newest entries first
         order_by = Entry.published_on.desc()
     else:
@@ -221,7 +230,7 @@ def get_stream_items_contents():
     items = []
     for entry in entries:
         item = {
-            'id': to_long_form(entry.id),
+            'id': entry.long_form_id,
             'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
             'timestampUsec':  f'{entry.feed.last_updated_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
             'published': entry.published_on_as_epoch,
@@ -273,7 +282,7 @@ def get_token():
 
 # @@TODO move to queries.py
 def get_feed_entries(user, self_link):
-    q =  (Entry.select(Entry.id)
+    q =  (Entry.select(Entry)
           .join(Feed)
           .join(Subscription) 
           .where(
@@ -282,7 +291,7 @@ def get_feed_entries(user, self_link):
     return q
 
 def get_group_entries(user, group_title):
-    q =  (Entry.select(Entry.id)
+    q =  (Entry.select(Entry)
           .join(Feed)
           .join(Subscription) 
           .join(Group) 

@@ -205,7 +205,7 @@ def get_stream_items_ids():
 
     # Check if we have finished
     if entry_count == len(entry_ids):
-        payload['continuation'] =  f'{offset + MAX_ITEMS_IDS}'
+        payload['continuation'] = f'{offset + MAX_ITEMS_IDS}'
 
     return flask.jsonify(payload)
 
@@ -214,9 +214,8 @@ def get_stream_items_contents():
     user = get_user(flask.request)
 
     # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L784
-    rank = flask.request.args.get('r', default='n')
-    ids = flask.request.values.getlist('i')
-    #print(ids)
+    rank = flask.request.values.get('r', default='n')
+    ids = flask.request.values.getlist('i', type=to_short_form)
 
     if rank == 'n':
         # Newest entries first
@@ -231,10 +230,11 @@ def get_stream_items_contents():
     for entry in entries:
         item = {
             'id': entry.long_form_id,
+            # Use timestamp from feed
             'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
             'timestampUsec':  f'{entry.feed.last_updated_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
             'published': entry.published_on_as_epoch,
-            'updated': entry.published_on_as_epoch,
+            #'updated': entry.published_on_as_epoch,
             'title': entry.title,
             'author': entry.author,
             'canonical': [
@@ -247,14 +247,19 @@ def get_stream_items_contents():
                 },                    
             ],
             'content': {
-                'direction': 'ltr',
+                #'direction': 'ltr',
                 'content': entry.content,
             },            
             'categories': [
                 # @@TODO Add actual categories
                 'user/-/state/com.google/reading-list',
             ],
-            'origin': {'streamId': f'feed/{entry.feed.self_link}'}
+            'origin': {
+                'streamId': f'feed/{entry.feed.self_link}',
+                'htmlUrl': entry.feed.alternate_link,
+                'title': entry.feed.title,
+                'feedUrl': entry.feed.self_link
+            }
         }
 
         # Add states
@@ -267,7 +272,7 @@ def get_stream_items_contents():
 
     payload = {
         'id': 'user/-/state/com.google/reading-list',
-        'updated': time.time(),
+        'updated': int(time.time()),
         'items': items,
     }
     return flask.jsonify(payload)
@@ -355,9 +360,9 @@ def to_short_form(long_form):
     value = int(long_form.split('/')[-1], 16)
     return struct.unpack("l", struct.pack("L", value))[0]
 
-def to_long_form(entry_id):
-    value = hex(struct.unpack("L", struct.pack("l", entry_id))[0])
-    return 'tag:google.com,2005:reader/item/{0}'.format(value[2:].zfill(16))
+# def to_long_form(entry_id):
+#     value = hex(struct.unpack("L", struct.pack("l", entry_id))[0])
+#     return 'tag:google.com,2005:reader/item/{0}'.format(value[2:].zfill(16))
 
 def get_user(request):
     # Authorization: GoogleLogin auth=<token>

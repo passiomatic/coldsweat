@@ -134,6 +134,16 @@ def test_items_starred(client):
     assert len(r.json['itemRefs']) == 2
     #print(r.json)
 
+def test_items_read(client):  
+    query_string={
+        'output': 'json',
+        's': 'user/-/state/com.google/read',
+    }
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    assert r.status_code == 200    
+    assert len(r.json['itemRefs']) == 2
+    #print(r.json)
+
 def test_items_feed(client):  
     query_string={
         'output': 'json',
@@ -159,7 +169,7 @@ def test_items_contents(client):
     sample_entries = Entry.select().limit(10)
 
     # Request a few entries 
-    entry_ids = [entry.id for entry in sample_entries]
+    entry_ids = [entry.long_form_id for entry in sample_entries]
     query_string={
         'output': 'json',
         'i': entry_ids
@@ -167,7 +177,7 @@ def test_items_contents(client):
     r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
     assert len(r.json['items']) == 10
-    #print(r.json['items'])
+    print(r.json)
 
 def test_post_token(client):
     r = get(client, '/reader/api/0/token', headers=AUTH_HEADERS)    

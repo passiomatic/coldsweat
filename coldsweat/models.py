@@ -203,6 +203,7 @@ class Entry(db_wrapper.Model):
     content_type = CharField(default='text/html')
     content = TextField()
     thumbnail_url = CharField(default='', max_length=MAX_URL_LENGTH)  # Future use
+    added_on = DateTimeField()
     published_on = DateTimeField()
     author = CharField(default='')
     link = CharField(default='', max_length=MAX_URL_LENGTH)  # If empty the entry *must* provide a GUID
@@ -213,6 +214,10 @@ class Entry(db_wrapper.Model):
     @property
     def published_on_as_epoch(self):
         return datetime_as_epoch(self.published_on)
+
+    @property
+    def added_on_as_epoch_msec(self):
+        return datetime_as_epoch(self.added_on)
 
     @property
     def long_form_id(self):

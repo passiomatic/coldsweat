@@ -244,7 +244,7 @@ class Fetcher(object):
                     % self.feed.self_link)
                 continue
 
-            timestamp = get_entry_timestamp(entry_dict, default=self.instant)
+            published_on = get_entry_timestamp(entry_dict, default=self.instant)
             content_type, content = get_entry_content(entry_dict, ('text/plain', ''))
             thumbnail_url = get_entry_thumbnail_url(entry_dict)
 
@@ -257,7 +257,8 @@ class Fetcher(object):
                 'content': markup.parse_html(content),
                 'content_type': content_type,
                 'thumbnail_url': thumbnail_url,
-                'published_on': timestamp
+                'added_on': self.instant,
+                'published_on': published_on
             }
             new_entries.append(entry)
 
@@ -328,6 +329,7 @@ class Fetcher(object):
             author='Coldsweat',
             content=content,
             content_type=content_type,
+            added_on=self.instant,
             published_on=self.instant
         )
         entry.save()

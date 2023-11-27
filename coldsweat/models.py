@@ -1,6 +1,7 @@
 '''
 Database models
 '''
+import struct
 from datetime import datetime
 from playhouse.signals import (pre_save, Model)
 from playhouse.flask_utils import FlaskDB
@@ -212,6 +213,11 @@ class Entry(db_wrapper.Model):
     @property
     def published_on_as_epoch(self):
         return datetime_as_epoch(self.published_on)
+
+    @property
+    def long_form_id(self):
+        value = hex(struct.unpack("L", struct.pack("l", self.id))[0])
+        return 'tag:google.com,2005:reader/item/{0}'.format(value[2:].zfill(16))
 
     @property
     def text_content(self):

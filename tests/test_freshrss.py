@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 from coldsweat import create_app
 from coldsweat.utilities import datetime_as_epoch
-from coldsweat.models import User, Entry, db_wrapper
+from coldsweat.models import User, Entry, Read, Saved, db_wrapper
 from coldsweat import TestingConfig
 
 API_ENDPOINT = "/freshrss"
@@ -25,6 +25,19 @@ def app():
         # https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.executescript
         sql = f.read()
         db_wrapper.database.connection().executescript(sql)
+
+        sample_entries = Entry.select().limit(3)
+        test_user = User.get_or_none((User.email==TEST_EMAIL))
+
+        # Mark entry 1 as read and starred
+        Read.create(entry=sample_entries[0], user=test_user)
+        Saved.create(entry=sample_entries[0], user=test_user)
+
+        # Mark entry 2 as read
+        Read.create(entry=sample_entries[1], user=test_user)
+
+        # Mark entry 3 as starred
+        Saved.create(entry=sample_entries[2], user=test_user)
 
     yield app
 
@@ -118,7 +131,7 @@ def test_items_starred(client):
     }
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    
-    assert len(r.json['itemRefs']) == 0
+    assert len(r.json['itemRefs']) == 2
     #print(r.json)
 
 def test_items_feed(client):  
@@ -143,7 +156,10 @@ def test_items_label(client):
     #print(r.json['itemRefs'])
 
 def test_items_contents(client):
-    entry_ids = [entry.id for entry in Entry.select(Entry.id).limit(10).objects()]
+    sample_entries = Entry.select().limit(10)
+
+    # Request a few entries 
+    entry_ids = [entry.id for entry in sample_entries]
     query_string={
         'output': 'json',
         'i': entry_ids

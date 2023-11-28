@@ -41,17 +41,17 @@ ITEM_LONG_FORM_PREFIX = 'tag:google.com,2005:reader/item/'
 MAX_ITEMS_IDS = 1000
 
 @bp.route('/accounts/ClientLogin', methods=['GET', 'POST'])
-def login():
-    email = flask.request.values.get('Email')
-    password = flask.request.values.get('Passwd') 
+def client_login():
+    email = flask.request.values.get('Email', default='')
+    password = flask.request.values.get('Passwd', default='') 
 
     user = User.validate_credentials(email, password)
     if not user:
         flask.abort(401)
 
     # @@TODO Use actual session token
-    sid, lsid, token = f'{email}/123', f'{email}/123', f'{email}/123'
-    payload = f"""SID={sid}\nLSID={lsid}\nAuth={token}\n"""
+    sid, token = f'{email}/123', f'{email}/123'
+    payload = f"""SID={sid}\nLSID=null\nAuth={token}\n"""
     return payload, 200, {'Content-Type': 'text/plain'}
 
 @bp.route('/reader/api/0/user-info', methods=['GET'])

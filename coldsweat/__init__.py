@@ -1,7 +1,7 @@
 '''
 Coldsweat - RSS aggregator and web reader compatible with the Fever API
 '''
-__version__ = (0, 10, 1, '')
+__version__ = (0, 10, 2, '')
 
 import os 
 import flask_login

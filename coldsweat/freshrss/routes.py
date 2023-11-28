@@ -203,7 +203,7 @@ def get_stream_items_ids():
         min_timestamp)
         .offset(offset).limit(entry_count))
 
-    entry_ids = [{'id': e.long_form_id} for e in q]
+    entry_ids = [{'id': f'{e.id}'} for e in q]
     payload = {
         'itemRefs': entry_ids,
     }    
@@ -242,7 +242,7 @@ def get_stream_items_contents():
 
 def make_google_reader_item(entry):
     item = {
-        'id': entry.long_form_id,
+        'id': f'{entry.id}',
         'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
         'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
         'published': entry.published_on_as_epoch,

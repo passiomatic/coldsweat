@@ -403,12 +403,11 @@ def to_short_form(long_form):
 
     https://github.com/mihaip/google-reader-api/blob/master/wiki/ItemId.wiki
     """
-    # Check if long_form
+    # Check if short form already
     if long_form.isnumeric():
         return int(long_form)
     
-    # @@TODO: check if long_form but without the tag: prefix
-    
+    # Handle long_form values with or without tag:... prefix
     value = int(long_form.split('/')[-1], 16)
     return struct.unpack("l", struct.pack("L", value))[0]
 

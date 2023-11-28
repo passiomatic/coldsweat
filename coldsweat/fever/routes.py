@@ -16,12 +16,8 @@ RE_DIGITS = re.compile('[0-9]+')
 RECENTLY_READ_DELTA = 600  # 10 minutes
 API_VERSION = 3
 
-@bp.route('/', methods=['GET'])
-def index_get():
-    return flask.render_template("fever/index.html")
 
-
-@bp.route('/', methods=['POST'])
+@bp.route('/fever', strict_slashes=False, methods=['POST', 'GET'])
 def index_post():
     app.logger.debug('client from %s requested: %s' % (
         flask.request.remote_addr, flask.request.url))

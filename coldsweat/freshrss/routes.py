@@ -13,7 +13,9 @@ FreshRSS PHP implementation:
     - https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L280
 """
 import struct
-from datetime import datetime, timedelta
+import operator
+from functools import reduce
+from datetime import datetime, timezone
 import time
 from peewee import JOIN
 import flask
@@ -160,35 +162,19 @@ def get_stream_items_ids():
     entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
     offset = flask.request.args.get('c', type=int, default=0)
     #include_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
-    excluded_stream_ids = flask.request.args.get('xt')
-    included_stream_ids = flask.request.args.get('it')
+    included_stream_ids = flask.request.args.getlist('it')
+    excluded_stream_ids = flask.request.args.getlist('xt')
     min_timestamp = flask.request.args.get('ot')
     max_timestamp = flask.request.args.get('nt')
 
-    # Unread 
-    # if STREAM_READ in excluded_stream_ids:
-    #     q = feed.get_unread_entries(user, Entry.id).objects()
-    # elif STREAM_STARRED in included_stream_ids:
-    #     q = feed.get_saved_entries(user, Entry.id).objects()
-    if stream_id == STREAM_READING_LIST:
-        q = feed.get_all_entries(user, Entry)       
-    elif stream_id == STREAM_READ:
-        q = feed.get_read_entries(user, Entry)
-    elif stream_id == STREAM_STARRED:
-        q = feed.get_saved_entries(user, Entry)
-    elif stream_id.startswith(STREAM_FEED_PREFIX):
-        feed_self_link = stream_id[5:]
-        q = get_feed_entries(user, feed_self_link)
-    elif stream_id.startswith(STREAM_LABEL_PREFIX):
-        group_title = stream_id[13:]
-        q = get_group_entries(user, group_title)
+    if rank == 'n':
+        # Newest entries first
+        sort_order = Entry.published_on.desc()
     else:
-        # Bad request
-        flask.abort(400)
+        # 'd', 'o', or...
+        sort_order = Entry.published_on.asc()
 
-    # @@TODO
-    # if min_timestamp:
-    #     q = q.where(Entry.published_on_as_epoch > min_timestamp)
+    q = get_filtered_entries(user, sort_order, stream_id, included_stream_ids, excluded_stream_ids, min_timestamp)
 
     #total_entries = q.count()
     q = q.offset(offset).limit(entry_count)
@@ -221,12 +207,12 @@ def get_stream_items_contents():
 
     if rank == 'n':
         # Newest entries first
-        order_by = Entry.published_on.desc()
+        sort_order = Entry.published_on.desc()
     else:
         # 'd', 'o', or...
-        order_by = Entry.published_on.asc()
+        sort_order = Entry.published_on.asc()
 
-    entries = get_entries(user, ids, order_by)
+    entries = get_entries_with_ids(user, ids, sort_order)
 
     items = []
     for entry in entries:
@@ -289,27 +275,69 @@ def get_token():
     return 'token123', 200, {'Content-Type': 'text/plain'}
 
 
-# @@TODO move to queries.py
-def get_feed_entries(user, self_link):
-    q =  (Entry.select(Entry)
-          .join(Feed)
-          .join(Subscription) 
-          .where(
-        (Subscription.user == user) &
-        (Feed.self_link == self_link)).distinct())
+def get_filtered_entries(user, sort_order, stream, include_streams, exclude_streams, min_timestamp):
+
+    # Always filter on current user 
+    where_clauses = [
+        (Subscription.user == user)
+    ]
+
+    # Read
+    if stream == STREAM_READ or (STREAM_READ in include_streams):
+        where_clauses.append(
+            (Entry.id << Read.select(Read.entry).where(Read.user == user))
+        )        
+
+    # Unread/exclude read
+    if stream == STREAM_UNREAD or (STREAM_READ in exclude_streams):
+        where_clauses.append(
+            ~(Entry.id << Read.select(Read.entry).where(Read.user == user))
+        )  
+
+    # Saved
+    if (stream == STREAM_STARRED) or (STREAM_STARRED in include_streams):
+        where_clauses.append(
+            (Entry.id << Saved.select(Saved.entry).where(Saved.user == user))   
+        )        
+
+    # Feed
+    if stream.startswith(STREAM_FEED_PREFIX):
+        feed_self_link = stream.replace(STREAM_FEED_PREFIX, '', 1)
+        where_clauses.append(
+            (Feed.self_link == feed_self_link)    
+        )
+
+    # Group
+    if stream.startswith(STREAM_LABEL_PREFIX):
+        group_title = stream.replace(STREAM_LABEL_PREFIX, '', 1)
+        where_clauses.append(
+            (Group.title == group_title)  
+        )
+
+    if min_timestamp:
+        min_datetime = datetime.fromtimestamp(float(min_timestamp), tz=timezone.utc)
+        where_clauses.append(
+            (Entry.published_on >= min_datetime)
+        )
+
+    # Start with returning the 'reading list' (all entries) and apply any given filter
+    q = (Entry.select(Entry, Feed, Read.read_on.alias("read_on"), Saved.saved_on.alias("saved_on"))
+         .join(Feed)
+         .join(Subscription)
+         .join(Group)          
+         .switch(Entry)
+         .join(Read, JOIN.LEFT_OUTER)
+         .switch(Entry)         
+         .join(Saved, JOIN.LEFT_OUTER)
+         # Chain all conditions together AND'ing them 
+         #  https://github.com/coleifer/peewee/issues/391#issuecomment-468042229
+         .where(reduce(operator.and_, where_clauses))
+         .order_by(sort_order)
+         .distinct()
+         .objects())
     return q
 
-def get_group_entries(user, group_title):
-    q =  (Entry.select(Entry)
-          .join(Feed)
-          .join(Subscription) 
-          .join(Group) 
-          .where(
-        (Subscription.user == user) &
-        (Group.title == group_title)))
-    return q
-
-def get_entries(user, ids, sort_criteria):
+def get_entries_with_ids(user, ids, sort_order):
     q = (Entry.select(Entry, Feed, Read.read_on.alias("read_on"), Saved.saved_on.alias("saved_on"))
          .join(Feed)
          .join(Subscription)
@@ -318,33 +346,10 @@ def get_entries(user, ids, sort_criteria):
          .switch(Entry)         
          .join(Saved, JOIN.LEFT_OUTER)
          .where((Subscription.user == user) & (Entry.id << ids))
-         .order_by(sort_criteria)
+         .order_by(sort_order)
          .distinct()
          .objects())
     return q
-
-# def _get_entries(user, q):
-
-#     r = Entry.select(Entry.id).join(Read).where(Read.user == user).objects()
-#     s = Entry.select(Entry.id).join(Saved).where(Saved.user == user).objects()
-
-#     read_ids = dict((i.id, None) for i in r)
-#     saved_ids = dict((i.id, None) for i in s)
-
-#     result = []
-#     for entry in q:
-#         result.append({
-#             'id': entry.id,
-#             'feed_id': entry.feed.id,
-#             'title': entry.title,
-#             'author': entry.author,
-#             'html': entry.content,
-#             'url': entry.link,
-#             'is_saved': 1 if entry.id in saved_ids else 0,
-#             'is_read': 1 if entry.id in read_ids else 0,
-#             'created_on_time': entry.published_on_as_epoch
-#         })
-#     return result
 
 # --------------
 # Helpers
@@ -364,9 +369,6 @@ def to_short_form(long_form):
     value = int(long_form.split('/')[-1], 16)
     return struct.unpack("l", struct.pack("L", value))[0]
 
-# def to_long_form(entry_id):
-#     value = hex(struct.unpack("L", struct.pack("l", entry_id))[0])
-#     return 'tag:google.com,2005:reader/item/{0}'.format(value[2:].zfill(16))
 
 def get_user(request):
     # Authorization: GoogleLogin auth=<token>

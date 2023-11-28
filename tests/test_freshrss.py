@@ -1,5 +1,5 @@
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytest
 from coldsweat import create_app
 from coldsweat.utilities import datetime_as_epoch
@@ -135,9 +135,12 @@ def test_items_starred(client):
     #print(r.json)
 
 def test_items_read(client):  
+    # Last month only
+    min_datetime = datetime.utcnow() - timedelta(days=30)
     query_string={
         'output': 'json',
         's': 'user/-/state/com.google/read',
+        #'ot': int(min_datetime.timestamp())
     }
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
     assert r.status_code == 200    

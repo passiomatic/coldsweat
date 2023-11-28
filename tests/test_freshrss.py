@@ -8,12 +8,12 @@ from coldsweat import TestingConfig
 
 API_ENDPOINT = "/freshrss"
 TEST_EMAIL = 'test@example.com'
-TEST_TOKEN = f'{TEST_EMAIL}/123'
 TEST_PASSWORD = 'secret-password'
+TEST_AUTH_TOKEN = f'{TEST_EMAIL}/123'
+TEST_POST_TOKEN = 'token123'
 TEST_DIR = Path(__file__).parent
-DEFAULT_PARAMS = {}
 AUTH_HEADERS = {
-    'Authorization': f'GoogleLogin auth={TEST_TOKEN}'
+    'Authorization': f'GoogleLogin auth={TEST_AUTH_TOKEN}'
 }
 
 auth_token = None
@@ -187,6 +187,25 @@ def test_post_token(client):
     r = get(client, '/reader/api/0/token', headers=AUTH_HEADERS)    
     assert r.status_code == 200 
     assert r.text == 'token123'
+
+# --------------
+# Edit
+# --------------
+
+EDIT_TAG_PATH = '/reader/api/0/edit-tag'
+
+def test_edit_tag(client):
+    sample_entries = Entry.select().limit(2)
+    entry_ids = [entry.long_form_id for entry in sample_entries]
+
+    request = {        
+        'T': TEST_POST_TOKEN,
+        'i': entry_ids,
+        'r': 'user/-/state/com.google/read' # Mark as unread
+    }
+    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 200
+    assert "OK" in r.text
 
 # --------------
 #  Helpers 

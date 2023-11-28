@@ -83,10 +83,12 @@ class User(db_wrapper.Model):
     enabled = BooleanField(default=True)
     password_hash = CharField()
 
-    # Fresh RSS
+    # Google Reader
 
-    api_auth_token = CharField(default='')
+    api_auth_token = CharField(unique=True)
     api_auth_token_expires_on = DateTimeField(null=True)
+    # api_post_token = CharField(default='')
+    # api_post_token_expires_on = DateTimeField(null=true)
 
     def __repr__(self):
         return "%s:%s" % (self.id, self.email)

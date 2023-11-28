@@ -284,11 +284,35 @@ def make_google_reader_item(entry):
 
     return item
 
+
+# --------------
+# Edit
+# --------------
+
 @bp.route('/reader/api/0/token', methods=['GET'])
 def get_token():
     # @@TODO Make a short-lived token
     return 'token123', 200, {'Content-Type': 'text/plain'}
 
+
+@bp.route('/reader/api/0/edit-tag', methods=['POST'])
+def post_edit_tag():
+    user = get_user(flask.request)
+
+    # @@TODO
+    #validate_post_token(user, flask.request)
+    ids = flask.request.form.getlist('i', type=to_short_form)
+    add_tags = flask.request.form.getlist('a')
+    remove_tags = flask.request.form.getlist('r')
+
+    for entry in Entry.select().where((Entry.id << ids)):
+        pass
+    
+    return 'OK', 200, {'Content-Type': 'text/plain'}
+
+# --------------
+# Helpers
+# --------------
 
 def get_filtered_entries(user, sort_order, stream, include_streams, exclude_streams, min_timestamp):
 
@@ -366,9 +390,7 @@ def get_entries_with_ids(user, ids, sort_order):
          .objects())
     return q
 
-# --------------
-# Helpers
-# --------------
+
 
 def to_short_form(long_form):
     """
@@ -381,6 +403,12 @@ def to_short_form(long_form):
 
     https://github.com/mihaip/google-reader-api/blob/master/wiki/ItemId.wiki
     """
+    # Check if long_form
+    if long_form.isnumeric():
+        return int(long_form)
+    
+    # @@TODO: check if long_form but without the tag: prefix
+    
     value = int(long_form.split('/')[-1], 16)
     return struct.unpack("l", struct.pack("L", value))[0]
 
@@ -394,3 +422,12 @@ def get_user(request):
     if not user:
         flask.abort(401)
     return user
+
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L246
+# def validate_post_token(user, request):
+#     token = request.values.get('T', default='')
+#     # @@TODO Check token expiration
+#     user = User.validate_api_post_token(token)
+#     if not user:
+#         flask.abort(401)
+#     return user

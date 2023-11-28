@@ -109,6 +109,7 @@ def test_subscription_list(client):
 # Items
 # --------------
 
+STREAM_CONTENTS_PATH = '/reader/api/0/stream/contents/'
 ITEMS_IDS_PATH = '/reader/api/0/stream/items/ids'
 ITEMS_CONTENTS_PATH = '/reader/api/0/stream/items/contents'
 

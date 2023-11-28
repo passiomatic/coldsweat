@@ -130,38 +130,7 @@ def get_stream_contents(stream_id):
     rank = flask.request.args.get('r', default='n')
     entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
     offset = flask.request.args.get('c', type=int, default=0)
-    excluded_stream_ids = flask.request.args.get('xt')
-    included_stream_ids = flask.request.args.get('it')
-    min_epoch_timestamp = flask.request.args.get('ot')
-    max_epoch_timestamp = flask.request.args.get('nt')
-
-    unread_entries = feed.get_unread_entries(user, Entry)
-    payload = {
-        "direction": "ltr",
-        "author": f"{user.display_name}",
-        "title": f"{user.display_name}'s reading list on Coldsweat",
-        "updated": 1405538866,
-        "continuation": "page2",
-        "id": f"user/{user.id}/state/com.google/reading-list",
-        "self": [{
-            # @@TODO
-            "href": "https://feedhq.org/reader/api/0/stream/contents/user/-/state/com.google/reading-list?output=json"
-        }],
-        "items": []
-    }
-
-    return flask.jsonify(payload)
-
-
-@bp.route('/reader/api/0/stream/items/ids', methods=['GET'])
-def get_stream_items_ids():
-    user = get_user(flask.request)
-
-    stream_id = flask.request.args.get('s', default=STREAM_READING_LIST)
-    rank = flask.request.args.get('r', default='n')
-    entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
-    offset = flask.request.args.get('c', type=int, default=0)
-    #include_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
+    #include_direct_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
     included_stream_ids = flask.request.args.getlist('it')
     excluded_stream_ids = flask.request.args.getlist('xt')
     min_timestamp = flask.request.args.get('ot')
@@ -174,17 +143,65 @@ def get_stream_items_ids():
         # 'd', 'o', or...
         sort_order = Entry.published_on.asc()
 
-    q = get_filtered_entries(user, sort_order, stream_id, included_stream_ids, excluded_stream_ids, min_timestamp)
+    q = (get_filtered_entries(
+        user, 
+        sort_order, 
+        stream_id, 
+        included_stream_ids, 
+        excluded_stream_ids, 
+        min_timestamp)
+        .offset(offset).limit(entry_count))
 
-    #total_entries = q.count()
-    q = q.offset(offset).limit(entry_count)
+    reader_entries = [make_google_reader_item(entry) for entry in q]  
+    payload = {
+        "direction": "ltr",
+        "id": f"user/{user.id}/state/com.google/reading-list",
+        "title": f"{user.display_name}'s reading list on Coldsweat",
+        "author": f"{user.display_name}",
+        "updated": int(time.time()),
+        "self": [{
+            # @@TODO
+            "href": ""
+        }],
+        "items": reader_entries
+    }
+
+    # Check if we have finished
+    if entry_count == len(reader_entries):
+        payload['continuation'] = f'{offset + MAX_ITEMS_IDS}'
+
+    return flask.jsonify(payload)
+
+
+@bp.route('/reader/api/0/stream/items/ids', methods=['GET'])
+def get_stream_items_ids():
+    user = get_user(flask.request)
+
+    stream_id = flask.request.args.get('s', default=STREAM_READING_LIST)
+    rank = flask.request.args.get('r', default='n')
+    entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
+    offset = flask.request.args.get('c', type=int, default=0)
+    #include_direct_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
+    included_stream_ids = flask.request.args.getlist('it')
+    excluded_stream_ids = flask.request.args.getlist('xt')
+    min_timestamp = flask.request.args.get('ot')
+    max_timestamp = flask.request.args.get('nt')
 
     if rank == 'n':
         # Newest entries first
-        q = q.order_by(Entry.published_on.desc())
+        sort_order = Entry.published_on.desc()
     else:
         # 'd', 'o', or...
-        q = q.order_by(Entry.published_on.asc())
+        sort_order = Entry.published_on.asc()
+
+    q = (get_filtered_entries(
+        user, 
+        sort_order, 
+        stream_id, 
+        included_stream_ids, 
+        excluded_stream_ids, 
+        min_timestamp)
+        .offset(offset).limit(entry_count))
 
     entry_ids = [{'id': e.long_form_id} for e in q]
     payload = {
@@ -196,6 +213,7 @@ def get_stream_items_ids():
         payload['continuation'] = f'{offset + MAX_ITEMS_IDS}'
 
     return flask.jsonify(payload)
+
 
 @bp.route('/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
 def get_stream_items_contents():
@@ -212,62 +230,59 @@ def get_stream_items_contents():
         # 'd', 'o', or...
         sort_order = Entry.published_on.asc()
 
-    entries = get_entries_with_ids(user, ids, sort_order)
-
-    items = []
-    for entry in entries:
-        item = {
-            'id': entry.long_form_id,
-            'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
-            'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
-            'published': entry.published_on_as_epoch,
-            #'updated': entry.published_on_as_epoch,
-            'title': entry.title,
-            'author': entry.author,
-            'canonical': [
-                {'href': entry.link}
-            ],
-            'alternate': [
-                {
-                    'href': entry.link,
-                    'type': entry.content_type,
-                },                    
-            ],
-            'content': {
-                #'direction': 'ltr',
-                'content': entry.content,
-            },            
-            'categories': [
-                # @@TODO Add actual categories
-                'user/-/state/com.google/reading-list',
-            ],
-            'origin': {
-                'streamId': f'feed/{entry.feed.self_link}',
-                'htmlUrl': entry.feed.alternate_link,
-                'title': entry.feed.title,
-                'feedUrl': entry.feed.self_link
-            }
-        }
-
-        # Add states
-        if entry.read_on:
-            item['categories'].append(STREAM_READ)
-        else:
-            item['categories'].append(STREAM_UNREAD)
-
-        if entry.saved_on:
-            item['categories'].append(STREAM_STARRED)
-
-        items.append(item)
-
+    q = get_entries_with_ids(user, ids, sort_order)
+    reader_entries = [make_google_reader_item(entry) for entry in q]    
     payload = {
         'id': 'user/-/state/com.google/reading-list',
         'updated': int(time.time()),
-        'items': items,
+        'items': reader_entries,
     }
     return flask.jsonify(payload)
 
 
+def make_google_reader_item(entry):
+    item = {
+        'id': entry.long_form_id,
+        'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
+        'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
+        'published': entry.published_on_as_epoch,
+        #'updated': entry.published_on_as_epoch,
+        'title': entry.title,
+        'author': entry.author,
+        'canonical': [
+            {'href': entry.link}
+        ],
+        'alternate': [
+            {
+                'href': entry.link,
+                'type': entry.content_type,
+            },                    
+        ],
+        'content': {
+            #'direction': 'ltr',
+            'content': entry.content,
+        },            
+        'categories': [
+            # @@TODO Add actual categories
+            'user/-/state/com.google/reading-list',
+        ],
+        'origin': {
+            'streamId': f'feed/{entry.feed.self_link}',
+            'htmlUrl': entry.feed.alternate_link,
+            'title': entry.feed.title,
+            'feedUrl': entry.feed.self_link
+        }
+    }    
+    # Add states
+    if entry.read_on:
+        item['categories'].append(STREAM_READ)
+    else:
+        item['categories'].append(STREAM_UNREAD)
+
+    if entry.saved_on:
+        item['categories'].append(STREAM_STARRED)    
+
+    return item
 
 @bp.route('/reader/api/0/token', methods=['GET'])
 def get_token():

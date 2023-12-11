@@ -106,10 +106,28 @@ def test_subscription_list(client):
     #print(r.json['subscriptions'])
 
 # --------------
-# Items
+# Stream
 # --------------
 
 STREAM_CONTENTS_PATH = '/reader/api/0/stream/contents/'
+
+def test_stream_contents_reading_list(client): 
+    query_string={
+        'output': 'json',
+        #'r': 'o',
+        'xt': 'user/-/state/com.google/read',
+        'n': 50
+    }
+    r = get(client, STREAM_CONTENTS_PATH + 'user/-/state/com.google/reading-list', query_string=query_string, headers=AUTH_HEADERS)
+    assert r.status_code == 200    
+    assert len(r.json['items']) == 50
+    #print(r.json)
+
+
+# --------------
+# Items
+# --------------
+
 ITEMS_IDS_PATH = '/reader/api/0/stream/items/ids'
 ITEMS_CONTENTS_PATH = '/reader/api/0/stream/items/contents'
 
@@ -186,7 +204,7 @@ def test_items_contents(client):
 def test_post_token(client):
     r = get(client, '/reader/api/0/token', headers=AUTH_HEADERS)    
     assert r.status_code == 200 
-    assert r.text == 'token123'
+    assert r.text == TEST_POST_TOKEN
 
 # --------------
 # Edit

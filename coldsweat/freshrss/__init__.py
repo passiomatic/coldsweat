@@ -1,5 +1,5 @@
 '''
-Web UI blueprint
+A Google Reader-like API
 '''
 
 from flask import Blueprint

@@ -1,16 +1,18 @@
 """
-Google Reader/FreshRSS API
+A partial Google Reader-like API implementation
 
 Specs:
     - https://feedhq.readthedocs.io/en/latest/api/
     - https://github.com/theoldreader/api
     - https://www.inoreader.com/developers/
+    - https://web.archive.org/web/20090820230934/http://blog.martindoms.com/2009/08/15/using-the-google-reader-api-part-1/
+    - https://web.archive.org/web/20091103085510/http://blog.martindoms.com/2009/10/16/using-the-google-reader-api-part-2/
 
 How to perform an ideal sync between client and server:
     - https://github.com/FreshRSS/FreshRSS/issues/2566#issuecomment-541317776
 
 FreshRSS PHP implementation:
-    - https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L280
+    - https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php
 """
 import struct
 import operator
@@ -159,8 +161,10 @@ def get_stream_contents(stream_id):
         "title": f"{user.display_name}'s reading list on Coldsweat",
         "author": f"{user.display_name}",
         "updated": int(time.time()),
+        # @@TODO 
+        # "self":[{"href":"http://www.google.com/reader/api/0/stream/contents/feed/http://astronomycast.com/podcast.xml?"}],
+        # "alternate":[{"href":"http://www.astronomycast.com","type":"text/html"}],            
         "self": [{
-            # @@TODO
             "href": ""
         }],
         "items": reader_entries

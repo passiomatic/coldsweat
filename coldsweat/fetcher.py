@@ -14,7 +14,7 @@ from requests.exceptions import RequestException
 import werkzeug.exceptions as exceptions
 from werkzeug import http
 from . import markup
-from .models import (Entry, Feed, db_wrapper)
+from .models import (Entry, Feed, db_wrapper, FEED_GENERIC, FEED_MASTODON)
 from .utilities import (datetime_as_epoch, 
                         tuple_as_datetime, 
                         scrub_url, 
@@ -218,6 +218,7 @@ class Fetcher(object):
         self.feed.alternate_link = get_feed_alternate_link(soup.feed)
         # Do not set title again if already set
         self.feed.title = self.feed.title or get_feed_title(soup.feed)
+        self.feed.source = get_feed_generator(soup.feed)
 
         icon_url = get_feed_icon(soup.feed)
         if icon_url:
@@ -373,6 +374,13 @@ def fetch_url(url, timeout=10, etag=None, modified_since=None):
 # ------------------------------------------------------
 
 IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif']
+
+
+def get_feed_generator(feed_dict):
+    value = feed_dict.get('generator', '')
+    if 'Mastodon' in value:
+        return FEED_MASTODON
+    return FEED_GENERIC
 
 
 def get_feed_timestamp(feed_dict, default):

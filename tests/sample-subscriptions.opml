@@ -15,6 +15,7 @@
     <outline type="rss" title="Coding Horror" xmlUrl="https://blog.codinghorror.com/rss/" text="Coding Horror" htmlUrl="https://blog.codinghorror.com/" />
     <outline text="as days pass by" title="as days pass by" type="rss" htmlUrl="https://www.kryogenix.org/days/" xmlUrl="https://kryogenix.org/days/feed" />
     <outline text="Hacker News" title="Hacker News" type="rss" htmlUrl="https://news.ycombinator.com" xmlUrl="https://news.ycombinator.com/rss" />
+    <outline text="Passiomatic" title="Passiomatic" type="rss" xmlUrl="https://functional.cafe/@passiomatic.rss" htmlUrl="https://functional.cafe/@passiomatic" />
 </outline>
 <outline title="Visual Arts and Design" text="Visual Arts and Design">
     <outline title="Brad Frost" htmlUrl="https://bradfrost.com" xmlUrl="http://feeds.feedburner.com/brad-frosts-blog" text="Brad Frost" type="rss" />

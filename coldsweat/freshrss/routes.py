@@ -384,7 +384,7 @@ def post_mark_all_read():
                     ).distinct())
 
     # Label 
-    if stream_id.startswith(STREAM_LABEL_PREFIX):
+    elif stream_id.startswith(STREAM_LABEL_PREFIX):
         # user/-/label/<name> 
         group_title = stream_id.replace(STREAM_LABEL_PREFIX, '', 1)
 
@@ -405,6 +405,10 @@ def post_mark_all_read():
                     # Exclude entries fetched after last sync
                     (Entry.published_on < max_datetime)
                     ).distinct())
+    
+    elif stream_id == STREAM_READING_LIST:
+        # @@TODO
+        raise NotImplementedError()
 
     with models.db_wrapper.database.transaction():
         for entry in q:

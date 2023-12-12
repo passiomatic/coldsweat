@@ -116,7 +116,17 @@ class User(db_wrapper.Model):
 
     @staticmethod
     def validate_api_auth_token(token):
-        return User.get_or_none(User.api_auth_token == token, User.enabled == True)  # noqa
+        user = User.get_or_none(User.api_auth_token == token, User.enabled == True)  # noqa
+        if not user:
+            return None 
+
+        # @@TODO        
+        # utc_now = datetime.utcnow()
+        # # Expired?
+        # if (not user.api_auth_token_expires_on) or (utc_now > user.api_auth_token_expires_on):             
+        #     return None
+
+        return user 
 
     def check_password(self, password):
         return security.check_password_hash(self.password_hash, password)

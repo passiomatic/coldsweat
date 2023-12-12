@@ -97,7 +97,7 @@ def friendly_url(url):
 
 
 def datetime_as_epoch(value):
-    return int(timegm(value.utctimetuple()))
+    return int(value.timestamp())
 
 
 def tuple_as_datetime(value):

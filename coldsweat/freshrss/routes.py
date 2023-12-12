@@ -160,7 +160,7 @@ def get_stream_contents(stream_id):
         "id": f"user/{user.id}/state/com.google/reading-list",
         "title": f"{user.display_name}'s reading list on Coldsweat",
         "author": f"{user.display_name}",
-        "updated": int(time.time()),
+        "updated": int(datetime.utcnow().timestamp()),
         # @@TODO 
         # "self":[{"href":"http://www.google.com/reader/api/0/stream/contents/feed/http://astronomycast.com/podcast.xml?"}],
         # "alternate":[{"href":"http://www.astronomycast.com","type":"text/html"}],            
@@ -238,7 +238,7 @@ def get_stream_items_contents():
     reader_entries = [make_google_reader_item(entry) for entry in q]    
     payload = {
         'id': 'user/-/state/com.google/reading-list',
-        'updated': int(time.time()),
+        'updated': int(datetime.utcnow().timestamp()),
         'items': reader_entries,
     }
     return flask.jsonify(payload)

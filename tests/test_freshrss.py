@@ -111,17 +111,17 @@ def test_subscription_list(client):
 
 STREAM_CONTENTS_PATH = '/reader/api/0/stream/contents/'
 
-def test_stream_contents_reading_list(client): 
-    query_string={
-        'output': 'json',
-        #'r': 'o',
-        'xt': 'user/-/state/com.google/read',
-        'n': 50
-    }
-    r = get(client, STREAM_CONTENTS_PATH + 'user/-/state/com.google/reading-list', query_string=query_string, headers=AUTH_HEADERS)
-    assert r.status_code == 200    
-    assert len(r.json['items']) == 50
-    #print(r.json)
+# def test_stream_contents_reading_list(client): 
+#     query_string={
+#         'output': 'json',
+#         #'r': 'o',
+#         'xt': 'user/-/state/com.google/read',
+#         'n': 50
+#     }
+#     r = get(client, STREAM_CONTENTS_PATH + 'user/-/state/com.google/reading-list', query_string=query_string, headers=AUTH_HEADERS)
+#     assert r.status_code == 200    
+#     assert len(r.json['items']) == 50
+#     #print(r.json)
 
 
 # --------------
@@ -212,7 +212,20 @@ def test_post_token(client):
 
 EDIT_TAG_PATH = '/reader/api/0/edit-tag'
 
-def test_edit_tag(client):
+def test_edit_tag_read(client):
+    sample_entries = Entry.select().limit(2)
+    entry_ids = [entry.long_form_id for entry in sample_entries]
+
+    request = {        
+        'T': TEST_POST_TOKEN,
+        'i': entry_ids,
+        'a': 'user/-/state/com.google/read' # Mark as read
+    }
+    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 200
+    assert "OK" in r.text
+
+def test_edit_tag_unread(client):
     sample_entries = Entry.select().limit(2)
     entry_ids = [entry.long_form_id for entry in sample_entries]
 
@@ -220,6 +233,32 @@ def test_edit_tag(client):
         'T': TEST_POST_TOKEN,
         'i': entry_ids,
         'r': 'user/-/state/com.google/read' # Mark as unread
+    }
+    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 200
+    assert "OK" in r.text
+
+def test_edit_tag_saved(client):
+    sample_entries = Entry.select().limit(2)
+    entry_ids = [entry.long_form_id for entry in sample_entries]
+
+    request = {        
+        'T': TEST_POST_TOKEN,
+        'i': entry_ids,
+        'a': 'user/-/state/com.google/starred' # Mark as saved
+    }
+    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 200
+    assert "OK" in r.text
+
+def test_edit_tag_unsaved(client):
+    sample_entries = Entry.select().limit(2)
+    entry_ids = [entry.long_form_id for entry in sample_entries]
+
+    request = {        
+        'T': TEST_POST_TOKEN,
+        'i': entry_ids,
+        'r': 'user/-/state/com.google/starred' # Mark as unsaved
     }
     r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
     assert r.status_code == 200

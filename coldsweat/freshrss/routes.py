@@ -19,7 +19,7 @@ import operator
 from functools import reduce
 from datetime import datetime, timezone
 import time
-from peewee import JOIN
+from peewee import JOIN, IntegrityError
 import flask
 from . import bp
 from flask import current_app as app
@@ -310,8 +310,34 @@ def post_edit_tag():
     remove_tags = flask.request.form.getlist('r')
 
     for entry in Entry.select().where((Entry.id << ids)):
-        pass
-    
+        # Mark as read 
+        if (STREAM_READ in add_tags) or (STREAM_UNREAD in remove_tags):
+            try:
+                Read.create(user=user, entry=entry)
+            except IntegrityError:
+                app.logger.debug(f'entry {entry.id} already marked as read, ignored')
+
+        # Mark as unread
+        if (STREAM_UNREAD in add_tags) or (STREAM_READ in remove_tags):
+            count = Read.delete().where(
+                (Read.user == user) & (Read.entry == entry)).execute()
+            if not count:
+                app.logger.debug(f'entry {entry.id} never marked as read, ignored')
+
+        # Mark as saved 
+        if STREAM_STARRED in add_tags:
+            try:
+                Saved.create(user=user, entry=entry)
+            except IntegrityError:
+                app.logger.debug(f'entry {entry.id} already marked as saved, ignored')            
+
+        # Mark as unsaved 
+        if STREAM_STARRED in remove_tags:
+            count = Saved.delete().where(
+                (Saved.user == user) & (Saved.entry == entry)).execute()
+            if not count:
+                app.logger.debug(f'entry {entry.id} never marked as saved, ignored')
+
     return 'OK', 200, {'Content-Type': 'text/plain'}
 
 # --------------
@@ -410,7 +436,7 @@ def to_short_form(long_form):
     # Check if short form already
     if long_form.isnumeric():
         return int(long_form)
-    
+
     # Handle long_form values with or without tag:... prefix
     value = int(long_form.split('/')[-1], 16)
     return struct.unpack("l", struct.pack("L", value))[0]

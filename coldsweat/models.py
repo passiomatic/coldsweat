@@ -2,7 +2,7 @@
 Database models
 '''
 import struct
-from datetime import datetime
+from datetime import datetime, timedelta
 from playhouse.signals import (pre_save, Model)
 from playhouse.flask_utils import FlaskDB
 from peewee import (BooleanField, CharField, FixedCharField, DateTimeField,
@@ -11,7 +11,7 @@ from peewee import (BooleanField, CharField, FixedCharField, DateTimeField,
                     TextField)
 from werkzeug import security
 from markupsafe import Markup
-from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash
+from .utilities import datetime_as_epoch, make_md5_hash, make_sha1_hash, make_sha256_hash
 
 __all__ = [
     'User',
@@ -40,6 +40,8 @@ FEED_GENERIC = 'G'
 FEED_MASTODON = 'M'
 FEED_YOUTUBE = 'Y'
 MAX_URL_LENGTH = 3072 // 4  # Stay below the 3072 char limit of recent MySQL versions with 4-byte text encodings
+
+AUTH_TOKEN_DAYS = 14
 
 class ColdsweatDB(FlaskDB):
     '''
@@ -101,9 +103,11 @@ class User(db_wrapper.Model):
         return make_md5_hash('%s:%s' % (email, password))
 
     @staticmethod
-    def make_api_auth_token(email, password):
-        # @@TODO 
-        return f'{email}/123'
+    def make_api_auth_token(email, secret_key):
+        utc_now = datetime.utcnow()
+        expiration = utc_now + timedelta(days=AUTH_TOKEN_DAYS)
+        token = make_sha1_hash(f'{secret_key}{expiration.timestamp()}')
+        return expiration, f'{email}/{token}'
 
     @staticmethod
     def validate_fever_api_key(api_key):

@@ -47,9 +47,10 @@ def add_commands(app):
             password = get_password(f"Enter password for user {email}: ")
 
         password_hash = security.generate_password_hash(password)
-        fever_api_key = User.make_fever_api_key(email, password)
-        api_auth_token = User.make_api_auth_token(email, password)
-        User.create(email=email, password_hash=password_hash, fever_api_key=fever_api_key, api_auth_token=api_auth_token, display_name=name)
+        fever_api_key = User.make_fever_api_key(email, password)        
+        #auth_token_expiration, auth_token = User.make_api_auth_token(email, app.config.get("SECRET_KEY"))
+        # Pass a throwaway, unique, auth token that will be replaced on first use
+        User.create(email=email, password_hash=password_hash, fever_api_key=fever_api_key, api_auth_token=email, display_name=name)
         print(f"Setup completed for user {email}")
 
 

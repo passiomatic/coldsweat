@@ -18,12 +18,10 @@ import struct
 import operator
 from functools import reduce
 from datetime import datetime, timezone
-import time
 from peewee import JOIN, IntegrityError
 import flask
 from . import bp
 from flask import current_app as app
-from ..utilities import datetime_as_epoch
 import coldsweat.feed as feed
 import coldsweat.models as models
 from ..models import (
@@ -51,9 +49,15 @@ def client_login():
     if not user:
         flask.abort(401)
 
-    # @@TODO Use actual session token
-    sid, token = f'{email}/123', f'{email}/123'
-    payload = f"""SID={sid}\nLSID=null\nAuth={token}\n"""
+    utc_now = datetime.utcnow()
+    # Never generated or expired
+    if (not user.api_auth_token_expires_on) or (utc_now > user.api_auth_token_expires_on):
+        new_auth_token_expiration, new_auth_token = User.make_api_auth_token(user.email, app.config.get("SECRET_KEY"))
+        user.api_auth_token = new_auth_token
+        user.auth_token_expiration = new_auth_token_expiration
+        user.save()
+        
+    payload = f"SID=null\nLSID=null\nAuth={user.api_auth_token}\n"
     return payload, 200, {'Content-Type': 'text/plain'}
 
 @bp.route('/reader/api/0/user-info', methods=['GET'])
@@ -109,6 +113,7 @@ def get_subscription_list():
                 'htmlUrl': feed_.alternate_link,
                 'iconUrl': feed_.icon_url,
                 #'sortid': f'A{feed.id:08}',
+                # @@TODO
                 # https://stackoverflow.com/a/4429974
                 #'firstitemmsec': 0,
                 'categories': [            

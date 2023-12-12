@@ -3,7 +3,7 @@ import re
 import urllib.request
 import urllib.parse
 import urllib.error
-from hashlib import md5, sha1
+from hashlib import md5, sha1, sha256
 import base64
 from calendar import timegm
 from datetime import datetime
@@ -45,6 +45,8 @@ def make_md5_hash(s):
 def make_sha1_hash(s):
     return sha1(encode(s)).hexdigest()
 
+def make_sha256_hash(s):
+    return sha256(encode(s)).hexdigest()
 
 def make_nonce():
     nonce = os.urandom(16)

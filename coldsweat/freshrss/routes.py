@@ -346,19 +346,20 @@ def post_mark_all_read():
     user = get_user(flask.request)
     stream_id = flask.request.form.get('s')
     max_timestamp = flask.request.form.get('ts', type=int, default=0) # As microseconds
-    if max_timestamp:
-        try:
-            # Convert in seconds
-            before = datetime.fromtimestamp(max_timestamp / (10**6), timezone.utc)
-        except ValueError as ex:
-            app.logger.debug(
-                f'missing or invalid parameter ({ex}), ignored')
-            flask.abort(400)
-    else:
-        before = datetime.utcnow()
 
     # @@TODO    
     #validate_post_token(user, flask.request)
+    
+    if max_timestamp:
+        try:
+            # Convert in seconds
+            max_datetime = datetime.fromtimestamp(max_timestamp / (10**6), timezone.utc)
+        except ValueError as ex:
+            app.logger.debug(
+                f'invalid ts parameter ({ex})')
+            flask.abort(400)
+    else:
+        max_datetime = datetime.utcnow()
 
     # Feed
     if stream_id.startswith(STREAM_FEED_PREFIX):
@@ -379,7 +380,7 @@ def post_mark_all_read():
                     ~(Entry.id << Read.select(Read.entry).where(
                         Read.user == user)) &
                     # Exclude entries fetched after last sync
-                    (Entry.published_on < before)
+                    (Entry.published_on < max_datetime)
                     ).distinct())
 
     # Label 
@@ -402,7 +403,7 @@ def post_mark_all_read():
                     ~(Entry.id << Read.select(
                         Read.entry).where(Read.user == user)) &
                     # Exclude entries fetched after last sync
-                    (Entry.published_on < before)
+                    (Entry.published_on < max_datetime)
                     ).distinct())
 
     with models.db_wrapper.database.transaction():

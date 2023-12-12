@@ -340,6 +340,83 @@ def post_edit_tag():
 
     return 'OK', 200, {'Content-Type': 'text/plain'}
 
+
+@bp.route('/reader/api/0/mark-all-as-read', methods=['POST'])
+def post_mark_all_read():
+    user = get_user(flask.request)
+    stream_id = flask.request.form.get('s')
+    max_timestamp = flask.request.form.get('ts', type=int, default=0) # As microseconds
+    if max_timestamp:
+        try:
+            # Convert in seconds
+            before = datetime.fromtimestamp(max_timestamp / (10**6), timezone.utc)
+        except ValueError as ex:
+            app.logger.debug(
+                f'missing or invalid parameter ({ex}), ignored')
+            flask.abort(400)
+    else:
+        before = datetime.utcnow()
+
+    # @@TODO    
+    #validate_post_token(user, flask.request)
+
+    # Feed
+    if stream_id.startswith(STREAM_FEED_PREFIX):
+        # feed/<feed url>
+        self_link = stream_id.replace(STREAM_FEED_PREFIX, '', 1)
+        try:
+            # @@TODO Check if user is subscribed to this feed 
+            feed = Feed.get(Feed.self_link == self_link)
+        except Feed.DoesNotExist:
+            app.logger.warning(f'could not find feed {self_link}')
+            flask.abort(404)        
+
+        q = (Entry.select()
+             .join(Feed)
+             .join(Subscription)
+             .where((Subscription.user == user) & (Subscription.feed == feed) &
+                    # Exclude entries already marked as read
+                    ~(Entry.id << Read.select(Read.entry).where(
+                        Read.user == user)) &
+                    # Exclude entries fetched after last sync
+                    (Entry.published_on < before)
+                    ).distinct())
+
+    # Label 
+    if stream_id.startswith(STREAM_LABEL_PREFIX):
+        # user/-/label/<name> 
+        group_title = stream_id.replace(STREAM_LABEL_PREFIX, '', 1)
+
+        try:
+            # @@TODO Check if user is subscribed to this gourp 
+            group = Group.get(Group.title == group_title)
+        except Group.DoesNotExist:
+            app.logger.warning(f'could not find group {group_title}')
+            flask.abort(404)
+
+        q = (Entry.select()
+             .join(Feed)
+             .join(Subscription)
+             .where((Subscription.user == user) & (Subscription.group == group) &
+                    # Exclude entries already marked as read
+                    ~(Entry.id << Read.select(
+                        Read.entry).where(Read.user == user)) &
+                    # Exclude entries fetched after last sync
+                    (Entry.published_on < before)
+                    ).distinct())
+
+    with models.db_wrapper.database.transaction():
+        for entry in q:
+            try:
+                Read.create(user=user, entry=entry)
+            except IntegrityError:
+                # Should not happen thanks to the query above
+                app.logger.warning(f'entry {entry.id} already marked as read, ignored')
+                continue
+
+    return 'OK', 200, {'Content-Type': 'text/plain'}
+
+
 # --------------
 # Helpers
 # --------------

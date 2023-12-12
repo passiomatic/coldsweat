@@ -211,6 +211,7 @@ def test_post_token(client):
 # --------------
 
 EDIT_TAG_PATH = '/reader/api/0/edit-tag'
+MARK_ALL_READ_PATH = '/reader/api/0/mark-all-as-read'
 
 def test_edit_tag_read(client):
     sample_entries = Entry.select().limit(2)
@@ -263,6 +264,40 @@ def test_edit_tag_unsaved(client):
     r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
     assert r.status_code == 200
     assert "OK" in r.text
+
+def test_mark_group_read(client):
+    request = {        
+        'T': TEST_POST_TOKEN,
+        's': 'user/-/label/Graphics',
+    }
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 200
+    assert "OK" in r.text
+
+def test_mark_group_read_404(client):
+    request = {        
+        'T': TEST_POST_TOKEN,
+        's': 'user/-/label/Wrong Label',
+    }
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 404
+
+def test_mark_feed_read(client):
+    request = {        
+        'T': TEST_POST_TOKEN,
+        's': 'feed/https://lab.passiomatic.com/coldsweat/tests/feed2.xml',
+    }
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 200
+    assert "OK" in r.text
+
+def test_mark_feed_read_404(client):
+    request = {        
+        'T': TEST_POST_TOKEN,
+        's': 'feed/https://example.com/not-found.xml',
+    }
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    assert r.status_code == 404
 
 # --------------
 #  Helpers 

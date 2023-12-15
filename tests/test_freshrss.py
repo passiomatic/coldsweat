@@ -310,11 +310,8 @@ def login(client):
 # def find_id(id, items):
 #     return (id in (item['id'] for item in items))
 
-def get(client, path, query_string=None, headers={}):
-    return client.get(API_ENDPOINT + path, query_string=(query_string or {}), headers=headers)
+def get(client, path, query_string=None, headers=None):
+    return client.get(API_ENDPOINT + path, query_string=(query_string or {}), headers=(headers or {}))
 
-def post(client, path, form=None, query_string=None, headers={}):
-    data = {}
-    if form:
-        data.update(form)
-    return client.post(API_ENDPOINT + path, data=data, query_string=(query_string or {}), headers=headers)
+def post(client, path, form=None, query_string=None, headers=None):
+    return client.post(API_ENDPOINT + path, data=(form or {}), query_string=(query_string or {}), headers=(headers or {}))

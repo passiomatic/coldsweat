@@ -56,7 +56,7 @@ def client_login():
         user.api_auth_token = new_auth_token
         user.auth_token_expiration = new_auth_token_expiration
         user.save()
-        
+
     payload = f"SID=null\nLSID=null\nAuth={user.api_auth_token}\n"
     return payload, 200, {'Content-Type': 'text/plain'}
 
@@ -80,14 +80,14 @@ def get_tag_list():
 
     tag_list = [{
         'id': f'user/{user.id}/state/com.google/starred',
-        'sortid': 'A00000000'
+        'sortid': 'A0000000'
     }
     ]
 
     groups = feed.get_groups(user)
     tag_list.extend([{
-        'id':  f'user/{user.id}/label/{group.title}',
-        'sortid': f'A{group.id:08}',
+        'id':  f'user/-/label/{group.title}',
+        'sortid': f'A{group.id:07X}',
     } for group in groups])
 
     payload = {
@@ -111,7 +111,7 @@ def get_subscription_list():
                 'url': feed_.self_link,
                 'htmlUrl': feed_.alternate_link,
                 'iconUrl': feed_.icon_url,
-                #'sortid': f'A{feed.id:08}',
+                'sortid': f'B{feed_.id:07X}',
                 # @@TODO
                 # https://stackoverflow.com/a/4429974
                 #'firstitemmsec': 0,
@@ -128,6 +128,20 @@ def get_subscription_list():
     }
     return flask.jsonify(payload)
 
+
+@bp.route('/reader/api/0/preference/stream/list', methods=['GET'])
+def get_preference_stream_list():
+    streams = {
+        "user/-/state/com.google/root": [{
+            "id": "subscription-ordering",
+            "value": ""
+        }],
+    }
+
+    payload = {
+        'streamprefs': streams
+    }
+    return flask.jsonify(payload)
 
 @bp.route('/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
 def get_stream_contents(stream_id):
@@ -353,7 +367,7 @@ def post_mark_all_read():
 
     # @@TODO    
     #validate_post_token(user, flask.request)
-    
+
     if max_timestamp:
         try:
             # Convert in seconds
@@ -409,7 +423,7 @@ def post_mark_all_read():
                     # Exclude entries fetched after last sync
                     (Entry.published_on < max_datetime)
                     ).distinct())
-    
+
     elif stream_id == STREAM_READING_LIST:
         # @@TODO
         raise NotImplementedError()

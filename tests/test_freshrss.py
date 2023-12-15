@@ -9,14 +9,9 @@ from coldsweat import TestingConfig
 API_ENDPOINT = "/freshrss"
 TEST_EMAIL = 'test@example.com'
 TEST_PASSWORD = 'secret-password'
-TEST_AUTH_TOKEN = f'{TEST_EMAIL}/123'
 TEST_POST_TOKEN = 'token123'
 TEST_DIR = Path(__file__).parent
-AUTH_HEADERS = {
-    'Authorization': f'GoogleLogin auth={TEST_AUTH_TOKEN}'
-}
 
-auth_token = None
 
 @pytest.fixture()
 def app():
@@ -71,16 +66,11 @@ def test_auth_failure_2(client):
     assert r.status_code == 401
 
 def test_auth(client):
-    auth_args = {
-        'Email': TEST_EMAIL,
-        'Passwd': TEST_PASSWORD
-    }    
-    r = post(client, AUTH_PATH, query_string=auth_args)
-    assert b"Auth=" in r.data
+    login(client)
 
 
 def test_user_info(client):
-    r = get(client, '/reader/api/0/user-info', query_string={'output': 'json'}, headers=AUTH_HEADERS)
+    r = get(client, '/reader/api/0/user-info', query_string={'output': 'json'}, headers=login(client))
     assert r.status_code == 200  
     assert r.json['userEmail'] == TEST_EMAIL
 
@@ -90,7 +80,7 @@ def test_user_info(client):
 # --------------
 
 def test_tag_list(client):  
-    r = get(client, '/reader/api/0/tag/list', query_string={'output': 'json'}, headers=AUTH_HEADERS)
+    r = get(client, '/reader/api/0/tag/list', query_string={'output': 'json'}, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['tags']) > 0
     #print(r.json['tags'])
@@ -100,7 +90,7 @@ def test_tag_list(client):
 # --------------
 
 def test_subscription_list(client):  
-    r = get(client, '/reader/api/0/subscription/list', query_string={'output': 'json'}, headers=AUTH_HEADERS)
+    r = get(client, '/reader/api/0/subscription/list', query_string={'output': 'json'}, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['subscriptions']) > 0
     #print(r.json['subscriptions'])
@@ -118,7 +108,7 @@ STREAM_CONTENTS_PATH = '/reader/api/0/stream/contents/'
 #         'xt': 'user/-/state/com.google/read',
 #         'n': 50
 #     }
-#     r = get(client, STREAM_CONTENTS_PATH + 'user/-/state/com.google/reading-list', query_string=query_string, headers=AUTH_HEADERS)
+#     r = get(client, STREAM_CONTENTS_PATH + 'user/-/state/com.google/reading-list', query_string=query_string, headers=login(client))
 #     assert r.status_code == 200    
 #     assert len(r.json['items']) == 50
 #     #print(r.json)
@@ -138,7 +128,7 @@ def test_items_reading_list(client):
         'r': 'o',
         'n': 50
     }
-    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 50
     #print(r.json)
@@ -148,7 +138,7 @@ def test_items_starred(client):
         'output': 'json',
         's': 'user/-/state/com.google/starred',
     }
-    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 2
     #print(r.json)
@@ -161,7 +151,7 @@ def test_items_read(client):
         's': 'user/-/state/com.google/read',
         #'ot': int(min_datetime.timestamp())
     }
-    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 2
     #print(r.json)
@@ -172,7 +162,7 @@ def test_items_feed(client):
         's': 'feed/https://lab.passiomatic.com/coldsweat/tests/feed5.xml',
         'r': 'n',
     }
-    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) > 0
     #print(r.json['itemRefs'])
@@ -182,7 +172,7 @@ def test_items_label(client):
         'output': 'json',
         's': 'user/-/label/Graphics',
     }
-    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) > 0
     #print(r.json['itemRefs'])
@@ -196,13 +186,13 @@ def test_items_contents(client):
         'output': 'json',
         'i': entry_ids
     }    
-    r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=AUTH_HEADERS)
+    r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['items']) == 10
     #print(r.json)
 
 def test_post_token(client):
-    r = get(client, '/reader/api/0/token', headers=AUTH_HEADERS)    
+    r = get(client, '/reader/api/0/token', headers=login(client))    
     assert r.status_code == 200 
     assert r.text == TEST_POST_TOKEN
 
@@ -222,7 +212,7 @@ def test_edit_tag_read(client):
         'i': entry_ids,
         'a': 'user/-/state/com.google/read' # Mark as read
     }
-    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, EDIT_TAG_PATH, form=request, headers=login(client))
     assert r.status_code == 200
     assert "OK" in r.text
 
@@ -235,7 +225,7 @@ def test_edit_tag_unread(client):
         'i': entry_ids,
         'r': 'user/-/state/com.google/read' # Mark as unread
     }
-    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, EDIT_TAG_PATH, form=request, headers=login(client))
     assert r.status_code == 200
     assert "OK" in r.text
 
@@ -248,7 +238,7 @@ def test_edit_tag_saved(client):
         'i': entry_ids,
         'a': 'user/-/state/com.google/starred' # Mark as saved
     }
-    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, EDIT_TAG_PATH, form=request, headers=login(client))
     assert r.status_code == 200
     assert "OK" in r.text
 
@@ -261,7 +251,7 @@ def test_edit_tag_unsaved(client):
         'i': entry_ids,
         'r': 'user/-/state/com.google/starred' # Mark as unsaved
     }
-    r = post(client, EDIT_TAG_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, EDIT_TAG_PATH, form=request, headers=login(client))
     assert r.status_code == 200
     assert "OK" in r.text
 
@@ -270,7 +260,7 @@ def test_mark_group_read(client):
         'T': TEST_POST_TOKEN,
         's': 'user/-/label/Graphics',
     }
-    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=login(client))
     assert r.status_code == 200
     assert "OK" in r.text
 
@@ -279,7 +269,7 @@ def test_mark_group_read_404(client):
         'T': TEST_POST_TOKEN,
         's': 'user/-/label/Wrong Label',
     }
-    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=login(client))
     assert r.status_code == 404
 
 def test_mark_feed_read(client):
@@ -287,7 +277,7 @@ def test_mark_feed_read(client):
         'T': TEST_POST_TOKEN,
         's': 'feed/https://lab.passiomatic.com/coldsweat/tests/feed2.xml',
     }
-    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=login(client))
     assert r.status_code == 200
     assert "OK" in r.text
 
@@ -296,15 +286,29 @@ def test_mark_feed_read_404(client):
         'T': TEST_POST_TOKEN,
         's': 'feed/https://example.com/not-found.xml',
     }
-    r = post(client, MARK_ALL_READ_PATH, form=request, headers=AUTH_HEADERS)
+    r = post(client, MARK_ALL_READ_PATH, form=request, headers=login(client))
     assert r.status_code == 404
 
 # --------------
 #  Helpers 
 # --------------
 
-def find_id(id, items):
-    return (id in (item['id'] for item in items))
+def login(client):
+    auth_args = {
+        'Email': TEST_EMAIL,
+        'Passwd': TEST_PASSWORD
+    }    
+    r = post(client, AUTH_PATH, query_string=auth_args)
+    assert "Auth=" in r.text
+    _, auth_token = r.text.splitlines()[2].split('=')
+    auth_headers = {
+        'Authorization': f'GoogleLogin auth={auth_token}'
+    }    
+    return auth_headers
+    
+
+# def find_id(id, items):
+#     return (id in (item['id'] for item in items))
 
 def get(client, path, query_string=None, headers={}):
     return client.get(API_ENDPOINT + path, query_string=(query_string or {}), headers=headers)

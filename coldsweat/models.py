@@ -116,11 +116,11 @@ class User(db_wrapper.Model):
 
     @staticmethod
     def validate_api_auth_token(token):
-        user = User.get_or_none(User.api_auth_token == token, User.enabled == True)  # noqa
+        user = User.get_or_none((User.api_auth_token == token) and (User.enabled == True))  # noqa
         if not user:
             return None 
 
-        # @@TODO        
+        # @@TODO
         # utc_now = datetime.utcnow()
         # # Expired?
         # if (not user.api_auth_token_expires_on) or (utc_now > user.api_auth_token_expires_on):             

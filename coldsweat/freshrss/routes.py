@@ -50,7 +50,7 @@ def client_login():
         flask.abort(401)
 
     utc_now = datetime.utcnow()
-    # Never generated or expired
+    # Check if never generated or expired
     if (not user.api_auth_token_expires_on) or (utc_now > user.api_auth_token_expires_on):
         new_auth_token_expiration, new_auth_token = User.make_api_auth_token(user.email, app.config.get("SECRET_KEY"))
         user.api_auth_token = new_auth_token
@@ -70,7 +70,6 @@ def get_user_info():
         "userProfileId": f"{user.id}",
         "userEmail": user.email,
         "isBloggerUser": False,
-        #"signupTimeSec": 1163850013,
         "isMultiLoginEnabled": False,
     }
     return flask.jsonify(payload)

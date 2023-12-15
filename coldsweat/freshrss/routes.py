@@ -17,7 +17,7 @@ FreshRSS PHP implementation:
 import struct
 import operator
 from functools import reduce
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from peewee import JOIN, IntegrityError
 import flask
 from . import bp
@@ -29,7 +29,7 @@ from ..models import (
 
 # Entry states
 STREAM_READING_LIST = 'user/-/state/com.google/reading-list'
-STREAM_STARRED = 'user/-/state/com.google/starred'
+STREAM_SAVED = 'user/-/state/com.google/starred'
 STREAM_READ = 'user/-/state/com.google/read'
 STREAM_UNREAD = 'user/-/state/com.google/kept-unread'
 
@@ -101,7 +101,8 @@ def get_subscription_list():
     user = get_user(flask.request)
     groups = feed.get_groups(user)
 
-    subscription_list = []
+    subscription_list = []    
+    firstItem = datetime.utcnow()- timedelta(days=14)
     for group in groups:
         feeds = feed.get_group_feeds(user, group)
         for feed_ in feeds: 
@@ -114,7 +115,7 @@ def get_subscription_list():
                 'sortid': f'B{feed_.id:07X}',
                 # @@TODO
                 # https://stackoverflow.com/a/4429974
-                #'firstitemmsec': 0,
+                'firstitemmsec': int(firstItem.timestamp() * 1000),
                 'categories': [            
                     {
                         'id': f'user/-/label/{group.title}',
@@ -153,8 +154,8 @@ def get_stream_contents(stream_id):
     #include_direct_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
     included_stream_ids = flask.request.args.getlist('it')
     excluded_stream_ids = flask.request.args.getlist('xt')
-    min_timestamp = flask.request.args.get('ot')
-    max_timestamp = flask.request.args.get('nt')
+    min_timestamp = flask.request.args.get('ot', type=float, default=0)
+    max_timestamp = flask.request.args.get('nt', type=float, default=0)
 
     if rank == 'n':
         # Newest entries first
@@ -206,8 +207,8 @@ def get_stream_items_ids():
     #include_direct_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
     included_stream_ids = flask.request.args.getlist('it')
     excluded_stream_ids = flask.request.args.getlist('xt')
-    min_timestamp = flask.request.args.get('ot')
-    max_timestamp = flask.request.args.get('nt')
+    min_timestamp = flask.request.args.get('ot', type=float, default=0)
+    max_timestamp = flask.request.args.get('nt', type=float, default=0)
 
     if rank == 'n':
         # Newest entries first
@@ -264,7 +265,7 @@ def get_stream_items_contents():
 
 def make_google_reader_item(entry):
     item = {
-        'id': f'{entry.id}',
+        'id': entry.long_form_id,
         'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
         'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
         'published': entry.published_on_as_epoch,
@@ -302,7 +303,7 @@ def make_google_reader_item(entry):
         item['categories'].append(STREAM_UNREAD)
 
     if entry.saved_on:
-        item['categories'].append(STREAM_STARRED)    
+        item['categories'].append(STREAM_SAVED)    
 
     return item
 
@@ -343,14 +344,14 @@ def post_edit_tag():
                 app.logger.debug(f'entry {entry.id} never marked as read, ignored')
 
         # Mark as saved 
-        if STREAM_STARRED in add_tags:
+        if STREAM_SAVED in add_tags:
             try:
                 Saved.create(user=user, entry=entry)
             except IntegrityError:
                 app.logger.debug(f'entry {entry.id} already marked as saved, ignored')            
 
         # Mark as unsaved 
-        if STREAM_STARRED in remove_tags:
+        if STREAM_SAVED in remove_tags:
             count = Saved.delete().where(
                 (Saved.user == user) & (Saved.entry == entry)).execute()
             if not count:
@@ -451,6 +452,9 @@ def get_filtered_entries(user, sort_order, stream, include_streams, exclude_stre
         (Subscription.user == user)
     ]
 
+    join_read = JOIN.LEFT_OUTER
+    join_saved = JOIN.LEFT_OUTER
+
     # Read
     if stream == STREAM_READ or (STREAM_READ in include_streams):
         where_clauses.append(
@@ -459,12 +463,14 @@ def get_filtered_entries(user, sort_order, stream, include_streams, exclude_stre
 
     # Unread/exclude read
     if stream == STREAM_UNREAD or (STREAM_READ in exclude_streams):
+        # Skip read entries in query
+        join_read = JOIN.INNER        
         where_clauses.append(
             ~(Entry.id << Read.select(Read.entry).where(Read.user == user))
         )  
 
     # Saved
-    if (stream == STREAM_STARRED) or (STREAM_STARRED in include_streams):
+    if (stream == STREAM_SAVED) or (STREAM_SAVED in include_streams):
         where_clauses.append(
             (Entry.id << Saved.select(Saved.entry).where(Saved.user == user))   
         )        
@@ -484,7 +490,7 @@ def get_filtered_entries(user, sort_order, stream, include_streams, exclude_stre
         )
 
     if min_timestamp:
-        min_datetime = datetime.fromtimestamp(float(min_timestamp), tz=timezone.utc)
+        min_datetime = datetime.fromtimestamp(min_timestamp, tz=timezone.utc)
         where_clauses.append(
             (Entry.published_on >= min_datetime)
         )
@@ -495,9 +501,9 @@ def get_filtered_entries(user, sort_order, stream, include_streams, exclude_stre
          .join(Subscription)
          .join(Group)          
          .switch(Entry)
-         .join(Read, JOIN.LEFT_OUTER)
+         .join(Read, join_read)
          .switch(Entry)         
-         .join(Saved, JOIN.LEFT_OUTER)
+         .join(Saved, join_saved)
          # Chain all conditions together AND'ing them 
          #  https://github.com/coleifer/peewee/issues/391#issuecomment-468042229
          .where(reduce(operator.and_, where_clauses))
@@ -533,8 +539,8 @@ def to_short_form(long_form):
 
     https://github.com/mihaip/google-reader-api/blob/master/wiki/ItemId.wiki
     """
-    # Check if short form already
-    if long_form.isnumeric():
+    # Check if in short form already
+    if long_form[0] != '0' and long_form.isdigit():
         return int(long_form)
 
     # Handle long_form values with or without tag:... prefix

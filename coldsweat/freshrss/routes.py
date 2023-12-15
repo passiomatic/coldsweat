@@ -102,7 +102,7 @@ def get_subscription_list():
     groups = feed.get_groups(user)
 
     subscription_list = []    
-    firstItem = datetime.utcnow()- timedelta(days=14)
+    firstItem = datetime.utcnow() - timedelta(days=14)
     for group in groups:
         feeds = feed.get_group_feeds(user, group)
         for feed_ in feeds: 
@@ -544,14 +544,14 @@ def to_short_form(long_form):
         return int(long_form)
 
     # Handle long_form values with or without tag:... prefix
-    value = int(long_form.split('/')[-1], 16)
+    value = int(long_form.split('/')[-1], base=16)
     return struct.unpack("l", struct.pack("L", value))[0]
 
 
 def get_user(request):
     # Authorization: GoogleLogin auth=<token>
     auth_header = request.headers.get('Authorization', '')
-    _, token = auth_header.split("=")
+    _, token = auth_header.split("=", 1)
     user = User.validate_api_auth_token(token)
     if not user:
         flask.abort(401)

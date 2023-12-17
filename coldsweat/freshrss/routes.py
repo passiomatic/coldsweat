@@ -176,7 +176,7 @@ def get_stream_contents(stream_id):
     reader_entries = [make_google_reader_item(entry) for entry in q]  
     payload = {
         "direction": "ltr",
-        "id": f"user/{user.id}/state/com.google/reading-list",
+        "id": "user/-/state/com.google/reading-list",
         "title": f"{user.display_name}'s reading list on Coldsweat",
         "author": f"{user.display_name}",
         "updated": int(datetime.utcnow().timestamp()),

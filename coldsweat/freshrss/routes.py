@@ -1,5 +1,5 @@
 """
-A partial Google Reader-like API implementation
+Fresh RSS: a Google Reader-like API implementation
 
 Specs:
     - https://feedhq.readthedocs.io/en/latest/api/
@@ -41,6 +41,7 @@ ITEM_LONG_FORM_PREFIX = 'tag:google.com,2005:reader/item/'
 MAX_ITEMS_IDS = 1000
 
 @bp.route('/accounts/ClientLogin', methods=['GET', 'POST'])
+@bp.route('/api/greader.php/accounts/ClientLogin', methods=['GET', 'POST'])
 def client_login():
     email = flask.request.values.get('Email', default='')
     password = flask.request.values.get('Passwd', default='') 
@@ -61,6 +62,7 @@ def client_login():
     return payload, 200, {'Content-Type': 'text/plain'}
 
 @bp.route('/reader/api/0/user-info', methods=['GET'])
+@bp.route('/api/greader.php/reader/api/0/user-info', methods=['GET'])
 def get_user_info():
     user = get_user(flask.request)
 
@@ -75,6 +77,7 @@ def get_user_info():
     return flask.jsonify(payload)
 
 @bp.route('/reader/api/0/tag/list', methods=['GET'])
+@bp.route('/api/greader.php/reader/api/0/tag/list', methods=['GET'])
 def get_tag_list():
     user = get_user(flask.request)
 
@@ -97,6 +100,7 @@ def get_tag_list():
 
 
 @bp.route('/reader/api/0/subscription/list', methods=['GET'])
+@bp.route('/api/greader.php/reader/api/0/subscription/list', methods=['GET'])
 def get_subscription_list():
     user = get_user(flask.request)
     groups = feed.get_groups(user)
@@ -131,6 +135,7 @@ def get_subscription_list():
 
 
 @bp.route('/reader/api/0/preference/stream/list', methods=['GET'])
+@bp.route('/api/greader.php/reader/api/0/preference/stream/list', methods=['GET'])
 def get_preference_stream_list():
     streams = {
         "user/-/state/com.google/root": [{
@@ -145,6 +150,7 @@ def get_preference_stream_list():
     return flask.jsonify(payload)
 
 @bp.route('/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
+@bp.route('/api/greader.php/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
 def get_stream_contents(stream_id):
     user = get_user(flask.request)
 
@@ -197,6 +203,7 @@ def get_stream_contents(stream_id):
 
 
 @bp.route('/reader/api/0/stream/items/ids', methods=['GET'])
+@bp.route('/api/greader.php/reader/api/0/stream/items/ids', methods=['GET'])
 def get_stream_items_ids():
     user = get_user(flask.request)
 
@@ -239,6 +246,7 @@ def get_stream_items_ids():
 
 
 @bp.route('/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
+@bp.route('/api/greader.php/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
 def get_stream_items_contents():
     user = get_user(flask.request)
 
@@ -314,12 +322,14 @@ def make_google_reader_item(entry):
 # --------------
 
 @bp.route('/reader/api/0/token', methods=['GET'])
+@bp.route('/api/greader.php/reader/api/0/token', methods=['GET'])
 def get_token():
     # @@TODO Make a short-lived token
     return 'token123', 200, {'Content-Type': 'text/plain'}
 
 
 @bp.route('/reader/api/0/edit-tag', methods=['POST'])
+@bp.route('/api/greader.php/reader/api/0/edit-tag', methods=['POST'])
 def post_edit_tag():
     user = get_user(flask.request)
 
@@ -362,6 +372,7 @@ def post_edit_tag():
 
 
 @bp.route('/reader/api/0/mark-all-as-read', methods=['POST'])
+@bp.route('/api/greader.php/reader/api/0/mark-all-as-read', methods=['POST'])
 def post_mark_all_read():
     user = get_user(flask.request)
     stream_id = flask.request.form.get('s')

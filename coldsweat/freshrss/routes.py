@@ -182,7 +182,7 @@ def get_stream_contents(stream_id):
     reader_entries = [make_google_reader_item(entry) for entry in q]  
     payload = {
         "direction": "ltr",
-        "id": "user/-/state/com.google/reading-list",
+        "id": STREAM_READING_LIST,
         "title": f"{user.display_name}'s reading list on Coldsweat",
         "author": f"{user.display_name}",
         "updated": int(datetime.utcnow().timestamp()),
@@ -233,7 +233,7 @@ def get_stream_items_ids():
         min_timestamp)
         .offset(offset).limit(entry_count))
 
-    entry_ids = [{'id': f'{e.id}'} for e in q]
+    entry_ids = [{'id': f'{e.long_form_id}'} for e in q]
     payload = {
         'itemRefs': entry_ids,
     }    
@@ -265,7 +265,7 @@ def get_stream_items_contents():
     q = get_entries_with_ids(user, ids, sort_order)
     reader_entries = [make_google_reader_item(entry) for entry in q]    
     payload = {
-        'id': 'user/-/state/com.google/reading-list',
+        'id': STREAM_READING_LIST,
         'updated': int(datetime.utcnow().timestamp()),
         'items': reader_entries,
     }
@@ -274,7 +274,7 @@ def get_stream_items_contents():
 
 def make_google_reader_item(entry):
     item = {
-        'id': f'{entry.id}',
+        'id': f'{entry.long_form_id}',
         'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
         'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
         'published': entry.published_on_as_epoch,
@@ -287,22 +287,24 @@ def make_google_reader_item(entry):
         'alternate': [
             {
                 'href': entry.link,
-                'type': entry.content_type,
+                #'type': entry.content_type,
             },                    
         ],
+        # @@TODO better truncate 
+        'summary': {
+            'content': entry.content[:500],
+        },            
         'content': {
-            #'direction': 'ltr',
             'content': entry.content,
         },            
         'categories': [
-            # @@TODO Add actual categories
-            'user/-/state/com.google/reading-list',
+            STREAM_READING_LIST,
         ],
         'origin': {
             'streamId': f'feed/{entry.feed.self_link}',
+            'feedUrl': entry.feed.self_link,
             'htmlUrl': entry.feed.alternate_link,
             'title': entry.feed.title,
-            'feedUrl': entry.feed.self_link
         }
     }    
     # Add states

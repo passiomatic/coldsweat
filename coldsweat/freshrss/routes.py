@@ -245,6 +245,7 @@ def get_stream_items_contents():
     # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L784
     rank = flask.request.values.get('r', default='n')
     ids = flask.request.values.getlist('i', type=to_short_form)
+    app.logger.debug(f'requested ids: {ids}')
 
     if rank == 'n':
         # Newest entries first
@@ -265,7 +266,7 @@ def get_stream_items_contents():
 
 def make_google_reader_item(entry):
     item = {
-        'id': entry.long_form_id,
+        'id': f'{entry.id}',
         'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
         'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
         'published': entry.published_on_as_epoch,
@@ -452,9 +453,6 @@ def get_filtered_entries(user, sort_order, stream, include_streams, exclude_stre
         (Subscription.user == user)
     ]
 
-    join_read = JOIN.LEFT_OUTER
-    join_saved = JOIN.LEFT_OUTER
-
     # Read
     if stream == STREAM_READ or (STREAM_READ in include_streams):
         where_clauses.append(
@@ -463,8 +461,6 @@ def get_filtered_entries(user, sort_order, stream, include_streams, exclude_stre
 
     # Unread/exclude read
     if stream == STREAM_UNREAD or (STREAM_READ in exclude_streams):
-        # Skip read entries in query
-        join_read = JOIN.INNER        
         where_clauses.append(
             ~(Entry.id << Read.select(Read.entry).where(Read.user == user))
         )  
@@ -501,9 +497,9 @@ def get_filtered_entries(user, sort_order, stream, include_streams, exclude_stre
          .join(Subscription)
          .join(Group)          
          .switch(Entry)
-         .join(Read, join_read)
+         .join(Read, JOIN.LEFT_OUTER)
          .switch(Entry)         
-         .join(Saved, join_saved)
+         .join(Saved, JOIN.LEFT_OUTER)
          # Chain all conditions together AND'ing them 
          #  https://github.com/coleifer/peewee/issues/391#issuecomment-468042229
          .where(reduce(operator.and_, where_clauses))

@@ -245,7 +245,9 @@ class Fetcher(object):
                     % self.feed.self_link)
                 continue
 
-            published_on = get_entry_timestamp(entry_dict, default=self.instant)
+            # Try to be as accurate as possible with Entry.aded_on values
+            utc_now = datetime.utcnow()
+            published_on = get_entry_timestamp(entry_dict, default=utc_now)
             content_type, content = get_entry_content(entry_dict, ('text/plain', ''))
             thumbnail_url = get_entry_thumbnail_url(entry_dict)
 
@@ -258,7 +260,7 @@ class Fetcher(object):
                 'content': markup.parse_html(content),
                 'content_type': content_type,
                 'thumbnail_url': thumbnail_url,
-                'added_on': self.instant,
+                'added_on': utc_now,
                 'published_on': published_on
             }
             new_entries.append(entry)

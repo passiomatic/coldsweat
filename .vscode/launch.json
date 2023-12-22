@@ -38,13 +38,33 @@
             "justMyCode": true
         },        
         {
-            "name": "Python: Run Tests",
+            "name": "Python: Run All Tests",
             "type": "python",
             "request": "launch",
             "module": "pytest", 
             "args": [
             ],
             "justMyCode": true
-        },         
+        },        
+        {
+            "name": "Python: Run FreshRSS Tests",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest", 
+            "args": [
+                "-k freshrss"
+            ],
+            "justMyCode": true
+        },     
+        {
+            "name": "Python: Run Fever Tests",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest", 
+            "args": [
+                "-k fever"
+            ],
+            "justMyCode": true
+        },               
     ]
 }

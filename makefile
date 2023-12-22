@@ -43,6 +43,12 @@ create-test-data:
 test:
 	python -m pytest -s
 
+test-freshrss:
+	python -m pytest -s -k freshrss
+
+test-fever:
+	python -m pytest -s -k fever
+
 # Build Wheel/PyPI Support
 
 install-build-deps:

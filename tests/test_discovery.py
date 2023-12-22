@@ -11,8 +11,8 @@ test_dir = path.dirname(path.abspath(__file__))
 
 @pytest.mark.parametrize("filename, expected_url", [
     ('discovery/html5-xhtml.html', 'http://example.com/feed'),
-    ('discovery/xhtml.html', 'http://somedomain.com/articles.xml'),
-    ('discovery/html4-base.html', 'http://somedomain.com/articles.xml'),
+    ('discovery/xhtml.html', 'http://example.com/articles.xml'),
+    ('discovery/html4-base.html', 'http://example.com/articles.xml'),
     ('discovery/html4-no-base.html', 'http://example.com/articles.xml'),
 ]
 )

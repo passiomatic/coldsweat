@@ -134,7 +134,6 @@ def test_items_reading_list(client):
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 50
-    #print(r.json)
 
 def test_items_starred(client):  
     query_string={
@@ -144,7 +143,6 @@ def test_items_starred(client):
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 2
-    #print(r.json)
 
 def test_items_read(client):  
     # Last month only
@@ -157,7 +155,6 @@ def test_items_read(client):
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 2
-    #print(r.json)
 
 def test_items_exclude_read(client):  
     #min_datetime = datetime.utcnow() - timedelta(days=30)
@@ -180,7 +177,6 @@ def test_items_feed(client):
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) > 0
-    #print(r.json['itemRefs'])
 
 def test_items_label(client):  
     query_string={
@@ -190,7 +186,6 @@ def test_items_label(client):
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) > 0
-    #print(r.json['itemRefs'])
 
 def test_items_contents_long_form(client):
     sample_entries = Entry.select().limit(10)
@@ -204,7 +199,6 @@ def test_items_contents_long_form(client):
     r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['items']) == 10
-    #print(r.json)
 
 def test_items_contents_short_form(client):
     sample_entries = Entry.select().limit(10)
@@ -218,7 +212,6 @@ def test_items_contents_short_form(client):
     r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['items']) == 10
-    #print(r.json)
 
 def test_post_token(client):
     r = get(client, '/reader/api/0/token', headers=login(client))    
@@ -231,6 +224,7 @@ def test_post_token(client):
 
 EDIT_TAG_PATH = '/reader/api/0/edit-tag'
 MARK_ALL_READ_PATH = '/reader/api/0/mark-all-as-read'
+QUICK_ADD_PATH = '/reader/api/0/subscription/quickadd'
 
 def test_edit_tag_read(client):
     sample_entries = Entry.select().limit(2)
@@ -328,6 +322,16 @@ def test_mark_feed_read_404(client):
     }
     r = post(client, MARK_ALL_READ_PATH, form=request, headers=login(client))
     assert r.status_code == 404
+
+def test_quick_add(client):
+    feed_url = 'https://lab.passiomatic.com/coldsweat/tests/feed6.xml'
+    request = {        
+        'T': TEST_POST_TOKEN,
+        'quickadd': feed_url,
+    }
+    r = post(client, QUICK_ADD_PATH, form=request, headers=login(client))
+    assert r.status_code == 200
+    assert feed_url in r.json['streamId']
 
 # --------------
 #  Helpers 

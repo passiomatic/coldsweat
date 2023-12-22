@@ -40,6 +40,7 @@ ITEM_LONG_FORM_PREFIX = 'tag:google.com,2005:reader/item/'
 
 MAX_ITEMS_IDS = 1000
 
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L280
 @bp.route('/accounts/ClientLogin', methods=['GET', 'POST'])
 @bp.route('/api/greader.php/accounts/ClientLogin', methods=['GET', 'POST'])
 def client_login():
@@ -58,9 +59,10 @@ def client_login():
         user.auth_token_expiration = new_auth_token_expiration
         user.save()
 
-    payload = f"SID=null\nLSID=null\nAuth={user.api_auth_token}\n"
+    payload = f"SID={user.api_auth_token}\nLSID=null\nAuth={user.api_auth_token}\n"
     return payload, 200, {'Content-Type': 'text/plain'}
 
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L280
 @bp.route('/reader/api/0/user-info', methods=['GET'])
 @bp.route('/api/greader.php/reader/api/0/user-info', methods=['GET'])
 def get_user_info():
@@ -71,11 +73,10 @@ def get_user_info():
         "userName": user.display_name,
         "userProfileId": f"{user.id}",
         "userEmail": user.email,
-        "isBloggerUser": False,
-        "isMultiLoginEnabled": False,
     }
     return flask.jsonify(payload)
 
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L280
 @bp.route('/reader/api/0/tag/list', methods=['GET'])
 @bp.route('/api/greader.php/reader/api/0/tag/list', methods=['GET'])
 def get_tag_list():
@@ -83,14 +84,15 @@ def get_tag_list():
 
     tag_list = [{
         'id': f'user/{user.id}/state/com.google/starred',
-        'sortid': 'A0000000'
+        #'sortid': 'A0000000'
     }
     ]
 
     groups = feed.get_groups(user)
     tag_list.extend([{
         'id':  f'user/-/label/{group.title}',
-        'sortid': f'A{group.id:07X}',
+        #'sortid': f'A{group.id:07X}',
+        'type': 'folder',
     } for group in groups])
 
     payload = {
@@ -99,6 +101,7 @@ def get_tag_list():
     return flask.jsonify(payload)
 
 
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L342
 @bp.route('/reader/api/0/subscription/list', methods=['GET'])
 @bp.route('/api/greader.php/reader/api/0/subscription/list', methods=['GET'])
 def get_subscription_list():
@@ -106,7 +109,7 @@ def get_subscription_list():
     groups = feed.get_groups(user)
 
     subscription_list = []    
-    firstItem = datetime.utcnow() - timedelta(days=14)
+    #firstItem = datetime.utcnow() - timedelta(days=14)
     for group in groups:
         feeds = feed.get_group_feeds(user, group)
         for feed_ in feeds: 
@@ -116,7 +119,7 @@ def get_subscription_list():
                 'url': feed_.self_link,
                 'htmlUrl': feed_.alternate_link,
                 'iconUrl': feed_.icon_url,
-                'sortid': f'B{feed_.id:07X}',
+                #'sortid': f'B{feed_.id:07X}',
                 # @@TODO
                 # https://stackoverflow.com/a/4429974
                 #'firstitemmsec': int(firstItem.timestamp() * 1000),
@@ -149,59 +152,60 @@ def get_preference_stream_list():
     }
     return flask.jsonify(payload)
 
-@bp.route('/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
-@bp.route('/api/greader.php/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
-def get_stream_contents(stream_id):
-    user = get_user(flask.request)
+# @bp.route('/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
+# @bp.route('/api/greader.php/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
+# def get_stream_contents(stream_id):
+#     user = get_user(flask.request)
 
-    rank = flask.request.args.get('r', default='n')
-    entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
-    offset = flask.request.args.get('c', type=int, default=0)
-    #include_direct_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
-    included_stream_ids = flask.request.args.getlist('it')
-    excluded_stream_ids = flask.request.args.getlist('xt')
-    min_timestamp = flask.request.args.get('ot', type=float, default=0)
-    max_timestamp = flask.request.args.get('nt', type=float, default=0)
+#     rank = flask.request.args.get('r', default='n')
+#     entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
+#     offset = flask.request.args.get('c', type=int, default=0)
+#     #include_direct_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
+#     included_stream_ids = flask.request.args.getlist('it')
+#     excluded_stream_ids = flask.request.args.getlist('xt')
+#     min_timestamp = flask.request.args.get('ot', type=float, default=0)
+#     max_timestamp = flask.request.args.get('nt', type=float, default=0)
 
-    if rank == 'n':
-        # Newest entries first
-        sort_order = Entry.published_on.desc()
-    else:
-        # 'd', 'o', or...
-        sort_order = Entry.published_on.asc()
+#     if rank == 'n':
+#         # Newest entries first
+#         sort_order = Entry.published_on.desc()
+#     else:
+#         # 'd', 'o', or...
+#         sort_order = Entry.published_on.asc()
 
-    q = (get_filtered_entries(
-        user, 
-        sort_order, 
-        stream_id, 
-        included_stream_ids, 
-        excluded_stream_ids, 
-        min_timestamp)
-        .offset(offset).limit(entry_count))
+#     q = (get_filtered_entries(
+#         user, 
+#         sort_order, 
+#         stream_id, 
+#         included_stream_ids, 
+#         excluded_stream_ids, 
+#         min_timestamp)
+#         .offset(offset).limit(entry_count))
 
-    reader_entries = [make_google_reader_item(entry) for entry in q]  
-    payload = {
-        "direction": "ltr",
-        "id": STREAM_READING_LIST,
-        "title": f"{user.display_name}'s reading list on Coldsweat",
-        "author": f"{user.display_name}",
-        "updated": int(datetime.utcnow().timestamp()),
-        # @@TODO 
-        # "self":[{"href":"http://www.google.com/reader/api/0/stream/contents/feed/http://astronomycast.com/podcast.xml?"}],
-        # "alternate":[{"href":"http://www.astronomycast.com","type":"text/html"}],            
-        "self": [{
-            "href": ""
-        }],
-        "items": reader_entries
-    }
+#     reader_entries = [make_google_reader_item(entry) for entry in q]  
+#     payload = {
+#         "direction": "ltr",
+#         "id": STREAM_READING_LIST,
+#         "title": f"{user.display_name}'s reading list on Coldsweat",
+#         "author": f"{user.display_name}",
+#         "updated": int(datetime.utcnow().timestamp()),
+#         # @@TODO 
+#         # "self":[{"href":"http://www.google.com/reader/api/0/stream/contents/feed/http://astronomycast.com/podcast.xml?"}],
+#         # "alternate":[{"href":"http://www.astronomycast.com","type":"text/html"}],            
+#         "self": [{
+#             "href": ""
+#         }],
+#         "items": reader_entries
+#     }
 
-    # Check if we have finished
-    if entry_count == len(reader_entries):
-        payload['continuation'] = f'{offset + MAX_ITEMS_IDS}'
+#     # Check if we have finished
+#     if entry_count == len(reader_entries):
+#         payload['continuation'] = f'{offset + MAX_ITEMS_IDS}'
 
-    return flask.jsonify(payload)
+#     return flask.jsonify(payload)
 
 
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L724
 @bp.route('/reader/api/0/stream/items/ids', methods=['GET'])
 @bp.route('/api/greader.php/reader/api/0/stream/items/ids', methods=['GET'])
 def get_stream_items_ids():
@@ -244,13 +248,12 @@ def get_stream_items_ids():
 
     return flask.jsonify(payload)
 
-
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L787
 @bp.route('/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
 @bp.route('/api/greader.php/reader/api/0/stream/items/contents', methods=['GET', 'POST'])
 def get_stream_items_contents():
     user = get_user(flask.request)
 
-    # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L784
     rank = flask.request.values.get('r', default='n')
     ids = flask.request.values.getlist('i', type=to_short_form)
     app.logger.debug(f'requested ids: {ids}')
@@ -275,7 +278,8 @@ def get_stream_items_contents():
 def make_google_reader_item(entry):
     item = {
         'id': f'{entry.id}',
-        'crawlTimeMsec': f'{entry.feed.last_updated_on_as_epoch_msec}',            
+        'guid': entry.guid,
+        'crawlTimeMsec': f'{entry.published_on_as_epoch_msec}',            
         'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
         'published': entry.published_on_as_epoch,
         #'updated': entry.published_on_as_epoch,
@@ -287,7 +291,8 @@ def make_google_reader_item(entry):
         'alternate': [
             {
                 'href': entry.link,
-                #'type': entry.content_type,
+                # https://github.com/FreshRSS/FreshRSS/blob/edge/app/Models/Entry.php#L860                
+                #'type': entry.content_type, 
             },                    
         ],
         # @@TODO better truncate 
@@ -329,7 +334,7 @@ def get_token():
     # @@TODO Make a short-lived token
     return 'token123', 200, {'Content-Type': 'text/plain'}
 
-
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L817
 @bp.route('/reader/api/0/edit-tag', methods=['POST'])
 @bp.route('/api/greader.php/reader/api/0/edit-tag', methods=['POST'])
 def post_edit_tag():
@@ -372,7 +377,7 @@ def post_edit_tag():
 
     return 'OK', 200, {'Content-Type': 'text/plain'}
 
-
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L945
 @bp.route('/reader/api/0/mark-all-as-read', methods=['POST'])
 @bp.route('/api/greader.php/reader/api/0/mark-all-as-read', methods=['POST'])
 def post_mark_all_read():

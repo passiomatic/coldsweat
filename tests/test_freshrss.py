@@ -160,8 +160,7 @@ def test_items_read(client):
     #print(r.json)
 
 def test_items_exclude_read(client):  
-    # Last month only
-    min_datetime = datetime.utcnow() - timedelta(days=30)
+    #min_datetime = datetime.utcnow() - timedelta(days=30)
     query_string={
         'output': 'json',
         's': 'user/-/state/com.google/reading-list',
@@ -171,7 +170,6 @@ def test_items_exclude_read(client):
     r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
     assert r.status_code == 200    
     assert len(r.json['itemRefs']) == 123
-    #print(r.json)
 
 def test_items_feed(client):  
     query_string={
@@ -294,6 +292,17 @@ def test_mark_group_read(client):
     r = post(client, MARK_ALL_READ_PATH, form=request, headers=login(client))
     assert r.status_code == 200
     assert "OK" in r.text
+
+    query_string={
+        'output': 'json',
+        's': 'user/-/state/com.google/reading-list',
+        'xt': 'user/-/state/com.google/read',
+        #'ot': int(min_datetime.timestamp())
+    }
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
+    assert r.status_code == 200    
+    assert len(r.json['itemRefs']) < 123
+
 
 def test_mark_group_read_404(client):
     request = {        

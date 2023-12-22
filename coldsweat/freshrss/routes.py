@@ -280,7 +280,7 @@ def make_google_reader_item(entry):
         'id': f'{entry.id}',
         'guid': entry.guid,
         'crawlTimeMsec': f'{entry.published_on_as_epoch_msec}',            
-        'timestampUsec': f'{entry.published_on_as_epoch_msec * 1000}',  # EasyRSS & Reeder
+        'timestampUsec': f'{entry.published_on_as_epoch_usec}',  # EasyRSS & Reeder
         'published': entry.published_on_as_epoch,
         #'updated': entry.published_on_as_epoch,
         'title': entry.title,

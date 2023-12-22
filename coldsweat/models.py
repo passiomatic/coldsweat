@@ -197,9 +197,9 @@ class Feed(db_wrapper.Model):
             return datetime_as_epoch(self.last_updated_on)
         return 0
 
-    @property
-    def last_updated_on_as_epoch_msec(self):
-        return self.last_updated_on_as_epoch * 1000
+    # @property
+    # def last_updated_on_as_epoch_msec(self):
+    #     return self.last_updated_on_as_epoch * 1000
     
     @property
     def icon_or_default(self):
@@ -233,8 +233,14 @@ class Entry(db_wrapper.Model):
 
     @property
     def published_on_as_epoch_msec(self):
-        return datetime_as_epoch(self.published_on) * 1000
-    
+        # s -> ms
+        return int(self.published_on.timestamp() * 10**3)
+
+    @property
+    def published_on_as_epoch_usec(self):
+        # s -> μs
+        return int(self.published_on.timestamp() * 10**6)
+        
     # @property
     # def added_on_as_epoch_msec(self):
     #     return datetime_as_epoch(self.added_on) * 1000

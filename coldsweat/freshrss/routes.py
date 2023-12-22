@@ -334,6 +334,30 @@ def get_token():
     # @@TODO Make a short-lived token
     return 'token123', 200, {'Content-Type': 'text/plain'}
 
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L471
+@bp.route('/reader/api/0/subscription/quickadd', methods=['POST'])
+@bp.route('/api/greader.php/reader/api/0/subscription/quickadd', methods=['POST'])
+def post_quick_add():
+    feed_url = flask.request.values.get('quickadd')
+    new_feed = feed.add_feed_from_url(feed_url, fetch_data=True)
+
+    #user = get_user(flask.request)
+
+    # if group_id:
+    #     group = Group.get(Group.id == group_id)
+    # else:
+    #group = Group.get(Group.title == Group.DEFAULT_GROUP)
+    #feed.add_subscription(user, new_feed, group)
+
+    payload = {
+        'numResults': 1,
+        'query': new_feed.self_link,
+        'streamId': f'feed/{new_feed.self_link}',
+        'streamName': new_feed.title,
+    }
+    return flask.jsonify(payload)
+
+
 # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L817
 @bp.route('/reader/api/0/edit-tag', methods=['POST'])
 @bp.route('/api/greader.php/reader/api/0/edit-tag', methods=['POST'])

@@ -152,6 +152,7 @@ class Group(db_wrapper.Model):
     Feed group/folder
     """
     DEFAULT_GROUP = 'Default'
+    DEFAULT_GROUP_ID = 1
 
     title = CharField(unique=True)
     color = CharField(default="#FFFFFF")  # Future use
@@ -302,7 +303,7 @@ class Subscription(db_wrapper.Model):
 
 
 BUILTIN_GROUPS = [
-    {'id': 1, 'title': Group.DEFAULT_GROUP},
+    {'id': Group.DEFAULT_GROUP_ID, 'title': Group.DEFAULT_GROUP},
     {'id': 2, 'title': 'Reserved 2'},
     {'id': 3, 'title': "Reserved 3"},
     {'id': 4, 'title': "Reserved 4"},

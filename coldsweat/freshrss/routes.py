@@ -339,16 +339,16 @@ def get_token():
 @bp.route('/api/greader.php/reader/api/0/subscription/quickadd', methods=['POST'])
 def post_quick_add():
     feed_url = flask.request.values.get('quickadd')
-    new_feed = feed.add_feed_from_url(feed_url, fetch_data=True)
+    new_feed = feed.add_feed_from_url(feed_url, fetch_data=True)    
+    user = get_user(flask.request)
+    # @@TODO    
+    #validate_post_token(user, flask.request)
 
-    #user = get_user(flask.request)
-
-    # if group_id:
-    #     group = Group.get(Group.id == group_id)
-    # else:
-    #group = Group.get(Group.title == Group.DEFAULT_GROUP)
-    #feed.add_subscription(user, new_feed, group)
-
+    # Temporary subscribe to the default group, 
+    #  later FreshRSS client will ask to edit the subscription
+    group = Group.get(Group.title == Group.DEFAULT_GROUP)
+    feed.add_subscription(user, new_feed, group)
+    # @@TODO manage error scenario
     payload = {
         'numResults': 1,
         'query': new_feed.self_link,
@@ -357,6 +357,48 @@ def post_quick_add():
     }
     return flask.jsonify(payload)
 
+# https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L471
+@bp.route('/reader/api/0/subscription/edit', methods=['POST'])
+@bp.route('/api/greader.php/reader/api/0/subscription/edit', methods=['POST'])
+def post_subscription_edit():
+    action = flask.request.values.get('ac')
+    feed_title = flask.request.values.get('t')
+    feed_stream_id = flask.request.values.get('s', default='')
+    add_group = flask.request.values.get('a', default='')
+    remove_group = flask.request.values.get('r', default='')
+
+    add_group_title = add_group.replace(STREAM_LABEL_PREFIX, '', 1)
+    remove_group_title = remove_group.replace(STREAM_LABEL_PREFIX, '', 1)
+    
+    user = get_user(flask.request)
+    # @@TODO    
+    #validate_post_token(user, flask.request)
+
+    feed_url = feed_stream_id.replace(STREAM_FEED_PREFIX, '', 1)
+    new_feed = Feed.get_or_none((Feed.self_link == feed_url))
+    if not new_feed:
+        flask.abort(404)
+        
+    if action == 'subscribe':
+        if add_group_title:            
+            # @@TODO create group if missing
+            group = Group.get(Group.title == add_group_title)
+        else:
+            group = Group.get(Group.id == Group.DEFAULT_GROUP_ID)
+        feed.add_subscription(user, new_feed, group)
+    elif action == 'edit': 
+        if add_group_title:
+            # @@TODO create group if missing
+            group = Group.get(Group.title == add_group_title)
+        else:   
+            group = Group.get(Group.id == Group.DEFAULT_GROUP_ID)
+        feed.add_subscription(user, new_feed, group)
+    elif action == 'unsubscribe':
+        raise NotImplementedError()
+    else:
+        flask.abort(400)
+    
+    return 'OK', 200, {'Content-Type': 'text/plain'}
 
 # https://github.com/FreshRSS/FreshRSS/blob/edge/p/api/greader.php#L817
 @bp.route('/reader/api/0/edit-tag', methods=['POST'])

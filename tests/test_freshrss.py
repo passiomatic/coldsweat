@@ -21,6 +21,9 @@ def app():
         sql = f.read()
         db_wrapper.database.connection().executescript(sql)
 
+        # count = Entry.select().count()
+        # print(f'total entries {count}')
+
         sample_entries = Entry.select().limit(3)
         test_user = User.get_or_none((User.email==TEST_EMAIL))
 
@@ -156,6 +159,20 @@ def test_items_read(client):
     assert len(r.json['itemRefs']) == 2
     #print(r.json)
 
+def test_items_exclude_read(client):  
+    # Last month only
+    min_datetime = datetime.utcnow() - timedelta(days=30)
+    query_string={
+        'output': 'json',
+        's': 'user/-/state/com.google/reading-list',
+        'xt': 'user/-/state/com.google/read',
+        #'ot': int(min_datetime.timestamp())
+    }
+    r = get(client, ITEMS_IDS_PATH, query_string=query_string, headers=login(client))
+    assert r.status_code == 200    
+    assert len(r.json['itemRefs']) == 123
+    #print(r.json)
+
 def test_items_feed(client):  
     query_string={
         'output': 'json',
@@ -177,11 +194,25 @@ def test_items_label(client):
     assert len(r.json['itemRefs']) > 0
     #print(r.json['itemRefs'])
 
-def test_items_contents(client):
+def test_items_contents_long_form(client):
     sample_entries = Entry.select().limit(10)
 
     # Request a few entries 
     entry_ids = [entry.long_form_id for entry in sample_entries]
+    query_string={
+        'output': 'json',
+        'i': entry_ids
+    }    
+    r = get(client, ITEMS_CONTENTS_PATH, query_string=query_string, headers=login(client))
+    assert r.status_code == 200    
+    assert len(r.json['items']) == 10
+    #print(r.json)
+
+def test_items_contents_short_form(client):
+    sample_entries = Entry.select().limit(10)
+
+    # Request a few entries 
+    entry_ids = [entry.id for entry in sample_entries]
     query_string={
         'output': 'json',
         'i': entry_ids

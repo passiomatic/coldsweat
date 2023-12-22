@@ -209,7 +209,7 @@ def get_stream_items_ids():
 
     stream_id = flask.request.args.get('s', default=STREAM_READING_LIST)
     rank = flask.request.args.get('r', default='n')
-    entry_count = min(flask.request.args.get('n', type=int, default=100), MAX_ITEMS_IDS)
+    entry_count = min(flask.request.args.get('n', type=int, default=MAX_ITEMS_IDS), MAX_ITEMS_IDS)
     offset = flask.request.args.get('c', type=int, default=0)
     #include_direct_stream_ids = flask.request.args.get('includeAllDirectStreamIds', default=0)
     included_stream_ids = flask.request.args.getlist('it')

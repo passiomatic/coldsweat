@@ -120,11 +120,10 @@ class User(db_wrapper.Model):
         if not user:
             return None 
 
-        # @@TODO
-        # utc_now = datetime.utcnow()
-        # # Expired?
-        # if (not user.api_auth_token_expires_on) or (utc_now > user.api_auth_token_expires_on):             
-        #     return None
+        utc_now = datetime.utcnow()
+        # Expired?
+        if (not user.api_auth_token_expires_on) or (utc_now > user.api_auth_token_expires_on):             
+            return None
 
         return user 
 

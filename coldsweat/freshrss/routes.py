@@ -56,7 +56,7 @@ def client_login():
     if (not user.api_auth_token_expires_on) or (utc_now > user.api_auth_token_expires_on):
         new_auth_token_expiration, new_auth_token = User.make_api_auth_token(user.email, app.config.get("SECRET_KEY"))
         user.api_auth_token = new_auth_token
-        user.auth_token_expiration = new_auth_token_expiration
+        user.api_auth_token_expires_on = new_auth_token_expiration
         user.save()
 
     payload = f"SID={user.api_auth_token}\nLSID=null\nAuth={user.api_auth_token}\n"
@@ -137,20 +137,20 @@ def get_subscription_list():
     return flask.jsonify(payload)
 
 
-@bp.route('/reader/api/0/preference/stream/list', methods=['GET'])
-@bp.route('/api/greader.php/reader/api/0/preference/stream/list', methods=['GET'])
-def get_preference_stream_list():
-    streams = {
-        "user/-/state/com.google/root": [{
-            "id": "subscription-ordering",
-            "value": ""
-        }],
-    }
+# @bp.route('/reader/api/0/preference/stream/list', methods=['GET'])
+# @bp.route('/api/greader.php/reader/api/0/preference/stream/list', methods=['GET'])
+# def get_preference_stream_list():
+#     streams = {
+#         "user/-/state/com.google/root": [{
+#             "id": "subscription-ordering",
+#             "value": ""
+#         }],
+#     }
 
-    payload = {
-        'streamprefs': streams
-    }
-    return flask.jsonify(payload)
+#     payload = {
+#         'streamprefs': streams
+#     }
+#     return flask.jsonify(payload)
 
 # @bp.route('/reader/api/0/stream/contents/<stream_id>', methods=['GET'])
 # @bp.route('/api/greader.php/reader/api/0/stream/contents/<stream_id>', methods=['GET'])

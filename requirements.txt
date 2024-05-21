@@ -1,6 +1,6 @@
 feedparser==6.0.10
 peewee==3.16.2
-requests==2.31.0
+requests==2.32.0
 pytest==7.3.1
 urllib3==1.26.18
 flask==3.0.0

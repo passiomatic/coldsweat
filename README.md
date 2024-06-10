@@ -2,7 +2,7 @@
 
 Coldsweat is a self-hosted Python 3 web RSS aggregator and reader compatible with the [Fever API][f]. This means that you can connect Coldsweat to a variety of clients like [Reeder][r] for iOS or Mac OS X [ReadKit][rk] app and use it to sync them together.
 
-![Screenshot](https://lab.passiomatic.com/coldsweat/images/coldsweat-0.9.6-screenshot.jpg)
+![Screenshot](screenshots/coldsweat-0.11-alpha.jpg)
 
 ## Features
 
